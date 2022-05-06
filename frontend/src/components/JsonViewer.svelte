@@ -6,7 +6,6 @@
     } from "@codemirror/basic-setup";
     import { ensureSyntaxTree } from "@codemirror/language";
     import { json } from "@codemirror/lang-json";
-    import { solarizedDarkTheme } from "cm6-theme-solarized-dark";
     import { onDestroy, onMount } from "svelte";
 
     export let code;
@@ -36,7 +35,6 @@
                 basicSetup,
                 EditorState.readOnly.of(true),
                 json(),
-                solarizedDarkTheme,
             ],
         });
         view = new EditorView({ state });
