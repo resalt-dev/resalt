@@ -24,7 +24,7 @@ pub struct SaltEvent {
 pub enum SaltError {
     Forbidden,
     RequestError(SendRequestError),
-    ResponseParseError(JsonPayloadError),
+    ResponseParseError(Option<JsonPayloadError>),
     FailedRequest(
         ClientResponse<
             actix_web::dev::Decompress<
@@ -80,7 +80,7 @@ impl SaltAPI {
         }
     }
 
-    pub async fn login(&self, username: &str, authtoken: &str) -> Option<SaltToken> {
+    pub async fn login(&self, username: &str, authtoken: &str) -> Result<SaltToken, SaltError> {
         let url = format!("{}/login", &SConfig::salt_api_url());
         // Send POST request to Salt API for auth token
         // This will contact us back on the /token endpoint to validate auth token
@@ -99,16 +99,25 @@ impl SaltAPI {
             Ok(res) => res,
             Err(e) => {
                 error!("{:?}", e);
-                return None;
+                return Err(SaltError::RequestError(e));
             }
         };
+
+        // If access denied (e.g. missing permissions)
+        if res.status() == StatusCode::FORBIDDEN {
+            return Err(SaltError::Forbidden);
+        }
+        // If status != 200, something went wrong
+        if res.status() != StatusCode::OK {
+            return Err(SaltError::FailedRequest(res));
+        }
 
         // Parse response from JSON stored as {return: [SaltToken]}
         let body = match res.json::<serde_json::Value>().await {
             Ok(body) => body,
             Err(e) => {
                 error!("{:?}", e);
-                return None;
+                return Err(SaltError::ResponseParseError(Some(e)));
             }
         };
 
@@ -116,14 +125,14 @@ impl SaltAPI {
             Some(salt_token) => salt_token,
             None => {
                 error!("No token returned from Salt API");
-                return None;
+                return Err(SaltError::ResponseParseError(None));
             }
         };
         let salt_token = match salt_token.get(0) {
             Some(salt_token) => salt_token,
             None => {
                 error!("No token returned from Salt API");
-                return None;
+                return Err(SaltError::ResponseParseError(None));
             }
         };
         // Convert to SaltToken object
@@ -131,13 +140,13 @@ impl SaltAPI {
             Ok(salt_token) => salt_token,
             Err(e) => {
                 error!("{:?}", e);
-                return None;
+                return Err(SaltError::ResponseParseError(None));
             }
         };
 
         debug!("{:?}", salt_token);
 
-        Some(salt_token)
+        Ok(salt_token)
     }
 
     pub fn listen_events(
@@ -324,7 +333,7 @@ impl SaltAPI {
         let body = match res.json::<serde_json::Value>().await {
             Ok(body) => body,
             Err(e) => {
-                return Err(SaltError::ResponseParseError(e));
+                return Err(SaltError::ResponseParseError(Some(e)));
             }
         };
         debug!("client_async run body {:?}", body);

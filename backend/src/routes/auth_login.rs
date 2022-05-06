@@ -75,10 +75,16 @@ pub async fn route_auth_login_post(
         }
     };
 
-    let salt_token = salt.login(&username, &authtoken.id).await;
+    let salt_token = match salt.login(&username, &authtoken.id).await {
+        Ok(salt_token) => salt_token,
+        Err(e) => {
+            error!("{:?}", e);
+            return Err(api_error_unauthorized());
+        }
+    };
 
     match data
-        .update_authtoken_salttoken(&authtoken.id, &salt_token)
+        .update_authtoken_salttoken(&authtoken.id, &Some(salt_token))
         .await
     {
         Ok(_) => {}
@@ -86,10 +92,6 @@ pub async fn route_auth_login_post(
             error!("{:?}", e);
             return Err(api_error_database());
         }
-    }
-
-    if salt_token == None {
-        return Err(api_error_unauthorized());
     }
 
     let response = LoginResponse {

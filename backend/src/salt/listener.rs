@@ -27,16 +27,30 @@ impl SaltEventListener {
     }
 
     async fn refresh_token(&self) -> Option<SaltToken> {
-        self.api
+        match self
+            .api
             .login(
                 HIBIKE_SALT_SYSTEM_SERVICE_USERNAME,
                 &SConfig::salt_api_system_service_token(),
             )
             .await
+        {
+            Ok(token) => Some(token),
+            Err(err) => {
+                error!("failed to refresh token: {:?}", err);
+                None
+            }
+        }
     }
 
     async fn listen(&self) {
-        let salt_token = self.refresh_token().await.unwrap();
+        let salt_token = match self.refresh_token().await {
+            Some(token) => token,
+            None => {
+                error!("Failed to refresh listener token");
+                return;
+            }
+        };
 
         let stream = self.api.listen_events(&salt_token);
         pin_mut!(stream);
@@ -176,6 +190,7 @@ impl SaltEventListener {
     pub async fn start(&self) {
         loop {
             self.listen().await;
+            tokio::time::sleep(std::time::Duration::from_secs(1)).await;
         }
     }
 }
