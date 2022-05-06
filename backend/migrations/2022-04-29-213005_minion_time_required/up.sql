@@ -1,0 +1,1 @@
+ALTER TABLE hibike.minions MODIFY COLUMN last_seen timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL;

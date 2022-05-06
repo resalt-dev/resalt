@@ -1,0 +1,1 @@
+ALTER TABLE hibike.minions CHANGE conformity_invalid conformity_incorrect int(11) DEFAULT 0 NOT NULL;

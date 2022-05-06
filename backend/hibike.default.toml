@@ -1,0 +1,20 @@
+[http]
+sub_path = "/hibike"
+
+[database]
+url = "mysql://hibike:hibike@127.0.0.1/hibike"
+
+[frontend]
+reverse_proxy = true
+reverse_proxy_target = "http://127.0.0.1:5555"
+
+[salt.api]
+url = "https://localhost:8080"
+disable_tls_verification = true
+# head /dev/urandom | tr -dc A-Za-z0-9 | head -c512; echo
+#system_service_token = ""
+
+[user]
+session_lifespan = 86400
+login_max_tries = 5
+login_timeout = 300
