@@ -244,13 +244,22 @@
 
                 <div class="card bg-light mb-3">
                     <div class="card-header bg-light">
-                        <span class="fw-bold">Tree view</span>
+                        <span class="fw-bold">Status</span>
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title">Primary card title</h5>
+                        <h5 class="card-title">Conformity</h5>
                         <p class="card-text">
-                            Some quick example text to build on the card title
-                            and make up the bulk of the card's content.
+                            Succeeded: {minion.conformity_success}
+                            <br />
+                            Incorrect: {minion.conformity_incorrect}
+                            <br />
+                            Error: {minion.conformity_error}
+                            <br />
+                            <br />
+                            <span class="fw-bold">Total: </span>
+                            {minion.conformity_success +
+                                minion.conformity_incorrect +
+                                minion.conformity_error}
                         </p>
                     </div>
                 </div>
