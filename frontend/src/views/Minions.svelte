@@ -26,31 +26,18 @@
 <br />
 <br />
 
-<table class="table table-striped table-hover align-middle">
-    <thead>
-        <tr>
-            <th scope="col">ID</th>
-            <th scope="col">Status</th>
-            <th scope="col">Last Seen</th>
-            <th scope="col">Conformity</th>
-            <th scope="col">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {#if !$minions}
-            <tr>
-                <td colspan="5">No minions found...</td>
-            </tr>
-        {:else}
-            {#each $minions as minion}
-                <tr>
-                    <th
-                        scope="row"
-                        on:click={() =>
-                            navigate(paths.minion.getPath(minion.id))}
-                        class="mouse-pointer">{minion.id}</th
-                    >
-                    <td>
+{#if !$minions}
+    <div class="p-3">No conformity data. Please refresh minion.</div>
+{:else}
+    {#each $minions as minion}
+        <div class="card bg-light mb-3">
+            <div class="card-header bg-light">
+                <h5 class="fw-bold mb-0">{minion.id}</h5>
+            </div>
+            <div class="card-body py-1  ">
+                <div class="row">
+                    <div class="col-3">
+                        Status:
                         {#if minion.last_updated_conformity == null}
                             <span class="badge bg-purple">Unknown</span>
                         {:else if minion.conformity_error > 0}
@@ -60,9 +47,12 @@
                         {:else if minion.conformity_succeeded > 0}
                             <span class="badge bg-green">OK</span>
                         {/if}
-                    </td>
-                    <td>{minion.last_seen}</td>
-                    <td>
+                    </div>
+                    <div class="col-3">
+                        Last updated: {minion.last_updated_conformity}
+                    </div>
+                    <div class="col-3">
+                        Conformity:
                         {#if minion.last_updated_conformity == null}
                             <span class="badge bg-purple">Unknown</span>
                         {:else}
@@ -78,29 +68,35 @@
                                 >{minion.conformity_error ?? "?"}</span
                             >
                         {/if}
-                    </td>
-                    <td>
+                    </div>
+                    <div class="col-3">
                         <button
-                            class="btn btn-primary btn-sm"
+                            class="btn btn-gold"
+                            on:click={() =>
+                                navigate(paths.minion.getPath(minion.id))}
+                            >View</button
+                        >
+                        <button
+                            class="btn btn-primary"
                             on:click={() =>
                                 navigate(paths.minion.getPath(minion.id))}
                             >Details</button
                         >
                         <button
-                            class="btn btn-secondary btn-sm"
+                            class="btn btn-secondary"
                             on:click={() =>
                                 navigate(`minions/${minion.id}/refresh`)}
                             >Refresh</button
                         >
                         <button
-                            class="btn btn-warning btn-sm"
+                            class="btn btn-warning"
                             on:click={() =>
                                 navigate(`minions/${minion.id}/execute`)}
                             >Run Job</button
                         >
-                    </td>
-                </tr>
-            {/each}
-        {/if}
-    </tbody>
-</table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {/each}
+{/if}
