@@ -28,6 +28,10 @@
             path: paths.minion.getPath(minionId),
         },
         {
+            name: "Conformity",
+            path: paths.minion.getPath(minionId, "conformity"),
+        },
+        {
             name: "Grains",
             path: paths.minion.getPath(minionId, "grains"),
         },
@@ -39,28 +43,21 @@
             name: "Packages",
             path: paths.minion.getPath(minionId, "packages"),
         },
-        {
-            name: "Conformity",
-            path: paths.minion.getPath(minionId, "conformity"),
-        },
     ];
 </script>
 
 <h1>Minion {minion.id}</h1>
 
-<div class="btn-group" role="group">
+<div class="nav bg-dark w-100">
     {#each subPagesNav as item}
         <Link
             to={item.path}
-            class="btn py-2 px-4 rounded-none {(item.name === 'General' &&
+            class="nav-link text-white px-4 py-3 fw-bold {(item.name ===
+                'General' &&
                 subPage === undefined) ||
             subPage === item.name.toLowerCase()
-                ? 'btn-dark pt-3'
-                : 'btn-light'}"
-            style={(item.name === "General" && subPage === undefined) ||
-            subPage === item.name.toLowerCase()
-                ? "margin-top: -0.5rem;"
-                : ""}
+                ? 'bg-gold'
+                : ''}"
         >
             {item.name}
         </Link>
