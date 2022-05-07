@@ -1,3 +1,3 @@
 include:
-  - aa
-  - b
+  - .aa
+  - .b

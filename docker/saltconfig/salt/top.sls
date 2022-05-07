@@ -5,3 +5,4 @@ base:
     - editor.vim
     - utils.htop
     - a
+    - invalid

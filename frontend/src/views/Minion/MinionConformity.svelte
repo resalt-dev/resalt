@@ -194,7 +194,7 @@
                                 checked={showSuccess}
                             />
                             <label class="form-check-label" for="showRawData">
-                                Show Success
+                                Show Succeeded ({minion.conformity_success})
                             </label>
                         </div>
                         <!-- showIncorrect -->
@@ -208,7 +208,7 @@
                                 checked={showIncorrect}
                             />
                             <label class="form-check-label" for="showIncorrect">
-                                Show Incorrect
+                                Show Incorrects ({minion.conformity_incorrect})
                             </label>
                         </div>
                         <!-- showError -->
@@ -221,7 +221,7 @@
                                 checked={showError}
                             />
                             <label class="form-check-label" for="showError">
-                                Show Error
+                                Show Errors ({minion.conformity_error})
                             </label>
                         </div>
                         <br />
@@ -244,23 +244,11 @@
 
                 <div class="card bg-light mb-3">
                     <div class="card-header bg-light">
-                        <span class="fw-bold">Status</span>
+                        <span class="fw-bold">Tree view</span>
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title">Conformity</h5>
-                        <p class="card-text">
-                            Succeeded: {minion.conformity_success}
-                            <br />
-                            Incorrect: {minion.conformity_incorrect}
-                            <br />
-                            Error: {minion.conformity_error}
-                            <br />
-                            <br />
-                            <span class="fw-bold">Total: </span>
-                            {minion.conformity_success +
-                                minion.conformity_incorrect +
-                                minion.conformity_error}
-                        </p>
+                        <h5 class="card-title">Title</h5>
+                        <p class="card-text">Text</p>
                     </div>
                 </div>
             </div>

@@ -11,7 +11,7 @@
     <div class="p-3">No packages data. Please refresh minion.</div>
 {:else}
     <button
-        class="btn btn-light float-end border-0 rounded-none"
+        class="btn btn-light float-end border border-1 rounded-none"
         style="margin-top: -0rem;z-index: 4;position: absolute;right: 0;"
         on:click={() => (rawData = !rawData)}
     >

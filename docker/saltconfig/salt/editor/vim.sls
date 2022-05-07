@@ -1,4 +1,4 @@
-common_packages:
+vim packages:
   pkg.installed:
     - pkgs:
       - vim

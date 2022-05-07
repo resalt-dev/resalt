@@ -46,27 +46,27 @@
     ];
 </script>
 
-<h1>Minion {minion.id}</h1>
-
-<div class="nav bg-dark w-100">
-    {#each subPagesNav as item}
-        <Link
-            to={item.path}
-            class="nav-link text-white px-4 py-3 fw-bold {(item.name ===
-                'General' &&
-                subPage === undefined) ||
-            subPage === item.name.toLowerCase()
-                ? 'bg-gold'
-                : ''}"
-        >
-            {item.name}
-        </Link>
-    {/each}
-</div>
-
 {#if !minion}
     <h1>Loading...</h1>
 {:else}
+    <h1>Minion {minion.id}</h1>
+
+    <div class="nav bg-dark w-100">
+        {#each subPagesNav as item}
+            <Link
+                to={item.path}
+                class="nav-link text-white px-4 py-3 fw-bold {(item.name ===
+                    'General' &&
+                    subPage === undefined) ||
+                subPage === item.name.toLowerCase()
+                    ? 'bg-gold'
+                    : ''}"
+            >
+                {item.name}
+            </Link>
+        {/each}
+    </div>
+
     <div class="card border-4 border-gold rounded-none">
         <div class="card-body p-0">
             {#if subPage === undefined}

@@ -7,14 +7,17 @@
     import { useNavigate } from "svelte-navigator";
     const navigate = useNavigate();
 
-    console.log($minions);
-
     onMount(() => {
         load_minions(navigate);
     });
 </script>
 
 <h1>Minions</h1>
+
+<div class="row">
+    <div class="col-6">Search</div>
+    <div class="col-6">Actions</div>
+</div>
 
 <button class="btn btn-gold" on:click={() => load_minions(navigate)}
     >Load minions</button
@@ -31,11 +34,14 @@
 {:else}
     {#each $minions as minion}
         <div class="card bg-light mb-3">
-            <div class="card-header bg-light">
+            <div
+                class="card-header bg-light mouse-pointer"
+                on:click={() => navigate(paths.minion.getPath(minion.id))}
+            >
                 <h5 class="fw-bold mb-0">{minion.id}</h5>
             </div>
-            <div class="card-body py-1  ">
-                <div class="row">
+            <div class="card-body py-1">
+                <div class="row align-items-center">
                     <div class="col-3">
                         Status:
                         {#if minion.last_updated_conformity == null}
@@ -49,7 +55,7 @@
                         {/if}
                     </div>
                     <div class="col-3">
-                        Last updated: {minion.last_updated_conformity}
+                        Last seen: {minion.last_seen}
                     </div>
                     <div class="col-3">
                         Conformity:
@@ -71,28 +77,10 @@
                     </div>
                     <div class="col-3">
                         <button
-                            class="btn btn-gold"
+                            class="btn btn-gold btn-sm px-3"
                             on:click={() =>
                                 navigate(paths.minion.getPath(minion.id))}
                             >View</button
-                        >
-                        <button
-                            class="btn btn-primary"
-                            on:click={() =>
-                                navigate(paths.minion.getPath(minion.id))}
-                            >Details</button
-                        >
-                        <button
-                            class="btn btn-secondary"
-                            on:click={() =>
-                                navigate(`minions/${minion.id}/refresh`)}
-                            >Refresh</button
-                        >
-                        <button
-                            class="btn btn-warning"
-                            on:click={() =>
-                                navigate(`minions/${minion.id}/execute`)}
-                            >Run Job</button
                         >
                     </div>
                 </div>
