@@ -656,8 +656,10 @@ hr {
 }
 .btn-arrow-right.btn-arrow-left, .btn-arrow-left.btn-arrow-left {
     padding-left: 36px;
+    padding-right: 48px;
 }
 .btn-arrow-right.btn-arrow-right, .btn-arrow-left.btn-arrow-right {
+    padding-left: 48px;
     padding-right: 36px;
 }
 .btn-arrow-right::before, .btn-arrow-left::before {
