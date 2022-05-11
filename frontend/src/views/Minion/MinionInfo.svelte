@@ -4,6 +4,9 @@
     $: grains = JSON.parse(minion.grains ?? "{}");
 
     function formatAsSize(megabytes) {
+        if (megabytes == undefined) {
+            return null;
+        }
         if (megabytes < 1024) {
             return `${megabytes} MB`;
         } else {
@@ -63,12 +66,12 @@
                 </li>
                 <li class="list-group-item bg-light">
                     Memory <span class="float-end"
-                        >{formatAsSize(grains.mem_total ?? "Unknown")}</span
+                        >{formatAsSize(grains.mem_total) ?? "Unknown"}</span
                     >
                 </li>
                 <li class="list-group-item bg-light">
                     Swap <span class="float-end"
-                        >{formatAsSize(grains.swap_total ?? "Unknown")}</span
+                        >{formatAsSize(grains.swap_total) ?? "Unknown"}</span
                     >
                 </li>
                 <li class="list-group-item bg-light">
@@ -88,19 +91,19 @@
             <ul class="list-group list-group-flush">
                 <li class="list-group-item bg-light">
                     IPv4 DNS
-                    {#each grains.dns.ip4_nameservers as dns}
+                    {#each (grains.dns ?? {}).ip4_nameservers ?? [] as dns}
                         <span class="float-end">{dns}</span><br />
                     {/each}
                 </li>
                 <li class="list-group-item bg-light">
                     IPv6 DNS
-                    {#each grains.dns.ip6_nameservers as dns}
+                    {#each (grains.dns ?? {}).ip6_nameservers ?? [] as dns}
                         <span class="float-end">{dns}</span><br />
                     {/each}
                 </li>
                 <li class="list-group-item bg-light">
                     Search Domains
-                    {#each grains.dns.search as search}
+                    {#each (grains.dns ?? {}).search ?? [] as search}
                         <span class="float-end">{search}</span><br />
                     {/each}
                 </li>
@@ -121,22 +124,30 @@
                 </li>
                 <li class="list-group-item bg-light">
                     Conformity check <span class="float-end"
-                        >{minion.last_updated_conformity} UTC</span
+                        >{minion.last_updated_conformity != null
+                            ? minion.last_updated_conformity + " UTC"
+                            : "Never"}</span
                     >
                 </li>
                 <li class="list-group-item bg-light">
                     Grains fetched <span class="float-end"
-                        >{minion.last_updated_grains} UTC</span
+                        >{minion.last_updated_grains != null
+                            ? minion.last_updated_grains + " UTC"
+                            : "Never"}</span
                     >
                 </li>
                 <li class="list-group-item bg-light">
                     Pillars fetched <span class="float-end"
-                        >{minion.last_updated_pillars} UTC</span
+                        >{minion.last_updated_pillars != null
+                            ? minion.last_updated_pillars + " UTC"
+                            : "Never"}</span
                     >
                 </li>
                 <li class="list-group-item bg-light">
                     Packages fetched <span class="float-end"
-                        >{minion.last_updated_pkgs} UTC</span
+                        >{minion.last_updated_pkgs != null
+                            ? minion.last_updated_pkgs + " UTC"
+                            : "Never"}</span
                     >
                 </li>
             </ul>

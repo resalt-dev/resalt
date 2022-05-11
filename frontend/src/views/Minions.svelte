@@ -68,7 +68,7 @@
         >
             <thead class="bg-dark text-white border-0">
                 <tr>
-                    <th scope="col">#</th>
+                    <th scope="col">ID</th>
                     <th scope="col">Type</th>
                     <th scope="col">Last seen</th>
                     <th scope="col">Conformity</th>
