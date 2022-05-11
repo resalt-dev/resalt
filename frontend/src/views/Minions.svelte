@@ -78,7 +78,11 @@
             <tbody>
                 {#each mapped_minions as minion}
                     <tr>
-                        <th scope="row" class="startside-success"
+                        <th
+                            scope="row"
+                            class="startside-success mouse-pointer"
+                            on:click={() =>
+                                navigate(paths.minion.getPath(minion.id))}
                             >{minion.id}</th
                         >
                         <td>{minion.datatable_type}</td>
