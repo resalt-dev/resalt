@@ -80,32 +80,31 @@
         </div>
     </div>
 
-    <div class="col-6">
+    <div class="col-3">
         <div class="card bg-light mb-3">
             <div class="card-header bg-light">
-                <span class="fw-bold">Network</span>
+                <span class="fw-bold">DNS</span>
             </div>
-            <div class="class-body">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th scope="col">Interface</th>
-                            <th scope="col">Address</th>
-                            <th scope="col">MAC</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {#each Object.keys(grains.ip_interfaces ?? {}) as inter}
-                            <tr>
-                                <th scope="row">{inter}</th>
-                                <td>{grains.ip_interfaces[inter].join(", ")}</td
-                                >
-                                <td>{grains.hwaddr_interfaces[inter]}</td>
-                            </tr>
-                        {/each}
-                    </tbody>
-                </table>
-            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item bg-light">
+                    IPv4 DNS
+                    {#each grains.dns.ip4_nameservers as dns}
+                        <span class="float-end">{dns}</span><br />
+                    {/each}
+                </li>
+                <li class="list-group-item bg-light">
+                    IPv6 DNS
+                    {#each grains.dns.ip6_nameservers as dns}
+                        <span class="float-end">{dns}</span><br />
+                    {/each}
+                </li>
+                <li class="list-group-item bg-light">
+                    Search Domains
+                    {#each grains.dns.search as search}
+                        <span class="float-end">{search}</span><br />
+                    {/each}
+                </li>
+            </ul>
         </div>
     </div>
 
@@ -141,6 +140,38 @@
                     >
                 </li>
             </ul>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card bg-light mb-3">
+            <div class="card-header bg-light">
+                <span class="fw-bold">Network</span>
+            </div>
+            <div class="class-body px-2">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">Interface</th>
+                            <th scope="col">Address</th>
+                            <th scope="col">MAC</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {#each Object.keys(grains.ip_interfaces ?? {}) as inter}
+                            <tr>
+                                <th scope="row">{inter}</th>
+                                <td>
+                                    {#each grains.ip_interfaces[inter] as addr}
+                                        {addr}<br />
+                                    {/each}
+                                </td>
+                                <td>{grains.hwaddr_interfaces[inter]}</td>
+                            </tr>
+                        {/each}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
