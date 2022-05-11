@@ -120,22 +120,22 @@
                     >
                 </li>
                 <li class="list-group-item bg-light">
-                    Conformity checked <span class="float-end"
+                    Conformity check <span class="float-end"
                         >{minion.last_updated_conformity} UTC</span
                     >
                 </li>
                 <li class="list-group-item bg-light">
-                    Grains fetched at <span class="float-end"
+                    Grains fetched <span class="float-end"
                         >{minion.last_updated_grains} UTC</span
                     >
                 </li>
                 <li class="list-group-item bg-light">
-                    Pillars fetched at <span class="float-end"
+                    Pillars fetched <span class="float-end"
                         >{minion.last_updated_pillars} UTC</span
                     >
                 </li>
                 <li class="list-group-item bg-light">
-                    Packages fetched at <span class="float-end"
+                    Packages fetched <span class="float-end"
                         >{minion.last_updated_pkgs} UTC</span
                     >
                 </li>

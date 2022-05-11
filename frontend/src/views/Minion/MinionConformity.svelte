@@ -194,7 +194,9 @@
                                 checked={showSuccess}
                             />
                             <label class="form-check-label" for="showRawData">
-                                Show Succeeded ({minion.conformity_success})
+                                Show Succeeded ({conformity.filter(
+                                    (c) => c.data.result === true
+                                ).length})
                             </label>
                         </div>
                         <!-- showIncorrect -->
@@ -208,7 +210,9 @@
                                 checked={showIncorrect}
                             />
                             <label class="form-check-label" for="showIncorrect">
-                                Show Incorrects ({minion.conformity_incorrect})
+                                Show Incorrects ({conformity.filter(
+                                    (c) => c.data.result === null
+                                ).length})
                             </label>
                         </div>
                         <!-- showError -->
@@ -221,7 +225,9 @@
                                 checked={showError}
                             />
                             <label class="form-check-label" for="showError">
-                                Show Errors ({minion.conformity_error})
+                                Show Errors ({conformity.filter(
+                                    (c) => c.data.result === false
+                                ).length})
                             </label>
                         </div>
                         <br />
