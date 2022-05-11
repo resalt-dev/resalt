@@ -89,7 +89,7 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th scope="col" />
+                            <th scope="col">Interface</th>
                             <th scope="col">Address</th>
                             <th scope="col">MAC</th>
                         </tr>
@@ -116,26 +116,28 @@
             </div>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item bg-light">
-                    Last seen <span class="float-end">{minion.last_seen}</span>
-                </li>
-                <li class="list-group-item bg-light">
-                    Conformity last checked <span class="float-end"
-                        >{minion.last_updated_conformity}</span
+                    Last seen <span class="float-end"
+                        >{minion.last_seen} UTC</span
                     >
                 </li>
                 <li class="list-group-item bg-light">
-                    Grains last fetched <span class="float-end"
-                        >{minion.last_updated_grains}</span
+                    Conformity checked <span class="float-end"
+                        >{minion.last_updated_conformity} UTC</span
                     >
                 </li>
                 <li class="list-group-item bg-light">
-                    Pillars last fetched <span class="float-end"
-                        >{minion.last_updated_pillars}</span
+                    Grains fetched at <span class="float-end"
+                        >{minion.last_updated_grains} UTC</span
                     >
                 </li>
                 <li class="list-group-item bg-light">
-                    Packages last fetched <span class="float-end"
-                        >{minion.last_updated_pkgs}</span
+                    Pillars fetched at <span class="float-end"
+                        >{minion.last_updated_pillars} UTC</span
+                    >
+                </li>
+                <li class="list-group-item bg-light">
+                    Packages fetched at <span class="float-end"
+                        >{minion.last_updated_pkgs} UTC</span
                     >
                 </li>
             </ul>
