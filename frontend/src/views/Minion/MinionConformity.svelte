@@ -256,7 +256,10 @@
                 <div class="d-grid">
                     {#each conformity as conform}
                         <div
-                            class="card bg-light mb-3 startside-{conform.color} {!(
+                            class="card bg-light mb-3 startside-{conform.color ==
+                            'yellow'
+                                ? 'gold'
+                                : conform.color} {!(
                                 (showSuccess && conform.data.result === true) ||
                                 (showIncorrect &&
                                     conform.data.result === null) ||
@@ -359,15 +362,3 @@
         </div>
     {/if}
 {/if}
-
-<style>
-    .startside-success {
-        border-left: 0.5rem solid var(--green);
-    }
-    .startside-warning {
-        border-left: 0.5rem solid var(--gold);
-    }
-    .startside-danger {
-        border-left: 0.5rem solid var(--red);
-    }
-</style>

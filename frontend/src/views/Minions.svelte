@@ -2,10 +2,23 @@
     import { onMount } from "svelte";
     import { load_minions } from "../controller";
     import { minions } from "../stores";
+    import Icon from "../components/Icon.svelte";
     import paths from "../paths";
 
     import { useNavigate } from "svelte-navigator";
     const navigate = useNavigate();
+
+    $: mapped_minions = ($minions ?? []).map((minion) => {
+        const grains = JSON.parse(minion.grains ?? "{}");
+        return {
+            ...minion,
+            datatable_type: (
+                (grains["osfullname"] ?? "Unknown") +
+                " " +
+                (grains["osrelease"] ?? "")
+            ).trim(),
+        };
+    });
 
     onMount(() => {
         load_minions(navigate);
@@ -14,77 +27,91 @@
 
 <h1>Minions</h1>
 
-<div class="row">
-    <div class="col-6">Search</div>
-    <div class="col-6">Actions</div>
+<div class="bg-dark text-white p-3">
+    <div class="row">
+        <div class="col-4">
+            <div class="input-group flex-nowrap">
+                <span class="input-group-text" id="addon-wrapping">
+                    <Icon name="search" />
+                </span>
+                <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Search"
+                    aria-label="Search"
+                    aria-describedby="addon-wrapping"
+                />
+            </div>
+        </div>
+        <div class="col-8">
+            <button class="btn btn-gold" on:click={() => load_minions(navigate)}
+                >Load minions</button
+            >
+            <button
+                class="btn btn-gold"
+                on:click={() => load_minions(navigate, true)}
+                >Force reload minions</button
+            >
+        </div>
+    </div>
 </div>
 
-<button class="btn btn-gold" on:click={() => load_minions(navigate)}
-    >Load minions</button
->
-<button class="btn btn-gold" on:click={() => load_minions(navigate, true)}
-    >Force reload minions</button
->
-
-<br />
 <br />
 
 {#if !$minions}
     <div class="p-3">No conformity data. Please refresh minion.</div>
 {:else}
-    {#each $minions as minion}
-        <div class="card bg-light mb-3">
-            <div
-                class="card-header bg-light mouse-pointer"
-                on:click={() => navigate(paths.minion.getPath(minion.id))}
-            >
-                <h5 class="fw-bold mb-0">{minion.id}</h5>
-            </div>
-            <div class="card-body py-1">
-                <div class="row align-items-center">
-                    <div class="col-3">
-                        Status:
-                        {#if minion.last_updated_conformity == null}
-                            <span class="badge bg-purple">Unknown</span>
-                        {:else if minion.conformity_error > 0}
-                            <span class="badge bg-red">Error</span>
-                        {:else if minion.conformity_incorrect > 0}
-                            <span class="badge bg-gold">Incorrect</span>
-                        {:else if minion.conformity_succeeded > 0}
-                            <span class="badge bg-green">OK</span>
-                        {/if}
-                    </div>
-                    <div class="col-3">
-                        Last seen: {minion.last_seen}
-                    </div>
-                    <div class="col-3">
-                        Conformity:
-                        {#if minion.last_updated_conformity == null}
-                            <span class="badge bg-purple">Unknown</span>
-                        {:else}
-                            <span class="badge bg-green fs-6"
-                                >{minion.conformity_success ?? "?"}</span
-                            >
-                            /
-                            <span class="badge bg-gold fs-6"
-                                >{minion.conformity_incorrect ?? "?"}</span
-                            >
-                            /
-                            <span class="badge bg-red fs-6"
-                                >{minion.conformity_error ?? "?"}</span
-                            >
-                        {/if}
-                    </div>
-                    <div class="col-3">
-                        <button
-                            class="btn btn-gold btn-sm px-3"
-                            on:click={() =>
-                                navigate(paths.minion.getPath(minion.id))}
-                            >View</button
+    <div class="table-responsive">
+        <table
+            id="minionListTable"
+            class="table table-striped table-hover align-middle"
+        >
+            <thead class="bg-dark text-white border-0">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Last seen</th>
+                    <th scope="col">Conformity</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {#each mapped_minions as minion}
+                    <tr>
+                        <th scope="row" class="startside-success"
+                            >{minion.id}</th
                         >
-                    </div>
-                </div>
-            </div>
-        </div>
-    {/each}
+                        <td>{minion.datatable_type}</td>
+                        <td>{minion.last_seen}</td>
+                        <td>
+                            {#if minion.last_updated_conformity == null}
+                                <span class="badge bg-purple fs-6">Unknown</span
+                                >
+                            {:else}
+                                <span class="badge bg-green fs-6"
+                                    >{minion.conformity_success ?? "?"}</span
+                                >
+                                /
+                                <span class="badge bg-gold fs-6"
+                                    >{minion.conformity_incorrect ?? "?"}</span
+                                >
+                                /
+                                <span class="badge bg-red fs-6"
+                                    >{minion.conformity_error ?? "?"}</span
+                                >
+                            {/if}
+                        </td>
+                        <td>
+                            <button
+                                class="btn btn-gold btn-sm px-3"
+                                on:click={() =>
+                                    navigate(paths.minion.getPath(minion.id))}
+                                >View</button
+                            >
+                        </td>
+                    </tr>
+                {/each}
+            </tbody>
+        </table>
+    </div>
 {/if}
