@@ -37,6 +37,27 @@ function require_token(navigate): boolean {
     return true;
 }
 
+// export async function connect_events(navigate) {
+//     if (!require_token(navigate)) return;
+
+//     let token = get(authStore);
+//     let source = await create_event_connection(token);
+
+//     source.addEventListener('message', function (e) {
+//         console.log(e.data);
+//     }, false);
+
+//     source.addEventListener('open', function (e) {
+//         // Connection was opened.
+//     }, false);
+
+//     source.addEventListener('error', function (e) {
+//         if (e.readyState == EventSource.CLOSED) {
+//             // Connection was closed.
+//         }
+//     }, false);
+// }
+
 export async function load_user(navigate) {
     if (!require_token(navigate)) return;
 

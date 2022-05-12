@@ -6,6 +6,7 @@ use prelude::*;
 use tokio::task;
 
 mod auth;
+mod broadcast;
 mod components;
 mod models;
 mod prelude;
@@ -17,6 +18,9 @@ mod storage;
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("Debug"));
+
+    // SSE
+    let broadcast = Broadcaster::create();
 
     // Database
     let database_url = SConfig::database_url();
@@ -43,6 +47,7 @@ async fn main() -> std::io::Result<()> {
         let salt_api = SaltAPI::new();
 
         App::new()
+            .app_data(web::Data::new(broadcast.clone()))
             .app_data(web::Data::new(db.clone()))
             .app_data(web::Data::new(salt_api.clone()))
             // enable automatic response compression - usually register this first
@@ -78,6 +83,11 @@ async fn main() -> std::io::Result<()> {
                             web::resource("/minions")
                                 .wrap(auth::RequireAuth::new())
                                 .route(web::get().to(route_minions_get)),
+                        );
+                        cfg.service(
+                            web::resource("/events")
+                                .wrap(auth::RequireAuth::new())
+                                .route(web::get().to(route_events_get)),
                         );
                     }),
             )

@@ -48,7 +48,7 @@ pub struct SaltAPI {
 }
 
 impl SaltAPI {
-    pub(crate) fn create_awc_client() -> Client {
+    pub(crate) fn create_awc_client() -> awc::Client {
         let certs = load_native_certs().unwrap();
 
         // Convert Vec<rustls_native_certs::Certificate> to RootCertStore
@@ -68,7 +68,7 @@ impl SaltAPI {
                 .set_certificate_verifier(Arc::new(danger::NoCertificateVerification));
         }
 
-        Client::builder()
+        awc::Client::builder()
             .connector(Connector::new().rustls(Arc::new(config)))
             .finish()
     }
