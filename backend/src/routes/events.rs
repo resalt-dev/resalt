@@ -1,8 +1,8 @@
-use crate::broadcast::Broadcaster;
+use crate::prelude::*;
 use actix_web::{http::header, web::Data, HttpResponse, Responder, Result};
 
-pub async fn route_events_get(broadcaster: Data<Broadcaster>) -> Result<impl Responder> {
-    let rx = broadcaster.new_client();
+pub async fn route_events_get(pipeline: Data<PipelineServer>) -> Result<impl Responder> {
+    let rx = pipeline.new_client();
 
     Ok(HttpResponse::Ok()
         .append_header((header::CONTENT_TYPE, "text/event-stream"))

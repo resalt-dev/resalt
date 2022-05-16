@@ -1,4 +1,3 @@
-//import EventSource from "eventsource";
 import constants from "./constants";
 import { ApiResponse, User } from "./models";
 
@@ -19,15 +18,10 @@ export async function request_authtoken(username: string, password: string): Pro
     return new ApiResponse(res.status, res.status == 200 ? await res.json() : await res.text());
 }
 
-// export async function create_event_connection(token: string): Promise<EventSource> {
-//     var stream = new EventSource(constants.apiUrl + "/events", {
-//         headers: {
-//             "Content-Type": "application/json",
-//             "Authorization": "Bearer " + token,
-//         },
-//     });
-//     return stream;
-// }
+export async function create_event_connection(token: string): Promise<EventSource> {
+    var stream = new EventSource(constants.apiUrl + "/events?token=" + token);
+    return stream;
+}
 
 export async function _authd_req(method: string, path: string, token: string, body?: any): Promise<ApiResponse> {
     if (!token) {

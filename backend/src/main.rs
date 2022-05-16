@@ -6,9 +6,9 @@ use prelude::*;
 use tokio::task;
 
 mod auth;
-mod broadcast;
 mod components;
 mod models;
+mod pipeline;
 mod prelude;
 mod routes;
 mod salt;
@@ -20,7 +20,7 @@ async fn main() -> std::io::Result<()> {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("Debug"));
 
     // SSE
-    let broadcast = Broadcaster::create();
+    let pipeline = PipelineServer::new();
 
     // Database
     let database_url = SConfig::database_url();
@@ -47,7 +47,7 @@ async fn main() -> std::io::Result<()> {
         let salt_api = SaltAPI::new();
 
         App::new()
-            .app_data(web::Data::new(broadcast.clone()))
+            .app_data(web::Data::new(pipeline.clone()))
             .app_data(web::Data::new(db.clone()))
             .app_data(web::Data::new(salt_api.clone()))
             // enable automatic response compression - usually register this first

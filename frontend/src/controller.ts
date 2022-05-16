@@ -4,7 +4,7 @@ import {
     user as userStore,
     minions as minionsStore,
 } from "./stores";
-import { list_minions, request_authtoken } from "./api";
+import { create_event_connection, list_minions, request_authtoken } from "./api";
 import paths from "./paths";
 import { get_user } from "./api";
 
@@ -28,35 +28,42 @@ export async function logout() {
     userStore.set(undefined);
 }
 
-function require_token(navigate): boolean {
+function require_token(navigate?): boolean {
     let token = get(authStore);
     if (!token) {
-        navigate(paths.login.path);
+        if (!!navigate) {
+            navigate(paths.login.path);
+        }
         return false;
     }
     return true;
 }
 
-// export async function connect_events(navigate) {
-//     if (!require_token(navigate)) return;
+export async function connect_events(timeout: number) {
+    if (typeof timeout != "number") timeout = 1000;
 
-//     let token = get(authStore);
-//     let source = await create_event_connection(token);
+    if (!require_token()) return;
 
-//     source.addEventListener('message', function (e) {
-//         console.log(e.data);
-//     }, false);
+    let token = get(authStore);
+    let source = await create_event_connection(token);
 
-//     source.addEventListener('open', function (e) {
-//         // Connection was opened.
-//     }, false);
+    source.addEventListener('message', function (e) {
+        console.log(e.data);
+    }, false);
 
-//     source.addEventListener('error', function (e) {
-//         if (e.readyState == EventSource.CLOSED) {
-//             // Connection was closed.
-//         }
-//     }, false);
-// }
+    source.addEventListener('open', function (e) {
+        // Connection was opened.
+        console.log("SSE Connected");
+    }, false);
+
+    source.addEventListener('error', function (e) {
+        // Connection was closed.
+        console.log("Retrying SSE connection in " + Math.round(timeout/1000) + " seconds...");
+        setTimeout(() => {
+            connect_events(Math.min(timeout * 2, 5 * 60 * 1000));
+        }, timeout);
+    }, false);
+}
 
 export async function load_user(navigate) {
     if (!require_token(navigate)) return;

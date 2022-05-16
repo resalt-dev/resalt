@@ -1,15 +1,11 @@
 <script>
     import { Router, Route } from "svelte-navigator";
-    import { onMount } from "svelte";
     import constants from "./constants";
     import paths from "./paths";
     import DashboardLayout from "./layouts/DashboardLayout.svelte";
     import DialogLayout from "./layouts/DialogLayout.svelte";
     import Redirect from "./components/Redirect.svelte";
-
-    onMount(() => {
-        console.log("APP Mounted!");
-    });
+    import SSEConnector from "./components/SSEConnector.svelte";
 
     // check if URL starts with basePath, if not then redirect
     const basePath = constants.basePath;
@@ -21,6 +17,7 @@
 
 <main>
     <Router basepath={constants.basePath} primary={false}>
+        <SSEConnector />
         <Route path="auth/*">
             <DialogLayout />
         </Route>
