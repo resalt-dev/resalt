@@ -13,7 +13,7 @@
     <div class="background2 h-100 w-100">
         <!-- Title -->
         <div class="row g-0">
-            <div class="col-9 offset-2 px-5" style="padding-top: 25rem;">
+            <div class="col-9 offset-2 px-5" style="padding-top: 30rem;">
                 <h1 class="text-uppercase text-white">
                     {constants.appName} Admin Console
                 </h1>

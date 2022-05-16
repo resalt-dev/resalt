@@ -1,14 +1,16 @@
 <script>
-    import feather from 'feather-icons';
+    import feather from "feather-icons";
 
     export let name = "home";
     let cssClass = "";
     export { cssClass as class };
     export let size = 24;
+    export let stroke = 2;
 </script>
 
 {@html feather.icons[name].toSvg({
     class: cssClass,
     width: size,
     height: size,
+    "stroke-width": stroke,
 })}

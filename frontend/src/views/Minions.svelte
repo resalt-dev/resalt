@@ -17,6 +17,14 @@
                 " " +
                 (grains["osrelease"] ?? "")
             ).trim(),
+            datatable_sidecolor:
+                minion.last_updated_conformity == null
+                    ? "purple"
+                    : minion.conformity_error > 0
+                    ? "red"
+                    : minion.conformity_incorrect > 0
+                    ? "orange"
+                    : "green",
         };
     });
 
@@ -27,28 +35,16 @@
 
 <h1>Minions</h1>
 
-<div class="bg-dark text-white p-3">
+<div class="bg-light text-white p-2">
     <div class="row">
-        <div class="col-4">
-            <div class="input-group flex-nowrap">
-                <span class="input-group-text" id="addon-wrapping">
-                    <Icon name="search" />
-                </span>
-                <input
-                    type="text"
-                    class="form-control"
-                    placeholder="Search"
-                    aria-label="Search"
-                    aria-describedby="addon-wrapping"
-                />
-            </div>
-        </div>
+        <div class="col-4" />
         <div class="col-8">
-            <button class="btn btn-gold" on:click={() => load_minions(navigate)}
-                >Load minions</button
+            <button
+                class="btn btn-secondary btn-sm"
+                on:click={() => load_minions(navigate)}>Load minions</button
             >
             <button
-                class="btn btn-gold"
+                class="btn btn-info btn-sm"
                 on:click={() => load_minions(navigate, true)}
                 >Force reload minions</button
             >
@@ -56,31 +52,118 @@
     </div>
 </div>
 
-<br />
-
 {#if !$minions}
-    <div class="p-3">No conformity data. Please refresh minion.</div>
+    <div class="p-3">No minions detected. Try force reload.</div>
 {:else}
     <div class="table-responsive">
-        <table
-            id="minionListTable"
-            class="table table-striped table-hover align-middle"
-        >
+        <table id="minionListTable" class="table table-striped table-hover">
             <thead class="bg-dark text-white border-0">
                 <tr>
-                    <th scope="col">ID</th>
-                    <th scope="col">Type</th>
-                    <th scope="col">Last seen</th>
-                    <th scope="col">Conformity</th>
+                    <th scope="col">
+                        <div class="row g-1">
+                            <div class="col-auto align-self-center ps-2">
+                                ID
+                            </div>
+                            <div class="col-auto align-self-center d-grid">
+                                <Icon
+                                    size="18"
+                                    stroke="2"
+                                    name="chevron-up"
+                                    class="sort-icon mouse-pointer"
+                                />
+                                <Icon
+                                    size="18"
+                                    stroke="2"
+                                    name="chevron-down"
+                                    class="sort-icon mouse-pointer"
+                                />
+                            </div>
+                            <div class="col-auto align-self-center">
+                                <input
+                                    type="text"
+                                    class="ms-1 lh-1"
+                                    size="20"
+                                />
+                            </div>
+                        </div>
+                    </th>
+                    <th scope="col">
+                        <div class="row g-1">
+                            <div class="col-auto align-self-center">Type</div>
+                            <div class="col-auto align-self-center d-grid">
+                                <Icon
+                                    size="18"
+                                    stroke="2"
+                                    name="chevron-up"
+                                    class="sort-icon mouse-pointer"
+                                />
+                                <Icon
+                                    size="18"
+                                    stroke="2"
+                                    name="chevron-down"
+                                    class="sort-icon mouse-pointer"
+                                />
+                            </div>
+                            <div class="col-auto align-self-center">
+                                <input
+                                    type="text"
+                                    class="ms-1 lh-1"
+                                    size="20"
+                                />
+                            </div>
+                        </div>
+                    </th>
+                    <th scope="col">
+                        <div class="row g-1">
+                            <div class="col-auto align-self-center">
+                                Last seen
+                            </div>
+                            <div class="col-auto align-self-center d-grid">
+                                <Icon
+                                    size="18"
+                                    stroke="2"
+                                    name="chevron-up"
+                                    class="sort-icon mouse-pointer"
+                                />
+                                <Icon
+                                    size="18"
+                                    stroke="2"
+                                    name="chevron-down"
+                                    class="sort-icon mouse-pointer"
+                                />
+                            </div>
+                        </div>
+                    </th>
+                    <th scope="col">
+                        <div class="row g-1">
+                            <div class="col-auto align-self-center">
+                                Conformity
+                            </div>
+                            <div class="col-auto align-self-center d-grid">
+                                <Icon
+                                    size="18"
+                                    stroke="2"
+                                    name="chevron-up"
+                                    class="sort-icon mouse-pointer"
+                                />
+                                <Icon
+                                    size="18"
+                                    stroke="2"
+                                    name="chevron-down"
+                                    class="sort-icon mouse-pointer"
+                                />
+                            </div>
+                        </div>
+                    </th>
                     <th scope="col">Actions</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="align-middle">
                 {#each mapped_minions as minion}
                     <tr>
                         <th
                             scope="row"
-                            class="startside-success mouse-pointer"
+                            class="startside-{minion.datatable_sidecolor} mouse-pointer"
                             on:click={() =>
                                 navigate(paths.minion.getPath(minion.id))}
                             >{minion.id}</th
@@ -89,20 +172,21 @@
                         <td>{minion.last_seen}</td>
                         <td>
                             {#if minion.last_updated_conformity == null}
-                                <span class="badge bg-purple fs-6">Unknown</span
-                                >
+                                <span class="text-purple fw-bold">
+                                    Unknown
+                                </span>
                             {:else}
-                                <span class="badge bg-green fs-6"
-                                    >{minion.conformity_success ?? "?"}</span
-                                >
-                                /
-                                <span class="badge bg-gold fs-6"
-                                    >{minion.conformity_incorrect ?? "?"}</span
-                                >
-                                /
-                                <span class="badge bg-red fs-6"
-                                    >{minion.conformity_error ?? "?"}</span
-                                >
+                                <span class="text-green fw-bold">
+                                    {minion.conformity_success ?? "?"}
+                                </span>
+                                -
+                                <span class="text-gold fw-bold">
+                                    {minion.conformity_incorrect ?? "?"}
+                                </span>
+                                -
+                                <span class="text-red fw-bold">
+                                    {minion.conformity_error ?? "?"}
+                                </span>
                             {/if}
                         </td>
                         <td>
@@ -119,3 +203,10 @@
         </table>
     </div>
 {/if}
+
+<style>
+    :global(.sort-icon) {
+        margin-top: -0.25rem;
+        margin-bottom: -0.25rem;
+    }
+</style>

@@ -56,7 +56,7 @@ impl SaltEventListener {
         pin_mut!(stream);
 
         while let Some(event) = stream.next().await {
-            //debug!("{:?}", event);
+            debug!("{:?}", event);
 
             let data: Value = serde_json::from_str(&event.data).unwrap();
             let data = data.get("data").unwrap().as_object().unwrap();
