@@ -1,16 +1,13 @@
 <script>
-    import feather from "feather-icons";
-
-    export let name = "home";
+    export let type = "regular";
+    export let name = "bx-rocket";
+    export let size = 2;
     let cssClass = "";
     export { cssClass as class };
-    export let size = 24;
-    export let stroke = 2;
+    export let style = "";
+
+    $: full_name =
+        (type === "solid" ? "bxs-" : type === "logo" ? "bxl-" : "bx-") + name;
 </script>
 
-{@html feather.icons[name].toSvg({
-    class: cssClass,
-    width: size,
-    height: size,
-    "stroke-width": stroke,
-})}
+<i class="bx {full_name} {cssClass}" style="font-size: {size}rem;{style}" />

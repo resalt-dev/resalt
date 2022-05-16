@@ -150,8 +150,8 @@
     {:else}
         <div class="row p-3">
             <div class="col-3">
-                <div class="card bg-light mb-3">
-                    <div class="card-header bg-light">
+                <div class="card mb-3">
+                    <div class="card-header">
                         <span class="fw-bold">Options</span>
                     </div>
                     <div class="card-body">
@@ -248,8 +248,8 @@
                     </div>
                 </div>
 
-                <div class="card bg-light mb-3">
-                    <div class="card-header bg-light">
+                <div class="card mb-3">
+                    <div class="card-header">
                         <span class="fw-bold">Tree view</span>
                     </div>
                     <div class="card-body">
@@ -262,7 +262,7 @@
                 <div class="d-grid">
                     {#each conformity as conform}
                         <div
-                            class="card bg-light mb-3 startside-{conform.color ==
+                            class="card mb-3 startside-{conform.color ==
                             'yellow'
                                 ? 'gold'
                                 : conform.color} {!(
@@ -276,7 +276,7 @@
                         >
                             <div
                                 type="button"
-                                class="card-header bg-light"
+                                class="card-header"
                                 data-bs-toggle="collapse"
                                 data-bs-target="#conformityCollapse{conform.data
                                     .__run_num__}"

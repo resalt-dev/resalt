@@ -56,7 +56,7 @@
     <div class="p-3">No minions detected. Try force reload.</div>
 {:else}
     <div class="table-responsive">
-        <table id="minionListTable" class="table table-striped table-hover">
+        <table id="minionListTable" class="table table-hover">
             <thead class="bg-dark text-white border-0">
                 <tr>
                     <th scope="col">
@@ -66,14 +66,12 @@
                             </div>
                             <div class="col-auto align-self-center d-grid">
                                 <Icon
-                                    size="18"
-                                    stroke="2"
+                                    size="1.125"
                                     name="chevron-up"
                                     class="sort-icon mouse-pointer"
                                 />
                                 <Icon
-                                    size="18"
-                                    stroke="2"
+                                    size="1.125"
                                     name="chevron-down"
                                     class="sort-icon mouse-pointer"
                                 />
@@ -92,14 +90,12 @@
                             <div class="col-auto align-self-center">Type</div>
                             <div class="col-auto align-self-center d-grid">
                                 <Icon
-                                    size="18"
-                                    stroke="2"
+                                    size="1.125"
                                     name="chevron-up"
                                     class="sort-icon mouse-pointer"
                                 />
                                 <Icon
-                                    size="18"
-                                    stroke="2"
+                                    size="1.125"
                                     name="chevron-down"
                                     class="sort-icon mouse-pointer"
                                 />
@@ -120,14 +116,12 @@
                             </div>
                             <div class="col-auto align-self-center d-grid">
                                 <Icon
-                                    size="18"
-                                    stroke="2"
+                                    size="1.125"
                                     name="chevron-up"
                                     class="sort-icon mouse-pointer"
                                 />
                                 <Icon
-                                    size="18"
-                                    stroke="2"
+                                    size="1.125"
                                     name="chevron-down"
                                     class="sort-icon mouse-pointer"
                                 />
@@ -141,14 +135,12 @@
                             </div>
                             <div class="col-auto align-self-center d-grid">
                                 <Icon
-                                    size="18"
-                                    stroke="2"
+                                    size="1.125"
                                     name="chevron-up"
                                     class="sort-icon mouse-pointer"
                                 />
                                 <Icon
-                                    size="18"
-                                    stroke="2"
+                                    size="1.125"
                                     name="chevron-down"
                                     class="sort-icon mouse-pointer"
                                 />

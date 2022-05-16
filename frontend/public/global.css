@@ -219,9 +219,9 @@
     --dark-danger: var(--dark-red);
 }
 
-/* * {
-    border-radius: 0 !important;
-} */
+* {
+    /* outline: 1px solid rebeccapurple; */
+}
 
 html, body {
 	position: relative;
@@ -426,6 +426,10 @@ samp {
     background-color: var(--black) !important;
 }
 
+.card-header {
+    background-color: rgba(0,0,0,.2) !important;
+}
+
 .border-red {
     border-color: var(--red) !important;
 }
@@ -482,58 +486,58 @@ samp {
 }
 
 .startside-red {
-    border-left: 0.5rem solid var(--red) !important;
+    border-left: 0.75rem solid var(--red) !important;
 }
 .startside-volcano {
-    border-left: 0.5rem solid var(--volcano) !important;
+    border-left: 0.75rem solid var(--volcano) !important;
 }
 .startside-orange {
-    border-left: 0.5rem solid var(--orange) !important;
+    border-left: 0.75rem solid var(--orange) !important;
 }
 .startside-gold {
-    border-left: 0.5rem solid var(--gold) !important;
+    border-left: 0.75rem solid var(--gold) !important;
 }
 .startside-yellow {
-    border-left: 0.5rem solid var(--yellow) !important;
+    border-left: 0.75rem solid var(--yellow) !important;
 }
 .startside-green {
-    border-left: 0.5rem solid var(--green) !important;
+    border-left: 0.75rem solid var(--green) !important;
 }
 .startside-cyan {
-    border-left: 0.5rem solid var(--cyan) !important;
+    border-left: 0.75rem solid var(--cyan) !important;
 }
 .startside-blue {
-    border-left: 0.5rem solid var(--blue) !important;
+    border-left: 0.75rem solid var(--blue) !important;
 }
 .startside-purple {
-    border-left: 0.5rem solid var(--purple) !important;
+    border-left: 0.75rem solid var(--purple) !important;
 }
 .startside-magenta {
-    border-left: 0.5rem solid var(--magenta) !important;
+    border-left: 0.75rem solid var(--magenta) !important;
 }
 .startside-primary {
-    border-left: 0.5rem solid var(--primary) !important;
+    border-left: 0.75rem solid var(--primary) !important;
 }
 .startside-secondary {
-    border-left: 0.5rem solid var(--secondary) !important;
+    border-left: 0.75rem solid var(--secondary) !important;
 }
 .startside-success {
-    border-left: 0.5rem solid var(--success) !important;
+    border-left: 0.75rem solid var(--success) !important;
 }
 .startside-info {
-    border-left: 0.5rem solid var(--info) !important;
+    border-left: 0.75rem solid var(--info) !important;
 }
 .startside-warning {
-    border-left: 0.5rem solid var(--warning) !important;
+    border-left: 0.75rem solid var(--warning) !important;
 }
 .startside-danger {
-    border-left: 0.5rem solid var(--danger) !important;
+    border-left: 0.75rem solid var(--danger) !important;
 }
 .startside-light {
-    border-left: 0.5rem solid var(--light-gray) !important;
+    border-left: 0.75rem solid var(--light-gray) !important;
 }
 .startside-dark {
-    border-left: 0.5rem solid var(--dark-gray) !important;
+    border-left: 0.75rem solid var(--dark-gray) !important;
 }
 
 hr {
@@ -672,10 +676,6 @@ hr {
     border-color: var(--black) !important;
 }
 
-.nav-pills .nav-link.active {
-    background-color: var(--gold);
-}
-
 .mouse-pointer {
     cursor: pointer;
 }
@@ -696,7 +696,13 @@ hr {
 }
 
 /*
- *directional-buttons override
+ * Boxicons
+ */
+.bx {
+}
+
+/*
+ * directional-buttons override
  */
 .btn-arrow-right::before, .btn-arrow-left::after {
     background: none;

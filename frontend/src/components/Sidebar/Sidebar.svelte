@@ -55,7 +55,7 @@
             aria-expanded="false"
         >
             <img
-                src="https://github.com/SGA-max-faxalv.png"
+                src="https://github.com/Foorack.png"
                 alt=""
                 class="rounded-circle {$collapsed ? '' : 'me-3'}"
                 width="32"
@@ -84,16 +84,16 @@
 
     <div
         on:click={handleClickCollapse}
-        class="text-white btn-dark bg-dark border-0 py-3 px-3 fw-light mouse-pointer"
+        class="text-white btn-dark bg-dark border-0 pt-3 pb-2 px-3 fw-light mouse-pointer d-flex align-items-center"
         aria-current="page"
     >
         <Icon
-            name={$collapsed ? "arrow-right" : "arrow-left"}
-            class="ps-2 {$collapsed ? '' : 'me-3'}"
-            size="30"
+            name={$collapsed ? "right-arrow-alt" : "left-arrow-alt"}
+            class={$collapsed ? "" : "me-3"}
+            size="2.5"
         />
         {#if !$collapsed}
-            <span class="fs-5 align-middle">Collapse</span>
+            <span class="fs-5">Collapse</span>
         {/if}
     </div>
 </div>
