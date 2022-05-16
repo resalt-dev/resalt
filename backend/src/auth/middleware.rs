@@ -1,12 +1,13 @@
 use crate::prelude::*;
 use actix_web::{
     dev::{forward_ready, Service, ServiceRequest, ServiceResponse, Transform},
+    web::Query,
     Error, HttpMessage,
 };
 use futures::future::{ok, Future, Ready};
 use log::*;
-use std::pin::Pin;
 use std::rc::Rc;
+use std::{collections::HashMap, pin::Pin};
 
 // There are two steps in middleware processing.
 // 1. Middleware initialization, middleware factory gets called with
@@ -68,7 +69,17 @@ where
 
         let token = match req.headers().get("Authorization") {
             Some(header) => header.to_str().unwrap().replace("Bearer ", "").clone(),
-            None => "".to_string(),
+            None => {
+                // Try fetch value "token" from query params
+                let token = match Query::<HashMap<String, String>>::from_query(req.query_string()) {
+                    Ok(params) => match params.get("token") {
+                        Some(token) => token.to_string(),
+                        None => "".to_string(),
+                    },
+                    Err(_) => "".to_string(),
+                };
+                token
+            }
         };
 
         Box::pin(async move {
