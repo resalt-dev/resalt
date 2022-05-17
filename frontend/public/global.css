@@ -330,7 +330,6 @@ samp {
 
 .btn-volcano, .btn-volcano:hover,
 .btn-orange, .btn-orange:hover,
-.btn-gold, .btn-gold:hover,
 .btn-yellow, .btn-yellow:hover,
 .btn-warning, .btn-warning:hover,
 .btn-light, .btn-light:hover {
@@ -338,6 +337,7 @@ samp {
 }
 
 .btn-red, .btn-red:hover,
+.btn-gold, .btn-gold:hover,
 .btn-green, .btn-green:hover,
 .btn-cyan, .btn-cyan:hover,
 .btn-blue, .btn-blue:hover,
@@ -369,34 +369,34 @@ samp {
 }
 
 .bg-red {
-    background-color: var(--red);
+    background-color: var(--red) !important;
 }
 .bg-volcano {
-    background-color: var(--volcano);
+    background-color: var(--volcano) !important;
 }
 .bg-orange {
-    background-color: var(--orange);
+    background-color: var(--orange) !important;
 }
 .bg-gold {
-    background-color: var(--gold);
+    background-color: var(--gold) !important;
 }
 .bg-yellow {
-    background-color: var(--yellow);
+    background-color: var(--yellow) !important;
 }
 .bg-green {
-    background-color: var(--green);
+    background-color: var(--green) !important;
 }
 .bg-cyan {
-    background-color: var(--cyan);
+    background-color: var(--cyan) !important;
 }
 .bg-blue {
-    background-color: var(--blue);
+    background-color: var(--blue) !important;
 }
 .bg-purple {
-    background-color: var(--purple);
+    background-color: var(--purple) !important;
 }
 .bg-magenta {
-    background-color: var(--magenta);
+    background-color: var(--magenta) !important;
 }
 .bg-primary {
     background-color: var(--primary) !important;
@@ -427,7 +427,7 @@ samp {
 }
 
 .card-header {
-    background-color: rgba(0,0,0,.2) !important;
+    background-color: rgba(0, 0, 0, 0.1) !important;
 }
 
 .border-red {

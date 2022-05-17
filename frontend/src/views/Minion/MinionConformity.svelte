@@ -202,7 +202,7 @@
                         <!-- showIncorrect -->
                         <div class="form-check">
                             <input
-                                class="form-check-input form-check-input-gold"
+                                class="form-check-input form-check-input-warning"
                                 type="checkbox"
                                 id="showIncorrect"
                                 on:click={() =>
@@ -262,10 +262,7 @@
                 <div class="d-grid">
                     {#each conformity as conform}
                         <div
-                            class="card mb-3 startside-{conform.color ==
-                            'yellow'
-                                ? 'gold'
-                                : conform.color} {!(
+                            class="card mb-3 startside-{conform.color} {!(
                                 (showSuccess && conform.data.result === true) ||
                                 (showIncorrect &&
                                     conform.data.result === null) ||

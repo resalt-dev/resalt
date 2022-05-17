@@ -2,6 +2,7 @@
     import { onMount } from "svelte";
     import { load_minions } from "../controller";
     import { minions } from "../stores";
+    import constants from "../constants";
     import Icon from "../components/Icon.svelte";
     import paths from "../paths";
 
@@ -164,26 +165,24 @@
                         <td>{minion.last_seen}</td>
                         <td>
                             {#if minion.last_updated_conformity == null}
-                                <span class="text-purple fw-bold">
-                                    Unknown
-                                </span>
+                                <span class="badge bg-purple"> Unknown </span>
                             {:else}
-                                <span class="text-green fw-bold">
+                                <span class="badge bg-green fw-bold">
                                     {minion.conformity_success ?? "?"}
                                 </span>
-                                -
-                                <span class="text-gold fw-bold">
+                                /
+                                <span class="badge bg-warning fw-bold">
                                     {minion.conformity_incorrect ?? "?"}
                                 </span>
-                                -
-                                <span class="text-red fw-bold">
+                                /
+                                <span class="badge bg-red fw-bold">
                                     {minion.conformity_error ?? "?"}
                                 </span>
                             {/if}
                         </td>
                         <td>
                             <button
-                                class="btn btn-gold btn-sm px-3"
+                                class={`btn btn-primary btn-sm px-3`}
                                 on:click={() =>
                                     navigate(paths.minion.getPath(minion.id))}
                                 >View</button
@@ -198,7 +197,7 @@
 
 <style>
     :global(.sort-icon) {
-        margin-top: -0.25rem;
-        margin-bottom: -0.25rem;
+        margin-top: -0.3rem;
+        margin-bottom: -0.3rem;
     }
 </style>

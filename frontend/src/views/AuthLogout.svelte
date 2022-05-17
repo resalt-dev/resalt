@@ -3,6 +3,7 @@
     import { Link } from "svelte-navigator";
     import paths from "../paths";
     import { logout } from "../controller";
+    import constants from "../constants";
 
     onMount(async () => {
         logout();
@@ -14,7 +15,9 @@
 {:then}
     <p class="fw-bold">You have been successfully signed out.</p>
     <br />
-    <Link to={paths.login.path} class="btn btn-gold float-end">Go to login</Link
+    <Link
+        to={paths.login.path}
+        class={`btn btn-${constants.mainColor} float-end`}>Go to login</Link
     >
 {:catch error}
     An error occurred.

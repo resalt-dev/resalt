@@ -1,6 +1,7 @@
 <script>
     import { useLocation, Link } from "svelte-navigator";
     import paths from "../paths";
+    import constants from "../constants";
 
     const location = useLocation();
 
@@ -25,7 +26,7 @@
                 {#if item.path}
                     <Link
                         to={item.path}
-                        class="btn btn-gold btn-arrow-right fw-bold"
+                        class={`btn btn-${constants.mainColor} btn-arrow-right fw-bold`}
                         >{item.title}</Link
                     >
                 {:else}

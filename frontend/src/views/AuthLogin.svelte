@@ -1,6 +1,7 @@
 <script>
     import { onMount } from "svelte";
     import { login } from "../controller";
+    import constants from "../constants";
 
     import { useNavigate } from "svelte-navigator";
     const navigate = useNavigate();
@@ -46,7 +47,8 @@
             />
         </div>
     </div>
-    <button on:click={handleClick} class="btn btn-gold float-end px-5"
-        >Login</button
+    <button
+        on:click={handleClick}
+        class={`btn btn-${constants.mainColor} float-end px-5`}>Login</button
     >
 </form>

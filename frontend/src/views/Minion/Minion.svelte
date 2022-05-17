@@ -2,6 +2,7 @@
     import { Link } from "svelte-navigator";
     import { load_minions } from "../../controller";
     import { minions } from "../../stores";
+    import constants from "../../constants";
     import paths from "../../paths";
     import Redirect from "../../components/Redirect.svelte";
 
@@ -59,7 +60,7 @@
                     'General' &&
                     subPage === undefined) ||
                 subPage === item.name.toLowerCase()
-                    ? 'bg-gold'
+                    ? 'bg-' + constants.mainColor
                     : ''}"
             >
                 {item.name}
@@ -67,7 +68,7 @@
         {/each}
     </div>
 
-    <div class="card border-4 border-gold rounded-none">
+    <div class={`card border-4 border-${constants.mainColor} rounded-none`}>
         <div class="card-body p-0">
             {#if subPage === undefined}
                 <MinionInfo {minion} />
