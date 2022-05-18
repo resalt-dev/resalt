@@ -279,6 +279,7 @@ samp {
 .btn-green {background-color: var(--green);}
 .btn-cyan {background-color: var(--cyan);}
 .btn-blue {background-color: var(--blue);}
+.btn-geekblue {background-color: var(--geekblue);}
 .btn-purple {background-color: var(--purple);}
 .btn-magenta {background-color: var(--magenta);}
 .btn-primary {background-color: var(--primary) !important;}
@@ -298,6 +299,7 @@ samp {
 .btn-green {border-color: var(--dark-green);}
 .btn-cyan {border-color: var(--dark-cyan);}
 .btn-blue {border-color: var(--dark-blue);}
+.btn-geekblue {border-color: var(--dark-geekblue);}
 .btn-purple {border-color: var(--dark-purple);}
 .btn-magenta {border-color: var(--dark-magenta);}
 .btn-primary {border-color: var(--dark-primary) !important;}
@@ -317,6 +319,7 @@ samp {
 .btn-green:hover, .btn-green.active {background-color: var(--dark-green);}
 .btn-cyan:hover, .btn-cyan.active {background-color: var(--dark-cyan);}
 .btn-blue:hover, .btn-blue.active {background-color: var(--dark-blue);}
+.btn-geekblue:hover, .btn-geekblue.active {background-color: var(--dark-geekblue);}
 .btn-purple:hover, .btn-purple.active {background-color: var(--dark-purple);}
 .btn-magenta:hover, .btn-magenta.active {background-color: var(--dark-magenta);}
 .btn-primary:hover, .btn-primary.active {background-color: var(--dark-primary) !important;}
@@ -341,6 +344,7 @@ samp {
 .btn-green, .btn-green:hover,
 .btn-cyan, .btn-cyan:hover,
 .btn-blue, .btn-blue:hover,
+.btn-geekblue, .btn-geekblue:hover,
 .btn-purple, .btn-purple:hover,
 .btn-magenta, .btn-magenta:hover,
 .btn-dark, .btn-dark:hover,
@@ -391,6 +395,9 @@ samp {
 }
 .bg-blue {
     background-color: var(--blue) !important;
+}
+.bg-geekblue {
+    background-color: var(--geekblue) !important;
 }
 .bg-purple {
     background-color: var(--purple) !important;
@@ -454,6 +461,9 @@ samp {
 .border-blue {
     border-color: var(--blue) !important;
 }
+.border-geekblue {
+    border-color: var(--geekblue) !important;
+}
 .border-purple {
     border-color: var(--purple) !important;
 }
@@ -508,6 +518,9 @@ samp {
 }
 .startside-blue {
     border-left: 0.75rem solid var(--blue) !important;
+}
+.startside-geekblue {
+    border-left: 0.75rem solid var(--geekblue) !important;
 }
 .startside-purple {
     border-left: 0.75rem solid var(--purple) !important;
@@ -567,6 +580,9 @@ hr {
 }
 .text-blue {
     color: var(--blue) !important;
+}
+.text-geekblue {
+    color: var(--geekblue) !important;
 }
 .text-purple {
     color: var(--purple) !important;
@@ -634,6 +650,10 @@ hr {
 .form-check-input-blue:checked {
     background-color: var(--blue) !important;
     border-color: var(--blue) !important;
+}
+.form-check-input-geekblue:checked {
+    background-color: var(--geekblue) !important;
+    border-color: var(--geekblue) !important;
 }
 .form-check-input-purple:checked {
     background-color: var(--purple) !important;
@@ -767,6 +787,10 @@ hr {
 .btn-blue.btn-arrow-left::before, .btn-blue.btn-arrow-right::after {
     border-top-color: var(--dark-blue);
     border-right-color: var(--dark-blue);
+}
+.btn-geekblue.btn-arrow-left::before, .btn-geekblue.btn-arrow-right::after {
+    border-top-color: var(--dark-geekblue);
+    border-right-color: var(--dark-geekblue);
 }
 .btn-purple.btn-arrow-left::before, .btn-purple.btn-arrow-right::after {
     border-top-color: var(--dark-purple);
