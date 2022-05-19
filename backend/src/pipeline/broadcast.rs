@@ -4,7 +4,6 @@
 //
 // MIT License, upbasedev / sse-actix-web
 //
-use std::collections::HashMap;
 use std::pin::Pin;
 use std::sync::Mutex;
 use std::task::{Context, Poll};
@@ -13,12 +12,10 @@ use std::time::Duration;
 use actix_web::web::{Bytes, Data};
 use actix_web::Error;
 use futures::Stream;
+use log::debug;
 use tokio::sync::mpsc::{channel, Receiver, Sender};
+use tokio::task;
 use tokio::time::{interval_at, Instant};
-
-pub fn broadcast(event: String, msg: String, broadcaster: Data<Mutex<Broadcaster>>) -> () {
-    broadcaster.lock().unwrap().send(&event, &msg);
-}
 
 pub struct Broadcaster {
     clients: Vec<Sender<Bytes>>,
@@ -30,7 +27,7 @@ impl Broadcaster {
         let me = Data::new(Mutex::new(Broadcaster::new()));
 
         // ping clients every 10 seconds to see if they are alive
-        //Broadcaster::spawn_ping(me.clone());
+        Broadcaster::spawn_ping(me.clone());
 
         me
     }
@@ -42,21 +39,33 @@ impl Broadcaster {
     }
 
     pub fn spawn_ping(me: Data<Mutex<Self>>) {
-        actix_web::rt::spawn(async move {
-            let mut task = interval_at(Instant::now(), Duration::from_secs(10));
-            loop {
-                task.tick().await;
-                me.lock().unwrap().remove_stale_clients();
-            }
+        std::thread::spawn(move || {
+            let rt = tokio::runtime::Runtime::new().unwrap();
+            let ls = task::LocalSet::new();
+            ls.block_on(&rt, async {
+                let mut interval = interval_at(Instant::now(), Duration::from_secs(1));
+                loop {
+                    interval.tick().await;
+                    me.lock().unwrap().remove_stale_clients();
+                }
+            });
         });
     }
 
     pub fn remove_stale_clients(&mut self) {
         let mut ok_clients = Vec::new();
+
+        let ping = serde_json::json!({
+            "time": chrono::Utc::now().naive_utc().format("%Y-%m-%d %H:%M:%S").to_string()
+        })
+        .to_string();
+
+        // debug!("pinging {} clients", self.clients.len());
+
         for client in self.clients.iter() {
             let result = client
                 .clone()
-                .try_send(Bytes::from("event: internal_status\ndata: ping\n\n"));
+                .try_send(Bytes::from(["event: ping\ndata: ", &ping, "\n\n"].concat()));
 
             if let Ok(()) = result {
                 ok_clients.push(client.clone());
@@ -65,29 +74,14 @@ impl Broadcaster {
         self.clients = ok_clients;
     }
 
-    pub fn new_client(&mut self, collection: HashMap<String, String>) -> Client {
+    pub fn new_client(&mut self) -> Client {
         let (tx, rx) = channel(100);
-        let tx_clone = tx.clone();
-
-        let mut new_collection: HashMap<String, String> = HashMap::new();
-        if collection.is_empty() {
-            new_collection.insert("internal_status".to_owned(), "connected".to_owned());
-        } else {
-            new_collection = collection;
-        }
-
-        for (evt, msg) in new_collection {
-            let msg = Bytes::from(["event: ", &evt, "\ndata: ", &msg, "\n\n"].concat());
-
-            tx_clone.clone().try_send(msg).unwrap();
-
-            self.clients.push(tx_clone.clone());
-        }
+        self.clients.push(tx);
         Client(rx)
     }
 
-    pub fn send(&self, evt: &str, msg: &str) {
-        let msg = Bytes::from(["event: ", evt, "\n", "data: ", msg, "\n\n"].concat());
+    pub fn send(&self, msg: &str) {
+        let msg = Bytes::from(["event: message\n", "data: ", msg, "\n\n"].concat());
 
         for client in self.clients.iter() {
             client.clone().try_send(msg.clone()).unwrap_or(());

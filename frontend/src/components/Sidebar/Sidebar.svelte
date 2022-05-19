@@ -70,7 +70,8 @@
             aria-labelledby="dropdownUser1"
         >
             <li><Link to="#" class="dropdown-item">Settings</Link></li>
-            <li><Link to="#" class="dropdown-item">Profile</Link></li>
+            <li><Link to="#" class="dropdown-item">Notifications</Link></li>
+            <li><Link to="#" class="dropdown-item">Theme</Link></li>
             <li><hr class="dropdown-divider" /></li>
             <li>
                 <Link to={paths.logout.path} class="dropdown-item"

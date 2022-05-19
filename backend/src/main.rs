@@ -30,6 +30,7 @@ async fn main() -> std::io::Result<()> {
     db.init().await;
 
     // Salt WebSocket
+    let salt_listener_pipeline = pipeline.clone();
     let salt_listener_db = db.clone();
     std::thread::spawn(move || {
         let rt = tokio::runtime::Runtime::new().unwrap();
@@ -37,7 +38,7 @@ async fn main() -> std::io::Result<()> {
         ls.block_on(&rt, async {
             // Wait a few seconds before starting SSE, so web server gets time to start
             tokio::time::sleep(std::time::Duration::from_secs(1)).await;
-            let salt_ws = SaltEventListener::new(salt_listener_db);
+            let salt_ws = SaltEventListener::new(salt_listener_pipeline, salt_listener_db);
             salt_ws.start().await;
         });
     });
@@ -50,8 +51,6 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(pipeline.clone()))
             .app_data(web::Data::new(db.clone()))
             .app_data(web::Data::new(salt_api.clone()))
-            // enable automatic response compression - usually register this first
-            .wrap(Compress::default())
             // Prevent sniffing of content type
             .wrap(DefaultHeaders::new().add((header::X_CONTENT_TYPE_OPTIONS, "nosniff")))
             // Removes trailing slash in the URL to make is sowe don't need as many services

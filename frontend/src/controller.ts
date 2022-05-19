@@ -3,8 +3,13 @@ import {
     auth as authStore,
     user as userStore,
     minions as minionsStore,
+    socket as socketStore,
 } from "./stores";
-import { create_event_connection, list_minions, request_authtoken } from "./api";
+import {
+    create_event_connection,
+    list_minions,
+    request_authtoken,
+} from "./api";
 import paths from "./paths";
 import { get_user } from "./api";
 
@@ -24,8 +29,8 @@ export async function login(navigate, username: string, password: string) {
 }
 
 export async function logout() {
-    authStore.set(undefined);
-    userStore.set(undefined);
+    authStore.set(null);
+    userStore.set(null);
 }
 
 function require_token(navigate?): boolean {
@@ -39,30 +44,101 @@ function require_token(navigate?): boolean {
     return true;
 }
 
+let source: EventSource;
+
+export function close_events() {
+    if (source) {
+        source.close();
+    }
+}
+
 export async function connect_events(timeout: number) {
     if (typeof timeout != "number") timeout = 1000;
 
     if (!require_token()) return;
 
+    if (source && source.readyState == EventSource.OPEN) {
+        console.log(
+            "Tried connecting to SSE when already connected, returning same."
+        );
+        return source;
+    } else {
+        if (get(socketStore).connected) {
+            socketStore.set({ connected: false, last_ping: null });
+        }
+    }
+
     let token = get(authStore);
-    let source = await create_event_connection(token);
+    source = await create_event_connection(token);
 
-    source.addEventListener('message', function (e) {
-        console.log(e.data);
-    }, false);
+    source.addEventListener(
+        "message",
+        function (e) {
+            let data = JSON.parse(e.data);
+            console.log("data", data);
 
-    source.addEventListener('open', function (e) {
-        // Connection was opened.
-        console.log("SSE Connected");
-    }, false);
+            const content = data.content;
 
-    source.addEventListener('error', function (e) {
-        // Connection was closed.
-        console.log("Retrying SSE connection in " + Math.round(timeout/1000) + " seconds...");
-        setTimeout(() => {
-            connect_events(Math.min(timeout * 2, 5 * 60 * 1000));
-        }, timeout);
-    }, false);
+            switch (data.type) {
+                case "update_minion":
+                    minionsStore.update((minions) => {
+                        // minions is a Vector of Minions.
+                        // If minion exists, replace it. If not, then add it.
+                        let index = minions.findIndex(
+                            (minion) => minion.id == content.minion.id
+                        );
+                        if (index >= 0) {
+                            minions[index] = content.minion;
+                        } else {
+                            minions.push(content.minion);
+                        }
+                        return minions;
+                    });
+                    break;
+            };
+        },
+        false
+    );
+
+    source.addEventListener(
+        "ping",
+        function (e) {
+            let time = new Date(JSON.parse(e.data).time + "Z");
+            socketStore.update((s) => {
+                s.last_ping = time;
+                return s;
+            });
+            // console.log("ping", time);
+        },
+        false
+    );
+
+    source.addEventListener(
+        "open",
+        function (e) {
+            // Connection was opened.
+            socketStore.set({ connected: true, last_ping: null });
+            console.log("SSE Connected");
+        },
+        false
+    );
+
+    source.addEventListener(
+        "error",
+        function (e) {
+            // Connection was closed.
+            socketStore.set({ connected: false, last_ping: null });
+            console.log(
+                "Retrying SSE connection in " +
+                    Math.round(timeout / 1000) +
+                    " seconds..."
+            );
+            setTimeout(() => {
+                connect_events(Math.min(timeout * 2, 5 * 60 * 1000));
+            }, timeout);
+        },
+        false
+    );
 }
 
 export async function load_user(navigate) {

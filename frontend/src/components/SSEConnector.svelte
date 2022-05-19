@@ -1,14 +1,19 @@
 <script>
-    import { onMount } from "svelte";
-    import { connect_events } from "../controller";
+    import { close_events, connect_events } from "../controller";
+    import { auth } from "../stores";
+    import { get } from "svelte/store";
 
     import { useNavigate } from "svelte-navigator";
     const navigate = useNavigate();
 
-    onMount(() => {
-        console.log("Connecting to SSE...");
-
-        // Connect to SSE
-        connect_events(navigate);
-    });
+    $: {
+        console.log("hi");
+        console.log(get(auth));
+        if ($auth) {
+            console.log("Connecting to SSE...");
+            connect_events(navigate);
+        } else {
+            close_events();
+        }
+    }
 </script>

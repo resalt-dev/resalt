@@ -15,13 +15,15 @@ lazy_static::lazy_static! {
 
 pub struct SaltEventListener {
     api: SaltAPI,
+    pipeline: PipelineServer,
     storage: Storage,
 }
 
 impl SaltEventListener {
-    pub fn new(storage: Storage) -> Self {
+    pub fn new(pipeline: PipelineServer, storage: Storage) -> Self {
         Self {
             api: SaltAPI::new(),
+            pipeline,
             storage,
         }
     }
@@ -82,7 +84,9 @@ impl SaltEventListener {
                             .update_minion_grains(minion_id, time, &grains)
                             .await
                         {
-                            Ok(_) => {}
+                            Ok(_) => {
+                                self.pipeline_update_minion(minion_id).await;
+                            }
                             Err(e) => error!("Failed updating minion grains {:?}", e),
                         }
                     }
@@ -95,7 +99,9 @@ impl SaltEventListener {
                             .update_minion_pillars(minion_id, time, &pillar)
                             .await
                         {
-                            Ok(_) => {}
+                            Ok(_) => {
+                                self.pipeline_update_minion(minion_id).await;
+                            }
                             Err(e) => error!("Failed updating minion pillar {:?}", e),
                         }
                     }
@@ -108,7 +114,9 @@ impl SaltEventListener {
                             .update_minion_pkgs(minion_id, time, &pkgs)
                             .await
                         {
-                            Ok(_) => {}
+                            Ok(_) => {
+                                self.pipeline_update_minion(minion_id).await;
+                            }
                             Err(e) => error!("Failed updating minion pkgs {:?}", e),
                         }
                     }
@@ -158,7 +166,9 @@ impl SaltEventListener {
                             )
                             .await
                         {
-                            Ok(_) => {}
+                            Ok(_) => {
+                                self.pipeline_update_minion(minion_id).await;
+                            }
                             Err(e) => error!("Failed updating minion conformity {:?}", e),
                         }
                     }
@@ -185,6 +195,23 @@ impl SaltEventListener {
         }
 
         warn!("Salt event stream ended! Reconnecting stream...");
+    }
+
+    async fn pipeline_update_minion(&self, id: &str) {
+        let minion = match self.storage.get_minion_by_id(id).await {
+            Ok(minion) => match minion {
+                Some(minion) => minion,
+                None => {
+                    error!("Minion not found in storage");
+                    return;
+                }
+            },
+            Err(e) => {
+                error!("Failed to get minion {:?}", e);
+                return;
+            }
+        };
+        self.pipeline.update_minion(minion);
     }
 
     pub async fn start(&self) {

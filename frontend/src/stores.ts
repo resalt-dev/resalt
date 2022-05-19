@@ -7,6 +7,7 @@ const prefix = constants.appName.toLowerCase() + "_";
 // Second param is the initial value.
 
 export const sidebarCollapsed = writable(prefix + "sidebarCollapsed", false);
-export const auth = writable(prefix + "auth", undefined);
-export const user = writable(prefix + "user", undefined);
-export const minions = writable(prefix + "minions", undefined);
+export const auth = writable(prefix + "auth", null);
+export const user = writable(prefix + "user", null);
+export const minions = writable(prefix + "minions", null);
+export const socket = writable(prefix + "socket", { connected: false, last_ping: null });

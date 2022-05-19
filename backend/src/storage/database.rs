@@ -328,6 +328,15 @@ impl Storage {
         .await
     }
 
+    pub async fn get_minion_by_id(&self, id: &str) -> Result<Option<Minion>, String> {
+        let connection = self.create_connection().await?;
+        minions::table
+            .filter(minions::id.eq(id))
+            .first(&connection)
+            .optional()
+            .map_err(|e| format!("{:?}", e))
+    }
+
     pub async fn list_minions(&self) -> Result<Vec<Minion>, String> {
         let connection = self.create_connection().await?;
         minions::table

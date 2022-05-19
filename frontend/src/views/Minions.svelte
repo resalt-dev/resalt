@@ -36,20 +36,37 @@
 
 <h1>Minions</h1>
 
-<div class="bg-light text-white p-2">
-    <div class="row">
-        <div class="col-4" />
-        <div class="col-8">
-            <button
-                class="btn btn-secondary btn-sm"
-                on:click={() => load_minions(navigate)}>Load minions</button
-            >
-            <button
-                class="btn btn-info btn-sm"
-                on:click={() => load_minions(navigate, true)}
-                >Force reload minions</button
-            >
+<div class="card mb-3">
+    <div class="card-header">
+        <span class="fw-bold">Search options</span>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col mb-3">
+                <label for="inputEmail3" class="form-label d-inline"
+                    >Search</label
+                >
+                <input
+                    id="inputEmail3"
+                    type="email"
+                    class="form-control ms-2 d-inline"
+                    style="width: 15rem;"
+                />
+            </div>
+            <div class="col" />
         </div>
+
+        <strong>CPU</strong>
+
+        <button
+            class="btn btn-secondary btn-sm"
+            on:click={() => load_minions(navigate)}>Load minions</button
+        >
+        <button
+            class="btn btn-info btn-sm"
+            on:click={() => load_minions(navigate, true)}
+            >Force reload minions</button
+        >
     </div>
 </div>
 
@@ -81,7 +98,7 @@
                                 <input
                                     type="text"
                                     class="ms-1 lh-1"
-                                    size="20"
+                                    size="15"
                                 />
                             </div>
                         </div>
@@ -105,7 +122,7 @@
                                 <input
                                     type="text"
                                     class="ms-1 lh-1"
-                                    size="20"
+                                    size="15"
                                 />
                             </div>
                         </div>
