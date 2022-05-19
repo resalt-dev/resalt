@@ -6,7 +6,7 @@
     import Icon from "../components/Icon.svelte";
     import paths from "../paths";
 
-    import { useNavigate } from "svelte-navigator";
+    import { Link, useNavigate } from "svelte-navigator";
     const navigate = useNavigate();
 
     $: mapped_minions = ($minions ?? []).map((minion) => {
@@ -35,6 +35,12 @@
 </script>
 
 <h1>Minions</h1>
+
+<div class="nav bg-dark w-100">
+    <div class="nav-link text-white px-4 py-3 fw-bold bg-{constants.mainColor}">
+        Search
+    </div>
+</div>
 
 <div class="card mb-3">
     <div class="card-header">
@@ -198,11 +204,9 @@
                             {/if}
                         </td>
                         <td>
-                            <button
-                                class={`btn btn-primary btn-sm px-3`}
-                                on:click={() =>
-                                    navigate(paths.minion.getPath(minion.id))}
-                                >View</button
+                            <Link
+                                to={paths.minion.getPath(minion.id)}
+                                class={`btn btn-primary btn-sm px-3`}>View</Link
                             >
                         </td>
                     </tr>
