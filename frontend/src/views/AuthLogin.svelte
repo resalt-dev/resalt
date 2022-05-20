@@ -2,6 +2,7 @@
     import { onMount } from "svelte";
     import { login } from "../controller";
     import constants from "../constants";
+    import { alerts } from "../stores";
 
     import { useNavigate } from "svelte-navigator";
     const navigate = useNavigate();
@@ -9,6 +10,14 @@
     let username = "";
     let password = "";
     let usernameField;
+
+    let localAlerts = [];
+
+    // Clone "alerts" to "localAlerts" then empty it on every Svelte update
+    $: {
+        localAlerts = $alerts.slice();
+        alerts.update(() => []);
+    }
 
     onMount(() => {
         usernameField.focus();
@@ -49,6 +58,12 @@
     </div>
     <button
         on:click={handleClick}
-        class={`btn btn-${constants.mainColor} float-end px-5`}>Login</button
+        class={`btn btn-${constants.mainColor} float-end px-5 mb-3`}
+        >Login</button
     >
+    <div class="clearfix" />
+
+    {#each localAlerts as alert}
+        <div class="alert alert-{alert.type}">{alert.message}</div>
+    {/each}
 </form>

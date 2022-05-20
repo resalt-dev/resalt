@@ -64,7 +64,11 @@
             <!-- display last_ping as hh:mm:ss -->
             <span class="badge rounded-pill bg-success"
                 >Connected: {new Date($socket.last_ping)
-                    .toLocaleTimeString()
+                    .toLocaleTimeString("en-US", {
+                        timeZone: "UTC",
+                        timeZoneName: "short",
+                        hour12: false,
+                    })
                     .replace(/\./g, ":")}</span
             >
         {:else}

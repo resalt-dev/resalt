@@ -4,15 +4,13 @@
 //
 // MIT License, upbasedev / sse-actix-web
 //
+use actix_web::web::{Bytes, Data};
+use actix_web::Error;
+use futures::Stream;
 use std::pin::Pin;
 use std::sync::Mutex;
 use std::task::{Context, Poll};
 use std::time::Duration;
-
-use actix_web::web::{Bytes, Data};
-use actix_web::Error;
-use futures::Stream;
-use log::debug;
 use tokio::sync::mpsc::{channel, Receiver, Sender};
 use tokio::task;
 use tokio::time::{interval_at, Instant};

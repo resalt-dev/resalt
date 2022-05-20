@@ -7,7 +7,7 @@ pub struct ApiError {
 }
 
 pub fn api_error_unauthorized() -> actix_web::Error {
-    actix_web::error::ErrorUnauthorized("Missing credentials".to_string())
+    actix_web::error::ErrorUnauthorized("Missing valid credentials".to_string())
 }
 
 pub fn api_error_user_ratelimited() -> actix_web::Error {

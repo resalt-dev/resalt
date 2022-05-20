@@ -5,10 +5,9 @@
     import AuthLogout from "../views/AuthLogout.svelte";
 </script>
 
-<!-- style_old="background-image: url('{constants.basePath}/assets/images/denisse-leon-OVEWbIgffDk-unsplash.jpg')" -->
 <div
     class="background1 h-100"
-    style="background-image: url('{constants.basePath}/assets/images/40-96-0-c-n.jpg')"
+    style="background-image: url('{constants.basePath}/assets/images/denisse-leon-OVEWbIgffDk-unsplash.jpg')"
 >
     <div class="background2 h-100 w-100">
         <!-- Title -->
@@ -22,7 +21,7 @@
         <!-- Content -->
         <div class="row g-0">
             <div class="col-2 bg-light p-5" />
-            <div class="col-6 bg-white p-5">
+            <div class="col-6 bg-white p-5" style="max-width: 54rem;">
                 <Router primary={false}>
                     <Route path="login" component={AuthLogin} />
                     <Route path="logout" component={AuthLogout} />
@@ -41,7 +40,6 @@
         background-attachment: fixed;
     }
     .background2 {
-        /* background: rgba(0, 0, 0, 1); */
-        background: rgba(255, 255, 255, 0.25);
+        /* background: rgba(255, 255, 255, 0.25); */
     }
 </style>

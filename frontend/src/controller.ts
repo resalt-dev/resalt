@@ -4,6 +4,7 @@ import {
     user as userStore,
     minions as minionsStore,
     socket as socketStore,
+    alerts,
 } from "./stores";
 import {
     create_event_connection,
@@ -13,7 +14,11 @@ import {
 import paths from "./paths";
 import { get_user } from "./api";
 
-import type { ApiResponse } from "./models";
+import { ApiResponse, Alert } from "./models";
+
+function alert(type: string, message: string): void {
+    alerts.update((alerts) => [...alerts, new Alert(type, message)]);
+}
 
 export async function login(navigate, username: string, password: string) {
     let result: ApiResponse = await request_authtoken(username, password);
@@ -24,6 +29,8 @@ export async function login(navigate, username: string, password: string) {
         navigate(paths.home.path);
     } else {
         // todo: error message is in result.data
+        console.log("login error", result);
+        alert("danger", "Login failed: " + result.data);
         logout();
     }
 }
@@ -152,8 +159,10 @@ export async function load_user(navigate) {
     } else if (result.status == 401) {
         logout();
         navigate(paths.logout.path);
+        return true;
     } else {
         // todo: error message is in result.data
+        return false;
     }
 }
 
