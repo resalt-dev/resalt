@@ -58,12 +58,21 @@
     </div>
     <button
         on:click={handleClick}
-        class={`btn btn-${constants.mainColor} float-end px-5 mb-3`}
+        class={`btn btn-${constants.mainColor} float-end px-5 fw-bold mb-3`}
         >Login</button
     >
     <div class="clearfix" />
 
     {#each localAlerts as alert}
-        <div class="alert alert-{alert.type}">{alert.message}</div>
+        <div class="card text-white bg-{alert.type} mb-3">
+            <div class="card-body">
+                <h5 class="card-title">
+                    {alert.title}
+                </h5>
+                <p class="card-text">
+                    {alert.message}
+                </p>
+            </div>
+        </div>
     {/each}
 </form>

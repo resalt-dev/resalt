@@ -16,8 +16,8 @@ import { get_user } from "./api";
 
 import { ApiResponse, Alert } from "./models";
 
-function alert(type: string, message: string): void {
-    alerts.update((alerts) => [...alerts, new Alert(type, message)]);
+function alert(type: string, title: string, message: string): void {
+    alerts.update((alerts) => [...alerts, new Alert(type, title, message)]);
 }
 
 export async function login(navigate, username: string, password: string) {
@@ -28,9 +28,8 @@ export async function login(navigate, username: string, password: string) {
         await load_user(navigate);
         navigate(paths.home.path);
     } else {
-        // todo: error message is in result.data
         console.log("login error", result);
-        alert("danger", "Login failed: " + result.data);
+        alert("danger", "Login Error", result.data);
         logout();
     }
 }

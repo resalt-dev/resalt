@@ -17,7 +17,8 @@
     <br />
     <Link
         to={paths.login.path}
-        class={`btn btn-${constants.mainColor} float-end`}>Go to login</Link
+        class={`btn btn-${constants.mainColor} float-end px-5 fw-bold`}
+        >Go back</Link
     >
 {:catch error}
     An error occurred.
