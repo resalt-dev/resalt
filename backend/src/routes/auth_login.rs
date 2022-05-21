@@ -15,6 +15,7 @@ struct LoginResponse {
 }
 
 pub async fn route_auth_login_post(
+    ldap: web::Data<LdapHandler>,
     data: web::Data<Storage>,
     salt: web::Data<SaltAPI>,
     input: web::Json<LoginRequest>,
@@ -24,76 +25,58 @@ pub async fn route_auth_login_post(
 
     info!("Attempting login for {:?}", username);
 
-    let user = match data.get_user_by_username(&username).await {
-        Ok(user) => match user {
-            Some(user) => user,
-            None => return Err(api_error_unauthorized()),
-        },
-        Err(e) => {
-            error!("{:?}", e);
-            return Err(api_error_database());
-        }
+    let mut user = match auth_login_classic(&data, &username, &password).await {
+        Ok(user) => user,
+        Err(e) => return Err(e),
     };
-    let recent_authtokens = match data.list_authtokens_by_user_id(&user.id).await {
-        Ok(authtokens) => authtokens,
-        Err(e) => {
-            error!("{:?}", e);
-            return Err(api_error_database());
-        }
-    };
-
-    let max_tries = SConfig::user_login_max_tries();
-    if recent_authtokens.len() >= max_tries as usize {
-        warn!("Too many login attempts for user {:?}", user.id);
-        return Err(api_error_user_ratelimited());
+    if user.is_none() {
+        debug!("User not found, testing LDAP");
+        user = match auth_login_ldap(&ldap, &data, &username, &password).await {
+            Ok(user) => user,
+            Err(e) => return Err(e),
+        };
     }
 
-    let user_pass = match user.password {
-        Some(user_pass) => user_pass,
+    let user = match user {
+        Some(user) => user,
         None => {
-            warn!("Attempted login with user {:?} has no password", user.id);
             return Err(api_error_unauthorized());
         }
     };
 
-    if !verify_password(&password, &user_pass) {
-        match data.create_authtoken(&user.id, false).await {
-            Ok(_) => {}
-            Err(e) => {
-                error!("{:?}", e);
-                return Err(api_error_database());
-            }
-        }
-        return Err(api_error_unauthorized());
-    }
+    debug!("User {} found, generating token", &user.username);
 
-    let authtoken = match data.create_authtoken(&user.id, true).await {
+    // Create token
+    let authtoken = match data.create_authtoken(&user.id).await {
         Ok(authtoken) => authtoken,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_unauthorized());
+            return Err(api_error_database());
         }
     };
 
-    let salt_token = match salt.login(&username, &authtoken.id).await {
+    // Create Salt session
+    let salt_token = match salt.login(&user.username, &authtoken.id).await {
         Ok(salt_token) => salt_token,
         Err(e) => {
-            error!("{:?}", e);
-            return Err(api_error_unauthorized());
+            error!("route_auth_login_post salt login {:?}", e);
+            return Err(api_error_internal_error());
         }
     };
 
+    // Update token with salt session
     match data
         .update_authtoken_salttoken(&authtoken.id, &Some(salt_token))
         .await
     {
         Ok(_) => {}
         Err(e) => {
-            error!("{:?}", e);
+            error!("route_auth_login_post update_salttoken {:?}", e);
             return Err(api_error_database());
         }
     }
 
+    // Return
     let response = LoginResponse {
         token: authtoken.id,
     };

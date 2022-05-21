@@ -7,7 +7,6 @@ use serde::Serialize;
 struct AuthUserResponse {
     id: String,
     username: String,
-    email: String,
 }
 
 pub async fn route_auth_user_get(
@@ -32,7 +31,6 @@ pub async fn route_auth_user_get(
     let response = AuthUserResponse {
         id: user.id,
         username: user.username,
-        email: user.email,
     };
     Ok(web::Json(response))
 }

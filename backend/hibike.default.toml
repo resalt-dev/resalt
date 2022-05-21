@@ -1,3 +1,24 @@
+[auth.ldap]
+enabled = true
+
+url = "ldap://ldap.example.com"
+start_tls = false
+no_tls_verify = false
+
+bind_dn = "cn=admin,dc=example,dc=com"
+bind_password = "secret"
+
+base_dn = "dc=example,dc=com"
+
+# OpenLDAP: (&(objectClass=inetOrgPerson)(uid=%s))
+# Active Directory: (&(objectClass=user)(sAMAccountName=%s))
+# AD with username or email: (&(objectClass=user)(|(sAMAccountName=%s)(mail=%s)))
+user_filter = "(&(objectClass=inetOrgPerson)(uid=%s))"
+user_attribute = "uid"
+
+[auth.user]
+session_lifespan = 86400
+
 [http]
 sub_path = "/hibike"
 
@@ -13,8 +34,3 @@ url = "https://localhost:8080"
 disable_tls_verification = true
 # head /dev/urandom | tr -dc A-Za-z0-9 | head -c512; echo
 #system_service_token = ""
-
-[user]
-session_lifespan = 86400
-login_max_tries = 5
-login_timeout = 300

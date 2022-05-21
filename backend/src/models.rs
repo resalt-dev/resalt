@@ -6,7 +6,6 @@ use serde::{ser::SerializeStruct, *};
 pub struct AuthToken {
     pub id: String,
     pub user_id: String,
-    pub success: bool,
     pub timestamp: chrono::NaiveDateTime,
     pub salt_token: Option<String>,
 }
@@ -102,7 +101,6 @@ pub struct User {
     pub id: String,
     pub username: String,
     pub password: Option<String>,
-    pub email: String,
 }
 
 #[derive(Debug, PartialEq)]

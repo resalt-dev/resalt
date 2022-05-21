@@ -2,7 +2,6 @@ table! {
     authtokens (id) {
         id -> Varchar,
         user_id -> Varchar,
-        success -> Bool,
         timestamp -> Timestamp,
         salt_token -> Nullable<Text>,
     }
@@ -31,7 +30,6 @@ table! {
         id -> Varchar,
         username -> Varchar,
         password -> Nullable<Varchar>,
-        email -> Varchar,
     }
 }
 

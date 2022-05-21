@@ -25,9 +25,7 @@ impl Storage {
     pub async fn init(&self) {
         // Create default user
         if self.list_users().await.unwrap_or_default().is_empty() {
-            self.create_user("admin", "admin", "admin@example.com")
-                .await
-                .unwrap();
+            self.create_user("admin", Some("admin")).await.unwrap();
         }
     }
 
@@ -41,16 +39,14 @@ impl Storage {
     pub async fn create_user(
         &self,
         username: &str,
-        password: &str,
-        email: &str,
+        password: Option<&str>,
     ) -> Result<User, String> {
         let connection = self.create_connection().await?;
         let uuid = format!("usr_{}", uuid::Uuid::new_v4());
         let user = User {
             id: uuid,
             username: username.to_string(),
-            password: Some(hash_password(password)),
-            email: email.to_string(),
+            password: password.map(|v| hash_password(v)),
         };
 
         diesel::insert_into(users::table)
@@ -86,17 +82,12 @@ impl Storage {
             .map_err(|e| format!("{:?}", e))
     }
 
-    pub async fn create_authtoken(
-        &self,
-        user_id: &str,
-        success: bool,
-    ) -> Result<AuthToken, String> {
+    pub async fn create_authtoken(&self, user_id: &str) -> Result<AuthToken, String> {
         let connection = self.create_connection().await?;
         let uuid = format!("auth_{}", uuid::Uuid::new_v4());
         let authtoken = AuthToken {
             id: uuid,
             user_id: user_id.to_string(),
-            success,
             timestamp: chrono::Utc::now().naive_utc(),
             salt_token: None,
         };
@@ -127,22 +118,6 @@ impl Storage {
             .map_err(|e| format!("{:?}", e))?;
 
         Ok(())
-    }
-
-    pub async fn list_authtokens_by_user_id(
-        &self,
-        user_id: &str,
-    ) -> Result<Vec<AuthToken>, String> {
-        let connection = self.create_connection().await?;
-        let timeout = SConfig::user_login_timeout();
-        let now = chrono::Utc::now().naive_utc();
-        let cutoff = now - chrono::Duration::seconds(timeout as i64);
-
-        authtokens::table
-            .filter(authtokens::user_id.eq(user_id))
-            .filter(authtokens::timestamp.ge(cutoff))
-            .load::<AuthToken>(&connection)
-            .map_err(|e| format!("{:?}", e))
     }
 
     pub async fn get_authtoken_by_id(&self, id: &str) -> Result<Option<AuthToken>, String> {

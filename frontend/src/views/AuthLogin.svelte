@@ -31,7 +31,7 @@
 <form onsubmit="return false;" autocomplete="false">
     <div class="row mb-3">
         <label for="loginInputUsername" class="col-sm-3 col-form-label fw-bold"
-            >Username or email</label
+            >Username</label
         >
         <div class="col-sm-9">
             <input

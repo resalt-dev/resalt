@@ -25,11 +25,9 @@ export class ApiResponse {
 export class User {
     id: string;
     username: string;
-    email: string;
 
-    constructor(id, username, email) {
+    constructor(id, username) {
         this.id = id;
         this.username = username;
-        this.email = email;
     }
 }

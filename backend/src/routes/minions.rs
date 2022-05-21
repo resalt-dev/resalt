@@ -35,7 +35,7 @@ pub async fn route_minions_get(
         match salt.refresh_minions(&salt_token).await {
             Ok(_) => (),
             Err(e) => {
-                error!("{:?}", e);
+                error!("route_minions_get refresh_minions {:?}", e);
                 return Err(api_error_internal_error());
             }
         };

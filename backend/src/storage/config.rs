@@ -25,6 +25,86 @@ lazy_static::lazy_static! {
 
 #[allow(dead_code)]
 impl SConfig {
+    pub fn auth_ldap_enabled() -> bool {
+        SETTINGS
+            .read()
+            .unwrap()
+            .get_bool("auth.ldap.enabled")
+            .unwrap()
+    }
+
+    pub fn auth_ldap_url() -> String {
+        SETTINGS
+            .read()
+            .unwrap()
+            .get_string("auth.ldap.url")
+            .unwrap()
+    }
+
+    pub fn auth_ldap_start_tls() -> bool {
+        SETTINGS
+            .read()
+            .unwrap()
+            .get_bool("auth.ldap.start_tls")
+            .unwrap()
+    }
+
+    pub fn auth_ldap_skip_tls_verify() -> bool {
+        SETTINGS
+            .read()
+            .unwrap()
+            .get_bool("auth.ldap.skip_tls_verify")
+            .unwrap()
+    }
+
+    pub fn auth_ldap_bind_dn() -> String {
+        SETTINGS
+            .read()
+            .unwrap()
+            .get_string("auth.ldap.bind_dn")
+            .unwrap()
+    }
+
+    pub fn auth_ldap_bind_password() -> String {
+        SETTINGS
+            .read()
+            .unwrap()
+            .get_string("auth.ldap.bind_password")
+            .unwrap()
+    }
+
+    pub fn auth_ldap_base_dn() -> String {
+        SETTINGS
+            .read()
+            .unwrap()
+            .get_string("auth.ldap.base_dn")
+            .unwrap()
+    }
+
+    pub fn auth_ldap_user_filter() -> String {
+        SETTINGS
+            .read()
+            .unwrap()
+            .get_string("auth.ldap.user_filter")
+            .unwrap()
+    }
+
+    pub fn auth_ldap_user_attribute() -> String {
+        SETTINGS
+            .read()
+            .unwrap()
+            .get_string("auth.ldap.user_attribute")
+            .unwrap()
+    }
+
+    pub fn auth_user_session_lifespan() -> u64 {
+        SETTINGS
+            .read()
+            .unwrap()
+            .get_int("auth.user.session_lifespan")
+            .unwrap() as u64
+    }
+
     pub fn database_url() -> String {
         SETTINGS.read().unwrap().get_string("database.url").unwrap()
     }
@@ -71,29 +151,5 @@ impl SConfig {
             .unwrap()
             .get_string("http.sub_path")
             .unwrap()
-    }
-
-    pub fn user_session_lifespan() -> u64 {
-        SETTINGS
-            .read()
-            .unwrap()
-            .get_int("user.session_lifespan")
-            .unwrap() as u64
-    }
-
-    pub fn user_login_max_tries() -> u64 {
-        SETTINGS
-            .read()
-            .unwrap()
-            .get_int("user.login_max_tries")
-            .unwrap() as u64
-    }
-
-    pub fn user_login_timeout() -> u64 {
-        SETTINGS
-            .read()
-            .unwrap()
-            .get_int("user.login_timeout")
-            .unwrap() as u64
     }
 }
