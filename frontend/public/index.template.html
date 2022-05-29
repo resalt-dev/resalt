@@ -11,6 +11,15 @@
 	<link href='__basePath__/assets/css/bootstrap-5.0.2.min.css' rel='stylesheet'>
 	<link href='__basePath__/assets/css/bootstrap-directional-buttons.min.css' rel='stylesheet'>
 	<script src='__basePath__/assets/js/bootstrap.bundle-5.0.2.min.js'></script>
+	<script src='__basePath__/assets/js/popper-2.9.2.min.js'></script>
+	<script type="text/javascript">
+		document.addEventListener("load", function(){
+			var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+			var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+			return new bootstrap.Popover(popoverTriggerEl)
+			})
+		});
+	</script>
 
 	<!-- Svelte -->
 	<!-- App name: __appName__ -->

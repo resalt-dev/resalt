@@ -331,15 +331,15 @@ samp {
 .btn-light:hover, .btn-light.active {background-color: var(--gray) !important;}
 .btn-dark:hover, .btn-dark.active {background-color: var(--black) !important;}
 
-.btn-volcano, .btn-volcano:hover,
-.btn-orange, .btn-orange:hover,
-.btn-yellow, .btn-yellow:hover,
-.btn-warning, .btn-warning:hover,
+/* .btn-yellow, .btn-yellow:hover,
+.btn-warning, .btn-warning:hover, */
 .btn-light, .btn-light:hover {
     color: var(--black);
 }
 
 .btn-red, .btn-red:hover,
+.btn-volcano, .btn-volcano:hover,
+.btn-orange, .btn-orange:hover,
 .btn-gold, .btn-gold:hover,
 .btn-green, .btn-green:hover,
 .btn-cyan, .btn-cyan:hover,
@@ -718,8 +718,8 @@ hr {
 /*
  * Boxicons
  */
-.bx {
-}
+/* .bx {
+} */
 
 /*
  * directional-buttons override

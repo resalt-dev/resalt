@@ -1,7 +1,7 @@
 <script>
     import { Link, useLocation } from "svelte-navigator";
+    import { theme } from "../../stores";
     import Icon from "../Icon.svelte";
-    import constants from "../../constants";
 
     export let route;
     export let collapsed;
@@ -15,7 +15,7 @@
     <Link
         to={route.path}
         class="nav-link text-white py-3 fw-light d-flex align-items-center {isActiveOrSub
-            ? `bg-${constants.mainColor} fw-bold`
+            ? `bg-${$theme.color} fw-bold`
             : ''}"
     >
         <Icon name={route.icon} class="ps-1 {collapsed ? '' : 'me-3'}" />

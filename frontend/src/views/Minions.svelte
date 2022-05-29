@@ -1,8 +1,7 @@
 <script>
     import { onMount } from "svelte";
     import { load_minions } from "../controller";
-    import { minions } from "../stores";
-    import constants from "../constants";
+    import { minions, theme } from "../stores";
     import Icon from "../components/Icon.svelte";
     import paths from "../paths";
 
@@ -37,7 +36,7 @@
 <h1>Minions</h1>
 
 <div class="nav bg-dark w-100">
-    <div class="nav-link text-white px-4 py-3 fw-bold bg-{constants.mainColor}">
+    <div class="nav-link text-white px-4 py-3 fw-bold bg-{$theme.color}">
         Search
     </div>
 </div>

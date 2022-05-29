@@ -2,8 +2,8 @@
     import { onMount } from "svelte";
     import { Link } from "svelte-navigator";
     import paths from "../paths";
+    import { theme } from "../stores";
     import { logout } from "../controller";
-    import constants from "../constants";
 
     onMount(async () => {
         logout();
@@ -17,8 +17,7 @@
     <br />
     <Link
         to={paths.login.path}
-        class={`btn btn-${constants.mainColor} float-end px-5 fw-bold`}
-        >Go back</Link
+        class={`btn btn-${$theme.color} float-end px-5 fw-bold`}>Go back</Link
     >
 {:catch error}
     An error occurred.

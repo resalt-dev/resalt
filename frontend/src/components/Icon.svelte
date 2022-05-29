@@ -1,7 +1,7 @@
 <script>
     export let type = "regular";
     export let name = "bx-rocket";
-    export let size = 2;
+    export let size = "2";
     let cssClass = "";
     export { cssClass as class };
     export let style = "";
@@ -10,4 +10,8 @@
         (type === "solid" ? "bxs-" : type === "logo" ? "bxl-" : "bx-") + name;
 </script>
 
-<i class="bx {full_name} {cssClass}" style="font-size: {size}rem;{style}" />
+<i
+    on:click
+    class="bx {full_name} {cssClass}"
+    style="font-size: {size}rem;{style}"
+/>

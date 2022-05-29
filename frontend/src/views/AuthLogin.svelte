@@ -1,8 +1,7 @@
 <script>
     import { onMount } from "svelte";
     import { login } from "../controller";
-    import constants from "../constants";
-    import { alerts } from "../stores";
+    import { theme, alerts } from "../stores";
 
     import { useNavigate } from "svelte-navigator";
     const navigate = useNavigate();
@@ -58,7 +57,7 @@
     </div>
     <button
         on:click={handleClick}
-        class={`btn btn-${constants.mainColor} float-end px-5 fw-bold mb-3`}
+        class={`btn btn-${$theme.color} float-end px-5 fw-bold mb-3`}
         >Login</button
     >
     <div class="clearfix" />
