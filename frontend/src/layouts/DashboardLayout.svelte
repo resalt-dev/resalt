@@ -1,7 +1,7 @@
 <script>
     import { onMount } from "svelte";
     import { Router, Route, useNavigate } from "svelte-navigator";
-    import { user } from "../stores";
+    import { user, theme } from "../stores";
     import { load_user } from "../controller";
     import paths from "../paths";
     import Sidebar from "../components/Sidebar/Sidebar.svelte";
@@ -9,8 +9,16 @@
     import Redirect from "../components/Redirect.svelte";
 
     import Home from "../views/Home.svelte";
-    import Minions from "../views/Minions.svelte";
     import Minion from "../views/Minion/Minion.svelte";
+    import Minions from "../views/Minions.svelte";
+    import Run from "../views/Run.svelte";
+    import Job from "../views/Job.svelte";
+    import Jobs from "../views/Jobs.svelte";
+    import Schedules from "../views/Schedules.svelte";
+    import Keys from "../views/Keys.svelte";
+    import Users from "../views/Users.svelte";
+    import Settings from "../views/Settings.svelte";
+    import Preferences from "../views/Preferences/Preferences.svelte";
 
     const navigate = useNavigate();
 
@@ -26,13 +34,25 @@
         <div class="">
             <Sidebar />
         </div>
-        <div class="stretch-width overflow-auto">
+        <div
+            class="stretch-width overflow-auto {$theme.dark
+                ? 'bg-darker text-white'
+                : ''}"
+        >
             <Topbar />
             <div class="px-4 py-3">
                 <Router primary={false}>
                     <Route path="home" component={Home} />
                     <Route path="minions/:minionId/*" component={Minion} />
                     <Route path="minions" component={Minions} />
+                    <Route path="run" component={Run} />
+                    <Route path="jobs/:jobId/*" component={Job} />
+                    <Route path="jobs" component={Jobs} />
+                    <Route path="schedules" component={Schedules} />
+                    <Route path="keys" component={Keys} />
+                    <Route path="users" component={Users} />
+                    <Route path="settings" component={Settings} />
+                    <Route path="preferences" component={Preferences} />
                     <Route path="*">
                         <Redirect to={paths.home.path} />
                     </Route>

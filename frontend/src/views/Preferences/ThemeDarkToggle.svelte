@@ -1,5 +1,5 @@
 <script>
-    import { theme } from "../stores";
+    import { theme } from "../../stores";
 
     function toggleDarkMode(event) {
         console.log("toggleDarkMode");

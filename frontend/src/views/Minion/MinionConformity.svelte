@@ -1,5 +1,6 @@
 <script lang="ts">
     import JsonViewer from "../../components/JsonViewer.svelte";
+    import { theme } from "../../stores";
     import ConsoleChangeBranch from "./ConsoleChangeBranch.svelte";
 
     const SHIFT = 10;
@@ -150,7 +151,7 @@
     {:else}
         <div class="row p-3">
             <div class="col-3">
-                <div class="card mb-3">
+                <div class="card mb-3 {$theme.dark ? 'bg-secondary' : ''}">
                     <div class="card-header">
                         <span class="fw-bold">Options</span>
                     </div>
@@ -248,7 +249,7 @@
                     </div>
                 </div>
 
-                <div class="card mb-3">
+                <div class="card mb-3 {$theme.dark ? 'bg-secondary' : ''}">
                     <div class="card-header">
                         <span class="fw-bold">Tree view</span>
                     </div>
@@ -262,7 +263,9 @@
                 <div class="d-grid">
                     {#each conformity as conform}
                         <div
-                            class="card mb-3 startside-{conform.color} {!(
+                            class="card mb-3 {$theme.dark
+                                ? 'bg-secondary'
+                                : ''} startside-{conform.color} {!(
                                 (showSuccess && conform.data.result === true) ||
                                 (showIncorrect &&
                                     conform.data.result === null) ||

@@ -1,11 +1,7 @@
 <script lang="ts">
-    import { Popover } from "sveltestrap";
     import { useLocation, Link } from "svelte-navigator";
     import { socket, theme } from "../stores";
     import paths from "../paths";
-    import Icon from "../components/Icon.svelte";
-    import ThemeColorPicker from "./ThemeColorPicker.svelte";
-    import ThemeDarkToggle from "./ThemeDarkToggle.svelte";
 
     const location = useLocation();
 
@@ -23,7 +19,11 @@
         });
 </script>
 
-<div class="row g-0 d-flex align-items-center bg-light">
+<div
+    class="row g-0 d-flex align-items-center {$theme.dark
+        ? 'bg-secondary'
+        : 'bg-light'}"
+>
     <div class="col">
         <div class="btn-group me-3" role="group">
             {#each navbar as item}
@@ -42,60 +42,6 @@
         </div>
     </div>
     <div class="col-auto pe-3 d-flex align-items-center">
-        <div class="btn-group me-2" role="group" aria-label="Basic example">
-            <button
-                id="topbar-popover-theme"
-                type="button"
-                class="btn btn-dark btn-sm d-flex align-items-center"
-            >
-                <Icon size="1.3" name="palette" />
-            </button>
-            <Popover
-                target="topbar-popover-theme"
-                placement="bottom"
-                title="Theme"
-            >
-                <h5>Color:</h5>
-                <hr />
-                <ThemeColorPicker />
-                <br />
-                <br />
-                <h5>Dark mode:</h5>
-                <hr />
-                <ThemeDarkToggle />
-            </Popover>
-            <button
-                id="topbar-popover-alerts"
-                type="button"
-                class="btn btn-dark btn-sm d-flex align-items-center"
-            >
-                <Icon size="1.3" name="bell" />
-            </button>
-            <Popover
-                target="topbar-popover-alerts"
-                placement="bottom"
-                title="Alerts"
-                trigger="focus"
-            >
-                Alerts:
-            </Popover>
-            <button
-                id="topbar-popover-settings"
-                type="button"
-                class="btn btn-dark btn-sm d-flex align-items-center"
-            >
-                <Icon size="1.3" name="wrench" />
-            </button>
-            <Popover
-                target="topbar-popover-settings"
-                placement="bottom"
-                title="Settings"
-                trigger="focus"
-            >
-                Settings:
-            </Popover>
-        </div>
-
         {#if $socket.connected}
             <!-- display last_ping as hh:mm:ss -->
             <span class="badge rounded-pill bg-success"

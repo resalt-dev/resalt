@@ -6,6 +6,15 @@
     import paths from "../paths";
 
     import { Link, useNavigate } from "svelte-navigator";
+    import {
+        Button,
+        Card,
+        CardBody,
+        CardHeader,
+        Col,
+        Row,
+        Table,
+    } from "sveltestrap";
     const navigate = useNavigate();
 
     $: mapped_minions = ($minions ?? []).map((minion) => {
@@ -17,14 +26,6 @@
                 " " +
                 (grains["osrelease"] ?? "")
             ).trim(),
-            datatable_sidecolor:
-                minion.last_updated_conformity == null
-                    ? "purple"
-                    : minion.conformity_error > 0
-                    ? "red"
-                    : minion.conformity_incorrect > 0
-                    ? "orange"
-                    : "green",
         };
     });
 
@@ -41,13 +42,16 @@
     </div>
 </div>
 
-<div class="card mb-3">
-    <div class="card-header">
-        <span class="fw-bold">Search options</span>
-    </div>
-    <div class="card-body">
-        <div class="row">
-            <div class="col mb-3">
+<Card class="mb-3 {$theme.dark ? 'bg-dark border-0' : ''}">
+    <CardHeader
+        class={$theme.dark ? "bg-dark" : ""}
+        style={$theme.dark ? "border-radius: 0px !important" : ""}
+    >
+        <span class="fw-bold">Search options:</span>
+    </CardHeader>
+    <CardBody>
+        <Row>
+            <Col class="mb-4">
                 <label for="inputEmail3" class="form-label d-inline"
                     >Search</label
                 >
@@ -57,32 +61,41 @@
                     class="form-control ms-2 d-inline"
                     style="width: 15rem;"
                 />
-            </div>
-            <div class="col" />
-        </div>
+            </Col>
+        </Row>
 
         <strong>CPU</strong>
 
-        <button
-            class="btn btn-secondary btn-sm"
-            on:click={() => load_minions(navigate)}>Load minions</button
+        <Button
+            color="secondary"
+            size="sm"
+            on:click={() => load_minions(navigate)}
         >
-        <button
-            class="btn btn-info btn-sm"
+            Load minions
+        </Button>
+        <Button
+            color="info"
+            size="sm"
             on:click={() => load_minions(navigate, true)}
-            >Force reload minions</button
         >
-    </div>
-</div>
+            Force reload minions
+        </Button>
+    </CardBody>
+</Card>
 
 {#if !$minions}
     <div class="p-3">No minions detected. Try force reload.</div>
 {:else}
-    <div class="table-responsive">
-        <table id="minionListTable" class="table table-hover">
+    <div class="table-responsive card {$theme.dark ? 'bg-dark' : ''}">
+        <Table
+            dark={$theme.dark}
+            hover
+            id="minionListTable"
+            class="b-0 mb-0 {$theme.dark ? 'text-white border-secondary' : ''}"
+        >
             <thead class="bg-dark text-white border-0">
                 <tr>
-                    <th scope="col">
+                    <th scope="col" class="border-secondary">
                         <div class="row g-1">
                             <div class="col-auto align-self-center ps-2">
                                 ID
@@ -108,7 +121,7 @@
                             </div>
                         </div>
                     </th>
-                    <th scope="col">
+                    <th scope="col" class="border-secondary">
                         <div class="row g-1">
                             <div class="col-auto align-self-center">Type</div>
                             <div class="col-auto align-self-center d-grid">
@@ -132,7 +145,7 @@
                             </div>
                         </div>
                     </th>
-                    <th scope="col">
+                    <th scope="col" class="border-secondary">
                         <div class="row g-1">
                             <div class="col-auto align-self-center">
                                 Last seen
@@ -151,7 +164,7 @@
                             </div>
                         </div>
                     </th>
-                    <th scope="col">
+                    <th scope="col" class="border-secondary">
                         <div class="row g-1">
                             <div class="col-auto align-self-center">
                                 Conformity
@@ -170,7 +183,7 @@
                             </div>
                         </div>
                     </th>
-                    <th scope="col">Actions</th>
+                    <th scope="col" class="border-secondary">Actions</th>
                 </tr>
             </thead>
             <tbody class="align-middle">
@@ -178,7 +191,7 @@
                     <tr>
                         <th
                             scope="row"
-                            class="startside-{minion.datatable_sidecolor} mouse-pointer"
+                            class="mouse-pointer"
                             on:click={() =>
                                 navigate(paths.minion.getPath(minion.id))}
                             >{minion.id}</th
@@ -187,17 +200,19 @@
                         <td>{minion.last_seen}</td>
                         <td>
                             {#if minion.last_updated_conformity == null}
-                                <span class="badge bg-purple"> Unknown </span>
+                                <span class="badge mb-1 bg-purple">
+                                    Unknown
+                                </span>
                             {:else}
-                                <span class="badge bg-green fw-bold">
+                                <span class="badge mb-1 bg-green fw-bold">
                                     {minion.conformity_success ?? "?"}
                                 </span>
                                 /
-                                <span class="badge bg-warning fw-bold">
+                                <span class="badge mb-1 bg-warning fw-bold">
                                     {minion.conformity_incorrect ?? "?"}
                                 </span>
                                 /
-                                <span class="badge bg-red fw-bold">
+                                <span class="badge mb-1 bg-red fw-bold">
                                     {minion.conformity_error ?? "?"}
                                 </span>
                             {/if}
@@ -211,7 +226,7 @@
                     </tr>
                 {/each}
             </tbody>
-        </table>
+        </Table>
     </div>
 {/if}
 

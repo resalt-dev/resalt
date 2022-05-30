@@ -1,6 +1,6 @@
 <script>
-    import Icon from "./Icon.svelte";
-    import { theme } from "../stores";
+    import Icon from "../../components/Icon.svelte";
+    import { theme } from "../../stores";
 
     $: currentColor = $theme.color;
     $: console.log("currentColor", currentColor);

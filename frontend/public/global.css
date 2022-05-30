@@ -188,10 +188,10 @@
     --dark-geekblue: var(--geekblue-8);
     --dark-purple: var(--purple-8);
     --dark-magenta: var(--magenta-8);
-    --dark-gray: var(--gray-9);
+    --dark-gray: var(--gray-10);
     
     --white: var(--gray-1);
-    --gray: var(--gray-7);
+    --gray: var(--gray-9);
     --black: var(--gray-13);
 
     /* Boostrap Colors */
@@ -372,6 +372,10 @@ samp {
     box-shadow: none;
 }
 
+.card-header {
+    background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
 .bg-red {
     background-color: var(--red) !important;
 }
@@ -433,8 +437,11 @@ samp {
     background-color: var(--black) !important;
 }
 
-.card-header {
-    background-color: rgba(0, 0, 0, 0.1) !important;
+.table-dark>:not(caption)>*>* {
+    --bs-table-bg: var(--dark);
+}
+.table-dark.table-hover>tbody>tr:hover {
+    --bs-table-accent-bg: var(--dark-gray);
 }
 
 .border-red {

@@ -67,7 +67,11 @@
         {/each}
     </div>
 
-    <div class={`card border-4 border-${$theme.color} rounded-none`}>
+    <div
+        class="card border-4 border-{$theme.color} rounded-none {$theme.dark
+            ? 'bg-dark'
+            : ''}"
+    >
         <div class="card-body p-0">
             {#if subPage === undefined}
                 <MinionInfo {minion} />

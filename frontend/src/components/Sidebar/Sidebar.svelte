@@ -38,6 +38,9 @@
     >
         {#each paths as route}
             {#if route.showInNav}
+                {#if route.name === "users"}
+                    <hr />
+                {/if}
                 <SidebarItem {route} collapsed={$collapsed} />
             {/if}
         {/each}
@@ -69,9 +72,11 @@
             class="dropdown-menu dropdown-menu-dark bg-darker text-small shadow ms-5"
             aria-labelledby="dropdownUser1"
         >
-            <li><Link to="#" class="dropdown-item">Settings</Link></li>
-            <li><Link to="#" class="dropdown-item">Notifications</Link></li>
-            <li><Link to="#" class="dropdown-item">Theme</Link></li>
+            <li>
+                <Link to={paths.preferences.path} class="dropdown-item"
+                    >Preferences</Link
+                >
+            </li>
             <li><hr class="dropdown-divider" /></li>
             <li>
                 <Link to={paths.logout.path} class="dropdown-item"

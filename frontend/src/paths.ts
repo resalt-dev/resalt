@@ -35,8 +35,24 @@ const authPaths = [
 
 const dashboardPaths = [
     new Path ("home", `/dashboard/home`, "Dashboard", "home", true),
-    new Path ("minion", `/dashboard/minions/:minionId/:subPage`, "Minion", "server", false, true),
+
+    new Path ("minion", `/dashboard/minions/:minionId/:subPage`, "Minion", "", false, true),
     new Path ("minions", `/dashboard/minions`, "Minions", "server", true),
+
+    new Path ("run", `/dashboard/run`, "Run", "play", true),
+
+    new Path ("job", `/dashboard/jobs/:jobId`, "Job", "", false, true),
+    new Path ("jobs", `/dashboard/jobs`, "Jobs", "list-ul", true),
+
+    new Path ("schedule", `/dashboard/schedules/:scheduleId`, "Schedule", "", false, true),
+    new Path ("schedules", `/dashboard/schedules`, "Schedules", "calendar", true),
+
+    new Path ("keys", `/dashboard/keys`, "Keys", "lock", true),
+
+    new Path ("users", `/dashboard/users`, "Users", "user-circle", true),
+    new Path ("settings", `/dashboard/settings`, "Settings", "cog", true),
+
+    new Path ("preferences", `/dashboard/preferences`, "Preferences", "cog", false, false),
 ];
 
 const paths: any = new Proxy ([
