@@ -14,7 +14,9 @@
 <li class="nav-item">
     <Link
         to={route.path}
-        class="nav-link text-white py-3 fw-light d-flex align-items-center {isActiveOrSub
+        class="nav-link text-{$theme.color === 'yellow' && isActiveOrSub
+            ? 'dark'
+            : 'white'} py-3 fw-light d-flex align-items-center {isActiveOrSub
             ? `bg-${$theme.color} fw-bold`
             : ''}"
     >

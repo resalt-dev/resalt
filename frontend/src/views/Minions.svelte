@@ -42,10 +42,13 @@
     </div>
 </div>
 
-<Card class="mb-3 {$theme.dark ? 'bg-dark border-0' : ''}">
+<Card
+    class="mb-3 {$theme.dark ? 'bg-dark border-0' : ''}"
+    style="border-radius: 0px !important"
+>
     <CardHeader
         class={$theme.dark ? "bg-dark" : ""}
-        style={$theme.dark ? "border-radius: 0px !important" : ""}
+        style="border-radius: 0px !important"
     >
         <span class="fw-bold">Search options:</span>
     </CardHeader>

@@ -151,7 +151,7 @@
     {:else}
         <div class="row p-3">
             <div class="col-3">
-                <div class="card mb-3 {$theme.dark ? 'bg-secondary' : ''}">
+                <div class="card mb-3 {$theme.dark ? 'bg-dark' : ''}">
                     <div class="card-header">
                         <span class="fw-bold">Options</span>
                     </div>
@@ -166,7 +166,9 @@
                                     (sortOrder = SortOrder[sortKey])}
                             >
                                 <input
-                                    class="form-check-input form-check-input-dark"
+                                    class="form-check-input form-check-input-{$theme.dark
+                                        ? $theme.color
+                                        : 'dark'}"
                                     type="radio"
                                     name="sortMethod"
                                     id={`sortMethod-${sortKey}`}
@@ -235,7 +237,9 @@
                         <!-- showCollapsed -->
                         <div class="form-check">
                             <input
-                                class="form-check-input form-check-input-dark"
+                                class="form-check-input form-check-input-{$theme.dark
+                                    ? $theme.color
+                                    : 'dark'}"
                                 type="checkbox"
                                 id="showCollapsed"
                                 on:click={() =>
@@ -249,7 +253,7 @@
                     </div>
                 </div>
 
-                <div class="card mb-3 {$theme.dark ? 'bg-secondary' : ''}">
+                <div class="card mb-3 {$theme.dark ? 'bg-dark' : ''}">
                     <div class="card-header">
                         <span class="fw-bold">Tree view</span>
                     </div>

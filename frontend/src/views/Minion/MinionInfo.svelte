@@ -1,4 +1,5 @@
 <script>
+    import { Table } from "sveltestrap";
     import { theme } from "../../stores";
 
     export let minion;
@@ -20,7 +21,7 @@
 
 <div class="row p-3">
     <div class="col-6 col-xxl-3">
-        <div class="card mb-3 {$theme.dark ? 'bg-secondary' : ''}">
+        <div class="card mb-3 {$theme.dark ? 'bg-dark' : ''}">
             <div class="card-header">
                 <span class="fw-bold">Common</span>
             </div>
@@ -75,7 +76,7 @@
     </div>
 
     <div class="col-6 col-xxl-3">
-        <div class="card mb-3 {$theme.dark ? 'bg-secondary' : ''}">
+        <div class="card mb-3 {$theme.dark ? 'bg-dark' : ''}">
             <div class="card-header">
                 <span class="fw-bold">Hardware</span>
             </div>
@@ -132,7 +133,7 @@
     </div>
 
     <div class="col-6 col-xxl-3">
-        <div class="card mb-3 {$theme.dark ? 'bg-secondary' : ''}">
+        <div class="card mb-3 {$theme.dark ? 'bg-dark' : ''}">
             <div class="card-header">
                 <span class="fw-bold">DNS</span>
             </div>
@@ -172,7 +173,7 @@
     </div>
 
     <div class="col-6 col-xxl-3">
-        <div class="card mb-3 {$theme.dark ? 'bg-secondary' : ''}">
+        <div class="card mb-3 {$theme.dark ? 'bg-dark' : ''}">
             <div class="card-header">
                 <span class="fw-bold">Timings</span>
             </div>
@@ -238,17 +239,15 @@
     </div>
 
     <div class="col-12">
-        <div class="card mb-3 {$theme.dark ? 'bg-secondary' : ''}">
+        <div class="card mb-3 {$theme.dark ? 'bg-dark' : ''}">
             <div class="card-header">
                 <span class="fw-bold">Network</span>
             </div>
-            <div
-                class="class-body px-2 {$theme.dark
-                    ? 'bg-dark text-white'
-                    : ''}"
-            >
-                <table
-                    class="table table-hover {$theme.dark ? 'text-white' : ''}"
+            <div class="class-body px-2 {$theme.dark ? 'text-white' : ''}">
+                <Table
+                    dark={$theme.dark}
+                    hover
+                    class={$theme.dark ? "text-white" : ""}
                 >
                     <thead>
                         <tr>
@@ -270,7 +269,7 @@
                             </tr>
                         {/each}
                     </tbody>
-                </table>
+                </Table>
             </div>
         </div>
     </div>

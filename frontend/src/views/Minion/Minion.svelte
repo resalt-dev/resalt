@@ -69,7 +69,7 @@
 
     <div
         class="card border-4 border-{$theme.color} rounded-none {$theme.dark
-            ? 'bg-dark'
+            ? 'bg-darker'
             : ''}"
     >
         <div class="card-body p-0">
