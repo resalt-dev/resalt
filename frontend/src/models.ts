@@ -31,3 +31,10 @@ export class User {
         this.username = username;
     }
 }
+
+export class SaltEvent {
+    id: string;
+    timestamp: string;
+    tag: string;
+    data: string;
+}

@@ -9,12 +9,13 @@ import {
 import {
     create_event_connection,
     list_minions,
+    list_events,
     request_authtoken,
 } from "./api";
 import paths from "./paths";
 import { get_user } from "./api";
 
-import { ApiResponse, Alert } from "./models";
+import { ApiResponse, Alert, SaltEvent } from "./models";
 
 function alert(type: string, title: string, message: string): void {
     alerts.update((alerts) => [...alerts, new Alert(type, title, message)]);
@@ -173,6 +174,19 @@ export async function load_minions(navigate, force_refresh = false) {
     let result = await list_minions(token, force_refresh);
     if (result.status == 200) {
         minionsStore.set(result.data.minions);
+    } else {
+        // todo: error handle
+    }
+}
+
+export async function get_events(navigate): Promise<Array<SaltEvent>> {
+    if (!require_token(navigate)) return;
+
+    let token = get(authStore);
+
+    let result = await list_events(token);
+    if (result.status == 200) {
+        return result.data.events;
     } else {
         // todo: error handle
     }

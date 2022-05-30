@@ -1,1 +1,1 @@
-ALTER TABLE hibike.users ADD email varchar(50) NOT NULL;
+ALTER TABLE users ADD email varchar(50) NOT NULL;

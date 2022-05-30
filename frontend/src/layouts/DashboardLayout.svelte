@@ -16,6 +16,7 @@
     import Jobs from "../views/Jobs.svelte";
     import Schedules from "../views/Schedules.svelte";
     import Keys from "../views/Keys.svelte";
+    import Events from "../views/Events.svelte";
     import Users from "../views/Users.svelte";
     import Settings from "../views/Settings.svelte";
     import Preferences from "../views/Preferences/Preferences.svelte";
@@ -50,6 +51,7 @@
                     <Route path="jobs" component={Jobs} />
                     <Route path="schedules" component={Schedules} />
                     <Route path="keys" component={Keys} />
+                    <Route path="events" component={Events} />
                     <Route path="users" component={Users} />
                     <Route path="settings" component={Settings} />
                     <Route path="preferences" component={Preferences} />

@@ -1,6 +1,12 @@
 use crate::schema::*;
 use serde::{ser::SerializeStruct, *};
 
+/*
+=========================
+=    DATABASE MODELS    =
+=========================
+*/
+
 #[derive(Debug, Insertable, PartialEq, Queryable)]
 #[table_name = "authtokens"]
 pub struct AuthToken {
@@ -8,6 +14,30 @@ pub struct AuthToken {
     pub user_id: String,
     pub timestamp: chrono::NaiveDateTime,
     pub salt_token: Option<String>,
+}
+
+#[derive(Debug, Insertable, PartialEq, Queryable)]
+#[table_name = "events"]
+pub struct Event {
+    pub id: String,
+    pub timestamp: chrono::NaiveDateTime,
+    pub tag: String,
+    pub data: String,
+}
+
+impl Serialize for Event {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let timestamp = self.timestamp.format("%Y-%m-%d %H:%M:%S%.6f").to_string();
+        let mut state = serializer.serialize_struct("Event", 3)?;
+        state.serialize_field("id", &self.id)?;
+        state.serialize_field("timestamp", &timestamp)?;
+        state.serialize_field("tag", &self.tag)?;
+        state.serialize_field("data", &self.data)?;
+        state.end()
+    }
 }
 
 #[derive(Debug, Insertable, PartialEq, Queryable, AsChangeset)]
@@ -85,6 +115,20 @@ impl Serialize for Minion {
     }
 }
 
+#[derive(Debug, Insertable, PartialEq, Queryable)]
+#[table_name = "users"]
+pub struct User {
+    pub id: String,
+    pub username: String,
+    pub password: Option<String>,
+}
+
+/*
+===========================
+=   NON-DATABASE MODELS   =
+===========================
+*/
+
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct SaltToken {
     pub token: String,
@@ -93,14 +137,6 @@ pub struct SaltToken {
     pub user: String,
     pub eauth: String,
     pub perms: serde_json::Value,
-}
-
-#[derive(Debug, Insertable, PartialEq, Queryable)]
-#[table_name = "users"]
-pub struct User {
-    pub id: String,
-    pub username: String,
-    pub password: Option<String>,
 }
 
 #[derive(Debug, PartialEq)]

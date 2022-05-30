@@ -19,7 +19,7 @@ export async function request_authtoken(username: string, password: string): Pro
 }
 
 export async function create_event_connection(token: string): Promise<EventSource> {
-    var stream = new EventSource(constants.apiUrl + "/events?token=" + token);
+    var stream = new EventSource(constants.apiUrl + "/pipeline?token=" + token);
     return stream;
 }
 
@@ -46,4 +46,8 @@ export async function get_user(token: string): Promise<ApiResponse> {
 
 export async function list_minions(token: string, force_refresh: boolean): Promise<ApiResponse> {
     return _authd_req("GET", `/minions?refresh=${force_refresh}`, token);
+}
+
+export async function list_events(token: string): Promise<ApiResponse> {
+    return _authd_req("GET", `/events`, token);
 }

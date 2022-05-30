@@ -60,9 +60,17 @@ impl SaltEventListener {
         while let Some(event) = stream.next().await {
             // debug!("{:?}", event);
 
+            // Insert into own DB
+            match self.storage.insert_event(&event.tag, &event.data).await {
+                Ok(_) => (),
+                Err(err) => error!("failed to insert event: {:?}", err),
+            }
+
+            // Unwrap string to JSON structure
             let data: Value = serde_json::from_str(&event.data).unwrap();
             let data = data.get("data").unwrap().as_object().unwrap();
 
+            // Check tag type
             if let Some(_job_id) = REGEX_JOB_RETURN.captures(&event.tag) {
                 //let job_id = job_id.get(1).unwrap().as_str().to_string();
 

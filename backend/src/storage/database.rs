@@ -318,4 +318,30 @@ impl Storage {
             .load::<Minion>(&connection)
             .map_err(|e| format!("{:?}", e))
     }
+
+    pub async fn insert_event(&self, tag: &str, data: &str) -> Result<(), String> {
+        let connection = self.create_connection().await?;
+        let uuid = format!("evnt_{}", uuid::Uuid::new_v4());
+        let event = Event {
+            id: uuid,
+            timestamp: chrono::Utc::now().naive_utc(),
+            tag: tag.to_string(),
+            data: data.to_string(),
+        };
+        diesel::insert_into(events::table)
+            .values(&event)
+            .execute(&connection)
+            .map_err(|e| format!("{:?}", e))?;
+        Ok(())
+    }
+
+    pub async fn list_events(&self) -> Result<Vec<Event>, String> {
+        let connection = self.create_connection().await?;
+        // filter by latest timestamp first, limit to 100 for now.
+        events::table
+            .order(events::timestamp.desc())
+            .limit(100)
+            .load::<Event>(&connection)
+            .map_err(|e| format!("{:?}", e))
+    }
 }

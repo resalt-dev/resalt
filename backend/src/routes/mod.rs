@@ -8,6 +8,7 @@ mod events;
 mod fallback;
 mod index;
 mod minions;
+mod pipeline;
 
 pub use self::config::*;
 pub use auth_login::*;
@@ -17,3 +18,4 @@ pub use events::*;
 pub use fallback::*;
 pub use index::*;
 pub use minions::*;
+pub use pipeline::*;

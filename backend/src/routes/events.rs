@@ -1,10 +1,35 @@
 use crate::prelude::*;
-use actix_web::{http::header, web::Data, HttpResponse, Responder, Result};
+use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
+use log::*;
+use serde::{Deserialize, Serialize};
 
-pub async fn route_events_get(pipeline: Data<PipelineServer>) -> Result<impl Responder> {
-    let rx = pipeline.new_client();
+#[derive(Serialize, Deserialize, Debug)]
+pub struct EventsGetQuery {
+    // refresh: Option<bool>,
+}
 
-    Ok(HttpResponse::Ok()
-        .append_header((header::CONTENT_TYPE, "text/event-stream"))
-        .streaming(rx))
+#[derive(Serialize, Debug)]
+struct EventsResponse {
+    events: Vec<Event>,
+}
+
+pub async fn route_events_get(
+    data: web::Data<Storage>,
+    salt: web::Data<SaltAPI>,
+    query: web::Query<EventsGetQuery>,
+    req: HttpRequest,
+) -> Result<impl Responder> {
+    let ext = req.extensions_mut();
+    let auth = ext.get::<AuthStatus>().unwrap();
+
+    let events = match data.list_events().await {
+        Ok(events) => events,
+        Err(e) => {
+            error!("{:?}", e);
+            return Err(api_error_database());
+        }
+    };
+
+    let response = EventsResponse { events };
+    Ok(web::Json(response))
 }

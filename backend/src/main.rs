@@ -91,6 +91,11 @@ async fn main() -> std::io::Result<()> {
                                 .wrap(auth::RequireAuth::new())
                                 .route(web::get().to(route_events_get)),
                         );
+                        cfg.service(
+                            web::resource("/pipeline")
+                                .wrap(auth::RequireAuth::new())
+                                .route(web::get().to(route_pipeline_get)),
+                        );
                     }),
             )
             // default (fallback to frontend)

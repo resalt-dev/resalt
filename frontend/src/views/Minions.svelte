@@ -229,10 +229,3 @@
         </Table>
     </div>
 {/if}
-
-<style>
-    :global(.sort-icon) {
-        margin-top: -0.3rem;
-        margin-bottom: -0.3rem;
-    }
-</style>

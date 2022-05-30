@@ -1,1 +1,1 @@
-ALTER TABLE hibike.authtokens DROP COLUMN success;
+ALTER TABLE authtokens DROP COLUMN success;

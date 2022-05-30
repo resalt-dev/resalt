@@ -8,6 +8,15 @@ table! {
 }
 
 table! {
+    events (id) {
+        id -> Varchar,
+        timestamp -> Timestamp,
+        tag -> Varchar,
+        data -> Mediumtext,
+    }
+}
+
+table! {
     minions (id) {
         id -> Varchar,
         last_seen -> Timestamp,
@@ -35,6 +44,7 @@ table! {
 
 allow_tables_to_appear_in_same_query!(
     authtokens,
+    events,
     minions,
     users,
 );
