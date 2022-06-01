@@ -333,7 +333,8 @@ samp {
 
 /* .btn-yellow, .btn-yellow:hover,
 .btn-warning, .btn-warning:hover, */
-.btn-light, .btn-light:hover {
+.btn-light, .btn-light:hover,
+.badge.bg-warning {
     color: var(--black);
 }
 
@@ -561,6 +562,7 @@ samp {
 }
 
 hr {
+    opacity: 1;
     color: var(--gray) !important;
 }
 

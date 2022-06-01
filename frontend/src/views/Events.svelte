@@ -4,6 +4,8 @@
     import Icon from "../components/Icon.svelte";
     import { get_events } from "../controller";
     import { theme } from "../stores";
+    import { useNavigate } from "svelte-navigator";
+    const navigate = useNavigate();
 
     let events = [];
 
@@ -20,7 +22,7 @@
     });
 
     onMount(() => {
-        get_events().then((data) => {
+        get_events(navigate).then((data) => {
             events = data;
         });
     });

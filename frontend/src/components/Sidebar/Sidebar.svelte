@@ -2,7 +2,7 @@
     import { Link } from "svelte-navigator";
     import constants from "../../constants";
     import paths from "../../paths";
-    import { sidebarCollapsed as collapsed } from "../../stores";
+    import { sidebarCollapsed as collapsed, theme } from "../../stores";
     import Icon from "../Icon.svelte";
     import SidebarItem from "./SidebarItem.svelte";
 

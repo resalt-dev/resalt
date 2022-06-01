@@ -4,7 +4,6 @@
     import { minions, theme } from "../stores";
     import Icon from "../components/Icon.svelte";
     import paths from "../paths";
-
     import { Link, useNavigate } from "svelte-navigator";
     import {
         Button,
@@ -203,19 +202,25 @@
                         <td>{minion.last_seen}</td>
                         <td>
                             {#if minion.last_updated_conformity == null}
-                                <span class="badge mb-1 bg-purple">
+                                <span class="badge mb-1 align-middle bg-purple">
                                     Unknown
                                 </span>
                             {:else}
-                                <span class="badge mb-1 bg-green fw-bold">
+                                <span
+                                    class="badge mb-1 align-middle bg-green fw-bold"
+                                >
                                     {minion.conformity_success ?? "?"}
                                 </span>
                                 /
-                                <span class="badge mb-1 bg-warning fw-bold">
+                                <span
+                                    class="badge mb-1 align-middle bg-warning fw-bold"
+                                >
                                     {minion.conformity_incorrect ?? "?"}
                                 </span>
                                 /
-                                <span class="badge mb-1 bg-red fw-bold">
+                                <span
+                                    class="badge mb-1 align-middle bg-red fw-bold"
+                                >
                                     {minion.conformity_error ?? "?"}
                                 </span>
                             {/if}
