@@ -60,24 +60,27 @@ impl SaltEventListener {
         while let Some(event) = stream.next().await {
             // debug!("{:?}", event);
 
-            // Insert into own DB
-            match self.storage.insert_event(&event.tag, &event.data).await {
-                Ok(_) => (),
-                Err(err) => error!("failed to insert event: {:?}", err),
-            }
-
             // Unwrap string to JSON structure
             let data: Value = serde_json::from_str(&event.data).unwrap();
             let data = data.get("data").unwrap().as_object().unwrap();
 
+            // Unpack timestamp
+            let time = data["_stamp"].as_str().unwrap();
+            let time = chrono::NaiveDateTime::parse_from_str(time, "%Y-%m-%dT%H:%M:%S.%f").unwrap();
+
+            // Insert into own DB
+            match self
+                .storage
+                .insert_event(&event.tag, &event.data, &time)
+                .await
+            {
+                Ok(_) => (),
+                Err(err) => error!("failed to insert event: {:?}", err),
+            }
+
             // Check tag type
             if let Some(_job_id) = REGEX_JOB_RETURN.captures(&event.tag) {
-                //let job_id = job_id.get(1).unwrap().as_str().to_string();
-
                 // Assumed always present, everything else is optional
-                let time = data["_stamp"].as_str().unwrap();
-                let time =
-                    chrono::NaiveDateTime::parse_from_str(time, "%Y-%m-%dT%H:%M:%S.%f").unwrap();
                 let fun = data["fun"].as_str().unwrap();
                 let fun_args = data["fun_args"].as_array().unwrap();
 
@@ -183,10 +186,6 @@ impl SaltEventListener {
                     _ => {}
                 }
             } else if event.tag == "salt/auth" {
-                let time = data["_stamp"].as_str().unwrap();
-                let time =
-                    chrono::NaiveDateTime::parse_from_str(time, "%Y-%m-%dT%H:%M:%S.%f").unwrap();
-
                 let result = data.get("result").unwrap().as_bool().unwrap();
                 if !result {
                     continue;

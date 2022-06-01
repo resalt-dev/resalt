@@ -2,6 +2,7 @@ extern crate diesel;
 
 use self::diesel::prelude::*;
 use crate::{prelude::*, schema::*};
+use chrono::NaiveDateTime;
 use diesel::r2d2::{ConnectionManager, Pool, PoolError, PooledConnection};
 
 type DbPooledConnection = PooledConnection<ConnectionManager<MysqlConnection>>;
@@ -319,12 +320,17 @@ impl Storage {
             .map_err(|e| format!("{:?}", e))
     }
 
-    pub async fn insert_event(&self, tag: &str, data: &str) -> Result<(), String> {
+    pub async fn insert_event(
+        &self,
+        tag: &str,
+        data: &str,
+        time: &NaiveDateTime,
+    ) -> Result<(), String> {
         let connection = self.create_connection().await?;
         let uuid = format!("evnt_{}", uuid::Uuid::new_v4());
         let event = Event {
             id: uuid,
-            timestamp: chrono::Utc::now().naive_utc(),
+            timestamp: *time,
             tag: tag.to_string(),
             data: data.to_string(),
         };
@@ -340,7 +346,7 @@ impl Storage {
         // filter by latest timestamp first, limit to 100 for now.
         events::table
             .order(events::timestamp.desc())
-            .limit(100)
+            .limit(2000)
             .load::<Event>(&connection)
             .map_err(|e| format!("{:?}", e))
     }
