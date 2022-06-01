@@ -623,6 +623,9 @@ hr {
 .text-dark {
     color: var(--black) !important;
 }
+.text-muted {
+    color: var(--gray-7) !important;
+}
 
 .form-check-input:checked {
     background-color: var(--primary);

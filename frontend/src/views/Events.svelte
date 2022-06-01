@@ -1,15 +1,25 @@
-<script>
+<script lang="ts">
     import { onMount } from "svelte";
     import { Table } from "sveltestrap";
     import Icon from "../components/Icon.svelte";
     import { get_events } from "../controller";
     import { theme } from "../stores";
     import { useNavigate } from "svelte-navigator";
+    import TablePaginate from "../components/TablePaginate.svelte";
+
     const navigate = useNavigate();
+    const EVENTS_PAGINATE_SIZE = 20;
 
+    let pagination_page: number = 1;
     let events = [];
+    let expanded_events = [];
 
-    $: mapped_events = (events ?? []).map((event) => {
+    $: filtered_events = events.filter((event) => true);
+    $: paginated_events = filtered_events.slice(
+        (pagination_page - 1) * EVENTS_PAGINATE_SIZE,
+        pagination_page * EVENTS_PAGINATE_SIZE
+    );
+    $: mapped_events = paginated_events.map((event) => {
         const data = JSON.parse(event.data ?? "{data: {}}").data;
         return {
             ...event,
@@ -18,8 +28,23 @@
             fun: data.fun ?? "",
             data_parsed: data,
             data_formatted: JSON.stringify(data, null, 2),
+            unique_index: (
+                (event.tag ?? "") +
+                "_" +
+                (event.timestamp ?? "")
+            ).replace(/ /g, "_"),
         };
     });
+
+    function toggle_event_expand(index: string) {
+        console.log(index);
+        if (expanded_events.includes(index)) {
+            expanded_events = expanded_events.filter((i) => i !== index);
+        } else {
+            expanded_events = [...expanded_events, index];
+        }
+        console.log(expanded_events);
+    }
 
     onMount(() => {
         get_events(navigate).then((data) => {
@@ -61,7 +86,7 @@
                 </th>
                 <th scope="col" class="border-secondary">
                     <div class="row g-1">
-                        <div class="col-auto align-self-center">Job ID</div>
+                        <div class="col-auto align-self-center">Function</div>
                         <div class="col-auto align-self-center d-grid">
                             <Icon
                                 size="1.125"
@@ -75,7 +100,7 @@
                             />
                         </div>
                         <div class="col-auto align-self-center">
-                            <input type="text" class="ms-1 lh-1" size="15" />
+                            <input type="text" class="ms-1 lh-1" size="12" />
                         </div>
                     </div>
                 </th>
@@ -101,7 +126,7 @@
                 </th>
                 <th scope="col" class="border-secondary">
                     <div class="row g-1">
-                        <div class="col-auto align-self-center">Function</div>
+                        <div class="col-auto align-self-center">Job ID</div>
                         <div class="col-auto align-self-center d-grid">
                             <Icon
                                 size="1.125"
@@ -115,7 +140,7 @@
                             />
                         </div>
                         <div class="col-auto align-self-center">
-                            <input type="text" class="ms-1 lh-1" size="12" />
+                            <input type="text" class="ms-1 lh-1" size="15" />
                         </div>
                     </div>
                 </th>
@@ -139,22 +164,49 @@
             </tr>
         </thead>
         <tbody class="align-middle">
-            {#each mapped_events as minion}
+            {#each mapped_events as event}
                 <tr>
-                    <!-- <th scope="row">{minion.id}</th> -->
-                    <td>{minion.tag}</td>
-                    <td>{minion.jid}</td>
-                    <td>{minion.target}</td>
-                    <td>{minion.fun}</td>
-                    <td>{minion.timestamp}</td>
+                    <!-- <th scope="row">{event.id}</th> -->
+                    <td
+                        on:click={() => toggle_event_expand(event.unique_index)}
+                        class="mouse-pointer"
+                    >
+                        <Icon
+                            size="1.125"
+                            name={expanded_events.includes(event.unique_index)
+                                ? "chevron-down"
+                                : "chevron-up"}
+                            class="align-middle"
+                        />
+                        {event.tag}
+                    </td>
+                    <td>{event.fun}</td>
+                    <td>{event.target}</td>
+                    <td>{event.jid}</td>
+                    <td><small>{event.timestamp}</small></td>
                 </tr>
+                {#if expanded_events.includes(event.unique_index)}
+                    <tr>
+                        <td class="bg-secondary" colspan="5">
+                            <pre class="text-left">{event.data_formatted}</pre>
+                        </td>
+                    </tr>
+                {/if}
             {/each}
         </tbody>
     </Table>
+    <TablePaginate
+        data={filtered_events}
+        size={EVENTS_PAGINATE_SIZE}
+        bind:page={pagination_page}
+    />
 </div>
 
 {#if events.length === 0}
     <div class="p-3">Loading events...</div>
 {:else}
-    <div class="p-3">Fetched the last 100 events.</div>
+    <div class="p-3 text-muted">
+        NOTE: Only a maximum of 2,000 most recent events (100 pages) can be
+        displayed.
+    </div>
 {/if}
