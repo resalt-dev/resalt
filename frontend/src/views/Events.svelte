@@ -187,7 +187,10 @@
                 </tr>
                 {#if expanded_events.includes(event.unique_index)}
                     <tr>
-                        <td class="bg-secondary" colspan="5">
+                        <td
+                            class={$theme.dark ? "bg-secondary" : "bg-light"}
+                            colspan="5"
+                        >
                             <pre class="text-left">{event.data_formatted}</pre>
                         </td>
                     </tr>
