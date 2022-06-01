@@ -59,7 +59,9 @@
                     'General' &&
                     subPage === undefined) ||
                 subPage === item.name.toLowerCase()
-                    ? 'bg-' + $theme.color
+                    ? 'bg-' +
+                      $theme.color +
+                      ($theme.color === 'yellow' ? ' text-dark' : '')
                     : ''}"
             >
                 {item.name}

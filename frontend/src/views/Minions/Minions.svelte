@@ -1,9 +1,9 @@
-<script>
+<script lang="ts">
     import { onMount } from "svelte";
-    import { load_minions } from "../controller";
-    import { minions, theme } from "../stores";
-    import Icon from "../components/Icon.svelte";
-    import paths from "../paths";
+    import { load_minions } from "../../controller";
+    import { minions as minions_store, theme } from "../../stores";
+    import Icon from "../../components/Icon.svelte";
+    import paths from "../../paths";
     import { Link, useNavigate } from "svelte-navigator";
     import {
         Button,
@@ -14,9 +14,26 @@
         Row,
         Table,
     } from "sveltestrap";
-    const navigate = useNavigate();
+    import TablePaginate from "../../components/TablePaginate.svelte";
 
-    $: mapped_minions = ($minions ?? []).map((minion) => {
+    enum FilterPage {
+        Search,
+        Groups,
+    }
+
+    const navigate = useNavigate();
+    const MINIONS_PAGINATE_SIZE = 5;
+
+    let filter_page: FilterPage = FilterPage.Search;
+    let pagination_page: number = 1;
+
+    $: minions = $minions_store ?? [];
+    $: filtered_minions = minions.filter((minion) => true);
+    $: paginated_minions = filtered_minions.slice(
+        (pagination_page - 1) * MINIONS_PAGINATE_SIZE,
+        pagination_page * MINIONS_PAGINATE_SIZE
+    );
+    $: mapped_minions = paginated_minions.map((minion) => {
         const grains = JSON.parse(minion.grains ?? "{}");
         return {
             ...minion,
@@ -36,47 +53,40 @@
 <h1>Minions</h1>
 
 <div class="nav bg-dark w-100">
-    <div class="nav-link text-white px-4 py-3 fw-bold bg-{$theme.color}">
-        Search
-    </div>
+    {#each Object.keys(FilterPage).filter((k) => isNaN(Number(k))) as fpage}
+        <div
+            on:click={() => (filter_page = FilterPage[fpage])}
+            class="nav-link text-white px-4 py-3 fw-bold mouse-pointer {fpage ===
+                FilterPage[filter_page] &&
+                'bg-' + $theme.color} {$theme.color === 'yellow' &&
+                fpage === FilterPage[filter_page] &&
+                'text-dark'}"
+        >
+            {fpage}
+        </div>
+    {/each}
 </div>
 
 <Card
     class="mb-3 {$theme.dark ? 'bg-dark border-0' : ''}"
     style="border-radius: 0px !important"
 >
-    <CardHeader
-        class={$theme.dark ? "bg-dark" : ""}
-        style="border-radius: 0px !important"
-    >
-        <span class="fw-bold">Search options:</span>
-    </CardHeader>
     <CardBody>
         <Row>
             <Col class="mb-4">
-                <label for="inputEmail3" class="form-label d-inline"
-                    >Search</label
+                <label for="minionsSearch" class="form-label d-inline"
+                    >ABC</label
                 >
                 <input
-                    id="inputEmail3"
+                    id="minionsSearch"
                     type="email"
                     class="form-control ms-2 d-inline"
                     style="width: 15rem;"
                 />
             </Col>
         </Row>
-
-        <strong>CPU</strong>
-
         <Button
             color="secondary"
-            size="sm"
-            on:click={() => load_minions(navigate)}
-        >
-            Load minions
-        </Button>
-        <Button
-            color="info"
             size="sm"
             on:click={() => load_minions(navigate, true)}
         >
@@ -85,7 +95,7 @@
     </CardBody>
 </Card>
 
-{#if !$minions}
+{#if minions.length === 0}
     <div class="p-3">No minions detected. Try force reload.</div>
 {:else}
     <div class="table-responsive card {$theme.dark ? 'bg-dark' : ''}">
@@ -235,5 +245,11 @@
                 {/each}
             </tbody>
         </Table>
+
+        <TablePaginate
+            data={filtered_minions}
+            size={MINIONS_PAGINATE_SIZE}
+            bind:page={pagination_page}
+        />
     </div>
 {/if}

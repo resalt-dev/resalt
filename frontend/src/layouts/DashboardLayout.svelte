@@ -10,7 +10,7 @@
 
     import Home from "../views/Home.svelte";
     import Minion from "../views/Minion/Minion.svelte";
-    import Minions from "../views/Minions.svelte";
+    import Minions from "../views/Minions/Minions.svelte";
     import Run from "../views/Run.svelte";
     import Job from "../views/Job.svelte";
     import Jobs from "../views/Jobs.svelte";
