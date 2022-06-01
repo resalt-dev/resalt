@@ -47,6 +47,8 @@ export default {
     },
     plugins: [
         copy({
+            copyOnce: true,
+            hook: "closeBundle",
             targets: [
                 {
                     src: "public/index.template.html",
