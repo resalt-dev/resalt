@@ -8,16 +8,16 @@
     import TablePaginate from "../components/TablePaginate.svelte";
 
     const navigate = useNavigate();
-    const EVENTS_PAGINATE_SIZE = 20;
 
+    let pagination_size: number = 20;
     let pagination_page: number = 1;
     let events = [];
     let expanded_events = [];
 
     $: filtered_events = events.filter((event) => true);
     $: paginated_events = filtered_events.slice(
-        (pagination_page - 1) * EVENTS_PAGINATE_SIZE,
-        pagination_page * EVENTS_PAGINATE_SIZE
+        (pagination_page - 1) * pagination_size,
+        pagination_page * pagination_size
     );
     $: mapped_events = paginated_events.map((event) => {
         const data = JSON.parse(event.data ?? "{data: {}}").data;
@@ -176,7 +176,6 @@
                             name={expanded_events.includes(event.unique_index)
                                 ? "chevron-down"
                                 : "chevron-up"}
-                            class="align-middle"
                         />
                         {event.tag}
                     </td>
@@ -200,7 +199,7 @@
     </Table>
     <TablePaginate
         data={filtered_events}
-        size={EVENTS_PAGINATE_SIZE}
+        bind:size={pagination_size}
         bind:page={pagination_page}
     />
 </div>
@@ -210,6 +209,6 @@
 {:else}
     <div class="p-3 text-muted">
         NOTE: Only a maximum of 2,000 most recent events (100 pages) can be
-        displayed.
+        displayed and filtered.
     </div>
 {/if}

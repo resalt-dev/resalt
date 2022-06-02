@@ -69,7 +69,7 @@
             {/if}
         </a>
         <ul
-            class="dropdown-menu dropdown-menu-dark bg-darker text-small shadow ms-5"
+            class="dropdown-menu dropdown-menu-dark bg-darker ms-5"
             aria-labelledby="dropdownUser1"
         >
             <li>

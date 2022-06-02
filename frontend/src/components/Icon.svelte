@@ -12,6 +12,6 @@
 
 <i
     on:click
-    class="bx {full_name} {cssClass}"
+    class="bx {full_name} align-middle {cssClass}"
     style="font-size: {size}rem;{style}"
 />

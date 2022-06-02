@@ -22,16 +22,16 @@
     }
 
     const navigate = useNavigate();
-    const MINIONS_PAGINATE_SIZE = 10;
 
     let filter_page: FilterPage = FilterPage.Search;
+    let pagination_size: number = 10;
     let pagination_page: number = 1;
 
     $: minions = $minions_store ?? [];
     $: filtered_minions = minions.filter((minion) => true);
     $: paginated_minions = filtered_minions.slice(
-        (pagination_page - 1) * MINIONS_PAGINATE_SIZE,
-        pagination_page * MINIONS_PAGINATE_SIZE
+        (pagination_page - 1) * pagination_size,
+        pagination_page * pagination_size
     );
     $: mapped_minions = paginated_minions.map((minion) => {
         const grains = JSON.parse(minion.grains ?? "{}");
@@ -248,7 +248,7 @@
 
         <TablePaginate
             data={filtered_minions}
-            size={MINIONS_PAGINATE_SIZE}
+            bind:size={pagination_size}
             bind:page={pagination_page}
         />
     </div>
