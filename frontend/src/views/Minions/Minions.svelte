@@ -22,7 +22,7 @@
     }
 
     const navigate = useNavigate();
-    const MINIONS_PAGINATE_SIZE = 5;
+    const MINIONS_PAGINATE_SIZE = 10;
 
     let filter_page: FilterPage = FilterPage.Search;
     let pagination_page: number = 1;
