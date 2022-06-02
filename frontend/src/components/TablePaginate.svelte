@@ -33,28 +33,28 @@
 
 <div class="nav bg-dark w-100 justify-content-start no-select">
     <div
-        class="nav-link text-white fw-bold mouse-pointer {page === 1
+        class="nav-link fw-bold mouse-pointer {page === 1
             ? 'text-secondary'
-            : ''}"
+            : 'text-white'}"
         on:click={() => (page = 1)}
     >
         &lt;&lt;
     </div>
     <div
-        class="nav-link text-white fw-bold mouse-pointer {page === 1
+        class="nav-link fw-bold mouse-pointer {page === 1
             ? 'text-secondary'
-            : ''}"
+            : 'text-white'}"
         on:click={() => page > 1 && (page = page - 1)}
     >
         &lt;
     </div>
     {#each visible_pagination_indexes as index}
         <div
-            class="nav-link text-white fw-bold mouse-pointer {page === index
+            class="nav-link fw-bold mouse-pointer {page === index
                 ? 'bg-' +
                   $theme.color +
-                  ($theme.color === 'yellow' ? ' text-dark' : '')
-                : ''}"
+                  ($theme.color === 'yellow' ? ' text-dark' : ' text-white')
+                : 'text-white'}"
             on:click={() => (page = index)}
         >
             {index}
@@ -72,17 +72,17 @@
         </div>
     {/if}
     <div
-        class="nav-link text-white fw-bold mouse-pointer {page === last_page
+        class="nav-link fw-bold mouse-pointer {page === last_page
             ? 'text-secondary'
-            : ''}"
+            : 'text-white'}"
         on:click={() => page < last_page && (page = page + 1)}
     >
         &gt;
     </div>
     <div
-        class="nav-link text-white fw-bold mouse-pointer {page === last_page
+        class="nav-link fw-bold mouse-pointer {page === last_page
             ? 'text-secondary'
-            : ''}"
+            : 'text-white'}"
         on:click={() => (page = last_page)}
     >
         &gt;&gt;
@@ -105,10 +105,9 @@
             {#each [10, 20, 50, 100, 250] as s}
                 <li>
                     <span
-                        class="dropdown-item mouse-pointer text-light {size ===
-                        s
+                        class="dropdown-item mouse-pointer {size === s
                             ? 'fw-bold text-white'
-                            : ''}"
+                            : 'text-light'}"
                         on:click={() => (size = s)}>{s}</span
                     >
                 </li>

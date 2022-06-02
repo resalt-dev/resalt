@@ -19,8 +19,6 @@ mod storage;
 async fn main() -> std::io::Result<()> {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("Debug"));
 
-    let ldap = LdapHandler::new().await;
-
     // SSE
     let pipeline = PipelineServer::new();
 
@@ -50,7 +48,6 @@ async fn main() -> std::io::Result<()> {
         let salt_api = SaltAPI::new();
 
         App::new()
-            .app_data(web::Data::new(ldap.clone()))
             .app_data(web::Data::new(pipeline.clone()))
             .app_data(web::Data::new(db.clone()))
             .app_data(web::Data::new(salt_api.clone()))

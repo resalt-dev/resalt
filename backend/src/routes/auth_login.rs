@@ -15,7 +15,6 @@ struct LoginResponse {
 }
 
 pub async fn route_auth_login_post(
-    ldap: web::Data<LdapHandler>,
     data: web::Data<Storage>,
     salt: web::Data<SaltAPI>,
     input: web::Json<LoginRequest>,
@@ -31,7 +30,7 @@ pub async fn route_auth_login_post(
     };
     if user.is_none() {
         debug!("User not found, testing LDAP");
-        user = match auth_login_ldap(&ldap, &data, &username, &password).await {
+        user = match auth_login_ldap(&data, &username, &password).await {
             Ok(user) => user,
             Err(e) => return Err(e),
         };

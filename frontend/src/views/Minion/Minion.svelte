@@ -55,14 +55,13 @@
         {#each subPagesNav as item}
             <Link
                 to={item.path}
-                class="nav-link text-white px-4 py-3 fw-bold {(item.name ===
-                    'General' &&
+                class="nav-link px-4 py-3 fw-bold {(item.name === 'General' &&
                     subPage === undefined) ||
                 subPage === item.name.toLowerCase()
                     ? 'bg-' +
                       $theme.color +
-                      ($theme.color === 'yellow' ? ' text-dark' : '')
-                    : ''}"
+                      ($theme.color === 'yellow' ? ' text-dark' : ' text-white')
+                    : 'text-white'}"
             >
                 {item.name}
             </Link>

@@ -61,13 +61,11 @@ pub async fn auth_login_classic(
         }
     };
 
-    // Fetch password
+    // Check password
     let user_pass = match &user.password {
         Some(user_pass) => user_pass,
         None => return Ok(None),
     };
-
-    // Check password
     if !verify_password(&password, user_pass) {
         return Ok(None);
     }
@@ -76,12 +74,11 @@ pub async fn auth_login_classic(
 }
 
 pub async fn auth_login_ldap(
-    ldap: &web::Data<LdapHandler>,
     data: &web::Data<Storage>,
     username: &String,
     password: &String,
 ) -> Result<Option<User>, actix_web::Error> {
-    let uid = match ldap.authenticate(username, password).await {
+    let uid = match LdapHandler::authenticate(username, password).await {
         Ok(Some(uid)) => uid,
         Ok(None) => return Ok(None),
         Err(e) => {

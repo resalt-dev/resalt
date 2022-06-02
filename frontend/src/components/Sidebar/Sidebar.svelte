@@ -2,7 +2,7 @@
     import { Link } from "svelte-navigator";
     import constants from "../../constants";
     import paths from "../../paths";
-    import { sidebarCollapsed as collapsed, theme } from "../../stores";
+    import { sidebarCollapsed as collapsed, theme, user } from "../../stores";
     import Icon from "../Icon.svelte";
     import SidebarItem from "./SidebarItem.svelte";
 
@@ -65,7 +65,7 @@
                 height="32"
             />
             {#if !$collapsed}
-                <strong class="me-1">Max</strong>
+                <strong class="me-1">{$user.username}</strong>
             {/if}
         </a>
         <ul

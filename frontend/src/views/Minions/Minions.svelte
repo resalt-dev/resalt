@@ -56,11 +56,12 @@
     {#each Object.keys(FilterPage).filter((k) => isNaN(Number(k))) as fpage}
         <div
             on:click={() => (filter_page = FilterPage[fpage])}
-            class="nav-link text-white px-4 py-3 fw-bold mouse-pointer {fpage ===
+            class="nav-link px-4 py-3 fw-bold mouse-pointer {fpage ===
                 FilterPage[filter_page] &&
                 'bg-' + $theme.color} {$theme.color === 'yellow' &&
-                fpage === FilterPage[filter_page] &&
-                'text-dark'}"
+            fpage === FilterPage[filter_page]
+                ? 'text-dark'
+                : 'text-white'}"
         >
             {fpage}
         </div>
