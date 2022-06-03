@@ -1,7 +1,7 @@
 <script>
     import { onMount } from "svelte";
     import { login } from "../controller";
-    import { theme, alerts } from "../stores";
+    import { theme } from "../stores";
 
     import { useNavigate } from "svelte-navigator";
     const navigate = useNavigate();
@@ -9,14 +9,6 @@
     let username = "";
     let password = "";
     let usernameField;
-
-    let localAlerts = [];
-
-    // Clone "alerts" to "localAlerts" then empty it on every Svelte update
-    $: {
-        localAlerts = $alerts.slice();
-        alerts.update(() => []);
-    }
 
     onMount(() => {
         usernameField.focus();
@@ -36,7 +28,8 @@
             <input
                 bind:value={username}
                 type="text"
-                class="form-control"
+                class="form-control {$theme.dark &&
+                    'bg-secondary border-0 text-white'}"
                 id="loginInputUsername"
                 bind:this={usernameField}
             />
@@ -50,7 +43,8 @@
             <input
                 bind:value={password}
                 type="password"
-                class="form-control"
+                class="form-control {$theme.dark &&
+                    'bg-secondary border-0 text-white'}"
                 id="loginInputPassword"
             />
         </div>
@@ -60,18 +54,4 @@
         class={`btn btn-${$theme.color} float-end px-5 fw-bold mb-3`}
         >Login</button
     >
-    <div class="clearfix" />
-
-    {#each localAlerts as alert}
-        <div class="card text-white bg-{alert.type} mb-3">
-            <div class="card-body">
-                <h5 class="card-title">
-                    {alert.title}
-                </h5>
-                <p class="card-text">
-                    {alert.message}
-                </p>
-            </div>
-        </div>
-    {/each}
 </form>
