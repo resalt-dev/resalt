@@ -15,25 +15,23 @@
         Table,
     } from "sveltestrap";
     import TablePaginate from "../../components/TablePaginate.svelte";
+    import FilterPageSearch from "./FilterPageSearch.svelte";
+    import type { Minion } from "../../models";
+    const navigate = useNavigate();
 
     enum FilterPage {
         Search,
         Groups,
     }
 
-    const navigate = useNavigate();
-
     let filter_page: FilterPage = FilterPage.Search;
+    let filter_id = "";
+    let filter_type = "";
     let pagination_size: number = 10;
     let pagination_page: number = 1;
 
     $: minions = $minions_store ?? [];
-    $: filtered_minions = minions.filter((minion) => true);
-    $: paginated_minions = filtered_minions.slice(
-        (pagination_page - 1) * pagination_size,
-        pagination_page * pagination_size
-    );
-    $: mapped_minions = paginated_minions.map((minion) => {
+    $: mapped_minions = minions.map((minion) => {
         const grains = JSON.parse(minion.grains ?? "{}");
         return {
             ...minion,
@@ -44,6 +42,19 @@
             ).trim(),
         };
     });
+    $: filtered_minions = mapped_minions.filter((minion) => {
+        console.log(minion);
+        return (
+            minion.id.toLowerCase().includes(filter_id.toLowerCase()) &&
+            minion.datatable_type
+                .toLowerCase()
+                .includes(filter_type.toLowerCase())
+        );
+    });
+    $: paginated_minions = filtered_minions.slice(
+        (pagination_page - 1) * pagination_size,
+        pagination_page * pagination_size
+    );
 
     onMount(() => {
         load_minions(navigate);
@@ -52,7 +63,7 @@
 
 <h1>Minions</h1>
 
-<div class="nav bg-dark w-100">
+<div class="nav bg-dark w-100 no-select">
     {#each Object.keys(FilterPage).filter((k) => isNaN(Number(k))) as fpage}
         <div
             on:click={() => (filter_page = FilterPage[fpage])}
@@ -73,26 +84,9 @@
     style="border-radius: 0px !important"
 >
     <CardBody>
-        <Row>
-            <Col class="mb-4">
-                <label for="minionsSearch" class="form-label d-inline"
-                    >ABC</label
-                >
-                <input
-                    id="minionsSearch"
-                    type="email"
-                    class="form-control ms-2 d-inline"
-                    style="width: 15rem;"
-                />
-            </Col>
-        </Row>
-        <Button
-            color="secondary"
-            size="sm"
-            on:click={() => load_minions(navigate, true)}
-        >
-            Force reload minions
-        </Button>
+        {#if filter_page === FilterPage.Search}
+            <FilterPageSearch {load_minions} {navigate} />
+        {/if}
     </CardBody>
 </Card>
 
@@ -128,8 +122,10 @@
                             <div class="col-auto align-self-center">
                                 <input
                                     type="text"
-                                    class="ms-1 lh-1"
+                                    class="ms-1 lh-1 {$theme.dark &&
+                                        'bg-secondary text-white border-0'}"
                                     size="15"
+                                    bind:value={filter_id}
                                 />
                             </div>
                         </div>
@@ -152,8 +148,10 @@
                             <div class="col-auto align-self-center">
                                 <input
                                     type="text"
-                                    class="ms-1 lh-1"
+                                    class="ms-1 lh-1 {$theme.dark &&
+                                        'bg-secondary text-white border-0'}"
                                     size="15"
+                                    bind:value={filter_type}
                                 />
                             </div>
                         </div>
@@ -200,7 +198,7 @@
                 </tr>
             </thead>
             <tbody class="align-middle">
-                {#each mapped_minions as minion}
+                {#each paginated_minions as minion}
                     <tr>
                         <th
                             scope="row"
@@ -213,25 +211,23 @@
                         <td>{minion.last_seen}</td>
                         <td>
                             {#if minion.last_updated_conformity == null}
-                                <span class="badge mb-1 align-middle bg-purple">
+                                <span class="badge align-middle bg-purple">
                                     Unknown
                                 </span>
                             {:else}
                                 <span
-                                    class="badge mb-1 align-middle bg-green fw-bold"
+                                    class="badge align-middle bg-green fw-bold"
                                 >
                                     {minion.conformity_success ?? "?"}
                                 </span>
                                 /
                                 <span
-                                    class="badge mb-1 align-middle bg-warning fw-bold"
+                                    class="badge align-middle bg-warning fw-bold"
                                 >
                                     {minion.conformity_incorrect ?? "?"}
                                 </span>
                                 /
-                                <span
-                                    class="badge mb-1 align-middle bg-red fw-bold"
-                                >
+                                <span class="badge align-middle bg-red fw-bold">
                                     {minion.conformity_error ?? "?"}
                                 </span>
                             {/if}

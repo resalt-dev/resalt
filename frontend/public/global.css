@@ -338,6 +338,10 @@ samp {
     color: var(--black);
 }
 
+.badge {
+    font-size: 1em;
+}
+
 .btn-red, .btn-red:hover,
 .btn-volcano, .btn-volcano:hover,
 .btn-orange, .btn-orange:hover,

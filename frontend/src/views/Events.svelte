@@ -6,7 +6,6 @@
     import { theme } from "../stores";
     import { useNavigate } from "svelte-navigator";
     import TablePaginate from "../components/TablePaginate.svelte";
-
     const navigate = useNavigate();
 
     let pagination_size: number = 20;
@@ -14,12 +13,7 @@
     let events = [];
     let expanded_events = [];
 
-    $: filtered_events = events.filter((event) => true);
-    $: paginated_events = filtered_events.slice(
-        (pagination_page - 1) * pagination_size,
-        pagination_page * pagination_size
-    );
-    $: mapped_events = paginated_events.map((event) => {
+    $: mapped_events = events.map((event) => {
         const data = JSON.parse(event.data ?? "{data: {}}").data;
         return {
             ...event,
@@ -35,6 +29,11 @@
             ).replace(/ /g, "_"),
         };
     });
+    $: filtered_events = mapped_events.filter((event) => true);
+    $: paginated_events = filtered_events.slice(
+        (pagination_page - 1) * pagination_size,
+        pagination_page * pagination_size
+    );
 
     function toggle_event_expand(index: string) {
         console.log(index);
@@ -164,7 +163,7 @@
             </tr>
         </thead>
         <tbody class="align-middle">
-            {#each mapped_events as event}
+            {#each paginated_events as event}
                 <tr>
                     <!-- <th scope="row">{event.id}</th> -->
                     <td

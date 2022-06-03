@@ -44,7 +44,7 @@
     <div class="col-auto pe-3 d-flex align-items-center">
         {#if $socket.connected}
             <!-- display last_ping as hh:mm:ss -->
-            <span class="badge rounded-pill bg-success"
+            <span class="badge rounded-pill bg-success font-monospace"
                 >Connected: {new Date($socket.last_ping)
                     .toLocaleTimeString("en-US", {
                         timeZone: "UTC",
@@ -54,7 +54,9 @@
                     .replace(/\./g, ":")}</span
             >
         {:else}
-            <span class="badge rounded-pill bg-danger">Disconnected</span>
+            <span class="badge rounded-pill bg-danger font-monospace"
+                >Disconnected</span
+            >
         {/if}
     </div>
 </div>
