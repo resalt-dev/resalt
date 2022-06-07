@@ -41,7 +41,7 @@ pub async fn route_minions_get(
         };
     }
 
-    let minions = match data.list_minions().await {
+    let minions = match data.list_minions() {
         Ok(minions) => minions,
         Err(e) => {
             error!("{:?}", e);

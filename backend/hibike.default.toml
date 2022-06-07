@@ -1,5 +1,5 @@
 [auth.ldap]
-enabled = true
+enabled = false
 
 url = "ldap://ldap.example.com"
 start_tls = false

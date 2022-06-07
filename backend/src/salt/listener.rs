@@ -69,11 +69,7 @@ impl SaltEventListener {
             let time = chrono::NaiveDateTime::parse_from_str(time, "%Y-%m-%dT%H:%M:%S.%f").unwrap();
 
             // Insert into own DB
-            match self
-                .storage
-                .insert_event(&event.tag, &event.data, &time)
-                .await
-            {
+            match self.storage.insert_event(&event.tag, &event.data, &time) {
                 Ok(_) => (),
                 Err(err) => error!("failed to insert event: {:?}", err),
             }
@@ -90,11 +86,7 @@ impl SaltEventListener {
                         let minion_id = data["id"].as_str().unwrap();
                         let grains = data.get("return").unwrap().as_object().unwrap();
                         let grains = serde_json::to_string(grains).unwrap();
-                        match self
-                            .storage
-                            .update_minion_grains(minion_id, time, &grains)
-                            .await
-                        {
+                        match self.storage.update_minion_grains(minion_id, time, &grains) {
                             Ok(_) => {
                                 self.pipeline_update_minion(minion_id).await;
                             }
@@ -105,11 +97,7 @@ impl SaltEventListener {
                         let minion_id = data["id"].as_str().unwrap();
                         let pillar = data.get("return").unwrap().as_object().unwrap();
                         let pillar = serde_json::to_string(pillar).unwrap();
-                        match self
-                            .storage
-                            .update_minion_pillars(minion_id, time, &pillar)
-                            .await
-                        {
+                        match self.storage.update_minion_pillars(minion_id, time, &pillar) {
                             Ok(_) => {
                                 self.pipeline_update_minion(minion_id).await;
                             }
@@ -120,11 +108,7 @@ impl SaltEventListener {
                         let minion_id = data["id"].as_str().unwrap();
                         let pkgs = data.get("return").unwrap().as_object().unwrap();
                         let pkgs = serde_json::to_string(pkgs).unwrap();
-                        match self
-                            .storage
-                            .update_minion_pkgs(minion_id, time, &pkgs)
-                            .await
-                        {
+                        match self.storage.update_minion_pkgs(minion_id, time, &pkgs) {
                             Ok(_) => {
                                 self.pipeline_update_minion(minion_id).await;
                             }
@@ -165,18 +149,14 @@ impl SaltEventListener {
                             };
                         }
 
-                        match self
-                            .storage
-                            .update_minion_conformity(
-                                minion_id,
-                                time,
-                                &data.get("return").unwrap().to_string(),
-                                success,
-                                incorrect,
-                                error,
-                            )
-                            .await
-                        {
+                        match self.storage.update_minion_conformity(
+                            minion_id,
+                            time,
+                            &data.get("return").unwrap().to_string(),
+                            success,
+                            incorrect,
+                            error,
+                        ) {
                             Ok(_) => {
                                 self.pipeline_update_minion(minion_id).await;
                             }
@@ -192,7 +172,7 @@ impl SaltEventListener {
                 }
 
                 let minion_id = data["id"].as_str().unwrap();
-                match self.storage.update_minion_last_seen(minion_id, time).await {
+                match self.storage.update_minion_last_seen(minion_id, time) {
                     Ok(_) => {}
                     Err(e) => error!("Failed updating minion last seen {:?}", e),
                 }
@@ -205,7 +185,7 @@ impl SaltEventListener {
     }
 
     async fn pipeline_update_minion(&self, id: &str) {
-        let minion = match self.storage.get_minion_by_id(id).await {
+        let minion = match self.storage.get_minion_by_id(id) {
             Ok(minion) => match minion {
                 Some(minion) => minion,
                 None => {

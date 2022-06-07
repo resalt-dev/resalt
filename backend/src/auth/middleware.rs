@@ -85,7 +85,7 @@ where
         Box::pin(async move {
             // We need to make sure the locking of data looses scope before calling srv.call.await
             {
-                let auth_status = match validate_auth_token(&data, &token).await {
+                let auth_status = match validate_auth_token(&data, &token) {
                     Ok(user_id) => user_id,
                     Err(e) => {
                         error!("{:?}", e);

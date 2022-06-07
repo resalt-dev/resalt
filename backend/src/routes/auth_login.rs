@@ -24,7 +24,7 @@ pub async fn route_auth_login_post(
 
     info!("Attempting login for {:?}", username);
 
-    let mut user = match auth_login_classic(&data, &username, &password).await {
+    let mut user = match auth_login_classic(&data, &username, &password) {
         Ok(user) => user,
         Err(e) => return Err(e),
     };
@@ -46,7 +46,7 @@ pub async fn route_auth_login_post(
     debug!("User {} found, generating token", &user.username);
 
     // Create token
-    let authtoken = match data.create_authtoken(&user.id).await {
+    let authtoken = match data.create_authtoken(&user.id) {
         Ok(authtoken) => authtoken,
         Err(e) => {
             error!("{:?}", e);
@@ -64,10 +64,7 @@ pub async fn route_auth_login_post(
     };
 
     // Update token with salt session
-    match data
-        .update_authtoken_salttoken(&authtoken.id, &Some(salt_token))
-        .await
-    {
+    match data.update_authtoken_salttoken(&authtoken.id, &Some(salt_token)) {
         Ok(_) => {}
         Err(e) => {
             error!("route_auth_login_post update_salttoken {:?}", e);

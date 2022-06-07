@@ -17,7 +17,7 @@ pub async fn route_auth_user_get(
     let ext = req.extensions_mut();
     let auth = ext.get::<AuthStatus>().unwrap();
 
-    let user = match db.get_user_by_id(&auth.user_id).await {
+    let user = match db.get_user_by_id(&auth.user_id) {
         Ok(user) => match user {
             Some(user) => user,
             None => return Err(api_error_unauthorized()),

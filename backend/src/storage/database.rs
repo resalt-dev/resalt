@@ -3,9 +3,16 @@ extern crate diesel;
 use self::diesel::prelude::*;
 use crate::{prelude::*, schema::*};
 use chrono::NaiveDateTime;
-use diesel::r2d2::{ConnectionManager, Pool, PoolError, PooledConnection};
+use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
+use diesel_migrations::embed_migrations;
+use log::{error, warn};
 
 type DbPooledConnection = PooledConnection<ConnectionManager<MysqlConnection>>;
+
+// This macro from `diesel_migrations` defines an `embedded_migrations` module
+// containing a function named `run`. This allows the example to be run and
+// tested without any outside setup of the database.
+embed_migrations!();
 
 #[derive(Clone)]
 pub struct Storage {
@@ -13,36 +20,50 @@ pub struct Storage {
 }
 
 impl Storage {
-    pub async fn connect(database_url: &str) -> Result<Self, PoolError> {
+    pub async fn connect(database_url: &str) -> Result<Self, String> {
         let manager = ConnectionManager::<MysqlConnection>::new(database_url);
         let pool = Pool::builder().build(manager);
 
         match pool {
-            Ok(pool) => Ok(Self { pool }),
-            Err(e) => Err(e),
+            Ok(pool) => {
+                let own = Self { pool };
+                let connection = match own.create_connection() {
+                    Ok(conn) => conn,
+                    Err(e) => return Err(e),
+                };
+
+                match embedded_migrations::run(&*connection) {
+                    Ok(()) => {
+                        warn!("Ran database migration!");
+                    }
+                    Err(e) => {
+                        error!("Failed to run database migrations: {:?}", e);
+                        return Err(format!("{:?}", e));
+                    }
+                };
+
+                Ok(own)
+            }
+            Err(e) => Err(format!("{:?}", e)),
         }
     }
 
     pub async fn init(&self) {
         // Create default user
-        if self.list_users().await.unwrap_or_default().is_empty() {
-            self.create_user("admin", Some("admin")).await.unwrap();
+        if self.list_users().unwrap_or_default().is_empty() {
+            self.create_user("admin", Some("admin")).unwrap();
         }
     }
 
-    async fn create_connection(&self) -> Result<DbPooledConnection, String> {
+    fn create_connection(&self) -> Result<DbPooledConnection, String> {
         return match self.pool.get() {
             Ok(conn) => Ok(conn),
             Err(e) => Err(format!("{:?}", e)),
         };
     }
 
-    pub async fn create_user(
-        &self,
-        username: &str,
-        password: Option<&str>,
-    ) -> Result<User, String> {
-        let connection = self.create_connection().await?;
+    pub fn create_user(&self, username: &str, password: Option<&str>) -> Result<User, String> {
+        let connection = self.create_connection()?;
         let uuid = format!("usr_{}", uuid::Uuid::new_v4());
         let user = User {
             id: uuid,
@@ -58,15 +79,15 @@ impl Storage {
         Ok(user)
     }
 
-    pub async fn list_users(&self) -> Result<Vec<User>, String> {
-        let connection = self.create_connection().await?;
+    pub fn list_users(&self) -> Result<Vec<User>, String> {
+        let connection = self.create_connection()?;
         users::table
             .load::<User>(&connection)
             .map_err(|e| format!("{:?}", e))
     }
 
-    pub async fn get_user_by_id(&self, id: &str) -> Result<Option<User>, String> {
-        let connection = self.create_connection().await?;
+    pub fn get_user_by_id(&self, id: &str) -> Result<Option<User>, String> {
+        let connection = self.create_connection()?;
         users::table
             .filter(users::id.eq(id))
             .first(&connection)
@@ -74,8 +95,8 @@ impl Storage {
             .map_err(|e| format!("{:?}", e))
     }
 
-    pub async fn get_user_by_username(&self, username: &str) -> Result<Option<User>, String> {
-        let connection = self.create_connection().await?;
+    pub fn get_user_by_username(&self, username: &str) -> Result<Option<User>, String> {
+        let connection = self.create_connection()?;
         users::table
             .filter(users::username.eq(username))
             .first(&connection)
@@ -83,8 +104,8 @@ impl Storage {
             .map_err(|e| format!("{:?}", e))
     }
 
-    pub async fn create_authtoken(&self, user_id: &str) -> Result<AuthToken, String> {
-        let connection = self.create_connection().await?;
+    pub fn create_authtoken(&self, user_id: &str) -> Result<AuthToken, String> {
+        let connection = self.create_connection()?;
         let uuid = format!("auth_{}", uuid::Uuid::new_v4());
         let authtoken = AuthToken {
             id: uuid,
@@ -101,12 +122,12 @@ impl Storage {
         Ok(authtoken)
     }
 
-    pub async fn update_authtoken_salttoken(
+    pub fn update_authtoken_salttoken(
         &self,
         auth_token: &str,
         salt_token: &Option<SaltToken>,
     ) -> Result<(), String> {
-        let connection = self.create_connection().await?;
+        let connection = self.create_connection()?;
         let salt_token = match salt_token {
             Some(salt_token) => Some(serde_json::to_string(salt_token).unwrap()),
             None => None,
@@ -121,8 +142,8 @@ impl Storage {
         Ok(())
     }
 
-    pub async fn get_authtoken_by_id(&self, id: &str) -> Result<Option<AuthToken>, String> {
-        let connection = self.create_connection().await?;
+    pub fn get_authtoken_by_id(&self, id: &str) -> Result<Option<AuthToken>, String> {
+        let connection = self.create_connection()?;
         authtokens::table
             .filter(authtokens::id.eq(id))
             .first(&connection)
@@ -130,7 +151,7 @@ impl Storage {
             .map_err(|e| format!("{:?}", e))
     }
 
-    async fn update_minion(
+    fn update_minion(
         &self,
         minion_id: &str,
         time: chrono::NaiveDateTime,
@@ -142,7 +163,7 @@ impl Storage {
         conformity_incorrect: Option<i32>,
         conformity_error: Option<i32>,
     ) -> Result<(), String> {
-        let connection = self.create_connection().await?;
+        let connection = self.create_connection()?;
 
         let last_updated_grains = match grains {
             Some(_) => Some(time.clone()),
@@ -212,16 +233,15 @@ impl Storage {
         Ok(())
     }
 
-    pub async fn update_minion_last_seen(
+    pub fn update_minion_last_seen(
         &self,
         minion_id: &str,
         time: chrono::NaiveDateTime,
     ) -> Result<(), String> {
         self.update_minion(minion_id, time, None, None, None, None, None, None, None)
-            .await
     }
 
-    pub async fn update_minion_grains(
+    pub fn update_minion_grains(
         &self,
         minion_id: &str,
         time: chrono::NaiveDateTime,
@@ -238,10 +258,9 @@ impl Storage {
             None,
             None,
         )
-        .await
     }
 
-    pub async fn update_minion_pillars(
+    pub fn update_minion_pillars(
         &self,
         minion_id: &str,
         time: chrono::NaiveDateTime,
@@ -258,10 +277,9 @@ impl Storage {
             None,
             None,
         )
-        .await
     }
 
-    pub async fn update_minion_pkgs(
+    pub fn update_minion_pkgs(
         &self,
         minion_id: &str,
         time: chrono::NaiveDateTime,
@@ -278,10 +296,9 @@ impl Storage {
             None,
             None,
         )
-        .await
     }
 
-    pub async fn update_minion_conformity(
+    pub fn update_minion_conformity(
         &self,
         minion_id: &str,
         time: chrono::NaiveDateTime,
@@ -301,11 +318,10 @@ impl Storage {
             Some(incorrect),
             Some(error),
         )
-        .await
     }
 
-    pub async fn get_minion_by_id(&self, id: &str) -> Result<Option<Minion>, String> {
-        let connection = self.create_connection().await?;
+    pub fn get_minion_by_id(&self, id: &str) -> Result<Option<Minion>, String> {
+        let connection = self.create_connection()?;
         minions::table
             .filter(minions::id.eq(id))
             .first(&connection)
@@ -313,20 +329,15 @@ impl Storage {
             .map_err(|e| format!("{:?}", e))
     }
 
-    pub async fn list_minions(&self) -> Result<Vec<Minion>, String> {
-        let connection = self.create_connection().await?;
+    pub fn list_minions(&self) -> Result<Vec<Minion>, String> {
+        let connection = self.create_connection()?;
         minions::table
             .load::<Minion>(&connection)
             .map_err(|e| format!("{:?}", e))
     }
 
-    pub async fn insert_event(
-        &self,
-        tag: &str,
-        data: &str,
-        time: &NaiveDateTime,
-    ) -> Result<(), String> {
-        let connection = self.create_connection().await?;
+    pub fn insert_event(&self, tag: &str, data: &str, time: &NaiveDateTime) -> Result<(), String> {
+        let connection = self.create_connection()?;
         let uuid = format!("evnt_{}", uuid::Uuid::new_v4());
         let event = Event {
             id: uuid,
@@ -341,8 +352,8 @@ impl Storage {
         Ok(())
     }
 
-    pub async fn list_events(&self) -> Result<Vec<Event>, String> {
-        let connection = self.create_connection().await?;
+    pub fn list_events(&self) -> Result<Vec<Event>, String> {
+        let connection = self.create_connection()?;
         // filter by latest timestamp first, limit to 100 for now.
         events::table
             .order(events::timestamp.desc())

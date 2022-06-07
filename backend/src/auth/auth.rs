@@ -2,7 +2,7 @@ use crate::prelude::*;
 use actix_web::{web, Result};
 use log::*;
 
-pub async fn validate_auth_token(
+pub fn validate_auth_token(
     data: &Storage,
     token: &str,
 ) -> Result<Option<AuthStatus>, actix_web::Error> {
@@ -10,7 +10,7 @@ pub async fn validate_auth_token(
         return Ok(None);
     }
 
-    let authtoken = match data.get_authtoken_by_id(&token).await {
+    let authtoken = match data.get_authtoken_by_id(&token) {
         Ok(authtoken) => match authtoken {
             Some(authtoken) => authtoken,
             None => return Ok(None),
@@ -44,13 +44,13 @@ pub async fn validate_auth_token(
     }));
 }
 
-pub async fn auth_login_classic(
+pub fn auth_login_classic(
     data: &web::Data<Storage>,
     username: &String,
     password: &String,
 ) -> Result<Option<User>, actix_web::Error> {
     // Fetch user
-    let user = match data.get_user_by_username(username).await {
+    let user = match data.get_user_by_username(username) {
         Ok(user) => match user {
             Some(user) => user,
             None => return Ok(None),
@@ -87,7 +87,7 @@ pub async fn auth_login_ldap(
         }
     };
 
-    let mut user = match data.get_user_by_username(&uid).await {
+    let mut user = match data.get_user_by_username(&uid) {
         Ok(user) => user,
         Err(e) => {
             error!("{:?}", e);
@@ -97,7 +97,7 @@ pub async fn auth_login_ldap(
 
     // Create user if doesn't exist, as LDAP passed.
     if user.is_none() {
-        user = match data.create_user(&uid, None).await {
+        user = match data.create_user(&uid, None) {
             Ok(user) => Some(user),
             Err(e) => {
                 error!("{:?}", e);

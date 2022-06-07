@@ -22,7 +22,7 @@ pub async fn route_events_get(
     let ext = req.extensions_mut();
     let auth = ext.get::<AuthStatus>().unwrap();
 
-    let events = match data.list_events().await {
+    let events = match data.list_events() {
         Ok(events) => events,
         Err(e) => {
             error!("{:?}", e);

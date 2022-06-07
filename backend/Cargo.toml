@@ -6,28 +6,45 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+# Web
 actix-service = "2.0.2"
 actix-web = { version = "4", features=["rustls"] }
-argon2 = "0.4.0"
-async-stream = "0.3.3"
 awc = { version = "3", features=["rustls"] }
-chrono = "0.4"
-config = "0.13.1"
+
+# DB
 diesel = { version = "1.4.8", features = ["mysql", "chrono", "r2d2"] }
+diesel_migrations = "1.4.0"
+
+# Auth
+ldap3 = { version = "0.10.5", features = ["rustls"] }
+argon2 = "0.4.0"
+
+# Logging
+log = "0.4.16"
 env_logger = "0.9.0"
+
+# Threading
+async-stream = "0.3.3"
+tokio = { version = "1", features = ["full"] }
+# Mutex, RwLock, Once, etc..
+parking_lot = "0.12.0"
 futures = "0.3.21"
 futures-core = "0.3.21"
 futures-util = "0.3.21"
-ldap3 = { version = "0.10.5", features = ["rustls"] }
+
+# Utils
+chrono = "0.4"
+config = "0.13.1"
 lazy_static = "1.4.0"
-log = "0.4.16"
-parking_lot = "0.12.0"
 rand = "0.8.5"
 regex = "1.5.5"
+uuid = { version = "0.8", features = ["serde", "v4"] }
+
+# TLS
 rustls = "0.20.4"
 rustls-native-certs = "0.6.2"
+
+# Parsing
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-tokio = { version = "1", features = ["full"] }
-uuid = { version = "0.8", features = ["serde", "v4"] }
 

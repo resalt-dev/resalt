@@ -1,5 +1,7 @@
 #[macro_use]
 extern crate diesel;
+#[macro_use]
+extern crate diesel_migrations;
 
 use actix_web::{http::header, middleware::*, web, App, HttpServer};
 use prelude::*;

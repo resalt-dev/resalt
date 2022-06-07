@@ -38,7 +38,7 @@ pub async fn route_auth_token_post(
         }
     }
 
-    match validate_auth_token(&db, &token).await {
+    match validate_auth_token(&db, &token) {
         Ok(Some(auth_status)) => {
             info!("Token validated for {:?}", auth_status.user_id);
             // send {username: None} as JSON response
