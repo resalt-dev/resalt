@@ -29,6 +29,24 @@ services:
     command: salt-minion -l info
     depends_on:
       - master
+  frontend:
+    image: node:18
+    volumes:
+      - ./frontend:/usr/src/app
+    command: bash -c "cd /usr/src/app && npm install && npm run dev"
+    ports:
+      - "5555:5555"
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend:/usr/src/app
+    environment:
+      - RUST_LOG_STYLE=always
+    ports:
+      - "8000:8000"
+
 #  ldap-server:
 #    image: osixia/openldap:1.3.0
 #    restart: always

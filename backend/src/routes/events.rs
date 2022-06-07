@@ -15,12 +15,12 @@ struct EventsResponse {
 
 pub async fn route_events_get(
     data: web::Data<Storage>,
-    salt: web::Data<SaltAPI>,
-    query: web::Query<EventsGetQuery>,
-    req: HttpRequest,
+    //salt: web::Data<SaltAPI>,
+    //query: web::Query<EventsGetQuery>,
+    //req: HttpRequest,
 ) -> Result<impl Responder> {
-    let ext = req.extensions_mut();
-    let auth = ext.get::<AuthStatus>().unwrap();
+    //let ext = req.extensions_mut();
+    //let auth = ext.get::<AuthStatus>().unwrap();
 
     let events = match data.list_events() {
         Ok(events) => events,
