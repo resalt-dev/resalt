@@ -1,39 +1,23 @@
-# Hibike
+# RAPID DEVELOPMENT
+# THIS PROJECT IS UNDER RAPID DEVELOPMENT, AND NOT YET STABLE FOR PRODUCTION USE.
 
-## Development
+# HIBIKE
 
-### Docker
+Hibike is an open-source self-hosted web-based SaltStack administration management panel.
 
-Setup configuration for system:
+> *Hibike (Japanese: 響け [ひびけ]) means "to resound; to be heard far and wide". Cloud Orchestration is a common term in the container industry, and it is the hope with this tool that you will get better insight and understanding of Salt. Like a dirigent conducting an orchestra; Enjoy and build the sound of your infrastructure!*
+
+By using Hibike, you can easily manage your SaltStack infrastructure.
+
+## 🔧 Set-up
+
+Easiest is to use the Docker container image [UNDER CONSTRUCTION].
+
+## 💖 Contributing
+
+Setup development system:
 ```
 docker compose up -d
 ```
 
-### Frontend 
-
-Install dependencies for frontend (new terminal):
-```
-cd frontend
-
-npm install rollup
-```
-
-Start frontend: `npm run dev`
-
-### Backend
-
-Install dependencies for backend (new terminal):
-```
-cd backend
-
-# Install system libraries
-sudo apt install build-essential pkg-config libssl-dev mysql-client libmysqlclient-dev
-
-# Install cargo-watch for hot reload
-cargo install cargo-watch
-
-# Install DB maintenance tool
-cargo install diesel_cli --no-default-features --features "mysql"
-```
-
-Start backend: `cargo watch -x run`
+Both the frontend (Svelte) and backend (Rust) will reload automatically.

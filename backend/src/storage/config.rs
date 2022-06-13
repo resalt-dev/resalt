@@ -13,7 +13,7 @@ lazy_static::lazy_static! {
     static ref SETTINGS: RwLock<config::Config> = RwLock::new(config::Config::builder()
     // load defaults from hibike.default.toml via include_str!
     .add_source(config::File::from_str(include_str!("../../hibike.default.toml"), config::FileFormat::Toml))
-    .add_source(config::File::with_name("/etc/hibike/config").required(false))
+    .add_source(config::File::with_name("/etc/hibike/hibike").required(false))
     .add_source(config::File::with_name("hibike").required(false))
     // Add in settings from the environment (with a prefix of HIBIKE)
     // Eg.. `HIBIKE_DEBUG=1 ./target/app` would set the `debug` key
@@ -106,6 +106,9 @@ impl SConfig {
     }
 
     pub fn database_url() -> String {
+        // Print all settings
+        println!("{:?}", SETTINGS.read().unwrap());
+
         SETTINGS.read().unwrap().get_string("database.url").unwrap()
     }
 
