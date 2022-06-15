@@ -14,7 +14,8 @@
         "green",
         "cyan",
         "blue",
-        "geekblue",
+        //"geekblue",
+        "primary",
         "purple",
         "magenta",
     ];

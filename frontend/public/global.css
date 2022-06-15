@@ -195,7 +195,7 @@
     --black: var(--gray-13);
 
     /* Boostrap Colors */
-    --primary: var(--blue);
+    --primary: var(--blue-8); /* navy dark */
     --secondary: var(--gray);
     --success: var(--green);
     --info: var(--cyan);
@@ -204,14 +204,14 @@
     --light: var(--light-gray);
     --dark: var(--black);
 
-    --light-primary: var(--light-blue);
+    --light-primary: var(--blue);
     --light-secondary: var(--light-gray);
     --light-success: var(--light-green);
     --light-info: var(--light-cyan);
     --light-warning: var(--light-yellow);
     --light-danger: var(--light-red);
 
-    --dark-primary: var(--dark-blue);
+    --dark-primary: var(--blue-9);
     --dark-secondary: var(--dark-gray);
     --dark-success: var(--dark-green);
     --dark-info: var(--dark-cyan);
