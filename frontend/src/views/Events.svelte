@@ -59,9 +59,9 @@
         dark={$theme.dark}
         hover
         id="eventListTable"
-        class="b-0 mb-0 {$theme.dark ? 'text-white border-secondary' : ''}"
+        class="b-0 mb-0 {$theme.dark ? 'text-light border-secondary' : ''}"
     >
-        <thead class="bg-dark text-white border-0">
+        <thead class="bg-dark text-light border-0">
             <tr>
                 <th scope="col" class="border-secondary">
                     <div class="row g-1">

@@ -37,7 +37,7 @@
         </div>
         <div
             class="stretch-width overflow-auto {$theme.dark
-                ? 'bg-darker text-white'
+                ? 'bg-darker text-light'
                 : ''}"
         >
             <Topbar />

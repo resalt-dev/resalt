@@ -12,7 +12,7 @@
 </script>
 
 <div
-    class="d-flex flex-column flex-shrink-0 text-white bg-dark h-100 no-select"
+    class="d-flex flex-column flex-shrink-0 text-light bg-dark h-100 no-select"
     style="min-height: 100vh; {$collapsed
         ? 'width: 4.5rem;'
         : 'width: 17.5rem;'}"
@@ -21,7 +21,7 @@
         on:click={handleClickCollapse}
         class="d-flex text-decoration-none mouse-pointer"
     >
-        <div class="d-flex align-items-center py-4 mx-auto text-white">
+        <div class="d-flex align-items-center py-4 mx-auto text-light">
             <Icon name="menu" class="mb-0 h3 {$collapsed ? '' : 'me-3'}" />
             {#if !$collapsed}
                 <span class="fs-4 fw-bold ln-0">{constants.appName}</span>
@@ -39,7 +39,7 @@
         {#each paths as route}
             {#if route.showInNav}
                 {#if route.name === "users"}
-                    <hr />
+                    <li><hr /></li>
                 {/if}
                 <SidebarItem {route} collapsed={$collapsed} />
             {/if}
@@ -52,7 +52,7 @@
         <!-- svelte-ignore a11y-invalid-attribute -->
         <a
             href="#"
-            class="d-flex align-items-center text-white text-decoration-none dropdown-toggle px-3"
+            class="d-flex align-items-center text-light text-decoration-none dropdown-toggle px-3"
             id="dropdownUser1"
             data-bs-toggle="dropdown"
             aria-expanded="false"
@@ -63,6 +63,7 @@
                 class="rounded-circle {$collapsed ? '' : 'me-3'}"
                 width="32"
                 height="32"
+                style="margin-left: -2px;margin-right: 2px;"
             />
             {#if !$collapsed}
                 <strong class="me-1">{$user.username}</strong>
@@ -90,7 +91,7 @@
 
     <div
         on:click={handleClickCollapse}
-        class="text-white btn-dark bg-dark border-0 pt-3 pb-2 px-3 fw-light mouse-pointer d-flex align-items-center"
+        class="text-light btn-dark bg-dark border-0 pt-3 pb-2 px-3 fw-light mouse-pointer d-flex align-items-center"
         aria-current="page"
     >
         <Icon

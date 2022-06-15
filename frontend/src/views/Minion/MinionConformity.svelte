@@ -306,7 +306,7 @@
                                 id="conformityCollapse{conform.data
                                     .__run_num__}"
                             >
-                                <div class="card-body bg-dark text-white">
+                                <div class="card-body bg-dark text-light">
                                     <div class="card-text">
                                         <pre
                                             class="text-console m-0 text-{conform.color}">{leftPadToTotalLength(

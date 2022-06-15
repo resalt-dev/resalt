@@ -14,10 +14,10 @@
 <li class="nav-item">
     <Link
         to={route.path}
-        class="nav-link text-{$theme.color === 'yellow' && isActiveOrSub
-            ? 'dark'
-            : 'white'} py-3 fw-light d-flex align-items-center {isActiveOrSub
-            ? `bg-${$theme.color} fw-bold`
+        class="nav-link {$theme.color === 'yellow' && isActiveOrSub
+            ? 'text-dark'
+            : 'text-light'} py-3 fw-light d-flex align-items-center {isActiveOrSub
+            ? `bg-${$theme.color}`
             : ''}"
     >
         <Icon name={route.icon} class="ps-1 {collapsed ? '' : 'me-3'}" />

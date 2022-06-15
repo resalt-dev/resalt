@@ -29,7 +29,7 @@
                 bind:value={username}
                 type="text"
                 class="form-control {$theme.dark &&
-                    'bg-secondary border-0 text-white'}"
+                    'bg-secondary border-0 text-light'}"
                 id="loginInputUsername"
                 bind:this={usernameField}
             />
@@ -44,7 +44,7 @@
                 bind:value={password}
                 type="password"
                 class="form-control {$theme.dark &&
-                    'bg-secondary border-0 text-white'}"
+                    'bg-secondary border-0 text-light'}"
                 id="loginInputPassword"
             />
         </div>

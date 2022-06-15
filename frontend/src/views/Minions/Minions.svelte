@@ -72,7 +72,7 @@
                 'bg-' + $theme.color} {$theme.color === 'yellow' &&
             fpage === FilterPage[filter_page]
                 ? 'text-dark'
-                : 'text-white'}"
+                : 'text-light'}"
         >
             {fpage}
         </div>
@@ -98,9 +98,9 @@
             dark={$theme.dark}
             hover
             id="minionListTable"
-            class="b-0 mb-0 {$theme.dark ? 'text-white border-secondary' : ''}"
+            class="b-0 mb-0 {$theme.dark ? 'text-light border-secondary' : ''}"
         >
-            <thead class="bg-dark text-white border-0">
+            <thead class="bg-dark text-light border-0">
                 <tr>
                     <th scope="col" class="border-secondary">
                         <div class="row g-1">
@@ -123,7 +123,7 @@
                                 <input
                                     type="text"
                                     class="ms-1 lh-1 {$theme.dark &&
-                                        'bg-secondary text-white border-0'}"
+                                        'bg-secondary text-light border-0'}"
                                     size="15"
                                     bind:value={filter_id}
                                 />
@@ -149,7 +149,7 @@
                                 <input
                                     type="text"
                                     class="ms-1 lh-1 {$theme.dark &&
-                                        'bg-secondary text-white border-0'}"
+                                        'bg-secondary text-light border-0'}"
                                     size="15"
                                     bind:value={filter_type}
                                 />

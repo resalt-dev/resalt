@@ -27,7 +27,7 @@
         <!-- Title -->
         <div class="row g-0">
             <div class="col-9 offset-2 px-5" style="padding-top: 30rem;">
-                <h1 class="text-uppercase text-white">
+                <h1 class="text-uppercase text-light">
                     {constants.appName} Admin Console
                 </h1>
             </div>
@@ -37,7 +37,7 @@
             <div class="col-2 p-5 {$theme.dark ? 'bg-darker' : 'bg-light'}" />
             <div
                 class="col-6 p-5 {$theme.dark
-                    ? 'bg-dark text-white'
+                    ? 'bg-dark text-light'
                     : 'bg-white text-dark'}"
                 style="max-width: 54rem;"
             >
@@ -49,7 +49,7 @@
                 <div class="clearfix" />
 
                 {#each localAlerts as alert}
-                    <div class="card text-white bg-{alert.type} mb-3">
+                    <div class="card text-light bg-{alert.type} mb-3">
                         <div class="card-body">
                             <h5 class="card-title">
                                 {alert.title}

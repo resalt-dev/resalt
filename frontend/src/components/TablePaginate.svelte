@@ -35,7 +35,7 @@
     <div
         class="nav-link fw-bold mouse-pointer {page === 1
             ? 'text-secondary'
-            : 'text-white'}"
+            : 'text-light'}"
         on:click={() => (page = 1)}
     >
         &lt;&lt;
@@ -43,7 +43,7 @@
     <div
         class="nav-link fw-bold mouse-pointer {page === 1
             ? 'text-secondary'
-            : 'text-white'}"
+            : 'text-light'}"
         on:click={() => page > 1 && (page = page - 1)}
     >
         &lt;
@@ -53,19 +53,19 @@
             class="nav-link fw-bold mouse-pointer {page === index
                 ? 'bg-' +
                   $theme.color +
-                  ($theme.color === 'yellow' ? ' text-dark' : ' text-white')
-                : 'text-white'}"
+                  ($theme.color === 'yellow' ? ' text-dark' : ' text-light')
+                : 'text-light'}"
             on:click={() => (page = index)}
         >
             {index}
         </div>
     {/each}
     {#if page < last_page - 3}
-        <div class="nav-link text-white fw-bold">...</div>
+        <div class="nav-link text-light fw-bold">...</div>
     {/if}
     {#if page < last_page - 2}
         <div
-            class="nav-link text-white fw-bold mouse-pointer"
+            class="nav-link text-light fw-bold mouse-pointer"
             on:click={() => (page = last_page)}
         >
             {last_page}
@@ -74,7 +74,7 @@
     <div
         class="nav-link fw-bold mouse-pointer {page === last_page
             ? 'text-secondary'
-            : 'text-white'}"
+            : 'text-light'}"
         on:click={() => page < last_page && (page = page + 1)}
     >
         &gt;
@@ -82,14 +82,14 @@
     <div
         class="nav-link fw-bold mouse-pointer {page === last_page
             ? 'text-secondary'
-            : 'text-white'}"
+            : 'text-light'}"
         on:click={() => (page = last_page)}
     >
         &gt;&gt;
     </div>
     <div class="nav-item dropdown ms-3">
         <span
-            class="nav-link text-white mouse-pointer"
+            class="nav-link text-light mouse-pointer"
             id="dropdownPaginatePageSize"
             role="button"
             data-bs-toggle="dropdown"
@@ -106,7 +106,7 @@
                 <li>
                     <span
                         class="dropdown-item mouse-pointer {size === s
-                            ? 'fw-bold text-white'
+                            ? 'fw-bold text-light'
                             : 'text-light'}"
                         on:click={() => (size = s)}>{s}</span
                     >

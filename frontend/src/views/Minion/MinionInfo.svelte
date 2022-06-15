@@ -243,11 +243,11 @@
             <div class="card-header">
                 <span class="fw-bold">Network</span>
             </div>
-            <div class="class-body px-2 {$theme.dark ? 'text-white' : ''}">
+            <div class="class-body px-2 {$theme.dark ? 'text-light' : ''}">
                 <Table
                     dark={$theme.dark}
                     hover
-                    class={$theme.dark ? "text-white" : ""}
+                    class={$theme.dark ? "text-light" : ""}
                 >
                     <thead>
                         <tr>
