@@ -21,15 +21,17 @@ function serve() {
 
     return {
         writeBundle() {
+            console.log(`server: ${server}`);
             if (server) return;
-            server = require("child_process").spawn(
-                "npm",
-                ["run", "start", "--", "--dev"],
-                {
+            try {
+                server = require("child_process").spawn("npm", ["run", "start", "--", "--dev"], {
                     stdio: ["ignore", "inherit", "inherit"],
                     shell: true,
-                }
-            );
+                });
+            } catch (e) {
+                console.log(e);
+            }
+            console.log(server);
 
             process.on("SIGTERM", toExit);
             process.on("exit", toExit);

@@ -35,7 +35,7 @@ services:
     image: node:18-alpine
     volumes:
       - ./frontend:/usr/src/app
-    command: /bin/sh -c "cd /usr/src/app && npm install && npm start dev"
+    command: /bin/sh -c "cd /usr/src/app && npm install && node ./node_modules/.bin/rollup -c -w"
     ports:
       - "5555:5555"
   backend:
