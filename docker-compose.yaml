@@ -38,6 +38,7 @@ services:
     command: /bin/sh -c "cd /usr/src/app && npm install && node ./node_modules/.bin/rollup -c -w"
     ports:
       - "5555:5555"
+      - "35730:35730"
   backend:
     build:
       context: ./backend

@@ -112,6 +112,7 @@ export default {
             livereload({
                 watch: "public",
                 delay: 500,
+                port: 35730,
             }),
 
         // If we're building for production (npm run build
