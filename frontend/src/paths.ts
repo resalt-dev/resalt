@@ -53,9 +53,8 @@ const dashboardPaths = [
     // -----
 
     new Path ("users", `/dashboard/users`, "Users", "user-circle", true),
-    new Path ("settings", `/dashboard/settings`, "Settings", "cog", true),
-
     new Path ("preferences", `/dashboard/preferences`, "Preferences", "wrench", true),
+    new Path ("settings", `/dashboard/settings`, "Settings", "cog", true),
 ];
 
 const paths: any = new Proxy ([
