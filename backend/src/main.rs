@@ -98,7 +98,7 @@ async fn main() -> std::io::Result<()> {
                     }),
             )
             // default (fallback to frontend)
-            .default_service(route_fallback_get)
+            .service(web::scope(&SConfig::sub_path()).default_service(route_fallback_get))
     })
     .bind(("0.0.0.0", 8000))?
     .run()

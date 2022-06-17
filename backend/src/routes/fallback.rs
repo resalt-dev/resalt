@@ -20,10 +20,13 @@ pub async fn route_fallback_proxy_get(
 ) -> Result<ServiceResponse, actix_web::Error> {
     let (req, _payload) = service_request.into_parts();
 
-    let sub_path = SConfig::sub_path();
-
     // Send request to PROXY_TARGET using awc::Client
-    let target = req.uri().path().replace(&sub_path, "");
+    let target = req.uri().path();
+    let target = target
+        .chars()
+        .into_iter()
+        .skip(SConfig::sub_path().len())
+        .collect::<String>();
     let target = format!("{}{}", SConfig::reverse_proxy_target(), target);
     let mut res = match awc::Client::new().get(&target).send().await {
         Ok(res) => res,

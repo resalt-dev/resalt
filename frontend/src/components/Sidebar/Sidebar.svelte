@@ -4,6 +4,7 @@
     import paths from "../../paths";
     import { sidebarCollapsed as collapsed, theme, user } from "../../stores";
     import Icon from "../Icon.svelte";
+    import Logo from "../Logo.svelte";
     import SidebarItem from "./SidebarItem.svelte";
 
     function handleClickCollapse() {
@@ -21,10 +22,15 @@
         on:click={handleClickCollapse}
         class="d-flex text-decoration-none mouse-pointer"
     >
-        <div class="d-flex align-items-center py-4 mx-auto text-light">
-            <Icon name="menu" class="mb-0 h3 {$collapsed ? '' : 'me-3'}" />
-            {#if !$collapsed}
-                <span class="fs-4 fw-bold ln-0">{constants.appName}</span>
+        <div
+            class="d-flex align-items-center py-4 mx-auto"
+            style="height: 80px"
+        >
+            <div class="w-100">
+                <Logo />
+            </div>
+            {#if $collapsed}
+                <Icon name="menu" class="mb-0 h3" />
             {/if}
         </div>
     </div>
@@ -63,7 +69,7 @@
                 class="rounded-circle {$collapsed ? '' : 'me-3'}"
                 width="32"
                 height="32"
-                style="margin-left: -2px;margin-right: 2px;"
+                style="margin-left: -4px;margin-right: 4px;"
             />
             {#if !$collapsed}
                 <strong class="me-1">{$user.username}</strong>
