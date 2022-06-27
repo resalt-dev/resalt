@@ -46,8 +46,6 @@ services:
       target: hibike-devel
     volumes:
       - ./backend:/usr/src/app
-    env_file:
-      - .env
     environment:
       - RUST_LOG_STYLE=always # Add color to logs
     ports:
