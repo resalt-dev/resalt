@@ -20,10 +20,10 @@ user_attribute = "uid"
 session_lifespan = 86400
 
 [http]
-sub_path = "/hibike"
+sub_path = "/resalt"
 
 [database]
-url = "mysql://hibike:hibike@db/hibike"
+url = "mysql://resalt:resalt@db/resalt"
 
 [frontend]
 reverse_proxy = true

@@ -11,13 +11,13 @@ lazy_static::lazy_static! {
                 .map(|c| c.to_string())
                 .collect::<String>();
     static ref SETTINGS: RwLock<config::Config> = RwLock::new(config::Config::builder()
-    // load defaults from hibike.default.toml via include_str!
-    .add_source(config::File::from_str(include_str!("../../hibike.default.toml"), config::FileFormat::Toml))
-    .add_source(config::File::with_name("/etc/hibike/hibike").required(false))
-    .add_source(config::File::with_name("hibike").required(false))
-    // Add in settings from the environment (with a prefix of HIBIKE)
-    // Eg.. `HIBIKE_DEBUG=1 ./target/app` would set the `debug` key
-    .add_source(config::Environment::with_prefix("HIBIKE"))
+    // load defaults from resalt.default.toml via include_str!
+    .add_source(config::File::from_str(include_str!("../../resalt.default.toml"), config::FileFormat::Toml))
+    .add_source(config::File::with_name("/etc/resalt/resalt").required(false))
+    .add_source(config::File::with_name("resalt").required(false))
+    // Add in settings from the environment (with a prefix of RESALT)
+    // Eg.. `RESALT_DEBUG=1 ./target/app` would set the `debug` key
+    .add_source(config::Environment::with_prefix("RESALT"))
     .set_default("salt.api.system_service_token", SYSTEM_TOKEN_FALLBACK.clone()).unwrap()
     .build()
     .unwrap());

@@ -7,8 +7,8 @@ services:
     environment:
       MYSQL_DATABASE: salt
       MYSQL_ROOT_PASSWORD: supersecretpassword
-      MYSQL_USER: hibike
-      MYSQL_PASSWORD: hibike
+      MYSQL_USER: resalt
+      MYSQL_PASSWORD: resalt
     volumes:
       - ./docker/sql/mysql:/docker-entrypoint-initdb.d
     ports:
@@ -43,7 +43,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-      target: hibike-devel
+      target: resalt-devel
     volumes:
       - ./backend:/usr/src/app
     environment:

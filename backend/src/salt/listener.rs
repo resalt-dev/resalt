@@ -6,7 +6,7 @@ use log::*;
 use regex::Regex;
 use serde_json::Value;
 
-pub const HIBIKE_SALT_SYSTEM_SERVICE_USERNAME: &str = "$superadmin/svc/hibike$";
+pub const RESALT_SALT_SYSTEM_SERVICE_USERNAME: &str = "$superadmin/svc/resalt$";
 
 lazy_static::lazy_static! {
     //static ref REGEX_JOB_NEW: Regex = Regex::new("salt/job/([0-9]+)/new").unwrap();
@@ -32,7 +32,7 @@ impl SaltEventListener {
         match self
             .api
             .login(
-                HIBIKE_SALT_SYSTEM_SERVICE_USERNAME,
+                RESALT_SALT_SYSTEM_SERVICE_USERNAME,
                 &SConfig::salt_api_system_service_token(),
             )
             .await

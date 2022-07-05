@@ -1,22 +1,22 @@
-DROP DATABASE IF EXISTS  `hibike`;
-CREATE DATABASE  `hibike`
+DROP DATABASE IF EXISTS  `resalt`;
+CREATE DATABASE  `resalt`
   DEFAULT CHARACTER SET utf8
   DEFAULT COLLATE utf8_general_ci;
 
-GRANT Alter ON hibike.* TO 'hibike'@'%';
-GRANT Create ON hibike.* TO 'hibike'@'%';
-GRANT Create view ON hibike.* TO 'hibike'@'%';
-GRANT Delete ON hibike.* TO 'hibike'@'%';
-GRANT Delete history ON hibike.* TO 'hibike'@'%';
-GRANT Drop ON hibike.* TO 'hibike'@'%';
-GRANT Grant option ON hibike.* TO 'hibike'@'%';
-GRANT Index ON hibike.* TO 'hibike'@'%';
-GRANT Insert ON hibike.* TO 'hibike'@'%';
-GRANT References ON hibike.* TO 'hibike'@'%';
-GRANT Select ON hibike.* TO 'hibike'@'%';
-GRANT Show view ON hibike.* TO 'hibike'@'%';
-GRANT Trigger ON hibike.* TO 'hibike'@'%';
-GRANT Update ON hibike.* TO 'hibike'@'%';
+GRANT Alter ON resalt.* TO 'resalt'@'%';
+GRANT Create ON resalt.* TO 'resalt'@'%';
+GRANT Create view ON resalt.* TO 'resalt'@'%';
+GRANT Delete ON resalt.* TO 'resalt'@'%';
+GRANT Delete history ON resalt.* TO 'resalt'@'%';
+GRANT Drop ON resalt.* TO 'resalt'@'%';
+GRANT Grant option ON resalt.* TO 'resalt'@'%';
+GRANT Index ON resalt.* TO 'resalt'@'%';
+GRANT Insert ON resalt.* TO 'resalt'@'%';
+GRANT References ON resalt.* TO 'resalt'@'%';
+GRANT Select ON resalt.* TO 'resalt'@'%';
+GRANT Show view ON resalt.* TO 'resalt'@'%';
+GRANT Trigger ON resalt.* TO 'resalt'@'%';
+GRANT Update ON resalt.* TO 'resalt'@'%';
 
 
 DROP DATABASE IF EXISTS  `salt`;

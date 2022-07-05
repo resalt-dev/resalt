@@ -22,7 +22,7 @@ pub async fn route_auth_token_post(
 
     info!("Token validation for {:?} with token {:?}", username, token);
 
-    if username == HIBIKE_SALT_SYSTEM_SERVICE_USERNAME {
+    if username == RESALT_SALT_SYSTEM_SERVICE_USERNAME {
         if token == SConfig::salt_api_system_service_token() {
             info!("System service token OK");
             return Ok(HttpResponse::Ok().json(HashMap::from([(
