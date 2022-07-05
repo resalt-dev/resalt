@@ -204,14 +204,14 @@
     --light: var(--light-gray);
     --dark: var(--black);
 
-    --light-primary: var(--blue);
+    --light-primary: var(--blue-4);
     --light-secondary: var(--light-gray);
     --light-success: var(--light-green);
     --light-info: var(--light-cyan);
     --light-warning: var(--light-yellow);
     --light-danger: var(--light-red);
 
-    --dark-primary: var(--blue-9);
+    --dark-primary: var(--blue-10);
     --dark-secondary: var(--dark-gray);
     --dark-success: var(--dark-green);
     --dark-info: var(--dark-cyan);

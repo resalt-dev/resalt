@@ -1,13 +1,38 @@
 <script>
     /*
 maketext.io
-fs: 180
+fs: 190
 ff: ArchivoBlack
 fb: 0,0,0,0
 ft: 0050b3 00ffff 0
++ edited afterwards
 */
 
     import constants from "../constants";
+
+    export let color = "primary";
+
+    // Decide stopColor1 and stopColor2 through switch
+    /* const themeColors = [
+    "red",
+    "volcano",
+    "orange",
+    "gold",
+    "yellow",
+    "green",
+    "cyan",
+    "blue",
+    //"geekblue",
+    "primary",
+    "purple",
+    "magenta",
+];
+*/
+
+    // original: #0050b3, #00ffff
+
+    $: stopColor1 = "var(--" + color + ")";
+    $: stopColor2 = "var(--light-" + color + ")";
 </script>
 
 <svg
@@ -24,8 +49,10 @@ ft: 0050b3 00ffff 0
             y2="0.5"
             gradientUnits="objectBoundingBox"
         >
-            <stop offset="0" stop-color="#0050b3" />
-            <stop offset="1" stop-color="#00ffff" />
+            <!-- <stop offset="0" stop-color="#0050b3" />
+            <stop offset="1" stop-color="#00ffff" /> -->
+            <stop offset="0" stop-color={stopColor1} />
+            <stop offset="1" stop-color={stopColor2} />
         </linearGradient>
     </defs>
     <g transform="matrix(1, 0, 0, 1, -137.428162, -83.720596)">

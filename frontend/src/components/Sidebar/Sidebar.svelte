@@ -27,7 +27,7 @@
             style="height: 80px"
         >
             <div class="w-100 px-5 py-3">
-                <Logo />
+                <Logo color={$theme.color} />
             </div>
             {#if $collapsed}
                 <Icon name="menu" class="mb-0 h3" />

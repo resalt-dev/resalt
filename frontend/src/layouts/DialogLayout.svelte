@@ -37,7 +37,7 @@
                     >
                         <!-- Title -->
                         <div class="m-3 px-5 py-3">
-                            <Logo />
+                            <Logo color={$theme.color} />
                         </div>
 
                         <hr class="mx-3 my-3" />

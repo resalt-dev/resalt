@@ -1,24 +1,10 @@
 <script>
     import Icon from "../../components/Icon.svelte";
+    import constants from "../../constants";
     import { theme } from "../../stores";
 
     $: currentColor = $theme.color;
     $: console.log("currentColor", currentColor);
-
-    const colors = [
-        "red",
-        "volcano",
-        "orange",
-        "gold",
-        "yellow",
-        "green",
-        "cyan",
-        "blue",
-        //"geekblue",
-        "primary",
-        "purple",
-        "magenta",
-    ];
 
     function selectColor(event) {
         let color = [...event.target.classList]
@@ -29,7 +15,7 @@
     }
 </script>
 
-{#each colors as color}
+{#each constants.themeColors as color}
     <Icon
         type={color === currentColor ? "solid" : "regular"}
         size="2"
