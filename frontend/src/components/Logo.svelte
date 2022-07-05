@@ -10,8 +10,12 @@ ft: 0050b3 00ffff 0
 
     export let color = "primary";
 
-    $: stopColor1 = "var(--" + color + ")";
-    $: stopColor2 = "var(--light-" + color + ")";
+    $: stopColor1Num = color == "primary" ? 8 : 6;
+    $: stopColor2Num = color == "primary" ? 4 : 4;
+
+    $: realColor = color == "primary" ? "blue" : color;
+    $: stopColor1 = "var(--" + realColor + "-" + stopColor1Num + ")";
+    $: stopColor2 = "var(--" + realColor + "-" + stopColor2Num + ")";
 </script>
 
 <svg
