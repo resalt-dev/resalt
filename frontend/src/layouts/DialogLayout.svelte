@@ -40,7 +40,7 @@
                             <Logo color={$theme.color} />
                         </div>
 
-                        <hr class="mx-3 my-3" />
+                        <hr class="mx-5 my-3 bg-light" />
 
                         <!-- Content -->
                         <div class="px-5 py-4" style="max-width: 54rem;">
