@@ -1,7 +1,5 @@
-const apiUrl = 'http://localhost:8000/resalt/api/1';
 const appName = "Resalt"
 const basePath = "/resalt";
-
 const themeColors = [
     "red",
     "volcano",
@@ -16,5 +14,7 @@ const themeColors = [
     "purple",
     "magenta",
 ];
+
+const apiUrl = basePath + '/api/1';
 
 export default { apiUrl, appName, basePath, themeColors };

@@ -1,6 +1,5 @@
 <script>
     import { Link } from "svelte-navigator";
-    import constants from "../../constants";
     import paths from "../../paths";
     import { sidebarCollapsed as collapsed, theme, user } from "../../stores";
     import Icon from "../Icon.svelte";
@@ -13,7 +12,7 @@
 </script>
 
 <div
-    class="d-flex flex-column flex-shrink-0 text-light bg-dark h-100 no-select"
+    class="d-flex flex-column flex-shrink-0 bg-dark h-100 no-select"
     style="min-height: 100vh; {$collapsed
         ? 'width: 4.5rem;'
         : 'width: 17.5rem;'}"
@@ -23,15 +22,20 @@
         class="d-flex text-decoration-none mouse-pointer"
     >
         <div
-            class="d-flex align-items-center py-4 mx-auto"
+            class="d-flex align-items-center py-4 {$collapsed
+                ? 'mx-auto'
+                : 'w-100'}"
             style="height: 80px"
         >
-            <div class="w-100 px-5 py-3">
+            <div class="px-5 py-3 {$collapsed ? 'd-none' : 'w-100'}">
                 <Logo color={$theme.color} />
             </div>
-            {#if $collapsed}
-                <Icon name="menu" class="mb-0 h3" />
-            {/if}
+            <Icon
+                name="menu"
+                class="mb-0 h3 {$theme.dark
+                    ? 'text-light'
+                    : 'text-white'} {!$collapsed && 'd-none'}"
+            />
         </div>
     </div>
 
@@ -58,7 +62,9 @@
         <!-- svelte-ignore a11y-invalid-attribute -->
         <a
             href="#"
-            class="d-flex align-items-center text-light text-decoration-none dropdown-toggle px-3"
+            class="d-flex align-items-center {$theme.dark
+                ? 'text-light'
+                : 'text-white'} text-decoration-none dropdown-toggle px-3"
             id="dropdownUser1"
             data-bs-toggle="dropdown"
             aria-expanded="false"
@@ -97,7 +103,9 @@
 
     <div
         on:click={handleClickCollapse}
-        class="text-light btn-dark bg-dark border-0 pt-3 pb-2 px-3 fw-light mouse-pointer d-flex align-items-center"
+        class="{$theme.dark
+            ? 'text-light'
+            : 'text-white'} btn-dark bg-dark border-0 pt-3 pb-2 px-3 fw-light mouse-pointer d-flex align-items-center"
         aria-current="page"
     >
         <Icon
@@ -110,9 +118,3 @@
         {/if}
     </div>
 </div>
-
-<style>
-    .ln-0 {
-        line-height: 0;
-    }
-</style>

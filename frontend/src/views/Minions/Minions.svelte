@@ -72,7 +72,7 @@
                 'bg-' + $theme.color} {$theme.color === 'yellow' &&
             fpage === FilterPage[filter_page]
                 ? 'text-dark'
-                : 'text-light'}"
+                : 'text-white'}"
         >
             {fpage}
         </div>
@@ -235,7 +235,8 @@
                         <td>
                             <Link
                                 to={paths.minion.getPath(minion.id)}
-                                class={`btn btn-primary btn-sm px-3`}>View</Link
+                                class="btn btn-{$theme.color} btn-sm px-3"
+                                >View</Link
                             >
                         </td>
                     </tr>

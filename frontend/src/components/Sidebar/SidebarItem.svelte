@@ -16,7 +16,9 @@
         to={route.path}
         class="nav-link {$theme.color === 'yellow' && isActiveOrSub
             ? 'text-dark'
-            : 'text-light'} py-3 fw-light d-flex align-items-center {isActiveOrSub
+            : $theme.dark && !isActiveOrSub
+            ? 'text-light'
+            : 'text-white'} py-3 fw-light d-flex align-items-center {isActiveOrSub
             ? `bg-${$theme.color}`
             : ''}"
     >

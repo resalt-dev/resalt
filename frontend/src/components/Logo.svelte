@@ -8,28 +8,7 @@ ft: 0050b3 00ffff 0
 + edited afterwards
 */
 
-    import constants from "../constants";
-
     export let color = "primary";
-
-    // Decide stopColor1 and stopColor2 through switch
-    /* const themeColors = [
-    "red",
-    "volcano",
-    "orange",
-    "gold",
-    "yellow",
-    "green",
-    "cyan",
-    "blue",
-    //"geekblue",
-    "primary",
-    "purple",
-    "magenta",
-];
-*/
-
-    // original: #0050b3, #00ffff
 
     $: stopColor1 = "var(--" + color + ")";
     $: stopColor2 = "var(--light-" + color + ")";
