@@ -1,5 +1,6 @@
 <script>
     import { Router, Route } from "svelte-navigator";
+    import Logo from "../components/Logo.svelte";
     import constants from "../constants";
     import { alerts, theme } from "../stores";
     import AuthLogin from "../views/AuthLogin.svelte";
@@ -16,50 +17,57 @@
 
 <div
     class="background1 h-100"
-    style="background-image: url('{constants.basePath}/assets/images/denisse-leon-OVEWbIgffDk-unsplash.jpg')"
+    style="background-image: url('{constants.basePath}/assets/images/0da7530ac9cd4c88850c62138da12e66.jpg');"
 >
-    <div
-        class="background2 h-100 w-100"
-        style={$theme.dark
-            ? "background: rgba(0, 0, 0, 0.25);"
-            : "background: rgba(255, 255, 255, 0.25);"}
-    >
-        <!-- Title -->
-        <div class="row g-0">
-            <div class="col-9 offset-2 px-5" style="padding-top: 30rem;">
-                <h1 class="text-uppercase text-light">
-                    {constants.appName} Admin Console
-                </h1>
-            </div>
-        </div>
-        <!-- Content -->
-        <div class="row g-0">
-            <div class="col-2 p-5 {$theme.dark ? 'bg-darker' : 'bg-light'}" />
+    <div class="background2 h-100 w-100">
+        <div class="row g-0 h-100">
+            <!-- Right side -->
             <div
-                class="col-6 p-5 {$theme.dark
-                    ? 'bg-dark text-light'
-                    : 'bg-white text-dark'}"
-                style="max-width: 54rem;"
+                class="offset-8 col-4 h-100 {$theme.dark
+                    ? 'bg-dark'
+                    : 'bg-white'}"
             >
-                <Router primary={false}>
-                    <Route path="login" component={AuthLogin} />
-                    <Route path="logout" component={AuthLogout} />
-                </Router>
+                <div
+                    class="row h-100 g-0 justify-content-center align-items-center"
+                >
+                    <div
+                        class="col-12 {$theme.dark
+                            ? 'bg-dark text-light'
+                            : 'bg-white'}"
+                    >
+                        <!-- Title -->
+                        <div class="m-3 px-5 py-3">
+                            <Logo />
+                        </div>
 
-                <div class="clearfix" />
+                        <hr class="mx-3 my-3" />
 
-                {#each localAlerts as alert}
-                    <div class="card text-light bg-{alert.type} mb-3">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                {alert.title}
-                            </h5>
-                            <p class="card-text">
-                                {alert.message}
-                            </p>
+                        <!-- Content -->
+                        <div class="px-5 py-4" style="max-width: 54rem;">
+                            <Router primary={false}>
+                                <Route path="login" component={AuthLogin} />
+                                <Route path="logout" component={AuthLogout} />
+                            </Router>
+
+                            <div class="clearfix" />
+
+                            {#each localAlerts as alert}
+                                <div
+                                    class="card text-light bg-{alert.type} mb-3"
+                                >
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            {alert.title}
+                                        </h5>
+                                        <p class="card-text">
+                                            {alert.message}
+                                        </p>
+                                    </div>
+                                </div>
+                            {/each}
                         </div>
                     </div>
-                {/each}
+                </div>
             </div>
         </div>
     </div>

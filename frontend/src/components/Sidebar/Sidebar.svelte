@@ -26,7 +26,7 @@
             class="d-flex align-items-center py-4 mx-auto"
             style="height: 80px"
         >
-            <div class="w-100">
+            <div class="w-100 px-5 py-3">
                 <Logo />
             </div>
             {#if $collapsed}
