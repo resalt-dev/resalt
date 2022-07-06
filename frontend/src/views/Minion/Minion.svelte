@@ -60,8 +60,8 @@
                 subPage === item.name.toLowerCase()
                     ? 'bg-' +
                       $theme.color +
-                      ($theme.color === 'yellow' ? ' text-dark' : ' text-light')
-                    : 'text-light'}"
+                      ($theme.color === 'yellow' ? ' text-dark' : ' text-white')
+                    : 'text-white'}"
             >
                 {item.name}
             </Link>
