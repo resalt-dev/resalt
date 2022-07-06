@@ -97,8 +97,10 @@ async fn main() -> std::io::Result<()> {
                         );
                     }),
             )
-            // default (fallback to frontend)
-            .service(web::scope(&SConfig::sub_path()).default_service(route_fallback_get))
+            // Serve UI
+            .service(web::scope(&SConfig::sub_path()).default_service(route_frontend_get))
+            // Redirect 302 to UI if outside sub_path using lambda
+            .default_service(route_fallback_redirect)
     })
     .bind(("0.0.0.0", 8000))?
     .run()
