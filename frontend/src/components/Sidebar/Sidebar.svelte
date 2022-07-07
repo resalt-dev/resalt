@@ -105,7 +105,7 @@
         on:click={handleClickCollapse}
         class="{$theme.dark
             ? 'text-light'
-            : 'text-white'} btn-dark border-0 pt-3 pb-2 px-3 fw-light mouse-pointer d-flex align-items-center"
+            : 'text-white'} btn-dark bg-dark border-0 pt-3 pb-2 px-3 fw-light mouse-pointer d-flex align-items-center"
         aria-current="page"
     >
         <Icon
