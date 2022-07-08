@@ -8,9 +8,8 @@
         showAlert,
     } from "../controller";
     import { theme } from "../stores";
-
-    import { useNavigate } from "svelte-navigator";
     import paths from "../paths";
+    import { useNavigate } from "svelte-navigator";
     const navigate = useNavigate();
 
     let username = "";
@@ -37,10 +36,6 @@
                 showAlert(AlertType.ERROR, "Login Error", err);
             });
     }
-
-    function returnFalse() {
-        return false;
-    }
 </script>
 
 <p class="fw-bold">
@@ -49,7 +44,7 @@
 
 <br />
 
-<form onsubmit={returnFalse} autocomplete="false">
+<form action="#" autocomplete="false">
     <input
         bind:value={username}
         type="text"

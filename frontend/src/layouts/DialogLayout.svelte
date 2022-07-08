@@ -1,5 +1,6 @@
 <script lang="ts">
     import { Router, Route } from "svelte-navigator";
+    import { Card, CardBody, CardText, CardTitle } from "sveltestrap";
     import Logo from "../components/Logo.svelte";
     import constants from "../constants";
     import { alerts, theme } from "../stores";
@@ -52,18 +53,12 @@
                             <div class="clearfix" />
 
                             {#each localAlerts as alert}
-                                <div
-                                    class="card text-light bg-{alert.type} mb-3"
-                                >
-                                    <div class="card-body">
-                                        <h5 class="card-title">
-                                            {alert.title}
-                                        </h5>
-                                        <p class="card-text">
-                                            {alert.message}
-                                        </p>
-                                    </div>
-                                </div>
+                                <Card class="text-white bg-{alert.type} mb-3">
+                                    <CardBody>
+                                        <CardTitle>{alert.title}</CardTitle>
+                                        <CardText>{alert.message}</CardText>
+                                    </CardBody>
+                                </Card>
                             {/each}
                         </div>
                     </div>
