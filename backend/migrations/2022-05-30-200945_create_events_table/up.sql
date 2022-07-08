@@ -4,4 +4,4 @@ CREATE TABLE `events` (
     `tag` varchar(255) NOT NULL,
     `data` mediumtext NOT NULL,
     PRIMARY KEY (`id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb3;
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;

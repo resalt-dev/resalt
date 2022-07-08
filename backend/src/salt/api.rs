@@ -10,7 +10,7 @@ use log::*;
 use rustls::ClientConfig;
 use rustls_native_certs::load_native_certs;
 use serde_json::json;
-use std::{sync::{Arc, Mutex}, collections::HashMap, any::Any};
+use std::sync::{Arc, Mutex};
 
 const X_AUTH_TOKEN: &str = "X-Auth-Token";
 
@@ -376,62 +376,6 @@ impl SaltAPI {
         // TODO: Can this be done cleaner/more efficient? Send all at once?
 
         // TODO: sync with key-management, add non-responsive minions, and remove deleted ones
-
-        Ok(())
-    }
-
-    async fn run_job(
-        &self,
-        salt_token: &SaltToken,
-        client: SaltClientType,
-        fun: &str,
-        arg: Vec<&str>,
-        kwarg: Option<HashMap<String, Box<dyn Any>>>,
-        tgt: &str,
-        tgt_type: Option<&str>,
-    ) -> Result<(), SaltError> {
-        let url = &SConfig::salt_api_url();
-        let job = json! ([{
-            "client": "local_async",
-            "fun": fun,
-            "tgt": tgt,
-            "tgt_type": tgt_type.unwrap_or("glob"),
-            "arg": arg,
-        }]);
-
-        debug!("job {:?}", job);
-
-        let mut res = match self
-            .client
-            .lock()
-            .unwrap()
-            .post(url)
-            .append_header((X_AUTH_TOKEN, salt_token.token.clone()))
-            .send_json(&job)
-            .await
-        {
-            Ok(res) => res,
-            Err(e) => {
-                return Err(SaltError::RequestError(e));
-            }
-        };
-
-        // If access denied (e.g. missing permissions)
-        if res.status() == StatusCode::FORBIDDEN {
-            return Err(SaltError::Forbidden);
-        }
-        // If status != 200, something went wrong
-        if res.status() != StatusCode::OK {
-            return Err(SaltError::FailedRequest(res));
-        }
-
-        let body = match res.json::<serde_json::Value>().await {
-            Ok(body) => body,
-            Err(e) => {
-                return Err(SaltError::ResponseParseError(Some(e)));
-            }
-        };
-        debug!("client_async run body {:?}", body);
 
         Ok(())
     }

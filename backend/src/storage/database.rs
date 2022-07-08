@@ -336,11 +336,16 @@ impl Storage {
             .map_err(|e| format!("{:?}", e))
     }
 
-    pub fn insert_event(&self, tag: &str, data: &str, time: &NaiveDateTime) -> Result<(), String> {
+    pub fn insert_event(
+        &self,
+        tag: &str,
+        data: &str,
+        time: &NaiveDateTime,
+    ) -> Result<String, String> {
         let connection = self.create_connection()?;
         let uuid = format!("evnt_{}", uuid::Uuid::new_v4());
         let event = Event {
-            id: uuid,
+            id: uuid.clone(),
             timestamp: *time,
             tag: tag.to_string(),
             data: data.to_string(),
@@ -349,7 +354,7 @@ impl Storage {
             .values(&event)
             .execute(&connection)
             .map_err(|e| format!("{:?}", e))?;
-        Ok(())
+        Ok(uuid)
     }
 
     pub fn list_events(&self) -> Result<Vec<Event>, String> {
@@ -359,6 +364,81 @@ impl Storage {
             .order(events::timestamp.desc())
             .limit(2000)
             .load::<Event>(&connection)
+            .map_err(|e| format!("{:?}", e))
+    }
+
+    pub fn insert_job(
+        &self,
+        jid: &str,
+        user: &str,
+        minions: &str,
+        event_id: &str,
+        time: &NaiveDateTime,
+    ) -> Result<(), String> {
+        let connection = self.create_connection()?;
+        let uuid = format!("job_{}", uuid::Uuid::new_v4());
+        let job = Job {
+            id: uuid.clone(),
+            timestamp: *time,
+            jid: jid.to_string(),
+            user: user.to_string(),
+            minions: minions.to_string(),
+            event_id: event_id.to_string(),
+        };
+        diesel::insert_into(jobs::table)
+            .values(&job)
+            .execute(&connection)
+            .map_err(|e| format!("{:?}", e))?;
+        Ok(())
+    }
+
+    pub fn list_jobs(&self) -> Result<Vec<Job>, String> {
+        let connection = self.create_connection()?;
+        jobs::table
+            .order(jobs::timestamp.desc())
+            .load::<Job>(&connection)
+            .map_err(|e| format!("{:?}", e))
+    }
+
+    pub fn get_job_by_jid(&self, jid: &str) -> Result<Option<Job>, String> {
+        let connection = self.create_connection()?;
+        jobs::table
+            .filter(jobs::jid.eq(jid))
+            .first(&connection)
+            .optional()
+            .map_err(|e| format!("{:?}", e))
+    }
+
+    pub fn insert_job_return(
+        &self,
+        jid: &str,
+        job_id: &str,
+        event_id: &str,
+        time: &NaiveDateTime,
+    ) -> Result<(), String> {
+        let connection = self.create_connection()?;
+        let uuid = format!("jret_{}", uuid::Uuid::new_v4());
+        let job_return = JobReturn {
+            id: uuid.clone(),
+            timestamp: *time,
+            jid: jid.to_string(),
+            job_id: job_id.to_string(),
+            event_id: event_id.to_string(),
+        };
+        diesel::insert_into(job_returns::table)
+            .values(&job_return)
+            .execute(&connection)
+            .map_err(|e| format!("{:?}", e))?;
+        Ok(())
+    }
+
+    pub fn get_job_returns_by_job(&self, job: Job) -> Result<Vec<Event>, String> {
+        let connection = self.create_connection()?;
+        events::table
+            .inner_join(job_returns::table)
+            .filter(job_returns::job_id.eq(job.id))
+            .load::<(Event, JobReturn)>(&connection)
+            .map(|v: Vec<(Event, JobReturn)>| v.into_iter().map(|(e, _)| e).collect())
             .map_err(|e| format!("{:?}", e))
     }
 }

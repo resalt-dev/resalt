@@ -9,7 +9,7 @@ use serde_json::Value;
 pub const RESALT_SALT_SYSTEM_SERVICE_USERNAME: &str = "$superadmin/svc/resalt$";
 
 lazy_static::lazy_static! {
-    //static ref REGEX_JOB_NEW: Regex = Regex::new("salt/job/([0-9]+)/new").unwrap();
+    static ref REGEX_JOB_NEW: Regex = Regex::new("salt/job/([0-9]+)/new").unwrap();
     static ref REGEX_JOB_RETURN: Regex = Regex::new("salt/job/([0-9]+)/ret/(.+)").unwrap();
 }
 
@@ -58,7 +58,7 @@ impl SaltEventListener {
         pin_mut!(stream);
 
         while let Some(event) = stream.next().await {
-            // debug!("{:?}", event);
+            debug!("{:?}", event);
 
             // Unwrap string to JSON structure
             let data: Value = serde_json::from_str(&event.data).unwrap();
@@ -68,17 +68,58 @@ impl SaltEventListener {
             let time = data["_stamp"].as_str().unwrap();
             let time = chrono::NaiveDateTime::parse_from_str(time, "%Y-%m-%dT%H:%M:%S.%f").unwrap();
 
-            // Insert into own DB
-            match self.storage.insert_event(&event.tag, &event.data, &time) {
-                Ok(_) => (),
-                Err(err) => error!("failed to insert event: {:?}", err),
-            }
+            // Insert event into database
+            let event_id = match self.storage.insert_event(&event.tag, &event.data, &time) {
+                Ok(uuid) => uuid,
+                Err(err) => {
+                    error!("failed to insert event: {:?}", err);
+                    continue;
+                }
+            };
 
             // Check tag type
-            if let Some(_job_id) = REGEX_JOB_RETURN.captures(&event.tag) {
-                // Assumed always present, everything else is optional
+            if let Some(jid) = REGEX_JOB_NEW.captures(&event.tag) {
+                // Assumed always present
+                let jid = jid.get(1).unwrap().as_str();
+                let user = data["user"].as_str().unwrap();
+                let minions = serde_json::to_string(data["minions"].as_array().unwrap()).unwrap();
+
+                // Insert job into database
+                match self
+                    .storage
+                    .insert_job(jid, user, &minions, &event_id, &time)
+                {
+                    Ok(_) => (),
+                    Err(err) => error!("failed to insert job: {:?}", err),
+                }
+            } else if let Some(jid) = REGEX_JOB_RETURN.captures(&event.tag) {
+                // Assumed always present
+                let jid = jid.get(1).unwrap().as_str();
                 let fun = data["fun"].as_str().unwrap();
                 let fun_args = data["fun_args"].as_array().unwrap();
+
+                // Insert job return into database
+                match self.storage.get_job_by_jid(jid) {
+                    Ok(job) => match job {
+                        Some(job) => {
+                            let job_id = job.id;
+                            match self
+                                .storage
+                                .insert_job_return(jid, &job_id, &event_id, &time)
+                            {
+                                Ok(_) => (),
+                                Err(err) => error!("failed to insert job return: {:?}", err),
+                            }
+                        }
+                        None => {
+                            error!("failed to get job by jid: {}", jid);
+                            continue;
+                        }
+                    },
+                    Err(err) => {
+                        error!("failed to get job by jid: {:?}", err);
+                    }
+                };
 
                 debug!("salt event job fun: {:?}", fun);
                 match fun {
