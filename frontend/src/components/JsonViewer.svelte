@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import {
         EditorState,
         EditorView,
@@ -31,11 +31,7 @@
     onMount(() => {
         let state = EditorState.create({
             doc: code,
-            extensions: [
-                basicSetup,
-                EditorState.readOnly.of(true),
-                json(),
-            ],
+            extensions: [basicSetup, EditorState.readOnly.of(true), json()],
         });
         view = new EditorView({ state });
         editorElement.replaceChildren(view.dom);

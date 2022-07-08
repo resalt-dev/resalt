@@ -1,5 +1,5 @@
 use crate::prelude::*;
-use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
+use actix_web::{web, Responder, Result};
 use chrono::NaiveDateTime;
 use log::*;
 use serde::{Deserialize, Serialize};
@@ -21,17 +21,31 @@ struct JobsResponse {
 pub async fn route_jobs_get(
     data: web::Data<Storage>,
     query: web::Query<JobsGetQuery>,
-    req: HttpRequest,
 ) -> Result<impl Responder> {
+    // Filtering
     let user = query.user.clone();
-    let start_date = query
-        .start_date
-        .clone()
-        .map(|s| NaiveDateTime::parse_from_str(&s, "%Y-%m-%d %H:%M:%S").unwrap());
-    let end_date = query
-        .end_date
-        .clone()
-        .map(|s| NaiveDateTime::parse_from_str(&s, "%Y-%m-%d %H:%M:%S").unwrap());
+    let start_date = match query.start_date.clone() {
+        Some(date) => match NaiveDateTime::parse_from_str(&date, "%Y-%m-%dT%H:%M:%S.%fZ") {
+            Ok(d) => Some(d),
+            Err(e) => {
+                error!("Failed to parse start_date: {}", e);
+                return Err(api_error_invalid_request());
+            }
+        },
+        None => None,
+    };
+    let end_date = match query.end_date.clone() {
+        Some(date) => match NaiveDateTime::parse_from_str(&date, "%Y-%m-%dT%H:%M:%S.%fZ") {
+            Ok(d) => Some(d),
+            Err(e) => {
+                error!("Failed to parse end_date: {}", e);
+                return Err(api_error_invalid_request());
+            }
+        },
+        None => None,
+    };
+
+    // Pagination
     let limit = query.limit.clone();
     let offset = query.offset.clone();
 

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     /*
 maketext.io
 fs: 190

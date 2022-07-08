@@ -1,22 +1,13 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { load_minions } from "../../controller";
+    import { AlertType, load_minions, showAlert } from "../../controller";
     import { minions as minions_store, theme } from "../../stores";
     import Icon from "../../components/Icon.svelte";
     import paths from "../../paths";
     import { Link, useNavigate } from "svelte-navigator";
-    import {
-        Button,
-        Card,
-        CardBody,
-        CardHeader,
-        Col,
-        Row,
-        Table,
-    } from "sveltestrap";
+    import { Card, CardBody, Table } from "sveltestrap";
     import TablePaginate from "../../components/TablePaginate.svelte";
     import FilterPageSearch from "./FilterPageSearch.svelte";
-    import type { Minion } from "../../models";
     const navigate = useNavigate();
 
     enum FilterPage {
@@ -57,7 +48,9 @@
     );
 
     onMount(() => {
-        load_minions(navigate);
+        load_minions().catch((err) => {
+            showAlert(AlertType.ERROR, "Failed fetching minions", err);
+        });
     });
 </script>
 
@@ -100,7 +93,11 @@
             id="minionListTable"
             class="b-0 mb-0 {$theme.dark ? 'text-light border-secondary' : ''}"
         >
-            <thead class="bg-dark text-light border-0">
+            <thead
+                class="bg-dark border-0 {$theme.dark
+                    ? 'text-light'
+                    : 'text-white'}"
+            >
                 <tr>
                     <th scope="col" class="border-secondary">
                         <div class="row g-1">

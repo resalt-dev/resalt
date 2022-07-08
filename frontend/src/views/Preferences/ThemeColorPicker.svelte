@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import Icon from "../../components/Icon.svelte";
     import constants from "../../constants";
     import { theme } from "../../stores";

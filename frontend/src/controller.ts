@@ -11,28 +11,42 @@ import {
     list_minions,
     list_events,
     request_authtoken,
+    list_jobs,
 } from "./api";
 import paths from "./paths";
 import { get_user } from "./api";
+import { Alert, SaltEvent, User, Job } from "./models";
 
-import { ApiResponse, Alert, SaltEvent } from "./models";
+/*
+ * INTERNAL UTILS
+ */
 
-function alert(type: string, title: string, message: string): void {
+function _require_token(): string {
+    let token = get(authStore);
+    if (!token) {
+        throw new Error("No API token provided");
+    }
+    return token;
+}
+
+/*
+ * API
+ */
+
+export enum AlertType {
+    INFO = "info",
+    SUCCESS = "success",
+    WARNING = "warning",
+    ERROR = "danger",
+}
+
+export function showAlert(type: string, title: string, message: string): void {
     alerts.update((alerts) => [...alerts, new Alert(type, title, message)]);
 }
 
-export async function login(navigate, username: string, password: string) {
-    let result: ApiResponse = await request_authtoken(username, password);
-
-    if (result.status == 200) {
-        authStore.set(result.data.token);
-        await load_user(navigate);
-        navigate(paths.home.path);
-    } else {
-        console.log("login error", result);
-        alert("danger", "Login Error", result.data);
-        logout();
-    }
+export async function login(username: string, password: string) {
+    let token: String = await request_authtoken(username, password);
+    authStore.set(token);
 }
 
 export async function logout() {
@@ -40,19 +54,7 @@ export async function logout() {
     userStore.set(null);
 }
 
-function require_token(navigate?): boolean {
-    let token = get(authStore);
-    if (!token) {
-        if (!!navigate) {
-            navigate(paths.login.path);
-        }
-        return false;
-    }
-    return true;
-}
-
 let source: EventSource;
-
 export function close_events() {
     if (source) {
         source.close();
@@ -62,7 +64,7 @@ export function close_events() {
 export async function connect_events(timeout: number) {
     if (typeof timeout != "number") timeout = 1000;
 
-    if (!require_token()) return;
+    if (!_require_token()) return;
 
     if (source && source.readyState == EventSource.OPEN) {
         console.log(
@@ -102,7 +104,7 @@ export async function connect_events(timeout: number) {
                         return minions;
                     });
                     break;
-            };
+            }
         },
         false
     );
@@ -148,46 +150,36 @@ export async function connect_events(timeout: number) {
     );
 }
 
-export async function load_user(navigate) {
-    if (!require_token(navigate)) return;
+export async function load_user(): Promise<void> {
+    let token = _require_token();
 
-    let token = get(authStore);
-
-    let result = await get_user(token);
-    if (result.status == 200) {
-        userStore.set(result.data);
-    } else if (result.status == 401) {
-        logout();
-        navigate(paths.logout.path);
-        return true;
-    } else {
-        // todo: error message is in result.data
-        return false;
+    try {
+        let user = await get_user(token);
+        userStore.set(user);
+    } catch (e) {
+        console.log(e);
+        throw e;
     }
 }
 
-export async function load_minions(navigate, force_refresh = false) {
-    if (!require_token(navigate)) return;
+export async function load_minions(force_refresh = false) {
+    let token = _require_token();
 
-    let token = get(authStore);
-
-    let result = await list_minions(token, force_refresh);
-    if (result.status == 200) {
-        minionsStore.set(result.data.minions);
-    } else {
-        // todo: error handle
+    try {
+        let minions = await list_minions(token, force_refresh);
+        minionsStore.set(minions);
+    } catch (e) {
+        console.log(e);
+        throw e;
     }
 }
 
-export async function get_events(navigate): Promise<Array<SaltEvent>> {
-    if (!require_token(navigate)) return;
+export async function get_events(): Promise<Array<SaltEvent>> {
+    let token = _require_token();
+    return await list_events(token);
+}
 
-    let token = get(authStore);
-
-    let result = await list_events(token);
-    if (result.status == 200) {
-        return result.data.events;
-    } else {
-        // todo: error handle
-    }
+export async function get_jobs(): Promise<Array<Job>> {
+    let token = _require_token();
+    return await list_jobs(token);
 }

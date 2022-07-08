@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import { Router, Route } from "svelte-navigator";
     import Logo from "../components/Logo.svelte";
     import constants from "../constants";

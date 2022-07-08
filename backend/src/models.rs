@@ -32,7 +32,7 @@ impl Serialize for Event {
         S: Serializer,
     {
         let timestamp = self.timestamp.format("%Y-%m-%d %H:%M:%S%.6f").to_string();
-        let mut state = serializer.serialize_struct("Event", 3)?;
+        let mut state = serializer.serialize_struct("Event", 4)?;
         state.serialize_field("id", &self.id)?;
         state.serialize_field("timestamp", &timestamp)?;
         state.serialize_field("tag", &self.tag)?;
@@ -59,12 +59,13 @@ impl Serialize for Job {
         S: Serializer,
     {
         let timestamp = self.timestamp.format("%Y-%m-%d %H:%M:%S%.6f").to_string();
-        let mut state = serializer.serialize_struct("Job", 3)?;
+        let minions: Vec<String> = serde_json::from_str(&self.minions).unwrap();
+        let mut state = serializer.serialize_struct("Job", 6)?;
         state.serialize_field("id", &self.id)?;
         state.serialize_field("timestamp", &timestamp)?;
         state.serialize_field("jid", &self.jid)?;
         state.serialize_field("user", &self.user)?;
-        state.serialize_field("minions", &self.minions)?;
+        state.serialize_field("minions", &minions)?;
         state.serialize_field("event_id", &self.event_id)?;
         state.end()
     }

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import JsonViewer from "../../components/JsonViewer.svelte";
 
     export let minion;

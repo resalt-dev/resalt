@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import { Link } from "svelte-navigator";
     import paths from "../../paths";
     import { sidebarCollapsed as collapsed, theme, user } from "../../stores";

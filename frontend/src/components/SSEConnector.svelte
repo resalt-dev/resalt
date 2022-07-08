@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import { close_events, connect_events } from "../controller";
     import { auth } from "../stores";
     import { get } from "svelte/store";

@@ -1,6 +1,4 @@
-@import url(https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,700;1,400&display=swap);
-@import url(https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&display=swap);
-@import url(https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap);
+@import url(https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;1,400&display=swap);
 
 :root {
     --red-1: #fff1f0;
@@ -236,7 +234,7 @@ html, body {
 
 body,
 p {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Lato', sans-serif;
     font-weight: 400;
     letter-spacing: 0;
 }
@@ -247,7 +245,7 @@ h3,
 h4,
 h5,
 h6 {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Lato', sans-serif;
     font-weight: 700;
     letter-spacing: 0;
 }
@@ -256,7 +254,7 @@ code,
 kbd,
 pre,
 samp {
-    font-family: 'Roboto Mono', monospace;
+    font-family: monospace;
     font-weight: 400;
 }
 

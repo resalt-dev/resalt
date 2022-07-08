@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import { onMount } from "svelte";
     import { Link } from "svelte-navigator";
     import paths from "../paths";

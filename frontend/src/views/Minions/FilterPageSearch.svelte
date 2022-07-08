@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import { Row, Col, Button } from "sveltestrap";
 
     export let navigate;
@@ -16,10 +16,8 @@
         />
     </Col>
 </Row>
-<Button
-    color="secondary"
-    size="sm"
-    on:click={() => load_minions(navigate, true)}
->
+
+<!-- TEMP -->
+<Button color="secondary" size="sm" on:click={() => load_minions(true)}>
     Force reload minions
 </Button>

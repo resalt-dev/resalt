@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import { onMount } from "svelte";
     import { Router, Route, useNavigate } from "svelte-navigator";
     import { user, theme } from "../stores";
@@ -13,7 +13,7 @@
     import Minions from "../views/Minions/Minions.svelte";
     import Run from "../views/Run.svelte";
     import Job from "../views/Job.svelte";
-    import Jobs from "../views/Jobs.svelte";
+    import Jobs from "../views/Jobs/Jobs.svelte";
     import Schedules from "../views/Schedules.svelte";
     import Keys from "../views/Keys.svelte";
     import Events from "../views/Events.svelte";
@@ -24,7 +24,10 @@
     const navigate = useNavigate();
 
     onMount(() => {
-        load_user(navigate);
+        load_user().catch(() => {
+            logout();
+            navigate(paths.logout.path);
+        });
     });
 </script>
 

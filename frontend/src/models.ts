@@ -10,18 +10,6 @@ export class Alert {
     }
 }
 
-export class ApiResponse {
-    status: number;
-    ok: boolean;
-    data: any;
-
-    constructor(status, data) {
-        this.status = status;
-        this.ok = status == 200;
-        this.data = data;
-    }
-}
-
 /*
 {
                 "id": Math.floor(Math.random() * 1000000) + "",
@@ -117,5 +105,21 @@ export namespace SortOrder {
             default:
                 return SortOrder.Up;
         }
+    }
+}
+
+export class Job {
+    id: string;
+    timestamp: string;
+    jid: string;
+    user: string;
+    minions: string[];
+
+    constructor(id, timestamp, jid, user, minions) {
+        this.id = id;
+        this.timestamp = timestamp;
+        this.jid = jid;
+        this.user = user;
+        this.minions = minions;
     }
 }

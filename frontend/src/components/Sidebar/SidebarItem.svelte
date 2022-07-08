@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import { Link, useLocation } from "svelte-navigator";
     import { theme } from "../../stores";
     import Icon from "../Icon.svelte";

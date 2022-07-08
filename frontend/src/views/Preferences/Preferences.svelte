@@ -1,13 +1,10 @@
-<script>
+<script lang="ts">
     import {
         Card,
         CardHeader,
         CardTitle,
         CardSubtitle,
         CardBody,
-        Button,
-        CardText,
-        CardFooter,
         Row,
         Col,
     } from "sveltestrap";

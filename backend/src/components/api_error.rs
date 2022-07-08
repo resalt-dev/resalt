@@ -21,3 +21,7 @@ pub fn api_error_internal_error() -> actix_web::Error {
 pub fn api_error_ldap() -> actix_web::Error {
     actix_web::error::ErrorInternalServerError("Internal LDAP error".to_string())
 }
+
+pub fn api_error_invalid_request() -> actix_web::Error {
+    actix_web::error::ErrorBadRequest("Invalid request".to_string())
+}

@@ -1,9 +1,16 @@
-<script>
+<script lang="ts">
     import { onMount } from "svelte";
-    import { login } from "../controller";
+    import {
+        AlertType,
+        load_user,
+        login,
+        logout,
+        showAlert,
+    } from "../controller";
     import { theme } from "../stores";
 
     import { useNavigate } from "svelte-navigator";
+    import paths from "../paths";
     const navigate = useNavigate();
 
     let username = "";
@@ -15,7 +22,24 @@
     });
 
     function handleClick() {
-        login(navigate, username, password);
+        login(username, password)
+            .then(() => {
+                load_user()
+                    .then(() => {
+                        navigate(paths.home.path);
+                    })
+                    .catch((err) => {
+                        showAlert(AlertType.ERROR, "Failed fetching user", err);
+                        logout();
+                    });
+            })
+            .catch((err) => {
+                showAlert(AlertType.ERROR, "Login Error", err);
+            });
+    }
+
+    function returnFalse() {
+        return false;
     }
 </script>
 
@@ -25,7 +49,7 @@
 
 <br />
 
-<form onsubmit="return false;" autocomplete="false">
+<form onsubmit={returnFalse} autocomplete="false">
     <input
         bind:value={username}
         type="text"
