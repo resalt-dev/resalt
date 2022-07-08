@@ -207,7 +207,7 @@
     <div class="p-3">Loading events...</div>
 {:else}
     <div class="p-3 text-muted">
-        NOTE: Only a maximum of 2,000 most recent events (100 pages) can be
+        Note: Only a maximum of 2,000 most recent events (100 pages) can be
         displayed and filtered.
     </div>
 {/if}

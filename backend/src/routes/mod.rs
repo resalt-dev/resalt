@@ -8,6 +8,7 @@ mod events;
 mod fallback;
 mod frontend;
 mod index;
+mod jobs;
 mod minions;
 mod pipeline;
 
@@ -19,5 +20,6 @@ pub use events::*;
 pub use fallback::*;
 pub use frontend::*;
 pub use index::*;
+pub use jobs::*;
 pub use minions::*;
 pub use pipeline::*;

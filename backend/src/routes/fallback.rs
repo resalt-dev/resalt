@@ -12,3 +12,13 @@ pub async fn route_fallback_redirect(
 
     return Ok(ServiceResponse::new(req, res));
 }
+
+pub async fn route_fallback_404(
+    service_request: ServiceRequest,
+) -> Result<ServiceResponse, actix_web::Error> {
+    let (req, _payload) = service_request.into_parts();
+
+    let res = HttpResponse::NotFound().finish();
+
+    return Ok(ServiceResponse::new(req, res));
+}

@@ -81,21 +81,27 @@ async fn main() -> std::io::Result<()> {
                                 .route(web::get().to(route_auth_user_get)),
                         );
                         cfg.service(
-                            web::resource("/minions")
-                                .wrap(auth::RequireAuth::new())
-                                .route(web::get().to(route_minions_get)),
-                        );
-                        cfg.service(
                             web::resource("/events")
                                 .wrap(auth::RequireAuth::new())
                                 .route(web::get().to(route_events_get)),
+                        );
+                        cfg.service(
+                            web::resource("/jobs")
+                                .wrap(auth::RequireAuth::new())
+                                .route(web::get().to(route_jobs_get)),
+                        );
+                        cfg.service(
+                            web::resource("/minions")
+                                .wrap(auth::RequireAuth::new())
+                                .route(web::get().to(route_minions_get)),
                         );
                         cfg.service(
                             web::resource("/pipeline")
                                 .wrap(auth::RequireAuth::new())
                                 .route(web::get().to(route_pipeline_get)),
                         );
-                    }),
+                    })
+                    .default_service(route_fallback_404),
             )
             // Serve UI
             .service(web::scope(&SConfig::sub_path()).default_service(route_frontend_get))

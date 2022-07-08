@@ -392,10 +392,35 @@ impl Storage {
         Ok(())
     }
 
-    pub fn list_jobs(&self) -> Result<Vec<Job>, String> {
+    pub fn list_jobs(
+        &self,
+        user: Option<String>,
+        start_date: Option<NaiveDateTime>,
+        end_date: Option<NaiveDateTime>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+    ) -> Result<Vec<Job>, String> {
         let connection = self.create_connection()?;
-        jobs::table
+        let mut query = jobs::table.into_boxed();
+
+        // Filtering
+        if let Some(user) = user {
+            query = query.filter(jobs::user.eq(user));
+        }
+        if let Some(start_date) = start_date {
+            query = query.filter(jobs::timestamp.ge(start_date));
+        }
+        if let Some(end_date) = end_date {
+            query = query.filter(jobs::timestamp.le(end_date));
+        }
+
+        // Pagination
+        query = query.limit(limit.unwrap_or(100));
+        query = query.offset(offset.unwrap_or(0));
+
+        query
             .order(jobs::timestamp.desc())
+            .limit(100)
             .load::<Job>(&connection)
             .map_err(|e| format!("{:?}", e))
     }
