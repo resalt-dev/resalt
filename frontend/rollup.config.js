@@ -53,7 +53,7 @@ export default {
             hook: "closeBundle",
             targets: [
                 {
-                    src: "public/index.template.html",
+                    src: "public/index.html.template",
                     dest: "public/",
                     rename: "index.html",
                     transform: (content, path) => {
