@@ -97,7 +97,6 @@
             </Col>
         </Row>
 
-        <!-- TEMP -->
         <Button color="secondary" size="sm" on:click={() => refreshMinions()}>
             Force reload minions
         </Button>
@@ -241,7 +240,7 @@
     <TablePaginate
         bind:size={paginationSize}
         bind:page={paginationPage}
-        last={$minions == null || $minions.length == 0}
+        last={$minions == null || $minions.length < paginationSize}
         {updateData}
     />
 </div>

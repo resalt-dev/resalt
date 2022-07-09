@@ -21,6 +21,10 @@
         page--;
         updateData();
     }
+    function paginateFirst() {
+        page = 1;
+        updateData();
+    }
     function setSize(newSize: number) {
         size = newSize;
         updateData();
@@ -32,7 +36,7 @@
         class="nav-link fw-bold mouse-pointer {page === 1
             ? 'text-secondary'
             : 'text-white'}"
-        on:click={() => (page = 1)}
+        on:click={paginateFirst}
     >
         &lt;&lt;
     </div>
@@ -40,7 +44,7 @@
         class="nav-link fw-bold mouse-pointer {page === 1
             ? 'text-secondary'
             : 'text-white'}"
-        on:click={() => page > 1 && (page = page - 1)}
+        on:click={paginateDecrement}
     >
         &lt;
     </div>
