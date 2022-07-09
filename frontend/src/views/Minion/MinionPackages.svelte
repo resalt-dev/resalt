@@ -1,5 +1,7 @@
 <script lang="ts">
+    import { Table } from "sveltestrap";
     import JsonViewer from "../../components/JsonViewer.svelte";
+    import { theme } from "../../stores";
 
     export let minion;
     let rawData = false;
@@ -21,24 +23,40 @@
         <JsonViewer code={minion.pkgs} />
     {:else}
         <div class="p-3">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th scope="col">Package</th>
-                        <th scope="col">Version</th>
-                        <th scope="col" />
-                    </tr>
-                </thead>
-                <tbody>
-                    {#each Object.entries(pkgs) as pkg}
+            <div class="table-responsive card {$theme.dark ? 'bg-dark' : ''}">
+                <Table
+                    dark={$theme.dark}
+                    hover
+                    class="b-0 mb-0 {$theme.dark
+                        ? 'text-light border-secondary'
+                        : ''}"
+                >
+                    <thead
+                        class="bg-dark border-0 {$theme.dark
+                            ? 'text-light'
+                            : 'text-white'}"
+                    >
                         <tr>
-                            <td>{pkg[0]}</td>
-                            <td>{pkg[1]}</td>
-                            <td />
+                            <th scope="col" class="border-secondary">
+                                Package
+                            </th>
+                            <th scope="col" class="border-secondary">
+                                Version
+                            </th>
+                            <th scope="col" class="border-secondary" />
                         </tr>
-                    {/each}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {#each Object.entries(pkgs) as pkg}
+                            <tr>
+                                <td>{pkg[0]}</td>
+                                <td>{pkg[1]}</td>
+                                <td />
+                            </tr>
+                        {/each}
+                    </tbody>
+                </Table>
+            </div>
         </div>
     {/if}
 {/if}
