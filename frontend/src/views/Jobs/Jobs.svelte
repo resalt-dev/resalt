@@ -135,7 +135,7 @@
                     <tr>
                         <th scope="row">{job.jid}</th>
                         <td>{job.user}</td>
-                        <td>{job.minions.join(", ")}</td>
+                        <td>-</td>
                         <td><small>{job.timestamp}</small></td>
                     </tr>
                 {/each}

@@ -48,18 +48,18 @@ export function showAlert(type: string, title: string, message: string): void {
  * NETWORK API
  */
 
-export async function login(username: string, password: string) {
+export async function login(username: string, password: string): Promise<void> {
     let token: String = await api_request_authtoken(username, password);
     authStore.set(token);
 }
 
-export async function logout() {
+export async function logout(): Promise<void> {
     authStore.set(null);
     userStore.set(null);
 }
 
 let source: EventSource;
-export function close_events() {
+export function close_events(): void {
     if (source) {
         source.close();
     }

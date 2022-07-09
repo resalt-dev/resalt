@@ -48,9 +48,8 @@ pub struct Job {
     pub id: String,
     pub timestamp: chrono::NaiveDateTime,
     pub jid: String,
-    pub user: String,
-    pub minions: String, // JSON
-    pub event_id: String,
+    pub user: Option<String>,
+    pub event_id: Option<String>,
 }
 
 impl Serialize for Job {
@@ -59,13 +58,11 @@ impl Serialize for Job {
         S: Serializer,
     {
         let timestamp = self.timestamp.format("%Y-%m-%d %H:%M:%S%.6f").to_string();
-        let minions: Vec<String> = serde_json::from_str(&self.minions).unwrap();
         let mut state = serializer.serialize_struct("Job", 6)?;
         state.serialize_field("id", &self.id)?;
         state.serialize_field("timestamp", &timestamp)?;
         state.serialize_field("jid", &self.jid)?;
         state.serialize_field("user", &self.user)?;
-        state.serialize_field("minions", &minions)?;
         state.serialize_field("event_id", &self.event_id)?;
         state.end()
     }
@@ -74,6 +71,7 @@ impl Serialize for Job {
 #[derive(Debug, Identifiable, Associations, Insertable, PartialEq, Queryable)]
 #[belongs_to(Job, foreign_key = "job_id")]
 #[belongs_to(Event, foreign_key = "event_id")]
+#[belongs_to(Minion, foreign_key = "minion_id")]
 #[table_name = "job_returns"]
 pub struct JobReturn {
     pub id: String,
@@ -81,6 +79,7 @@ pub struct JobReturn {
     pub jid: String,
     pub job_id: String,
     pub event_id: String,
+    pub minion_id: String,
 }
 
 #[derive(Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset)]

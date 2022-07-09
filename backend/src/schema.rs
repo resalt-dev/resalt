@@ -1,6 +1,3 @@
-joinable!(job_returns -> events (event_id));
-allow_tables_to_appear_in_same_query!(job_returns, events);
-
 table! {
     authtokens (id) {
         id -> Varchar,
@@ -24,9 +21,8 @@ table! {
         id -> Varchar,
         timestamp -> Timestamp,
         jid -> Varchar,
-        user -> Varchar,
-        minions -> Mediumtext,
-        event_id -> Varchar,
+        user -> Nullable<Varchar>,
+        event_id -> Nullable<Varchar>,
     }
 }
 
@@ -37,6 +33,7 @@ table! {
         jid -> Varchar,
         job_id -> Varchar,
         event_id -> Varchar,
+        minion_id -> Varchar,
     }
 }
 
@@ -65,3 +62,12 @@ table! {
         password -> Nullable<Varchar>,
     }
 }
+
+allow_tables_to_appear_in_same_query!(
+    authtokens,
+    events,
+    jobs,
+    job_returns,
+    minions,
+    users,
+);

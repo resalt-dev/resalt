@@ -39,7 +39,7 @@ impl SaltEventListener {
         {
             Ok(token) => Some(token),
             Err(err) => {
-                error!("failed to refresh token: {:?}", err);
+                error!("Failed to refresh token: {:?}", err);
                 None
             }
         }
@@ -69,89 +69,98 @@ impl SaltEventListener {
             let time = chrono::NaiveDateTime::parse_from_str(time, "%Y-%m-%dT%H:%M:%S.%f").unwrap();
 
             // Insert event into database
-            let event_id = match self.storage.insert_event(&event.tag, &event.data, &time) {
+            let event_id = match self
+                .storage
+                .insert_event(event.tag.clone(), event.data, time)
+            {
                 Ok(uuid) => uuid,
                 Err(err) => {
-                    error!("failed to insert event: {:?}", err);
+                    error!("Failed to insert event: {:?}", err);
                     continue;
                 }
             };
 
             // Check tag type
-            if let Some(jid) = REGEX_JOB_NEW.captures(&event.tag) {
+            if let Some(capture) = REGEX_JOB_NEW.captures(&event.tag) {
                 // Assumed always present
-                let jid = jid.get(1).unwrap().as_str();
-                let user = data["user"].as_str().unwrap();
-                let minions = serde_json::to_string(data["minions"].as_array().unwrap()).unwrap();
+                let jid = capture.get(1).unwrap().as_str().to_string();
+                let user = data["user"].as_str().map(|s| s.to_string());
 
                 // Insert job into database
-                match self
-                    .storage
-                    .insert_job(jid, user, &minions, &event_id, &time)
-                {
+                match self.storage.insert_job(jid, user, Some(event_id), time) {
                     Ok(_) => (),
-                    Err(err) => error!("failed to insert job: {:?}", err),
+                    Err(err) => error!("Failed to insert job: {:?}", err),
                 }
-            } else if let Some(jid) = REGEX_JOB_RETURN.captures(&event.tag) {
+            } else if let Some(capture) = REGEX_JOB_RETURN.captures(&event.tag) {
                 // Assumed always present
-                let jid = jid.get(1).unwrap().as_str();
+                let jid = capture.get(1).unwrap().as_str().to_string();
+                let minion_id = capture.get(2).unwrap().as_str().to_string();
                 let fun = data["fun"].as_str().unwrap();
                 let fun_args = data["fun_args"].as_array().unwrap();
 
                 // Insert job return into database
-                match self.storage.get_job_by_jid(jid) {
+                match self.storage.get_job_by_jid(&jid) {
                     Ok(job) => match job {
                         Some(job) => {
                             let job_id = job.id;
                             match self
                                 .storage
-                                .insert_job_return(jid, &job_id, &event_id, &time)
+                                .insert_job_return(jid, job_id, event_id, minion_id, time)
                             {
                                 Ok(_) => (),
-                                Err(err) => error!("failed to insert job return: {:?}", err),
+                                Err(err) => error!("Failed to insert job return: {:?}", err),
                             }
                         }
                         None => {
-                            error!("failed to get job by jid: {}", jid);
+                            error!("Failed to get job by jid: {}", jid);
                             continue;
                         }
                     },
                     Err(err) => {
-                        error!("failed to get job by jid: {:?}", err);
+                        error!("Failed to get job by jid: {:?}", err);
                     }
                 };
 
                 debug!("salt event job fun: {:?}", fun);
                 match fun {
                     "grains.items" => {
-                        let minion_id = data["id"].as_str().unwrap();
+                        let minion_id = data["id"].as_str().unwrap().to_string();
                         let grains = data.get("return").unwrap().as_object().unwrap();
                         let grains = serde_json::to_string(grains).unwrap();
-                        match self.storage.update_minion_grains(minion_id, time, &grains) {
+                        match self
+                            .storage
+                            .update_minion_grains(minion_id.clone(), time, grains)
+                        {
                             Ok(_) => {
-                                self.pipeline_update_minion(minion_id).await;
+                                self.pipeline_update_minion(&minion_id).await;
                             }
                             Err(e) => error!("Failed updating minion grains {:?}", e),
                         }
                     }
                     "pillar.items" => {
-                        let minion_id = data["id"].as_str().unwrap();
+                        let minion_id = data["id"].as_str().unwrap().to_string();
                         let pillar = data.get("return").unwrap().as_object().unwrap();
                         let pillar = serde_json::to_string(pillar).unwrap();
-                        match self.storage.update_minion_pillars(minion_id, time, &pillar) {
+                        match self
+                            .storage
+                            .update_minion_pillars(minion_id.clone(), time, pillar)
+                        {
                             Ok(_) => {
-                                self.pipeline_update_minion(minion_id).await;
+                                self.pipeline_update_minion(&minion_id).await;
                             }
                             Err(e) => error!("Failed updating minion pillar {:?}", e),
                         }
                     }
                     "pkg.list_pkgs" => {
-                        let minion_id = data["id"].as_str().unwrap();
+                        let minion_id = data["id"].as_str().unwrap().to_string();
                         let pkgs = data.get("return").unwrap().as_object().unwrap();
                         let pkgs = serde_json::to_string(pkgs).unwrap();
-                        match self.storage.update_minion_pkgs(minion_id, time, &pkgs) {
+                        match self
+                            .storage
+                            .update_minion_pkgs(minion_id.clone(), time, pkgs)
+                        {
                             Ok(_) => {
-                                self.pipeline_update_minion(minion_id).await;
+                                self.pipeline_update_minion(&minion_id).await;
                             }
                             Err(e) => error!("Failed updating minion pkgs {:?}", e),
                         }
@@ -170,7 +179,7 @@ impl SaltEventListener {
                             continue;
                         }
 
-                        let minion_id = data["id"].as_str().unwrap();
+                        let minion_id = data["id"].as_str().unwrap().to_string();
 
                         // Loop over return's and count success/incorrect/error
                         let mut success = 0;
@@ -191,15 +200,15 @@ impl SaltEventListener {
                         }
 
                         match self.storage.update_minion_conformity(
-                            minion_id,
+                            minion_id.clone(),
                             time,
-                            &data.get("return").unwrap().to_string(),
+                            data.get("return").unwrap().to_string(),
                             success,
                             incorrect,
                             error,
                         ) {
                             Ok(_) => {
-                                self.pipeline_update_minion(minion_id).await;
+                                self.pipeline_update_minion(&minion_id).await;
                             }
                             Err(e) => error!("Failed updating minion conformity {:?}", e),
                         }
@@ -212,7 +221,7 @@ impl SaltEventListener {
                     continue;
                 }
 
-                let minion_id = data["id"].as_str().unwrap();
+                let minion_id = data["id"].as_str().unwrap().to_string();
                 match self.storage.update_minion_last_seen(minion_id, time) {
                     Ok(_) => {}
                     Err(e) => error!("Failed updating minion last seen {:?}", e),

@@ -51,7 +51,8 @@ impl Storage {
     pub async fn init(&self) {
         // Create default user
         if self.list_users().unwrap_or_default().is_empty() {
-            self.create_user("admin", Some("admin")).unwrap();
+            self.create_user("admin".to_string(), Some("admin".to_string()))
+                .unwrap();
         }
     }
 
@@ -66,13 +67,13 @@ impl Storage {
     /// Users ///
     /////////////
 
-    pub fn create_user(&self, username: &str, password: Option<&str>) -> Result<User, String> {
+    pub fn create_user(&self, username: String, password: Option<String>) -> Result<User, String> {
         let connection = self.create_connection()?;
-        let uuid = format!("usr_{}", uuid::Uuid::new_v4());
+        let id = format!("usr_{}", uuid::Uuid::new_v4());
         let user = User {
-            id: uuid,
-            username: username.to_string(),
-            password: password.map(|v| hash_password(v)),
+            id,
+            username,
+            password: password.map(|v| hash_password(&v)),
         };
 
         diesel::insert_into(users::table)
@@ -112,12 +113,12 @@ impl Storage {
     /// Auth tokens ///
     ///////////////////
 
-    pub fn create_authtoken(&self, user_id: &str) -> Result<AuthToken, String> {
+    pub fn create_authtoken(&self, user_id: String) -> Result<AuthToken, String> {
         let connection = self.create_connection()?;
-        let uuid = format!("auth_{}", uuid::Uuid::new_v4());
+        let id = format!("auth_{}", uuid::Uuid::new_v4());
         let authtoken = AuthToken {
-            id: uuid,
-            user_id: user_id.to_string(),
+            id,
+            user_id,
             timestamp: chrono::Utc::now().naive_utc(),
             salt_token: None,
         };
@@ -165,12 +166,12 @@ impl Storage {
 
     fn update_minion(
         &self,
-        minion_id: &str,
+        minion_id: String,
         time: chrono::NaiveDateTime,
-        grains: Option<&str>,
-        pillars: Option<&str>,
-        pkgs: Option<&str>,
-        conformity: Option<&str>,
+        grains: Option<String>,
+        pillars: Option<String>,
+        pkgs: Option<String>,
+        conformity: Option<String>,
         conformity_success: Option<i32>,
         conformity_incorrect: Option<i32>,
         conformity_error: Option<i32>,
@@ -194,15 +195,15 @@ impl Storage {
             None => None,
         };
         let changeset = Minion {
-            id: minion_id.to_string(),
+            id: minion_id.clone(),
             last_seen: time,
-            grains: grains.map(|s| s.to_string()),
-            pillars: pillars.map(|s| s.to_string()),
-            pkgs: pkgs.map(|s| s.to_string()),
+            grains,
+            pillars,
+            pkgs,
             last_updated_grains,
             last_updated_pillars,
             last_updated_pkgs,
-            conformity: conformity.map(|s| s.to_string()),
+            conformity,
             conformity_success,
             conformity_incorrect,
             conformity_error,
@@ -212,7 +213,7 @@ impl Storage {
         // Update if it exists, insert if it doesn't
 
         let result = diesel::update(minions::table)
-            .filter(minions::id.eq(minion_id))
+            .filter(minions::id.eq(&minion_id))
             .set(&changeset)
             .execute(&connection)
             .map_err(|e| format!("{:?}", e))?;
@@ -247,7 +248,7 @@ impl Storage {
 
     pub fn update_minion_last_seen(
         &self,
-        minion_id: &str,
+        minion_id: String,
         time: chrono::NaiveDateTime,
     ) -> Result<(), String> {
         self.update_minion(minion_id, time, None, None, None, None, None, None, None)
@@ -255,9 +256,9 @@ impl Storage {
 
     pub fn update_minion_grains(
         &self,
-        minion_id: &str,
+        minion_id: String,
         time: chrono::NaiveDateTime,
-        grains: &str,
+        grains: String,
     ) -> Result<(), String> {
         self.update_minion(
             minion_id,
@@ -274,9 +275,9 @@ impl Storage {
 
     pub fn update_minion_pillars(
         &self,
-        minion_id: &str,
+        minion_id: String,
         time: chrono::NaiveDateTime,
-        pillars: &str,
+        pillars: String,
     ) -> Result<(), String> {
         self.update_minion(
             minion_id,
@@ -293,9 +294,9 @@ impl Storage {
 
     pub fn update_minion_pkgs(
         &self,
-        minion_id: &str,
-        time: chrono::NaiveDateTime,
-        pkgs: &str,
+        minion_id: String,
+        time: NaiveDateTime,
+        pkgs: String,
     ) -> Result<(), String> {
         self.update_minion(
             minion_id,
@@ -312,9 +313,9 @@ impl Storage {
 
     pub fn update_minion_conformity(
         &self,
-        minion_id: &str,
-        time: chrono::NaiveDateTime,
-        conformity: &str,
+        minion_id: String,
+        time: NaiveDateTime,
+        conformity: String,
         success: i32,
         incorrect: i32,
         error: i32,
@@ -371,23 +372,23 @@ impl Storage {
 
     pub fn insert_event(
         &self,
-        tag: &str,
-        data: &str,
-        time: &NaiveDateTime,
+        tag: String,
+        data: String,
+        timestamp: NaiveDateTime,
     ) -> Result<String, String> {
         let connection = self.create_connection()?;
-        let uuid = format!("evnt_{}", uuid::Uuid::new_v4());
+        let id = format!("evnt_{}", uuid::Uuid::new_v4());
         let event = Event {
-            id: uuid.clone(),
-            timestamp: *time,
-            tag: tag.to_string(),
-            data: data.to_string(),
+            id: id.clone(),
+            timestamp,
+            tag,
+            data,
         };
         diesel::insert_into(events::table)
             .values(&event)
             .execute(&connection)
             .map_err(|e| format!("{:?}", e))?;
-        Ok(uuid)
+        Ok(id)
     }
 
     pub fn list_events(&self) -> Result<Vec<Event>, String> {
@@ -406,21 +407,19 @@ impl Storage {
 
     pub fn insert_job(
         &self,
-        jid: &str,
-        user: &str,
-        minions: &str,
-        event_id: &str,
-        time: &NaiveDateTime,
+        jid: String,
+        user: Option<String>,
+        event_id: Option<String>,
+        timestamp: NaiveDateTime,
     ) -> Result<(), String> {
         let connection = self.create_connection()?;
-        let uuid = format!("job_{}", uuid::Uuid::new_v4());
+        let id = format!("job_{}", uuid::Uuid::new_v4());
         let job = Job {
-            id: uuid.clone(),
-            timestamp: *time,
-            jid: jid.to_string(),
-            user: user.to_string(),
-            minions: minions.to_string(),
-            event_id: event_id.to_string(),
+            id,
+            timestamp,
+            jid,
+            user,
+            event_id,
         };
         diesel::insert_into(jobs::table)
             .values(&job)
@@ -477,19 +476,21 @@ impl Storage {
 
     pub fn insert_job_return(
         &self,
-        jid: &str,
-        job_id: &str,
-        event_id: &str,
-        time: &NaiveDateTime,
+        jid: String,
+        job_id: String,
+        event_id: String,
+        minion_id: String,
+        timestamp: NaiveDateTime,
     ) -> Result<(), String> {
         let connection = self.create_connection()?;
-        let uuid = format!("jret_{}", uuid::Uuid::new_v4());
+        let id = format!("jret_{}", uuid::Uuid::new_v4());
         let job_return = JobReturn {
-            id: uuid.clone(),
-            timestamp: *time,
-            jid: jid.to_string(),
-            job_id: job_id.to_string(),
-            event_id: event_id.to_string(),
+            id,
+            timestamp,
+            jid,
+            job_id,
+            event_id,
+            minion_id,
         };
         diesel::insert_into(job_returns::table)
             .values(&job_return)
@@ -501,7 +502,7 @@ impl Storage {
     pub fn get_job_returns_by_job(&self, job: Job) -> Result<Vec<Event>, String> {
         let connection = self.create_connection()?;
         events::table
-            .inner_join(job_returns::table)
+            .inner_join(job_returns::table.on(events::id.eq(job_returns::event_id)))
             .filter(job_returns::job_id.eq(job.id))
             .load::<(Event, JobReturn)>(&connection)
             .map(|v: Vec<(Event, JobReturn)>| v.into_iter().map(|(e, _)| e).collect())

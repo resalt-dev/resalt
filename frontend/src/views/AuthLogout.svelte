@@ -19,6 +19,7 @@
         to={paths.login.path}
         class={`btn btn-${$theme.color} float-start px-5 fw-bold`}>Go back</Link
     >
+    <br />
 {:catch error}
     An error occurred.
 {/await}

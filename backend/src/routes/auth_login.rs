@@ -46,7 +46,7 @@ pub async fn route_auth_login_post(
     debug!("User {} found, generating token", &user.username);
 
     // Create token
-    let authtoken = match data.create_authtoken(&user.id) {
+    let authtoken = match data.create_authtoken(user.id) {
         Ok(authtoken) => authtoken,
         Err(e) => {
             error!("{:?}", e);

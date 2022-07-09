@@ -97,7 +97,7 @@ pub async fn auth_login_ldap(
 
     // Create user if doesn't exist, as LDAP passed.
     if user.is_none() {
-        user = match data.create_user(&uid, None) {
+        user = match data.create_user(uid, None) {
             Ok(user) => Some(user),
             Err(e) => {
                 error!("{:?}", e);
