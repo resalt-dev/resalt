@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import { Router, Route, useNavigate } from "svelte-navigator";
     import { user, theme } from "../stores";
-    import { load_user } from "../controller";
+    import { loadUser, logout } from "../controller";
     import paths from "../paths";
     import Sidebar from "../components/Sidebar/Sidebar.svelte";
     import Topbar from "../components/Topbar.svelte";
@@ -24,7 +24,7 @@
     const navigate = useNavigate();
 
     onMount(() => {
-        load_user().catch(() => {
+        loadUser().catch(() => {
             logout();
             navigate(paths.logout.path);
         });

@@ -3,8 +3,8 @@
     import { writable } from "svelte/store";
     import {
         AlertType,
-        refresh_minions,
-        get_minions,
+        refreshMinions,
+        getMinions,
         showAlert,
     } from "../../controller";
     import { theme } from "../../stores";
@@ -29,7 +29,7 @@
     const minions = writable(null);
 
     function updateData() {
-        get_minions(paginationSize, (paginationPage - 1) * paginationSize)
+        getMinions(paginationSize, (paginationPage - 1) * paginationSize)
             .then((data) => {
                 minions.set(
                     data.map((minion) => {
@@ -98,7 +98,7 @@
         </Row>
 
         <!-- TEMP -->
-        <Button color="secondary" size="sm" on:click={() => refresh_minions()}>
+        <Button color="secondary" size="sm" on:click={() => refreshMinions()}>
             Force reload minions
         </Button>
     </CardBody>

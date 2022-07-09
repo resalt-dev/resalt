@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { close_events, connect_events } from "../controller";
+    import { closeEvents, connectEvents } from "../controller";
     import { auth } from "../stores";
     import { get } from "svelte/store";
 
@@ -11,9 +11,9 @@
         console.log(get(auth));
         if ($auth) {
             console.log("Connecting to SSE...");
-            connect_events(navigate);
+            connectEvents();
         } else {
-            close_events();
+            closeEvents();
         }
     }
 </script>

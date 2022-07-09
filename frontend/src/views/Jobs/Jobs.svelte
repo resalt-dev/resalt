@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import { theme } from "../../stores";
     import { useNavigate } from "svelte-navigator";
-    import { AlertType, get_jobs, showAlert } from "../../controller";
+    import { AlertType, getJobs, showAlert } from "../../controller";
     import { Table, Tooltip } from "sveltestrap";
     import Icon from "../../components/Icon.svelte";
     const navigate = useNavigate();
@@ -13,7 +13,7 @@
     let jobs = null;
 
     onMount(() => {
-        get_jobs()
+        getJobs()
             .then((data) => {
                 jobs = data;
             })

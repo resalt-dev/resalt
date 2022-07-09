@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Link } from "svelte-navigator";
-    import { showAlert, AlertType, load_minions } from "../../controller";
+    import { showAlert, AlertType, loadMinions } from "../../controller";
     import { minions, theme } from "../../stores";
     import paths from "../../paths";
     import Redirect from "../../components/Redirect.svelte";
@@ -18,7 +18,7 @@
 
     $: minion = ($minions ?? []).filter((minion) => minion.id === minionId)[0];
     $: minion === undefined &&
-        load_minions().catch((err) => {
+        loadMinions().catch((err) => {
             showAlert(AlertType.ERROR, "Failed fetching minions", err);
         });
 

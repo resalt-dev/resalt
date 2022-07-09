@@ -1,30 +1,32 @@
-import { get } from "svelte/store";
+import { get } from 'svelte/store';
 import {
     auth as authStore,
     user as userStore,
     minions as minionsStore,
     socket as socketStore,
     alerts,
-} from "./stores";
+} from './stores';
 import {
-    api_create_event_connection,
-    api_list_minions,
-    api_list_events,
-    api_request_authtoken,
-    api_list_jobs,
-    api_refresh_minions,
-    api_fetch_user,
-} from "./api";
-import { Alert, SaltEvent, User, Job, Minion } from "./models";
+    apiCreateEventConnection,
+    apiListMinions,
+    apiListEvents,
+    apiRequestAuthToken,
+    apiListJobs,
+    apiRefreshMinions,
+    apiFetchUser,
+} from './api';
+import {
+    Alert, SaltEvent, User, Job, Minion,
+} from './models';
 
 /*
  * INTERNAL UTILS
  */
 
-function _require_token(): string {
-    let token = get(authStore);
+function requireToken(): string {
+    const token = get(authStore);
     if (!token) {
-        throw new Error("No API token provided");
+        throw new Error('No API token provided');
     }
     return token;
 }
@@ -32,16 +34,20 @@ function _require_token(): string {
 /*
  * UTIL
  */
-
+// eslint-disable-next-line no-shadow
 export enum AlertType {
-    INFO = "info",
-    SUCCESS = "success",
-    WARNING = "warning",
-    ERROR = "danger",
+    // eslint-disable-next-line no-unused-vars
+    INFO = 'info',
+    // eslint-disable-next-line no-unused-vars
+    SUCCESS = 'success',
+    // eslint-disable-next-line no-unused-vars
+    WARNING = 'warning',
+    // eslint-disable-next-line no-unused-vars
+    ERROR = 'danger',
 }
 
 export function showAlert(type: string, title: string, message: string): void {
-    alerts.update((alerts) => [...alerts, new Alert(type, title, message)]);
+    alerts.update((mAlerts) => [...mAlerts, new Alert(type, title, message)]);
 }
 
 /*
@@ -49,7 +55,7 @@ export function showAlert(type: string, title: string, message: string): void {
  */
 
 export async function login(username: string, password: string): Promise<void> {
-    let token: String = await api_request_authtoken(username, password);
+    const token: String = await apiRequestAuthToken(username, password);
     authStore.set(token);
 }
 
@@ -59,104 +65,105 @@ export async function logout(): Promise<void> {
 }
 
 let source: EventSource;
-export function close_events(): void {
+export function closeEvents(): void {
     if (source) {
         source.close();
     }
 }
 
-export async function connect_events(timeout: number) {
-    if (typeof timeout != "number") timeout = 1000;
-
-    if (source && source.readyState == EventSource.OPEN) {
+export async function connectEvents(timeout: number = 1000): Promise<EventSource> {
+    if (source && source.readyState === EventSource.OPEN) {
         console.log(
-            "Tried connecting to SSE when already connected, returning same."
+            'Tried connecting to SSE when already connected, returning same.',
         );
         return source;
-    } else {
-        if (get(socketStore).connected) {
-            socketStore.set({ connected: false, last_ping: null });
-        }
+    }
+    if (get(socketStore).connected) {
+        socketStore.set({ connected: false, last_ping: null });
     }
 
-    let token = _require_token();
-    source = await api_create_event_connection(token);
+    const token = requireToken();
+    source = await apiCreateEventConnection(token);
 
     source.addEventListener(
-        "message",
-        function (e) {
-            let data = JSON.parse(e.data);
-            console.log("data", data);
+        'message',
+        (e) => {
+            const data = JSON.parse(e.data);
+            console.log('data', data);
 
-            const content = data.content;
+            const { content } = data;
 
             switch (data.type) {
-                case "update_minion":
-                    minionsStore.update((minions) => {
-                        // minions is a Vector of Minions.
-                        // If minion exists, replace it. If not, then add it.
-                        let index = minions.findIndex(
-                            (minion) => minion.id == content.minion.id
-                        );
-                        if (index >= 0) {
-                            minions[index] = content.minion;
-                        } else {
-                            minions.push(content.minion);
-                        }
-                        return minions;
-                    });
-                    break;
+            case 'update_minion':
+                minionsStore.update((minions: Array<Minion>) => {
+                    // minions is a Vector of Minions.
+                    // If minion exists, replace it. If not, then add it.
+                    const index = minions.findIndex(
+                        (minion) => minion.id === content.minion.id,
+                    );
+                    if (index >= 0) {
+                        minions[index] = content.minion;
+                    } else {
+                        minions.push(content.minion);
+                    }
+                    return minions;
+                });
+                break;
+            default:
+                console.log('Unknown event type', data.type);
             }
         },
-        false
+        false,
     );
 
     source.addEventListener(
-        "ping",
-        function (e) {
-            let time = new Date(JSON.parse(e.data).time + "Z");
+        'ping',
+        (e) => {
+            const time = new Date(`${JSON.parse(e.data).time}Z`);
             socketStore.update((s) => {
                 s.last_ping = time;
                 return s;
             });
             // console.log("ping", time);
         },
-        false
+        false,
     );
 
     source.addEventListener(
-        "open",
-        function (e) {
+        'open',
+        () => {
             // Connection was opened.
             socketStore.set({ connected: true, last_ping: null });
-            console.log("SSE Connected");
+            console.log('SSE Connected');
         },
-        false
+        false,
     );
 
     source.addEventListener(
-        "error",
-        function (e) {
+        'error',
+        () => {
             // Connection was closed.
             socketStore.set({ connected: false, last_ping: null });
             console.log(
-                "Retrying SSE connection in " +
-                Math.round(timeout / 1000) +
-                " seconds..."
+                `Retrying SSE connection in ${
+                    Math.round(timeout / 1000)
+                } seconds...`,
             );
             setTimeout(() => {
-                connect_events(Math.min(timeout * 2, 5 * 60 * 1000));
+                connectEvents(Math.min(timeout * 2, 5 * 60 * 1000));
             }, timeout);
         },
-        false
+        false,
     );
+
+    return source;
 }
 
-export async function load_user(): Promise<void> {
-    let token = _require_token();
+export async function loadUser(): Promise<void> {
+    const token = requireToken();
 
     try {
-        let user = await api_fetch_user(token);
+        const user = await apiFetchUser(token);
         userStore.set(user);
     } catch (e) {
         console.log(e);
@@ -164,41 +171,40 @@ export async function load_user(): Promise<void> {
     }
 }
 
-export async function load_minions(force_refresh = false) {
-    let token = _require_token();
+export async function loadMinions() {
+    const token = requireToken();
 
-    let minions = await api_list_minions(token);
+    const minions = await apiListMinions(token);
     minionsStore.set(minions);
 }
 
-
-export async function get_user(): Promise<User> {
-    let token = _require_token();
-    return await api_fetch_user(token);
+export async function getUser(): Promise<User> {
+    const token = requireToken();
+    return apiFetchUser(token);
 }
 
-export async function get_minions(limit?: number, offset?: number): Promise<Array<Minion>> {
-    let token = _require_token();
-    return await api_list_minions(token, limit, offset);
+export async function getMinions(limit?: number, offset?: number): Promise<Array<Minion>> {
+    const token = requireToken();
+    return apiListMinions(token, limit, offset);
 }
 
-export async function refresh_minions(): Promise<void> {
-    let token = _require_token();
-    await api_refresh_minions(token);
+export async function refreshMinions(): Promise<void> {
+    const token = requireToken();
+    await apiRefreshMinions(token);
 }
 
-export async function get_events(): Promise<Array<SaltEvent>> {
-    let token = _require_token();
-    return await api_list_events(token);
+export async function getEvents(): Promise<Array<SaltEvent>> {
+    const token = requireToken();
+    return apiListEvents(token);
 }
 
-export async function get_jobs(
+export async function getJobs(
     user?: string,
-    start_date?: Date,
-    end_date?: Date,
+    startDate?: Date,
+    endDate?: Date,
     limit?: number,
     offset?: number,
 ): Promise<Array<Job>> {
-    let token = _require_token();
-    return await api_list_jobs(token, user, start_date, end_date, limit, offset);
+    const token = requireToken();
+    return apiListJobs(token, user, startDate, endDate, limit, offset);
 }

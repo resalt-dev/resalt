@@ -17,7 +17,12 @@
     "@rollup/plugin-node-resolve": "^11.0.0",
     "@rollup/plugin-typescript": "^8.0.0",
     "@tsconfig/svelte": "^2.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.30.5",
+    "@typescript-eslint/parser": "^5.30.5",
     "cm6-theme-solarized-dark": "^0.1.0",
+    "eslint": "^8.19.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0",
     "prettier": "^2.7.1",
     "prettier-plugin-svelte": "^2.7.0",
     "rollup": "^2.75.5",
@@ -43,8 +48,5 @@
   "resolutions": {
     "@codemirror/state": "0.20.0",
     "@codemirror/view": "0.20.3"
-  },
-  "eslintConfig": {
-    "extends": "airbnb-base"
   }
 }

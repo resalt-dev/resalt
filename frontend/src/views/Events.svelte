@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import { Table } from "sveltestrap";
     import Icon from "../components/Icon.svelte";
-    import { get_events } from "../controller";
+    import { getEvents } from "../controller";
     import { theme } from "../stores";
     import { useNavigate } from "svelte-navigator";
     import TablePaginate from "../components/TablePaginate.svelte";
@@ -46,7 +46,7 @@
     }
 
     onMount(() => {
-        get_events()
+        getEvents()
             .then((data) => {
                 events = data;
             })
