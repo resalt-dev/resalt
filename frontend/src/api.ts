@@ -62,8 +62,13 @@ export async function api_fetch_user(token: string): Promise<User> {
     return await _authd_req("GET", "/auth/user", token);
 }
 
-export async function api_list_minions(token: string): Promise<Array<Minion>> {
-    return (await _authd_req("GET", `/minions`, token));
+export async function api_list_minions(token: string, limit?: number, offset?: number): Promise<Array<Minion>> {
+    let args = new URLSearchParams();
+
+    if (limit) args.append("limit", limit.toString());
+    if (offset) args.append("offset", offset.toString());
+
+    return await _authd_req("GET", `/minions?${args.toString()}`, token);
 }
 
 export async function api_refresh_minions(token: string): Promise<void> {
@@ -90,5 +95,5 @@ export async function api_list_jobs(
     if (limit) args.append("limit", limit.toString());
     if (offset) args.append("offset", offset.toString());
 
-    return (await _authd_req("GET", `/jobs?${args.toString()}`, token));
+    return await _authd_req("GET", `/jobs?${args.toString()}`, token);
 }

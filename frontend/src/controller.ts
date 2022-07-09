@@ -141,8 +141,8 @@ export async function connect_events(timeout: number) {
             socketStore.set({ connected: false, last_ping: null });
             console.log(
                 "Retrying SSE connection in " +
-                    Math.round(timeout / 1000) +
-                    " seconds..."
+                Math.round(timeout / 1000) +
+                " seconds..."
             );
             setTimeout(() => {
                 connect_events(Math.min(timeout * 2, 5 * 60 * 1000));
@@ -177,9 +177,9 @@ export async function get_user(): Promise<User> {
     return await api_fetch_user(token);
 }
 
-export async function get_minions(): Promise<Array<Minion>> {
+export async function get_minions(limit?: number, offset?: number): Promise<Array<Minion>> {
     let token = _require_token();
-    return await api_list_minions(token);
+    return await api_list_minions(token, limit, offset);
 }
 
 export async function refresh_minions(): Promise<void> {
@@ -192,7 +192,13 @@ export async function get_events(): Promise<Array<SaltEvent>> {
     return await api_list_events(token);
 }
 
-export async function get_jobs(): Promise<Array<Job>> {
+export async function get_jobs(
+    user?: string,
+    start_date?: Date,
+    end_date?: Date,
+    limit?: number,
+    offset?: number,
+): Promise<Array<Job>> {
     let token = _require_token();
-    return await api_list_jobs(token);
+    return await api_list_jobs(token, user, start_date, end_date, limit, offset);
 }

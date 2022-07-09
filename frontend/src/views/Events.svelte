@@ -202,11 +202,11 @@
             {/each}
         </tbody>
     </Table>
-    <TablePaginate
+    <!-- <TablePaginate
         data={filtered_events}
         bind:size={pagination_size}
         bind:page={pagination_page}
-    />
+    /> -->
 </div>
 
 {#if events.length === 0}

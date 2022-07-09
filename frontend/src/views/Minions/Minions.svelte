@@ -1,5 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
+    import { writable } from "svelte/store";
     import {
         AlertType,
         refresh_minions,
@@ -22,29 +23,35 @@
     import TablePaginate from "../../components/TablePaginate.svelte";
     const navigate = useNavigate();
 
-    let pagination_size: number = 10;
-    let pagination_page: number = 1;
+    let paginationSize: number = 10;
+    let paginationPage: number = 1;
 
-    let minions = null;
+    const minions = writable(null);
 
-    onMount(() => {
-        get_minions()
+    function updateData() {
+        get_minions(paginationSize, (paginationPage - 1) * paginationSize)
             .then((data) => {
-                minions = data.map((minion) => {
-                    const grains = JSON.parse(minion.grains ?? "{}");
-                    return {
-                        ...minion,
-                        datatable_type: (
-                            (grains["osfullname"] ?? "Unknown") +
-                            " " +
-                            (grains["osrelease"] ?? "")
-                        ).trim(),
-                    };
-                });
+                minions.set(
+                    data.map((minion) => {
+                        const grains = JSON.parse(minion.grains ?? "{}");
+                        return {
+                            ...minion,
+                            datatable_type: (
+                                (grains["osfullname"] ?? "Unknown") +
+                                " " +
+                                (grains["osrelease"] ?? "")
+                            ).trim(),
+                        };
+                    })
+                );
             })
             .catch((err) => {
                 showAlert(AlertType.ERROR, "Failed fetching minions", err);
             });
+    }
+
+    onMount(() => {
+        updateData();
     });
 </script>
 
@@ -180,12 +187,12 @@
             </tr>
         </thead>
         <tbody class="align-middle">
-            {#if minions == null}
+            {#if $minions == null}
                 <p>Loading</p>
-            {:else if minions.length == 0}
+            {:else if $minions.length == 0}
                 <div class="p-3">No minions detected. Try force reload.</div>
             {:else}
-                {#each minions as minion}
+                {#each $minions as minion}
                     <tr>
                         <th
                             scope="row"
@@ -231,10 +238,10 @@
             {/if}
         </tbody>
     </Table>
-
-    <!-- <TablePaginate
-            data={minions}
-            bind:size={pagination_size}
-            bind:page={pagination_page}
-        /> -->
+    <TablePaginate
+        bind:size={paginationSize}
+        bind:page={paginationPage}
+        last={$minions == null || $minions.length == 0}
+        {updateData}
+    />
 </div>

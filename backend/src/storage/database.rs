@@ -350,7 +350,7 @@ impl Storage {
     ) -> Result<Vec<Minion>, String> {
         let connection = self.create_connection()?;
         let mut query = minions::table.into_boxed();
-        query = query.order(minions::id.desc());
+        query = query.order(minions::id.asc());
 
         // Filtering
         if let Some(id) = id {
