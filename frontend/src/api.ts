@@ -1,9 +1,9 @@
 import constants from "./constants";
-import { Job, Minion, SaltEvent, User } from "./models";
+import type { Job, Minion, SaltEvent, User } from "./models";
 
 // API class is independent, and is not allowed to import svelte/store's.
 
-export async function request_authtoken(
+export async function api_request_authtoken(
     username: string,
     password: string
 ): Promise<String> {
@@ -25,7 +25,7 @@ export async function request_authtoken(
     return (await res.json()).token;
 }
 
-export async function create_event_connection(
+export async function api_create_event_connection(
     token: string
 ): Promise<EventSource> {
     var stream = new EventSource(constants.apiUrl + "/pipeline?token=" + token);
@@ -58,30 +58,30 @@ export async function _authd_req(
     return res.json();
 }
 
-export async function get_user(token: string): Promise<User> {
+export async function api_fetch_user(token: string): Promise<User> {
     return await _authd_req("GET", "/auth/user", token);
 }
 
-export async function list_minions(
-    token: string,
-    force_refresh: boolean
-): Promise<Minion[]> {
-    return (await _authd_req("GET", `/minions?refresh=${force_refresh}`, token))
-        .minions;
+export async function api_list_minions(token: string): Promise<Array<Minion>> {
+    return (await _authd_req("GET", `/minions`, token));
 }
 
-export async function list_events(token: string): Promise<SaltEvent[]> {
-    return (await _authd_req("GET", `/events`, token)).events;
+export async function api_refresh_minions(token: string): Promise<void> {
+    await _authd_req("POST", "/minions/refresh", token);
 }
 
-export async function list_jobs(
+export async function api_list_events(token: string): Promise<Array<SaltEvent>> {
+    return (await _authd_req("GET", `/events`, token));
+}
+
+export async function api_list_jobs(
     token: string,
     user?: string,
     start_date?: Date,
     end_date?: Date,
     limit?: number,
     offset?: number
-): Promise<Job[]> {
+): Promise<Array<Job>> {
     let args = new URLSearchParams();
 
     if (user) args.append("user", user);
@@ -90,5 +90,5 @@ export async function list_jobs(
     if (limit) args.append("limit", limit.toString());
     if (offset) args.append("offset", offset.toString());
 
-    return (await _authd_req("GET", `/jobs?${args.toString()}`, token)).jobs;
+    return (await _authd_req("GET", `/jobs?${args.toString()}`, token));
 }

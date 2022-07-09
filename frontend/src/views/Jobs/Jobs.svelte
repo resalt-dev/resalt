@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import { theme } from "../../stores";
     import { useNavigate } from "svelte-navigator";
-    import { get_jobs } from "../../controller";
+    import { AlertType, get_jobs, showAlert } from "../../controller";
     import { Table, Tooltip } from "sveltestrap";
     import Icon from "../../components/Icon.svelte";
     const navigate = useNavigate();
@@ -18,7 +18,7 @@
                 jobs = data;
             })
             .catch((err) => {
-                console.error(err);
+                showAlert(AlertType.ERROR, "Failed fetching jobs", err);
             });
     });
 

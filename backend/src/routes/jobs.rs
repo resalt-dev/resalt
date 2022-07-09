@@ -13,11 +13,6 @@ pub struct JobsGetQuery {
     offset: Option<i64>,
 }
 
-#[derive(Serialize, Debug)]
-struct JobsResponse {
-    jobs: Vec<Job>,
-}
-
 pub async fn route_jobs_get(
     data: web::Data<Storage>,
     query: web::Query<JobsGetQuery>,
@@ -57,6 +52,5 @@ pub async fn route_jobs_get(
         }
     };
 
-    let response = JobsResponse { jobs };
-    Ok(web::Json(response))
+    Ok(web::Json(jobs))
 }

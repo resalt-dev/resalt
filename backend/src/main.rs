@@ -62,45 +62,46 @@ async fn main() -> std::io::Result<()> {
             .service(
                 web::scope(&format!("{}/api/1", &SConfig::sub_path()))
                     .wrap(auth::ValidateAuth::new(db.clone()))
-                    .configure(|cfg| {
-                        cfg.service(web::resource("/").route(web::get().to(route_index_get)));
-                        cfg.service(
-                            web::resource("/config").route(web::get().to(route_config_get)),
-                        );
-                        cfg.service(
-                            web::resource("/auth/login")
-                                .route(web::post().to(route_auth_login_post)),
-                        );
-                        cfg.service(
-                            web::resource("/auth/token")
-                                .route(web::post().to(route_auth_token_post)),
-                        );
-                        cfg.service(
-                            web::resource("/auth/user")
-                                .wrap(auth::RequireAuth::new())
-                                .route(web::get().to(route_auth_user_get)),
-                        );
-                        cfg.service(
-                            web::resource("/events")
-                                .wrap(auth::RequireAuth::new())
-                                .route(web::get().to(route_events_get)),
-                        );
-                        cfg.service(
-                            web::resource("/jobs")
-                                .wrap(auth::RequireAuth::new())
-                                .route(web::get().to(route_jobs_get)),
-                        );
-                        cfg.service(
-                            web::resource("/minions")
-                                .wrap(auth::RequireAuth::new())
-                                .route(web::get().to(route_minions_get)),
-                        );
-                        cfg.service(
-                            web::resource("/pipeline")
-                                .wrap(auth::RequireAuth::new())
-                                .route(web::get().to(route_pipeline_get)),
-                        );
-                    })
+                    .route("/", web::get().to(route_index_get))
+                    .route("/config", web::get().to(route_config_get))
+                    // auth
+                    .service(
+                        web::scope("/auth")
+                            .route("/login", web::post().to(route_auth_login_post))
+                            .route("/token", web::post().to(route_auth_token_post))
+                            .service(
+                                web::scope("/user")
+                                    .wrap(auth::RequireAuth::new())
+                                    .route("", web::get().to(route_auth_user_get)),
+                            ),
+                    )
+                    // minions
+                    .service(
+                        web::scope("/minions")
+                            .wrap(auth::RequireAuth::new())
+                            .route("", web::get().to(route_minions_get))
+                            .route("/refresh", web::post().to(route_minions_refresh_post))
+                            .route("/{id}", web::get().to(route_minion_get)),
+                    )
+                    // jobs
+                    .service(
+                        web::scope("/jobs")
+                            .wrap(auth::RequireAuth::new())
+                            .route("", web::get().to(route_jobs_get)), //.route("/{id}", web::get().to(route_job_get)),
+                    )
+                    // events
+                    .service(
+                        web::scope("/events")
+                            .wrap(auth::RequireAuth::new())
+                            .route("", web::get().to(route_events_get)),
+                    )
+                    // pipeline
+                    .service(
+                        web::scope("/pipeline")
+                            .wrap(auth::RequireAuth::new())
+                            .route("", web::get().to(route_pipeline_get)),
+                    )
+                    // fallback to 404
                     .default_service(route_fallback_404),
             )
             // Serve UI

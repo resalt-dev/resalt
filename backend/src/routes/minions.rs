@@ -4,44 +4,21 @@ use log::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct MinionsGetQuery {
-    refresh: Option<bool>,
-}
-
-#[derive(Serialize, Debug)]
-struct MinionsResponse {
-    minions: Vec<Minion>,
-    refresh: bool,
+pub struct MinionsListGetQuery {
+    id: Option<String>,
+    limit: Option<i64>,
+    offset: Option<i64>,
 }
 
 pub async fn route_minions_get(
     data: web::Data<Storage>,
-    salt: web::Data<SaltAPI>,
-    query: web::Query<MinionsGetQuery>,
-    req: HttpRequest,
+    query: web::Query<MinionsListGetQuery>,
 ) -> Result<impl Responder> {
-    let ext = req.extensions_mut();
-    let auth = ext.get::<AuthStatus>().unwrap();
-    let refresh = query.refresh.unwrap_or(false);
+    let id = query.id.clone();
+    let limit = query.limit.clone();
+    let offset = query.offset.clone();
 
-    if refresh {
-        let salt_token = match &auth.salt_token {
-            Some(salt_token) => salt_token,
-            None => {
-                error!("No salt token found");
-                return Err(api_error_unauthorized());
-            }
-        };
-        match salt.refresh_minions(&salt_token).await {
-            Ok(_) => (),
-            Err(e) => {
-                error!("route_minions_get refresh_minions {:?}", e);
-                return Err(api_error_internal_error());
-            }
-        };
-    }
-
-    let minions = match data.list_minions() {
+    let minions = match data.list_minions(id, limit, offset) {
         Ok(minions) => minions,
         Err(e) => {
             error!("{:?}", e);
@@ -49,6 +26,50 @@ pub async fn route_minions_get(
         }
     };
 
-    let response = MinionsResponse { minions, refresh };
-    Ok(web::Json(response))
+    Ok(web::Json(minions))
+}
+
+#[derive(Deserialize)]
+pub struct MinionGetInfo {
+    id: String,
+}
+
+pub async fn route_minion_get(
+    data: web::Data<Storage>,
+    info: web::Path<MinionGetInfo>,
+) -> Result<impl Responder> {
+    let minion = match data.get_minion_by_id(&info.id) {
+        Ok(minion) => minion,
+        Err(e) => {
+            error!("{:?}", e);
+            return Err(api_error_database());
+        }
+    };
+
+    Ok(web::Json(minion))
+}
+
+pub async fn route_minions_refresh_post(
+    salt: web::Data<SaltAPI>,
+    req: HttpRequest,
+) -> Result<impl Responder> {
+    let ext = req.extensions_mut();
+    let auth = ext.get::<AuthStatus>().unwrap();
+
+    let salt_token = match &auth.salt_token {
+        Some(salt_token) => salt_token,
+        None => {
+            error!("No salt token found");
+            return Err(api_error_unauthorized());
+        }
+    };
+    match salt.refresh_minions(&salt_token).await {
+        Ok(_) => (),
+        Err(e) => {
+            error!("refresh_minions {:?}", e);
+            return Err(api_error_internal_error());
+        }
+    };
+
+    Ok(web::Json(()))
 }

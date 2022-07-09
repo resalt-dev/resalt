@@ -1,69 +1,61 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { AlertType, load_minions, showAlert } from "../../controller";
-    import { minions as minions_store, theme } from "../../stores";
+    import {
+        AlertType,
+        refresh_minions,
+        get_minions,
+        showAlert,
+    } from "../../controller";
+    import { theme } from "../../stores";
     import Icon from "../../components/Icon.svelte";
     import paths from "../../paths";
     import { Link, useNavigate } from "svelte-navigator";
-    import { Card, CardBody, Table } from "sveltestrap";
+    import {
+        Button,
+        Card,
+        CardBody,
+        Col,
+        Input,
+        Row,
+        Table,
+    } from "sveltestrap";
     import TablePaginate from "../../components/TablePaginate.svelte";
-    import FilterPageSearch from "./FilterPageSearch.svelte";
     const navigate = useNavigate();
 
-    enum FilterPage {
-        Search,
-        Groups,
-    }
-
-    let filter_page: FilterPage = FilterPage.Search;
-    let filter_id = "";
-    let filter_type = "";
     let pagination_size: number = 10;
     let pagination_page: number = 1;
 
-    $: minions = $minions_store ?? [];
-    $: mapped_minions = minions.map((minion) => {
-        const grains = JSON.parse(minion.grains ?? "{}");
-        return {
-            ...minion,
-            datatable_type: (
-                (grains["osfullname"] ?? "Unknown") +
-                " " +
-                (grains["osrelease"] ?? "")
-            ).trim(),
-        };
-    });
-    $: filtered_minions = mapped_minions.filter((minion) => {
-        console.log(minion);
-        return (
-            minion.id.toLowerCase().includes(filter_id.toLowerCase()) &&
-            minion.datatable_type
-                .toLowerCase()
-                .includes(filter_type.toLowerCase())
-        );
-    });
-    $: paginated_minions = filtered_minions.slice(
-        (pagination_page - 1) * pagination_size,
-        pagination_page * pagination_size
-    );
+    let minions = null;
 
     onMount(() => {
-        load_minions().catch((err) => {
-            showAlert(AlertType.ERROR, "Failed fetching minions", err);
-        });
+        get_minions()
+            .then((data) => {
+                minions = data.map((minion) => {
+                    const grains = JSON.parse(minion.grains ?? "{}");
+                    return {
+                        ...minion,
+                        datatable_type: (
+                            (grains["osfullname"] ?? "Unknown") +
+                            " " +
+                            (grains["osrelease"] ?? "")
+                        ).trim(),
+                    };
+                });
+            })
+            .catch((err) => {
+                showAlert(AlertType.ERROR, "Failed fetching minions", err);
+            });
     });
 </script>
 
 <h1>Minions</h1>
 
 <div class="nav bg-dark w-100 no-select">
-    {#each Object.keys(FilterPage).filter((k) => isNaN(Number(k))) as fpage}
+    {#each ["Search Options", "Groups"].filter( (k) => isNaN(Number(k)) ) as fpage}
         <div
-            on:click={() => (filter_page = FilterPage[fpage])}
-            class="nav-link px-4 py-3 fw-bold mouse-pointer {fpage ===
-                FilterPage[filter_page] &&
-                'bg-' + $theme.color} {$theme.color === 'yellow' &&
-            fpage === FilterPage[filter_page]
+            class="nav-link px-4 py-3 fw-bold mouse-pointer {fpage != 'Groups'
+                ? 'bg-' + $theme.color
+                : ''} {$theme.color === 'yellow' && fpage != 'Groups'
                 ? 'text-dark'
                 : 'text-white'}"
         >
@@ -77,125 +69,123 @@
     style="border-radius: 0px !important"
 >
     <CardBody>
-        {#if filter_page === FilterPage.Search}
-            <FilterPageSearch {load_minions} {navigate} />
-        {/if}
+        <Row>
+            <Col class="mb-4">
+                <label for="minionsSearch" class="form-label d-inline"
+                    >ABC</label
+                >
+                <Input
+                    id="minionsSearch"
+                    type="text"
+                    placeholder="Search minions"
+                    class="form-control ms-2 d-inline"
+                    style="width: 15rem;"
+                />
+                <input
+                    id="minionsSearch"
+                    type="email"
+                    class="form-control ms-2 d-inline"
+                    style="width: 15rem;"
+                />
+            </Col>
+        </Row>
+
+        <!-- TEMP -->
+        <Button color="secondary" size="sm" on:click={() => refresh_minions()}>
+            Force reload minions
+        </Button>
     </CardBody>
 </Card>
 
-{#if minions.length === 0}
-    <div class="p-3">No minions detected. Try force reload.</div>
-{:else}
-    <div class="table-responsive card {$theme.dark ? 'bg-dark' : ''}">
-        <Table
-            dark={$theme.dark}
-            hover
-            id="minionListTable"
-            class="b-0 mb-0 {$theme.dark ? 'text-light border-secondary' : ''}"
+<div class="table-responsive card {$theme.dark ? 'bg-dark' : ''}">
+    <Table
+        dark={$theme.dark}
+        hover
+        id="minionListTable"
+        class="b-0 mb-0 {$theme.dark ? 'text-light border-secondary' : ''}"
+    >
+        <thead
+            class="bg-dark border-0 {$theme.dark ? 'text-light' : 'text-white'}"
         >
-            <thead
-                class="bg-dark border-0 {$theme.dark
-                    ? 'text-light'
-                    : 'text-white'}"
-            >
-                <tr>
-                    <th scope="col" class="border-secondary">
-                        <div class="row g-1">
-                            <div class="col-auto align-self-center ps-2">
-                                ID
-                            </div>
-                            <div class="col-auto align-self-center d-grid">
-                                <Icon
-                                    size="1.125"
-                                    name="chevron-up"
-                                    class="sort-icon mouse-pointer"
-                                />
-                                <Icon
-                                    size="1.125"
-                                    name="chevron-down"
-                                    class="sort-icon mouse-pointer"
-                                />
-                            </div>
-                            <div class="col-auto align-self-center">
-                                <input
-                                    type="text"
-                                    class="ms-1 lh-1 {$theme.dark &&
-                                        'bg-secondary text-light border-0'}"
-                                    size="15"
-                                    bind:value={filter_id}
-                                />
-                            </div>
+            <tr>
+                <th scope="col" class="border-secondary">
+                    <div class="row g-1">
+                        <div class="col-auto align-self-center ps-2">ID</div>
+                        <div class="col-auto align-self-center d-grid">
+                            <Icon
+                                size="1.125"
+                                name="chevron-up"
+                                class="sort-icon mouse-pointer"
+                            />
+                            <Icon
+                                size="1.125"
+                                name="chevron-down"
+                                class="sort-icon mouse-pointer"
+                            />
                         </div>
-                    </th>
-                    <th scope="col" class="border-secondary">
-                        <div class="row g-1">
-                            <div class="col-auto align-self-center">Type</div>
-                            <div class="col-auto align-self-center d-grid">
-                                <Icon
-                                    size="1.125"
-                                    name="chevron-up"
-                                    class="sort-icon mouse-pointer"
-                                />
-                                <Icon
-                                    size="1.125"
-                                    name="chevron-down"
-                                    class="sort-icon mouse-pointer"
-                                />
-                            </div>
-                            <div class="col-auto align-self-center">
-                                <input
-                                    type="text"
-                                    class="ms-1 lh-1 {$theme.dark &&
-                                        'bg-secondary text-light border-0'}"
-                                    size="15"
-                                    bind:value={filter_type}
-                                />
-                            </div>
+                    </div>
+                </th>
+                <th scope="col" class="border-secondary">
+                    <div class="row g-1">
+                        <div class="col-auto align-self-center">Type</div>
+                        <div class="col-auto align-self-center d-grid">
+                            <Icon
+                                size="1.125"
+                                name="chevron-up"
+                                class="sort-icon mouse-pointer"
+                            />
+                            <Icon
+                                size="1.125"
+                                name="chevron-down"
+                                class="sort-icon mouse-pointer"
+                            />
                         </div>
-                    </th>
-                    <th scope="col" class="border-secondary">
-                        <div class="row g-1">
-                            <div class="col-auto align-self-center">
-                                Last seen
-                            </div>
-                            <div class="col-auto align-self-center d-grid">
-                                <Icon
-                                    size="1.125"
-                                    name="chevron-up"
-                                    class="sort-icon mouse-pointer"
-                                />
-                                <Icon
-                                    size="1.125"
-                                    name="chevron-down"
-                                    class="sort-icon mouse-pointer"
-                                />
-                            </div>
+                    </div>
+                </th>
+                <th scope="col" class="border-secondary">
+                    <div class="row g-1">
+                        <div class="col-auto align-self-center">Last seen</div>
+                        <div class="col-auto align-self-center d-grid">
+                            <Icon
+                                size="1.125"
+                                name="chevron-up"
+                                class="sort-icon mouse-pointer"
+                            />
+                            <Icon
+                                size="1.125"
+                                name="chevron-down"
+                                class="sort-icon mouse-pointer"
+                            />
                         </div>
-                    </th>
-                    <th scope="col" class="border-secondary">
-                        <div class="row g-1">
-                            <div class="col-auto align-self-center">
-                                Conformity
-                            </div>
-                            <div class="col-auto align-self-center d-grid">
-                                <Icon
-                                    size="1.125"
-                                    name="chevron-up"
-                                    class="sort-icon mouse-pointer"
-                                />
-                                <Icon
-                                    size="1.125"
-                                    name="chevron-down"
-                                    class="sort-icon mouse-pointer"
-                                />
-                            </div>
+                    </div>
+                </th>
+                <th scope="col" class="border-secondary">
+                    <div class="row g-1">
+                        <div class="col-auto align-self-center">Conformity</div>
+                        <div class="col-auto align-self-center d-grid">
+                            <Icon
+                                size="1.125"
+                                name="chevron-up"
+                                class="sort-icon mouse-pointer"
+                            />
+                            <Icon
+                                size="1.125"
+                                name="chevron-down"
+                                class="sort-icon mouse-pointer"
+                            />
                         </div>
-                    </th>
-                    <th scope="col" class="border-secondary">Actions</th>
-                </tr>
-            </thead>
-            <tbody class="align-middle">
-                {#each paginated_minions as minion}
+                    </div>
+                </th>
+                <th scope="col" class="border-secondary">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="align-middle">
+            {#if minions == null}
+                <p>Loading</p>
+            {:else if minions.length == 0}
+                <div class="p-3">No minions detected. Try force reload.</div>
+            {:else}
+                {#each minions as minion}
                     <tr>
                         <th
                             scope="row"
@@ -238,13 +228,13 @@
                         </td>
                     </tr>
                 {/each}
-            </tbody>
-        </Table>
+            {/if}
+        </tbody>
+    </Table>
 
-        <TablePaginate
-            data={filtered_minions}
+    <!-- <TablePaginate
+            data={minions}
             bind:size={pagination_size}
             bind:page={pagination_page}
-        />
-    </div>
-{/if}
+        /> -->
+</div>

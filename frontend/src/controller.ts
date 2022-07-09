@@ -7,15 +7,15 @@ import {
     alerts,
 } from "./stores";
 import {
-    create_event_connection,
-    list_minions,
-    list_events,
-    request_authtoken,
-    list_jobs,
+    api_create_event_connection,
+    api_list_minions,
+    api_list_events,
+    api_request_authtoken,
+    api_list_jobs,
+    api_refresh_minions,
+    api_fetch_user,
 } from "./api";
-import paths from "./paths";
-import { get_user } from "./api";
-import { Alert, SaltEvent, User, Job } from "./models";
+import { Alert, SaltEvent, User, Job, Minion } from "./models";
 
 /*
  * INTERNAL UTILS
@@ -30,7 +30,7 @@ function _require_token(): string {
 }
 
 /*
- * API
+ * UTIL
  */
 
 export enum AlertType {
@@ -44,8 +44,12 @@ export function showAlert(type: string, title: string, message: string): void {
     alerts.update((alerts) => [...alerts, new Alert(type, title, message)]);
 }
 
+/*
+ * NETWORK API
+ */
+
 export async function login(username: string, password: string) {
-    let token: String = await request_authtoken(username, password);
+    let token: String = await api_request_authtoken(username, password);
     authStore.set(token);
 }
 
@@ -64,8 +68,6 @@ export function close_events() {
 export async function connect_events(timeout: number) {
     if (typeof timeout != "number") timeout = 1000;
 
-    if (!_require_token()) return;
-
     if (source && source.readyState == EventSource.OPEN) {
         console.log(
             "Tried connecting to SSE when already connected, returning same."
@@ -77,8 +79,8 @@ export async function connect_events(timeout: number) {
         }
     }
 
-    let token = get(authStore);
-    source = await create_event_connection(token);
+    let token = _require_token();
+    source = await api_create_event_connection(token);
 
     source.addEventListener(
         "message",
@@ -154,7 +156,7 @@ export async function load_user(): Promise<void> {
     let token = _require_token();
 
     try {
-        let user = await get_user(token);
+        let user = await api_fetch_user(token);
         userStore.set(user);
     } catch (e) {
         console.log(e);
@@ -165,21 +167,32 @@ export async function load_user(): Promise<void> {
 export async function load_minions(force_refresh = false) {
     let token = _require_token();
 
-    try {
-        let minions = await list_minions(token, force_refresh);
-        minionsStore.set(minions);
-    } catch (e) {
-        console.log(e);
-        throw e;
-    }
+    let minions = await api_list_minions(token);
+    minionsStore.set(minions);
+}
+
+
+export async function get_user(): Promise<User> {
+    let token = _require_token();
+    return await api_fetch_user(token);
+}
+
+export async function get_minions(): Promise<Array<Minion>> {
+    let token = _require_token();
+    return await api_list_minions(token);
+}
+
+export async function refresh_minions(): Promise<void> {
+    let token = _require_token();
+    await api_refresh_minions(token);
 }
 
 export async function get_events(): Promise<Array<SaltEvent>> {
     let token = _require_token();
-    return await list_events(token);
+    return await api_list_events(token);
 }
 
 export async function get_jobs(): Promise<Array<Job>> {
     let token = _require_token();
-    return await list_jobs(token);
+    return await api_list_jobs(token);
 }

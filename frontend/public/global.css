@@ -186,9 +186,10 @@
     --dark-geekblue: var(--geekblue-8);
     --dark-purple: var(--purple-8);
     --dark-magenta: var(--magenta-8);
-    --dark-gray: var(--gray-10);
+    --dark-gray: var(--gray-11);
     
     --white: var(--gray-1);
+    --muted: var(--gray-7);
     --gray: var(--gray-9);
     --black: var(--gray-13);
 
@@ -439,6 +440,9 @@ samp {
 .bg-dark {
     background-color: var(--black) !important;
 }
+.bg-muted {
+    background-color: var(--muted) !important;
+}
 
 .table-dark>:not(caption)>*>* {
     --bs-table-bg: var(--dark);
@@ -626,7 +630,7 @@ hr {
     color: var(--black) !important;
 }
 .text-muted {
-    color: var(--gray-7) !important;
+    color: var(--muted) !important;
 }
 .text-white {
     color: var(--white) !important;

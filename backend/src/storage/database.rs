@@ -62,6 +62,10 @@ impl Storage {
         };
     }
 
+    /////////////
+    /// Users ///
+    /////////////
+
     pub fn create_user(&self, username: &str, password: Option<&str>) -> Result<User, String> {
         let connection = self.create_connection()?;
         let uuid = format!("usr_{}", uuid::Uuid::new_v4());
@@ -103,6 +107,10 @@ impl Storage {
             .optional()
             .map_err(|e| format!("{:?}", e))
     }
+
+    ///////////////////
+    /// Auth tokens ///
+    ///////////////////
 
     pub fn create_authtoken(&self, user_id: &str) -> Result<AuthToken, String> {
         let connection = self.create_connection()?;
@@ -150,6 +158,10 @@ impl Storage {
             .optional()
             .map_err(|e| format!("{:?}", e))
     }
+
+    ///////////////
+    /// Minions ///
+    ///////////////
 
     fn update_minion(
         &self,
@@ -329,12 +341,33 @@ impl Storage {
             .map_err(|e| format!("{:?}", e))
     }
 
-    pub fn list_minions(&self) -> Result<Vec<Minion>, String> {
+    pub fn list_minions(
+        &self,
+        id: Option<String>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+    ) -> Result<Vec<Minion>, String> {
         let connection = self.create_connection()?;
-        minions::table
+        let mut query = minions::table.into_boxed();
+        query = query.order(minions::id.desc());
+
+        // Filtering
+        if let Some(id) = id {
+            query = query.filter(minions::id.eq(id));
+        }
+
+        // Pagination
+        query = query.limit(limit.unwrap_or(100));
+        query = query.offset(offset.unwrap_or(0));
+
+        query
             .load::<Minion>(&connection)
             .map_err(|e| format!("{:?}", e))
     }
+
+    //////////////
+    /// Events ///
+    //////////////
 
     pub fn insert_event(
         &self,
@@ -366,6 +399,10 @@ impl Storage {
             .load::<Event>(&connection)
             .map_err(|e| format!("{:?}", e))
     }
+
+    ////////////
+    /// Jobs ///
+    ////////////
 
     pub fn insert_job(
         &self,
@@ -402,6 +439,7 @@ impl Storage {
     ) -> Result<Vec<Job>, String> {
         let connection = self.create_connection()?;
         let mut query = jobs::table.into_boxed();
+        query = query.order(jobs::timestamp.desc());
 
         // Filtering
         if let Some(user) = user {
@@ -418,9 +456,8 @@ impl Storage {
         query = query.limit(limit.unwrap_or(100));
         query = query.offset(offset.unwrap_or(0));
 
+        // Query
         query
-            .order(jobs::timestamp.desc())
-            .limit(100)
             .load::<Job>(&connection)
             .map_err(|e| format!("{:?}", e))
     }
@@ -433,6 +470,10 @@ impl Storage {
             .optional()
             .map_err(|e| format!("{:?}", e))
     }
+
+    ///////////////////
+    /// Job Returns ///
+    ///////////////////
 
     pub fn insert_job_return(
         &self,
