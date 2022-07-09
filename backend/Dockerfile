@@ -1,5 +1,5 @@
 # BUILD ENVIRONMENT
-FROM rust:1.61-slim AS resalt-env
+FROM rust:1.62-slim AS resalt-env
 
 EXPOSE 8000
 WORKDIR /usr/src/app
