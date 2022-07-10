@@ -193,9 +193,9 @@ export async function refreshMinions(): Promise<void> {
     await apiRefreshMinions(token);
 }
 
-export async function getEvents(): Promise<Array<SaltEvent>> {
+export async function getEvents(limit?: number, offset?: number): Promise<Array<SaltEvent>> {
     const token = requireToken();
-    return apiListEvents(token);
+    return apiListEvents(token, limit, offset);
 }
 
 export async function getJobs(

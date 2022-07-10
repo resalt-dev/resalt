@@ -391,12 +391,23 @@ impl Storage {
         Ok(id)
     }
 
-    pub fn list_events(&self) -> Result<Vec<Event>, String> {
+    pub fn list_events(
+        &self,
+        limit: Option<i64>,
+        offset: Option<i64>,
+    ) -> Result<Vec<Event>, String> {
         let connection = self.create_connection()?;
-        // filter by latest timestamp first, limit to 100 for now.
-        events::table
-            .order(events::timestamp.desc())
-            .limit(2000)
+        let mut query = events::table.into_boxed();
+        query = query.order(events::timestamp.desc());
+
+        // Filtering
+
+        // Pagination
+        query = query.limit(limit.unwrap_or(100));
+        query = query.offset(offset.unwrap_or(0));
+
+        // Query
+        query
             .load::<Event>(&connection)
             .map_err(|e| format!("{:?}", e))
     }

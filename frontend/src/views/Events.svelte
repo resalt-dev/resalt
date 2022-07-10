@@ -2,57 +2,60 @@
     import { onMount } from "svelte";
     import { Table } from "sveltestrap";
     import Icon from "../components/Icon.svelte";
-    import { getEvents } from "../controller";
+    import { AlertType, getEvents, showAlert } from "../controller";
     import { theme } from "../stores";
     import { useNavigate } from "svelte-navigator";
     import TablePaginate from "../components/TablePaginate.svelte";
+    import { writable } from "svelte/store";
     const navigate = useNavigate();
 
-    let pagination_size: number = 20;
-    let pagination_page: number = 1;
-    let events = [];
-    let expanded_events = [];
+    let paginationSize: number = 20;
+    let paginationPage: number = 1;
 
-    $: mapped_events = events.map((event) => {
-        const data = JSON.parse(event.data ?? "{data: {}}").data;
-        return {
-            ...event,
-            jid: data.jid ?? "",
-            target: data.id ?? "",
-            fun: data.fun ?? "",
-            data_parsed: data,
-            data_formatted: JSON.stringify(data, null, 2),
-            unique_index: (
-                (event.tag ?? "") +
-                "_" +
-                (event.timestamp ?? "")
-            ).replace(/ /g, "_"),
-        };
-    });
-    $: filtered_events = mapped_events.filter((event) => true);
-    $: paginated_events = filtered_events.slice(
-        (pagination_page - 1) * pagination_size,
-        pagination_page * pagination_size
-    );
+    const events = writable(null);
+    const expandedEvents = writable<string[]>([]);
 
-    function toggle_event_expand(index: string) {
+    function toggleExpandEvent(index: string) {
         console.log(index);
-        if (expanded_events.includes(index)) {
-            expanded_events = expanded_events.filter((i) => i !== index);
+        if ($expandedEvents.includes(index)) {
+            expandedEvents.update((array) => array.filter((i) => i !== index));
         } else {
-            expanded_events = [...expanded_events, index];
+            expandedEvents.update((array) => [...array, index]);
         }
-        console.log(expanded_events);
+        console.log($expandedEvents); // TODO: remove
+    }
+
+    function updateData() {
+        getEvents(paginationSize, (paginationPage - 1) * paginationSize)
+            .then((data) => {
+                events.set(
+                    data.map((event) => {
+                        const data = JSON.parse(
+                            event.data ?? "{data: {}}"
+                        ).data;
+                        return {
+                            ...event,
+                            jid: data.jid ?? "",
+                            target: data.id ?? "",
+                            fun: data.fun ?? "",
+                            data_parsed: data,
+                            data_formatted: JSON.stringify(data, null, 2),
+                            unique_index: (
+                                (event.tag ?? "") +
+                                "_" +
+                                (event.timestamp ?? "")
+                            ).replace(/ /g, "_"),
+                        };
+                    })
+                );
+            })
+            .catch((err) => {
+                showAlert(AlertType.ERROR, "Failed fetching events", err);
+            });
     }
 
     onMount(() => {
-        getEvents()
-            .then((data) => {
-                events = data;
-            })
-            .catch((err) => {
-                console.error(err);
-            });
+        updateData();
     });
 </script>
 
@@ -169,51 +172,55 @@
             </tr>
         </thead>
         <tbody class="align-middle">
-            {#each paginated_events as event}
-                <tr>
-                    <!-- <th scope="row">{event.id}</th> -->
-                    <td
-                        on:click={() => toggle_event_expand(event.unique_index)}
-                        class="mouse-pointer"
-                    >
-                        <Icon
-                            size="1.125"
-                            name={expanded_events.includes(event.unique_index)
-                                ? "chevron-down"
-                                : "chevron-up"}
-                        />
-                        {event.tag}
-                    </td>
-                    <td>{event.fun}</td>
-                    <td>{event.target}</td>
-                    <td>{event.jid}</td>
-                    <td><small>{event.timestamp}</small></td>
-                </tr>
-                {#if expanded_events.includes(event.unique_index)}
+            {#if $events == null}
+                <p>Loading</p>
+            {:else if $events.length == 0}
+                <div class="p-3">No events exist. Very unusal.</div>
+            {:else}
+                {#each $events as event}
                     <tr>
+                        <!-- <th scope="row">{event.id}</th> -->
                         <td
-                            class={$theme.dark ? "bg-secondary" : "bg-light"}
-                            colspan="5"
+                            on:click={() =>
+                                toggleExpandEvent(event.unique_index)}
+                            class="mouse-pointer"
                         >
-                            <pre class="text-left">{event.data_formatted}</pre>
+                            <Icon
+                                size="1.125"
+                                name={$expandedEvents.includes(
+                                    event.unique_index
+                                )
+                                    ? "chevron-down"
+                                    : "chevron-up"}
+                            />
+                            {event.tag}
                         </td>
+                        <td>{event.fun}</td>
+                        <td>{event.target}</td>
+                        <td>{event.jid}</td>
+                        <td><small>{event.timestamp}</small></td>
                     </tr>
-                {/if}
-            {/each}
+                    {#if $expandedEvents.includes(event.unique_index)}
+                        <tr>
+                            <td
+                                class={$theme.dark
+                                    ? "bg-secondary"
+                                    : "bg-light"}
+                                colspan="5"
+                            >
+                                <pre
+                                    class="text-left">{event.data_formatted}</pre>
+                            </td>
+                        </tr>
+                    {/if}
+                {/each}
+            {/if}
         </tbody>
     </Table>
-    <!-- <TablePaginate
-        data={filtered_events}
-        bind:size={pagination_size}
-        bind:page={pagination_page}
-    /> -->
+    <TablePaginate
+        bind:size={paginationSize}
+        bind:page={paginationPage}
+        last={$events == null || $events.length < paginationSize}
+        {updateData}
+    />
 </div>
-
-{#if events.length === 0}
-    <div class="p-3">Loading events...</div>
-{:else}
-    <div class="p-3 text-muted">
-        Note: Only a maximum of 2,000 most recent events (100 pages) can be
-        displayed and filtered.
-    </div>
-{/if}

@@ -81,8 +81,17 @@ export async function apiRefreshMinions(token: string): Promise<void> {
     await sendAuthenticatedRequest('POST', '/minions/refresh', token);
 }
 
-export async function apiListEvents(token: string): Promise<Array<SaltEvent>> {
-    return sendAuthenticatedRequest('GET', '/events', token);
+export async function apiListEvents(
+    token: string,
+    limit?: number,
+    offset?: number,
+): Promise<Array<SaltEvent>> {
+    const args = new URLSearchParams();
+
+    if (limit) args.append('limit', limit.toString());
+    if (offset) args.append('offset', offset.toString());
+
+    return sendAuthenticatedRequest('GET', `/events?${args.toString()}`, token);
 }
 
 export async function apiListJobs(

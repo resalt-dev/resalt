@@ -1,26 +1,16 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { onMount, SvelteComponent } from "svelte";
     import { writable } from "svelte/store";
-    import {
-        AlertType,
-        refreshMinions,
-        getMinions,
-        showAlert,
-    } from "../../controller";
+    import { AlertType, getMinions, showAlert } from "../../controller";
     import { theme } from "../../stores";
     import Icon from "../../components/Icon.svelte";
     import paths from "../../paths";
     import { Link, useNavigate } from "svelte-navigator";
-    import {
-        Button,
-        Card,
-        CardBody,
-        Col,
-        Input,
-        Row,
-        Table,
-    } from "sveltestrap";
+    import { Table } from "sveltestrap";
     import TablePaginate from "../../components/TablePaginate.svelte";
+    import Tabs from "../../components/Tabs.svelte";
+    import MinionsTabSearch from "./MinionsTabSearch.svelte";
+    import MinionsTabGroups from "./MinionsTabGroups.svelte";
     const navigate = useNavigate();
 
     let paginationSize: number = 10;
@@ -53,55 +43,26 @@
     onMount(() => {
         updateData();
     });
+
+    let mappingA = new Map<string, any>();
+    mappingA.set("search", MinionsTabSearch);
+    mappingA.set("groups", MinionsTabGroups);
 </script>
 
 <h1>Minions</h1>
 
-<div class="nav bg-dark w-100 no-select">
-    {#each ["Search Options", "Groups"].filter( (k) => isNaN(Number(k)) ) as fpage}
-        <div
-            class="nav-link px-4 py-3 fw-bold mouse-pointer {fpage != 'Groups'
-                ? 'bg-' + $theme.color
-                : ''} {$theme.color === 'yellow' && fpage != 'Groups'
-                ? 'text-dark'
-                : 'text-white'}"
-        >
-            {fpage}
-        </div>
-    {/each}
-</div>
-
-<Card
-    class="mb-3 {$theme.dark ? 'bg-dark border-0' : ''}"
-    style="border-radius: 0px !important"
->
-    <CardBody>
-        <Row>
-            <Col class="mb-4">
-                <label for="minionsSearch" class="form-label d-inline"
-                    >ABC</label
-                >
-                <Input
-                    id="minionsSearch"
-                    type="text"
-                    placeholder="Search minions"
-                    class="form-control ms-2 d-inline"
-                    style="width: 15rem;"
-                />
-                <input
-                    id="minionsSearch"
-                    type="email"
-                    class="form-control ms-2 d-inline"
-                    style="width: 15rem;"
-                />
-            </Col>
-        </Row>
-
-        <Button color="secondary" size="sm" on:click={() => refreshMinions()}>
-            Force reload minions
-        </Button>
-    </CardBody>
-</Card>
+<Tabs
+    children={[
+        {
+            label: "Search",
+            component: MinionsTabSearch,
+        },
+        {
+            label: "Groups",
+            component: MinionsTabGroups,
+        },
+    ]}
+/>
 
 <div class="table-responsive card {$theme.dark ? 'bg-dark' : ''}">
     <Table
