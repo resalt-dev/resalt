@@ -190,8 +190,8 @@
                                 name={$expandedEvents.includes(
                                     event.unique_index
                                 )
-                                    ? "chevron-down"
-                                    : "chevron-up"}
+                                    ? "chevron-up"
+                                    : "chevron-down"}
                             />
                             {event.tag}
                         </td>

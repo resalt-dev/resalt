@@ -5,21 +5,36 @@
     import { AlertType, getJobs, showAlert } from "../../controller";
     import { Table, Tooltip } from "sveltestrap";
     import Icon from "../../components/Icon.svelte";
+    import { writable } from "svelte/store";
+    import TablePaginate from "../../components/TablePaginate.svelte";
     const navigate = useNavigate();
 
-    let pagination_size: number = 20;
-    let pagination_page: number = 1;
+    let filterUser: string | null = null;
+    let filterStartDate: Date | null = null;
+    let filterEndDate: Date | null = null;
+    let paginationSize: number = 20;
+    let paginationPage: number = 1;
 
-    let jobs = null;
+    const jobs = writable(null);
 
-    onMount(() => {
-        getJobs()
+    function updateData() {
+        getJobs(
+            filterUser,
+            filterStartDate,
+            filterEndDate,
+            paginationSize,
+            (paginationPage - 1) * paginationSize
+        )
             .then((data) => {
-                jobs = data;
+                jobs.set(data);
             })
             .catch((err) => {
                 showAlert(AlertType.ERROR, "Failed fetching jobs", err);
             });
+    }
+
+    onMount(() => {
+        updateData();
     });
 
     let jobIdTooltipElement;
@@ -128,10 +143,12 @@
             </tr>
         </thead>
         <tbody class="align-middle">
-            {#if jobs == null}
+            {#if $jobs == null}
                 <p>Loading</p>
+            {:else if $jobs.length == 0}
+                <div class="p-3">No events exist. Very unusal.</div>
             {:else}
-                {#each jobs as job}
+                {#each $jobs as job}
                     <tr>
                         <th scope="row">{job.jid}</th>
                         <td>{job.user}</td>
@@ -142,4 +159,10 @@
             {/if}
         </tbody>
     </Table>
+    <TablePaginate
+        bind:size={paginationSize}
+        bind:page={paginationPage}
+        last={$jobs == null || $jobs.length < paginationSize}
+        {updateData}
+    />
 </div>
