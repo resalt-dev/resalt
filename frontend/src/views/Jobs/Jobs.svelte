@@ -159,10 +159,11 @@
             {/if}
         </tbody>
     </Table>
-    <TablePaginate
-        bind:size={paginationSize}
-        bind:page={paginationPage}
-        last={$jobs == null || $jobs.length < paginationSize}
-        {updateData}
-    />
 </div>
+
+<TablePaginate
+    bind:size={paginationSize}
+    bind:page={paginationPage}
+    last={$jobs == null || $jobs.length < paginationSize}
+    {updateData}
+/>

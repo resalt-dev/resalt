@@ -198,10 +198,11 @@
             {/if}
         </tbody>
     </Table>
-    <TablePaginate
-        bind:size={paginationSize}
-        bind:page={paginationPage}
-        last={$minions == null || $minions.length < paginationSize}
-        {updateData}
-    />
 </div>
+
+<TablePaginate
+    bind:size={paginationSize}
+    bind:page={paginationPage}
+    last={$minions == null || $minions.length < paginationSize}
+    {updateData}
+/>

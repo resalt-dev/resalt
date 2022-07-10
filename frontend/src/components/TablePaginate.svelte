@@ -48,29 +48,6 @@
     >
         &lt;
     </div>
-    <!-- {#each visible_pagination_indexes as index}
-        <div
-            class="nav-link fw-bold mouse-pointer {page === index
-                ? 'bg-' +
-                  $theme.color +
-                  ($theme.color === 'yellow' ? ' text-dark' : ' text-white')
-                : 'text-white'}"
-            on:click={() => (page = index)}
-        >
-            {index}
-        </div>
-    {/each}
-    {#if page < last_page - 3}
-        <div class="nav-link text-white fw-bold">...</div>
-    {/if}
-    {#if page < last_page - 2}
-        <div
-            class="nav-link text-white fw-bold mouse-pointer"
-            on:click={() => (page = last_page)}
-        >
-            {last_page}
-        </div>
-    {/if} -->
     <div
         class="nav-link fw-bold mouse-pointer {last
             ? 'text-secondary'
@@ -91,16 +68,17 @@
             <Icon name="caret-down" size="1.125" />
         </span>
         <ul
-            class="dropdown-menu dropdown-menu-dark bg-darker ms-5"
+            class="dropdown-menu dropdown-menu-dark ms-5 {$theme.dark
+                ? 'bg-secondary'
+                : 'bg-darker'}"
             aria-labelledby="dropdownPaginatePageSize"
         >
             {#each [10, 20, 50, 100, 250] as s}
                 <li>
                     <span
-                        class="dropdown-item mouse-pointer text-light {size ===
-                        s
-                            ? 'fw-bold'
-                            : ''}"
+                        class="dropdown-item mouse-pointer {$theme.dark
+                            ? 'text-light'
+                            : 'text-white'} {size === s ? 'fw-bold' : ''}"
                         on:click={() => setSize(s)}>{s}</span
                     >
                 </li>
