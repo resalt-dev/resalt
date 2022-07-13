@@ -25,3 +25,7 @@ pub fn api_error_ldap() -> actix_web::Error {
 pub fn api_error_invalid_request() -> actix_web::Error {
     actix_web::error::ErrorBadRequest("Invalid request".to_string())
 }
+
+pub fn api_error_not_found() -> actix_web::Error {
+    actix_web::error::ErrorNotFound("Not found".to_string())
+}

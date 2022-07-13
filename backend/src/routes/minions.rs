@@ -3,7 +3,7 @@ use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize)]
 pub struct MinionsListGetQuery {
     id: Option<String>,
     limit: Option<i64>,
@@ -45,6 +45,10 @@ pub async fn route_minion_get(
             return Err(api_error_database());
         }
     };
+
+    if minion.is_none() {
+        return Err(api_error_not_found());
+    }
 
     Ok(web::Json(minion))
 }

@@ -439,6 +439,15 @@ impl Storage {
         Ok(())
     }
 
+    pub fn get_job_by_jid(&self, jid: &str) -> Result<Option<Job>, String> {
+        let connection = self.create_connection()?;
+        jobs::table
+            .filter(jobs::jid.eq(jid))
+            .first(&connection)
+            .optional()
+            .map_err(|e| format!("{:?}", e))
+    }
+
     pub fn list_jobs(
         &self,
         user: Option<String>,
@@ -469,15 +478,6 @@ impl Storage {
         // Query
         query
             .load::<Job>(&connection)
-            .map_err(|e| format!("{:?}", e))
-    }
-
-    pub fn get_job_by_jid(&self, jid: &str) -> Result<Option<Job>, String> {
-        let connection = self.create_connection()?;
-        jobs::table
-            .filter(jobs::jid.eq(jid))
-            .first(&connection)
-            .optional()
             .map_err(|e| format!("{:?}", e))
     }
 

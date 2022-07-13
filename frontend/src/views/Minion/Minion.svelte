@@ -11,7 +11,7 @@
     import MinionPackages from "./MinionPackages.svelte";
     import MinionConformity from "./MinionConformity.svelte";
 
-    export let navigate;
+    // export let navigate;
     export let location;
 
     export let minionId;

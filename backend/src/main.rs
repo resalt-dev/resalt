@@ -91,8 +91,8 @@ async fn main() -> std::io::Result<()> {
                         web::scope("/jobs")
                             .wrap(auth::RequireAuth::new())
                             .route("", web::get().to(route_jobs_get))
+                            .route("/{jid}", web::get().to(route_job_get))
                             .default_service(route_fallback_404),
-                        //.route("/{id}", web::get().to(route_job_get)),
                     )
                     // events
                     .service(

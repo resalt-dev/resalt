@@ -18,7 +18,7 @@ pub async fn route_fallback_404(
 ) -> Result<ServiceResponse, actix_web::Error> {
     let (req, _payload) = service_request.into_parts();
 
-    let res = HttpResponse::NotFound().finish();
+    let res = HttpResponse::NotFound().body("Not found");
 
     return Ok(ServiceResponse::new(req, res));
 }

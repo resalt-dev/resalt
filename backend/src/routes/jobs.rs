@@ -4,8 +4,8 @@ use chrono::NaiveDateTime;
 use log::*;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct JobsGetQuery {
+#[derive(Deserialize)]
+pub struct JobsListGetQuery {
     user: Option<String>,
     start_date: Option<String>, // NaiveDateTime
     end_date: Option<String>,   // NaiveDateTime
@@ -15,7 +15,7 @@ pub struct JobsGetQuery {
 
 pub async fn route_jobs_get(
     data: web::Data<Storage>,
-    query: web::Query<JobsGetQuery>,
+    query: web::Query<JobsListGetQuery>,
 ) -> Result<impl Responder> {
     // Filtering
     let user = query.user.clone();
@@ -53,4 +53,28 @@ pub async fn route_jobs_get(
     };
 
     Ok(web::Json(jobs))
+}
+
+#[derive(Deserialize)]
+pub struct JobGetInfo {
+    jid: String,
+}
+
+pub async fn route_job_get(
+    data: web::Data<Storage>,
+    info: web::Path<JobGetInfo>,
+) -> Result<impl Responder> {
+    let job = match data.get_job_by_jid(&info.jid) {
+        Ok(job) => job,
+        Err(e) => {
+            error!("{:?}", e);
+            return Err(api_error_database());
+        }
+    };
+
+    if job.is_none() {
+        return Err(api_error_not_found());
+    }
+
+    Ok(web::Json(job))
 }
