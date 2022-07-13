@@ -510,11 +510,11 @@ impl Storage {
         Ok(())
     }
 
-    pub fn get_job_returns_by_job(&self, job: Job) -> Result<Vec<Event>, String> {
+    pub fn get_job_returns_by_job(&self, job: &Job) -> Result<Vec<Event>, String> {
         let connection = self.create_connection()?;
         events::table
             .inner_join(job_returns::table.on(events::id.eq(job_returns::event_id)))
-            .filter(job_returns::job_id.eq(job.id))
+            .filter(job_returns::job_id.eq(&job.id))
             .load::<(Event, JobReturn)>(&connection)
             .map(|v: Vec<(Event, JobReturn)>| v.into_iter().map(|(e, _)| e).collect())
             .map_err(|e| format!("{:?}", e))

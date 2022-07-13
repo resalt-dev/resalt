@@ -49,6 +49,7 @@ services:
     volumes:
       - ./backend:/usr/src/app
     environment:
+      - CARGO_HOME=/tmp/.cargo
       - RUST_LOG_STYLE=always # Add color to logs
     ports:
       - "8000:8000"

@@ -46,9 +46,12 @@ pub async fn route_minion_get(
         }
     };
 
-    if minion.is_none() {
-        return Err(api_error_not_found());
-    }
+    let minion = match minion {
+        Some(minion) => minion,
+        None => {
+            return Err(api_error_not_found());
+        }
+    };
 
     Ok(web::Json(minion))
 }

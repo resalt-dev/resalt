@@ -60,6 +60,12 @@ pub struct JobGetInfo {
     jid: String,
 }
 
+#[derive(Serialize)]
+pub struct JobGetResponse {
+    job: Job,
+    returns: Vec<Event>,
+}
+
 pub async fn route_job_get(
     data: web::Data<Storage>,
     info: web::Path<JobGetInfo>,
@@ -72,9 +78,20 @@ pub async fn route_job_get(
         }
     };
 
-    if job.is_none() {
-        return Err(api_error_not_found());
-    }
+    let job = match job {
+        Some(job) => job,
+        None => {
+            return Err(api_error_not_found());
+        }
+    };
 
-    Ok(web::Json(job))
+    let returns = match data.get_job_returns_by_job(&job) {
+        Ok(returns) => returns,
+        Err(e) => {
+            error!("{:?}", e);
+            return Err(api_error_database());
+        }
+    };
+
+    Ok(web::Json(JobGetResponse { job, returns }))
 }
