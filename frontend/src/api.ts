@@ -1,7 +1,8 @@
 import constants from './constants';
-import type {
-    Job, Minion, SaltEvent, User,
-} from './models';
+import type Minion from './models/Minion';
+import type User from './models/User';
+import type SaltEvent from './models/SaltEvent';
+import type Job from './models/Job';
 
 // API class is independent, and is not allowed to import svelte/store's.
 

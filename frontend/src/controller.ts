@@ -15,9 +15,11 @@ import {
     apiRefreshMinions,
     apiFetchUser,
 } from './api';
-import {
-    Alert, SaltEvent, User, Job, Minion,
-} from './models';
+import Alert from './models/Alert';
+import type Minion from './models/Minion';
+import type User from './models/User';
+import type SaltEvent from './models/SaltEvent';
+import type Job from './models/Job';
 
 /*
  * INTERNAL UTILS

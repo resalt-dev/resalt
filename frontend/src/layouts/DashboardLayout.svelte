@@ -12,7 +12,7 @@
     import Minion from "../views/Minion/Minion.svelte";
     import Minions from "../views/Minions/Minions.svelte";
     import Run from "../views/Run.svelte";
-    import Job from "../views/Job.svelte";
+    import Job from "../views/Job/Job.svelte";
     import Jobs from "../views/Jobs/Jobs.svelte";
     import Schedules from "../views/Schedules.svelte";
     import Keys from "../views/Keys.svelte";
