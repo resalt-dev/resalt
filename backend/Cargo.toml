@@ -7,44 +7,40 @@ edition = "2021"
 
 [dependencies]
 # Web
-actix-service = "2.0.2"
-actix-web = { version = "4", features=["rustls"] }
-awc = { version = "3", features=["rustls"] }
+actix-web = { version = "4.1.0", features=["compress-gzip"], default-features = false }
+awc = { version = "3", features=["rustls", "compress-gzip"], default-features = false }
 
 # DB
 diesel = { version = "1.4.8", features = ["mysql", "chrono", "r2d2"] }
 diesel_migrations = "1.4.0"
 
 # Auth
-ldap3 = { version = "0.10.5", features = ["rustls"] }
-argon2 = "0.4.0"
+ldap3 = { version = "0.10.5", features = ["tls-native"], default-features = false }
+argon2 = "0.4.1"
 
 # Logging
-log = "0.4.16"
+log = { version = "0.4.16" }
 env_logger = "0.9.0"
 
 # Threading
 async-stream = "0.3.3"
-tokio = { version = "1", features = ["full"] }
-# Mutex, RwLock, Once, etc..
-parking_lot = "0.12.0"
+tokio = { version = "1.20.0", features = ["rt-multi-thread"], default-features = false }
 futures = "0.3.21"
 futures-core = "0.3.21"
-futures-util = "0.3.21"
 
 # Utils
 chrono = "0.4"
-config = "0.13.1"
+config = { version = "0.13.1", features = ["toml"],  default-features = false }
 lazy_static = "1.4.0"
 rand = "0.8.5"
-regex = "1.5.5"
-uuid = { version = "0.8", features = ["serde", "v4"] }
+regex = "1.6.0"
+uuid = { version = "1.1.2", features = ["serde", "v4"] }
 
 # TLS
-rustls = "0.20.4"
+rustls = "0.20.6"
 rustls-native-certs = "0.6.2"
 
 # Parsing
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
+serde = { version = "1.0.139", features = ["derive"] }
+serde_json = "1.0.82"
 
