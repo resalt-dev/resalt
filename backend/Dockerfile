@@ -32,6 +32,7 @@ ENTRYPOINT ./resalt
 FROM resalt-env AS resalt-devel
 RUN cargo install cargo-watch
 RUN cargo install diesel_cli --no-default-features --features "mysql"
+RUN mkdir -p /.cache/sccache && chmod a+rwx /.cache/sccache
 RUN cargo install sccache
 ENV RUSTC_WRAPPER sccache
 CMD cargo watch --poll -x run
