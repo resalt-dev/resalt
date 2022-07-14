@@ -10,7 +10,10 @@ use log::*;
 use rustls::ClientConfig;
 use rustls_native_certs::load_native_certs;
 use serde_json::json;
-use std::sync::{Arc, Mutex};
+use std::{
+    collections::HashMap,
+    sync::{Arc, Mutex},
+};
 
 const X_AUTH_TOKEN: &str = "X-Auth-Token";
 
@@ -42,24 +45,121 @@ pub enum SaltError {
     ),
 }
 
-pub enum SaltClientType {
-    Local,
-    Runner,
-    Wheel,
-    LocalAsync,
-    RunnerAsync,
-    WheelAsync,
+#[derive(Default)]
+pub enum SaltTgtType {
+    #[default]
+    Glob,
+    PCRE,
+    List,
+    Grain,
+    GrainPCRE,
+    Pillar,
+    PillarPCRE,
+    NodeGroup,
+    NodeGroupPCRE,
+    Range,
+    RangePCRE,
+    Compound,
+    IPCIDR,
 }
 
-impl ToString for SaltClientType {
+impl ToString for SaltTgtType {
     fn to_string(&self) -> String {
         match self {
-            SaltClientType::Local => "local".to_string(),
-            SaltClientType::Runner => "runner".to_string(),
-            SaltClientType::Wheel => "wheel".to_string(),
-            SaltClientType::LocalAsync => "local_async".to_string(),
-            SaltClientType::RunnerAsync => "runner_async".to_string(),
-            SaltClientType::WheelAsync => "wheel_async".to_string(),
+            SaltTgtType::Glob => "glob".to_string(),
+            SaltTgtType::PCRE => "pcre".to_string(),
+            SaltTgtType::List => "list".to_string(),
+            SaltTgtType::Grain => "grain".to_string(),
+            SaltTgtType::GrainPCRE => "grain_pcre".to_string(),
+            SaltTgtType::Pillar => "pillar".to_string(),
+            SaltTgtType::PillarPCRE => "pillar_pcre".to_string(),
+            SaltTgtType::NodeGroup => "nodegroup".to_string(),
+            SaltTgtType::NodeGroupPCRE => "nodegroup_pcre".to_string(),
+            SaltTgtType::Range => "range".to_string(),
+            SaltTgtType::RangePCRE => "range_pcre".to_string(),
+            SaltTgtType::Compound => "compound".to_string(),
+            SaltTgtType::IPCIDR => "ipcidr".to_string(),
+        }
+    }
+}
+
+type Dictionary = HashMap<String, String>;
+
+pub enum SaltCommand {
+    Local {
+        tgt: String,
+        fun: String,
+        arg: Vec<String>,
+        timeout: Option<u64>,
+        tgt_type: Option<SaltTgtType>,
+        kwarg: Option<Dictionary>,
+    },
+    LocalAsync {
+        tgt: String,
+        fun: String,
+        arg: Vec<String>,
+        tgt_type: Option<SaltTgtType>,
+        kwarg: Option<Dictionary>,
+    },
+    LocalBatch {
+        tgt: String,
+        fun: String,
+        arg: Vec<String>,
+        tgt_type: Option<SaltTgtType>,
+        kwarg: Option<Dictionary>,
+        batch: String,
+    },
+}
+
+impl SaltCommand {
+    pub fn to_json(self) -> serde_json::Value {
+        match self {
+            SaltCommand::Local {
+                tgt,
+                fun,
+                arg,
+                timeout,
+                tgt_type,
+                kwarg,
+            } => json!({
+                "client": "local",
+                "tgt": tgt,
+                "fun": fun,
+                "arg": arg,
+                "timeout": timeout,
+                "tgt_type": (tgt_type.unwrap_or_default()).to_string(),
+                "kwarg": kwarg,
+            }),
+            SaltCommand::LocalAsync {
+                tgt,
+                fun,
+                arg,
+                tgt_type,
+                kwarg,
+            } => json!({
+                "client": "local_async",
+                "tgt": tgt,
+                "fun": fun,
+                "arg": arg,
+                "tgt_type": (tgt_type.unwrap_or_default()).to_string(),
+                "kwarg": kwarg,
+            }),
+            SaltCommand::LocalBatch {
+                tgt,
+                fun,
+                arg,
+                tgt_type,
+                kwarg,
+                batch,
+            } => json!({
+                "client": "local_batch",
+                "tgt": tgt,
+                "fun": fun,
+                "arg": arg,
+                "tgt_type": (tgt_type.unwrap_or_default()).to_string(),
+                "kwarg": kwarg,
+                "batch": batch,
+            }),
         }
     }
 }
