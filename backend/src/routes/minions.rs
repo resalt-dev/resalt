@@ -1,7 +1,7 @@
 use crate::prelude::*;
 use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
 #[derive(Deserialize)]
 pub struct MinionsListGetQuery {
