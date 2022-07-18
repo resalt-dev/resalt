@@ -5,7 +5,7 @@ use awc::{
     error::{JsonPayloadError, SendRequestError},
     *,
 };
-use futures::StreamExt;
+use futures::{try_join, StreamExt};
 use log::*;
 use rustls::ClientConfig;
 use rustls_native_certs::load_native_certs;
@@ -84,85 +84,6 @@ impl ToString for SaltTgtType {
 }
 
 type Dictionary = HashMap<String, String>;
-
-pub enum SaltCommand {
-    Local {
-        tgt: String,
-        fun: String,
-        arg: Vec<String>,
-        timeout: Option<u64>,
-        tgt_type: Option<SaltTgtType>,
-        kwarg: Option<Dictionary>,
-    },
-    LocalAsync {
-        tgt: String,
-        fun: String,
-        arg: Vec<String>,
-        tgt_type: Option<SaltTgtType>,
-        kwarg: Option<Dictionary>,
-    },
-    LocalBatch {
-        tgt: String,
-        fun: String,
-        arg: Vec<String>,
-        tgt_type: Option<SaltTgtType>,
-        kwarg: Option<Dictionary>,
-        batch: String,
-    },
-}
-
-impl SaltCommand {
-    pub fn to_json(self) -> serde_json::Value {
-        match self {
-            SaltCommand::Local {
-                tgt,
-                fun,
-                arg,
-                timeout,
-                tgt_type,
-                kwarg,
-            } => json!({
-                "client": "local",
-                "tgt": tgt,
-                "fun": fun,
-                "arg": arg,
-                "timeout": timeout,
-                "tgt_type": (tgt_type.unwrap_or_default()).to_string(),
-                "kwarg": kwarg,
-            }),
-            SaltCommand::LocalAsync {
-                tgt,
-                fun,
-                arg,
-                tgt_type,
-                kwarg,
-            } => json!({
-                "client": "local_async",
-                "tgt": tgt,
-                "fun": fun,
-                "arg": arg,
-                "tgt_type": (tgt_type.unwrap_or_default()).to_string(),
-                "kwarg": kwarg,
-            }),
-            SaltCommand::LocalBatch {
-                tgt,
-                fun,
-                arg,
-                tgt_type,
-                kwarg,
-                batch,
-            } => json!({
-                "client": "local_batch",
-                "tgt": tgt,
-                "fun": fun,
-                "arg": arg,
-                "tgt_type": (tgt_type.unwrap_or_default()).to_string(),
-                "kwarg": kwarg,
-                "batch": batch,
-            }),
-        }
-    }
-}
 
 #[derive(Clone)]
 pub struct SaltAPI {
@@ -409,24 +330,12 @@ impl SaltAPI {
         }
     }
 
-    async fn run_job_client_async(
+    async fn run_job(
         &self,
         salt_token: &SaltToken,
-        fun: &str,
-        tgt: &str,
-        tgt_type: Option<&str>,
-        arg: Vec<&str>,
+        data: serde_json::Value,
     ) -> Result<(), SaltError> {
         let url = &SConfig::salt_api_url();
-        let job = json! ([{
-            "client": "local_async",
-            "fun": fun,
-            "tgt": tgt,
-            "tgt_type": tgt_type.unwrap_or("glob"),
-            "arg": arg,
-        }]);
-
-        debug!("job {:?}", job);
 
         let mut res = match self
             .client
@@ -434,7 +343,7 @@ impl SaltAPI {
             .unwrap()
             .post(url)
             .append_header((X_AUTH_TOKEN, salt_token.token.clone()))
-            .send_json(&job)
+            .send_json(&data)
             .await
         {
             Ok(res) => res,
@@ -463,21 +372,87 @@ impl SaltAPI {
         Ok(())
     }
 
-    pub async fn refresh_minions(&self, salt_token: &SaltToken) -> Result<(), SaltError> {
-        self.run_job_client_async(salt_token, "state.highstate", "*", None, vec!["test=True"])
-            .await?;
-        self.run_job_client_async(salt_token, "grains.items", "*", None, vec![])
-            .await?;
-        self.run_job_client_async(salt_token, "pillar.items", "*", None, vec![])
-            .await?;
-        self.run_job_client_async(salt_token, "pkg.list_pkgs", "*", None, vec![])
-            .await?;
+    async fn run_job_local<S: AsRef<str>>(
+        &self,
+        salt_token: &SaltToken,
+        tgt: S,
+        fun: S,
+        arg: Option<Vec<S>>,
+        timeout: Option<u64>,
+        tgt_type: Option<SaltTgtType>,
+        kwarg: Option<Dictionary>,
+    ) -> Result<(), SaltError> {
+        let data = json!({
+            "client": "local",
+            "tgt": tgt.as_ref(),
+            "fun": fun.as_ref(),
+            "arg": arg.map(|v| v.iter().map(|s| s.as_ref()).collect::<String>()).unwrap_or_default(),
+            "timeout": timeout,
+            "tgt_type": (tgt_type.unwrap_or_default()).to_string(),
+            "kwarg": kwarg.unwrap_or_default(),
+        });
+        self.run_job(salt_token, data).await
+    }
 
-        // TODO: Can this be done cleaner/more efficient? Send all at once?
+    async fn run_job_local_async<S: AsRef<str>>(
+        &self,
+        salt_token: &SaltToken,
+        tgt: S,
+        fun: S,
+        arg: Option<Vec<S>>,
+        tgt_type: Option<SaltTgtType>,
+        kwarg: Option<Dictionary>,
+    ) -> Result<(), SaltError> {
+        let data = json!({
+            "client": "local_async",
+            "tgt": tgt.as_ref(),
+            "fun": fun.as_ref(),
+            "arg": arg.map(|v| v.iter().map(|s| s.as_ref()).collect::<String>()).unwrap_or_default(),
+            "tgt_type": (tgt_type.unwrap_or_default()).to_string(),
+            "kwarg": kwarg.unwrap_or_default(),
+        });
+        self.run_job(salt_token, data).await
+    }
+
+    async fn run_job_local_batch<S: AsRef<str>>(
+        &self,
+        salt_token: &SaltToken,
+        tgt: S,
+        fun: S,
+        arg: Option<Vec<S>>,
+        tgt_type: Option<SaltTgtType>,
+        kwarg: Option<Dictionary>,
+        batch: S,
+    ) -> Result<(), SaltError> {
+        let data = json!({
+            "client": "local_batch",
+            "tgt": tgt.as_ref(),
+            "fun": fun.as_ref(),
+            "arg": arg.map(|v| v.iter().map(|s| s.as_ref()).collect::<String>()).unwrap_or_default(),
+            "tgt_type": (tgt_type.unwrap_or_default()).to_string(),
+            "kwarg": kwarg.unwrap_or_default(),
+            "batch": batch.as_ref(),
+        });
+        self.run_job(salt_token, data).await
+    }
+
+    pub async fn refresh_minions(&self, salt_token: &SaltToken) -> Result<(), SaltError> {
+        let state = self.run_job_local(
+            salt_token,
+            "*",
+            "state.highstate",
+            None,
+            None,
+            None,
+            Some(HashMap::from([("test".to_owned(), "True".to_owned())])),
+        );
+        let grains = self.run_job_local(salt_token, "*", "grains.items", None, None, None, None);
+        let pillar = self.run_job_local(salt_token, "*", "pillar.items", None, None, None, None);
+        let pkg = self.run_job_local(salt_token, "*", "pkg.list_pkgs", None, None, None, None);
 
         // TODO: sync with key-management, add non-responsive minions, and remove deleted ones
 
-        Ok(())
+        try_join!(state, grains, pillar, pkg).map(|_| ())
     }
 }
 
