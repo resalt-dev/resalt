@@ -85,13 +85,8 @@ impl ToString for SaltTgtType {
 
 type Dictionary = HashMap<String, String>;
 
-#[derive(Clone)]
-pub struct SaltAPI {
-    client: Arc<Mutex<awc::Client>>,
-}
-
-impl SaltAPI {
-    pub(crate) fn create_awc_client() -> awc::Client {
+lazy_static::lazy_static! {
+    static ref AWC_CONFIG: ClientConfig = {
         let certs = load_native_certs().unwrap();
 
         // Convert Vec<rustls_native_certs::Certificate> to RootCertStore
@@ -111,8 +106,19 @@ impl SaltAPI {
                 .set_certificate_verifier(Arc::new(danger::NoCertificateVerification));
         }
 
+        config
+    };
+}
+
+#[derive(Clone)]
+pub struct SaltAPI {
+    client: Arc<Mutex<awc::Client>>,
+}
+
+impl SaltAPI {
+    pub(crate) fn create_awc_client() -> awc::Client {
         awc::Client::builder()
-            .connector(Connector::new().rustls(Arc::new(config)))
+            .connector(Connector::new().rustls(Arc::new(AWC_CONFIG.to_owned())))
             .finish()
     }
 
