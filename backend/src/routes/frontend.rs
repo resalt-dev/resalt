@@ -3,7 +3,10 @@ use actix_web::{
     dev::{ServiceRequest, ServiceResponse},
     HttpResponse,
 };
-use log::error;
+use include_dir::{include_dir, Dir};
+use log::{error, warn};
+
+static FRONTEND_PUBLIC_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/../frontend/public");
 
 pub async fn route_frontend_get(
     service_request: ServiceRequest,
@@ -55,7 +58,41 @@ pub async fn route_frontend_proxy_get(
 }
 
 pub async fn route_frontend_static_get(
-    _service_request: ServiceRequest,
+    service_request: ServiceRequest,
 ) -> Result<ServiceResponse, actix_web::Error> {
-    return Err(api_error_internal_error());
+    let (req, _payload) = service_request.into_parts();
+
+    // fetch file from FRONTEND_PUBLIC_DIR based on request URL
+    let path = req.uri().path();
+    let path = path
+        .chars()
+        .into_iter()
+        .skip(SConfig::sub_path().len())
+        .collect::<String>();
+
+    // fetch using FRONTEND_PUBLIC_DIR.get_file
+    let mut file = FRONTEND_PUBLIC_DIR.get_file(&path);
+    if file.is_none() {
+        file = FRONTEND_PUBLIC_DIR.get_file("index.html");
+    }
+    let file = match file {
+        Some(file) => file,
+        None => {
+            warn!("File not found: {}", path);
+            return Err(api_error_not_found());
+        }
+    };
+
+    let body = match file.contents_utf8() {
+        Some(body) => body,
+        None => {
+            error!("Error reading file {}, no content", path);
+            return Err(api_error_internal_error());
+        }
+    };
+
+    return Ok(ServiceResponse::new(
+        req.clone(),
+        HttpResponse::Ok().body(body),
+    ));
 }

@@ -22,6 +22,7 @@ RUN cargo build --release
 # SHIP APP
 # We use a Docker multi-stage build here in order that we only take the compiled executable
 FROM alpine:3.13 AS resalt-run
+ENV HIBIKE_FRONTEND_REVERSE_PROXY TRUE
 COPY --from=resalt-build /usr/src/app/target/release/resalt /usr/src/app/resalt
 ENTRYPOINT ./resalt
 
