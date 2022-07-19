@@ -20,7 +20,7 @@ pub async fn route_auth_token_post(
     let username = input.username.to_lowercase();
     let token = input.password.clone();
 
-    info!("Token validation for {:?} with token {:?}", username, token);
+    // debug!("Token validation for {:?} with token {:?}", username, token);
 
     if username == RESALT_SALT_SYSTEM_SERVICE_USERNAME {
         if token == SConfig::salt_api_system_service_token() {

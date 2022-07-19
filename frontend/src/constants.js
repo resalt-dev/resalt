@@ -1,4 +1,4 @@
-const appName = "Resalt"
+const appName = "Resalt"; // THESE ARE NOT CONFIGS - they are constants
 const basePath = "/resalt";
 const themeColors = [
     "red",

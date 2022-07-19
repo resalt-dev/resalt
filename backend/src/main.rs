@@ -116,7 +116,7 @@ async fn main() -> std::io::Result<()> {
             // Redirect 302 to UI if outside sub_path using lambda
             .default_service(route_fallback_redirect)
     })
-    .bind(("0.0.0.0", 8000))?
+    .bind(("0.0.0.0", SConfig::http_port()))?
     .run()
     .await
 }

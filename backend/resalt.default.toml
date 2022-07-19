@@ -19,18 +19,18 @@ user_attribute = "uid"
 [auth.user]
 session_lifespan = 86400
 
-[http]
-sub_path = "/resalt"
-
 [database]
 url = "mysql://resalt:resalt@db/resalt"
 
-[frontend]
-reverse_proxy = true
-reverse_proxy_target = "http://frontend:5555"
+[frontend.proxy]
+enabled = true
+target = "http://frontend:5555"
 
 [salt.api]
 url = "https://master:8080"
 disable_tls_verification = true
 # head /dev/urandom | tr -dc A-Za-z0-9 | head -c512; echo
 #system_service_token = ""
+
+[http]
+port = 8000

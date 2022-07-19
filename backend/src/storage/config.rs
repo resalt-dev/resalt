@@ -17,7 +17,7 @@ lazy_static::lazy_static! {
     .add_source(config::File::with_name("resalt").required(false))
     // Add in settings from the environment (with a prefix of RESALT)
     // Eg.. `RESALT_DEBUG=1 ./target/app` would set the `debug` key
-    .add_source(config::Environment::with_prefix("RESALT"))
+    .add_source(config::Environment::with_prefix("resalt"))
     .set_default("salt.api.system_service_token", SYSTEM_TOKEN_FALLBACK.clone()).unwrap()
     .build()
     .unwrap());
@@ -106,8 +106,13 @@ impl SConfig {
     }
 
     pub fn database_url() -> String {
-        // Print all settings
-        println!("{:?}", SETTINGS.read().unwrap());
+        // print all settings
+        log::info!("{:?}", SETTINGS.read().unwrap());
+
+        // print out all env vars
+        for (key, value) in std::env::vars() {
+            log::info!("{}={}", key, value);
+        }
 
         SETTINGS.read().unwrap().get_string("database.url").unwrap()
     }
@@ -132,27 +137,27 @@ impl SConfig {
             .unwrap()
     }
 
-    pub fn reverse_proxy() -> bool {
+    pub fn frontend_proxy_enabled() -> bool {
         SETTINGS
             .read()
             .unwrap()
-            .get_bool("frontend.reverse_proxy")
+            .get_bool("frontend.proxy.enabled")
             .unwrap()
     }
 
-    pub fn reverse_proxy_target() -> String {
+    pub fn frontend_proxy_target() -> String {
         SETTINGS
             .read()
             .unwrap()
-            .get_string("frontend.reverse_proxy_target")
+            .get_string("frontend.proxy.target")
             .unwrap()
+    }
+
+    pub fn http_port() -> u16 {
+        SETTINGS.read().unwrap().get_int("http.port").unwrap() as u16
     }
 
     pub fn sub_path() -> String {
-        SETTINGS
-            .read()
-            .unwrap()
-            .get_string("http.sub_path")
-            .unwrap()
+        "/resalt".to_string()
     }
 }
