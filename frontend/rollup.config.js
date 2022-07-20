@@ -1,14 +1,14 @@
-import svelte from "rollup-plugin-svelte";
-import commonjs from "@rollup/plugin-commonjs";
-import resolve from "@rollup/plugin-node-resolve";
-import livereload from "rollup-plugin-livereload";
-import { terser } from "rollup-plugin-terser";
-import sveltePreprocess from "svelte-preprocess";
-import typescript from "@rollup/plugin-typescript";
-import css from "rollup-plugin-css-only";
+import svelte from 'rollup-plugin-svelte';
+import commonjs from '@rollup/plugin-commonjs';
+import resolve from '@rollup/plugin-node-resolve';
+import livereload from 'rollup-plugin-livereload';
+import { terser } from 'rollup-plugin-terser';
+import sveltePreprocess from 'svelte-preprocess';
+import typescript from '@rollup/plugin-typescript';
+import css from 'rollup-plugin-css-only';
 
-import copy from "rollup-plugin-copy";
-import constants from "./src/constants";
+import copy from 'rollup-plugin-copy';
+import constants from './src/constants';
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -24,8 +24,9 @@ function serve() {
             console.log(`server: ${server}`);
             if (server) return;
             try {
-                server = require("child_process").spawn("npm", ["run", "start", "--", "--dev"], {
-                    stdio: ["ignore", "inherit", "inherit"],
+                // eslint-disable-next-line global-require
+                server = require('child_process').spawn('npm', ['run', 'start', '--', '--dev'], {
+                    stdio: ['ignore', 'inherit', 'inherit'],
                     shell: true,
                 });
             } catch (e) {
@@ -33,40 +34,39 @@ function serve() {
             }
             console.log(server);
 
-            process.on("SIGTERM", toExit);
-            process.on("exit", toExit);
+            process.on('SIGTERM', toExit);
+            process.on('exit', toExit);
         },
     };
 }
 
 export default {
-    input: "src/main.ts",
+    input: 'src/main.ts',
     output: {
-        sourcemap: true,
-        format: "iife",
-        name: "app",
-        file: "public/build/bundle.js",
+        sourcemap: !production,
+        format: 'iife',
+        name: 'app',
+        file: 'public/build/bundle.js',
     },
     plugins: [
         copy({
             copyOnce: true,
-            hook: "closeBundle",
+            hook: 'closeBundle',
             targets: [
                 {
-                    src: "public/index.html.template",
-                    dest: "public/",
-                    rename: "index.html",
-                    transform: (content, path) => {
-                        return content
-                            .toString()
-                            .replace(
-                                /__buildEnv__/g,
-                                production ? "production" : "development"
-                            )
-                            .replace(/__buildDate__/g, new Date().toISOString())
-                            .replace(/__appName__/g, constants.appName)
-                            .replace(/__basePath__/g, constants.basePath);
-                    },
+                    src: 'public/index.html.template',
+                    dest: 'public/',
+                    rename: 'index.html',
+                    // eslint-disable-next-line no-unused-vars
+                    transform: (content, _path) => content
+                        .toString()
+                        .replace(
+                            /__buildEnv__/g,
+                            production ? 'production' : 'development',
+                        )
+                        .replace(/__buildDate__/g, new Date().toISOString())
+                        .replace(/__appName__/g, constants.appName)
+                        .replace(/__basePath__/g, constants.basePath),
                 },
             ],
         }),
@@ -83,7 +83,7 @@ export default {
         // we'll extract any component CSS out into
         // a separate file - better for performance
         css({
-            output: "bundle.css",
+            output: 'bundle.css',
         }),
 
         // If you have external dependencies installed from
@@ -93,7 +93,7 @@ export default {
         // https://github.com/rollup/plugins/tree/master/packages/commonjs
         resolve({
             browser: true,
-            dedupe: ["svelte"],
+            dedupe: ['svelte'],
         }),
         commonjs(),
         typescript({
@@ -107,10 +107,10 @@ export default {
 
         // Watch the `public` directory and refresh the
         // browser on changes when not in production
-        //!production && livereload('public'),
-        !production &&
-            livereload({
-                watch: "public",
+        //! production && livereload('public'),
+        !production
+            && livereload({
+                watch: 'public',
                 delay: 500,
                 port: 35730,
             }),

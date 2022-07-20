@@ -1,0 +1,28 @@
+on: [push]
+
+name: CI
+
+env: 
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build
+    steps:
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 18
+      - uses: actions/checkout@v3
+      - name: "cd into /frontend and build"
+        run: |
+          cd frontend
+          npm install
+          npm run build
+      - name: "cd into /backend and build"
+        run: |
+          cd backend
+          cargo build --release
+      - run: ls -lah ./frontend/public
+      - run: ls -lah ./backend/target/release
