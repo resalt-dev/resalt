@@ -10,11 +10,17 @@ jobs:
     runs-on: ubuntu-latest
     name: Build
     steps:
-      - name: Setup Node
-        uses: actions/setup-node@v1
+      - uses: actions/setup-node@v1
         with:
           node-version: 18
       - uses: actions/checkout@v3
+      - name: 'Cache node_modules'
+        uses: actions/cache@v2
+        with:
+          path: ./frontend/node_modules
+          key: ${{ runner.os }}-node-v18-${{ hashFiles('./frontend/package-lock.json') }}
+      - name: 'Cache Rust dependencies'
+        uses: Swatinem/rust-cache@v2
       - name: "cd into /frontend and build"
         run: |
           cd frontend
