@@ -6,7 +6,7 @@ use actix_web::{
 use include_dir::{include_dir, Dir};
 use log::{error, warn};
 
-static FRONTEND_PUBLIC_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/../frontend/public");
+static FRONTEND_PUBLIC_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/frontend/public");
 
 pub async fn route_frontend_get(
     service_request: ServiceRequest,

@@ -43,12 +43,11 @@ services:
   backend:
     user: "${UID:-1000}:${GID:-1000}"
     build:
-      context: ./backend
+      context: ./
       dockerfile: Dockerfile
       target: resalt-devel
     volumes:
-      - ./backend:/usr/src/app
-      - ./frontend:/usr/src/frontend
+      - .:/usr/src/app
     environment:
       - CARGO_HOME=/tmp/.cargo
       - RUST_LOG_STYLE=always # Add color to logs

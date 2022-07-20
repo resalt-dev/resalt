@@ -1,9 +1,7 @@
 # BUILD ENVIRONMENT
 FROM rust:1.62-slim AS resalt-env
-
 EXPOSE 8000
 WORKDIR /usr/src/app
-
 # Upgrade System and Install dependencies
 RUN apt-get update && \
   apt-get upgrade -y -o DPkg::Options::=--force-confold && \
@@ -22,7 +20,7 @@ RUN cargo build --release
 # SHIP APP
 # We use a Docker multi-stage build here in order that we only take the compiled executable
 FROM alpine:3.13 AS resalt-run
-ENV HIBIKE_FRONTEND_REVERSE_PROXY TRUE
+ENV RESALT_FRONTEND_PROXY_ENABLED false
 COPY --from=resalt-build /usr/src/app/target/release/resalt /usr/src/app/resalt
 ENTRYPOINT ./resalt
 

@@ -26,9 +26,7 @@ jobs:
           cd frontend
           npm install
           npm run build
-      - name: "cd into /backend and build"
-        run: |
-          cd backend
-          cargo build --release
+      - name: "Build backend"
+        run: cargo build --release
       - run: ls -lah ./frontend/public
-      - run: ls -lah ./backend/target/release
+      - run: ls -lah ./target/release
