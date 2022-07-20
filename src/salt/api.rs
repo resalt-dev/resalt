@@ -276,7 +276,7 @@ impl SaltAPI {
                             if c == '\n' {
                                 // End of message!
                                 // If we've found both tag and data, emit event
-                                if event.tag != "" && event.data != "" {
+                                if !event.tag.is_empty() && !event.data.is_empty() {
                                     yield event.clone();
                                 }
                                 // Always reset

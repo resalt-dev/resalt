@@ -13,8 +13,8 @@ pub async fn route_events_get(
     data: web::Data<Storage>,
     query: web::Query<EventsListGetQuery>,
 ) -> Result<impl Responder> {
-    let limit = query.limit.clone();
-    let offset = query.offset.clone();
+    let limit = query.limit;
+    let offset = query.offset;
 
     let events = match data.list_events(limit, offset) {
         Ok(events) => events,

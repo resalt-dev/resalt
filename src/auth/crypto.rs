@@ -12,7 +12,7 @@ pub fn hash_password(password: &str) -> String {
         .hash_password(password.as_bytes(), &salt)
         .unwrap()
         .to_string();
-    return password_hash;
+    password_hash
 }
 
 pub fn verify_password(password: &str, password_hash: &str) -> bool {
@@ -20,8 +20,8 @@ pub fn verify_password(password: &str, password_hash: &str) -> bool {
     //
     // NOTE: hash params from `parsed_hash` are used instead of what is configured in the
     // `Argon2` instance.
-    let parsed_hash = PasswordHash::new(&password_hash).unwrap();
-    return Argon2::default()
+    let parsed_hash = PasswordHash::new(password_hash).unwrap();
+    Argon2::default()
         .verify_password(password.as_bytes(), &parsed_hash)
-        .is_ok();
+        .is_ok()
 }

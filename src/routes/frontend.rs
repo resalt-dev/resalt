@@ -54,7 +54,7 @@ pub async fn route_frontend_proxy_get(
         }
     });
 
-    return Ok(ServiceResponse::new(req.clone(), response));
+    Ok(ServiceResponse::new(req.clone(), response))
 }
 
 pub async fn route_frontend_static_get(
@@ -91,8 +91,8 @@ pub async fn route_frontend_static_get(
         }
     };
 
-    return Ok(ServiceResponse::new(
+    Ok(ServiceResponse::new(
         req.clone(),
         HttpResponse::Ok().body(body),
-    ));
+    ))
 }

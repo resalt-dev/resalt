@@ -6,7 +6,7 @@ pub struct LdapHandler {}
 
 impl LdapHandler {
     pub fn is_enabled() -> bool {
-        return SConfig::auth_ldap_enabled();
+        SConfig::auth_ldap_enabled()
     }
 
     async fn create_connection() -> Result<Ldap, LdapError> {
@@ -22,7 +22,7 @@ impl LdapHandler {
         let (conn, ldap) = LdapConnAsync::with_settings(settings, &ldap_url).await?;
         ldap3::drive!(conn);
 
-        return Ok(ldap);
+        Ok(ldap)
     }
 
     async fn create_system_connection() -> Result<Ldap, LdapError> {
@@ -53,7 +53,7 @@ impl LdapHandler {
             }
         };
 
-        return Ok(ldap);
+        Ok(ldap)
     }
 
     async fn find_dn(username: &str) -> Result<Option<(String, String)>, LdapError> {
@@ -88,7 +88,7 @@ impl LdapHandler {
             .get(0)
             .unwrap()
             .clone();
-        return Ok(Some((dn, user_id)));
+        Ok(Some((dn, user_id)))
     }
 
     /**

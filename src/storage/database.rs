@@ -137,10 +137,9 @@ impl Storage {
         salt_token: &Option<SaltToken>,
     ) -> Result<(), String> {
         let connection = self.create_connection()?;
-        let salt_token = match salt_token {
-            Some(salt_token) => Some(serde_json::to_string(salt_token).unwrap()),
-            None => None,
-        };
+        let salt_token = salt_token
+            .as_ref()
+            .map(|salt_token| serde_json::to_string(salt_token).unwrap());
 
         diesel::update(authtokens::table)
             .filter(authtokens::id.eq(auth_token))
@@ -178,22 +177,10 @@ impl Storage {
     ) -> Result<(), String> {
         let connection = self.create_connection()?;
 
-        let last_updated_grains = match grains {
-            Some(_) => Some(time.clone()),
-            None => None,
-        };
-        let last_updated_pillars = match pillars {
-            Some(_) => Some(time.clone()),
-            None => None,
-        };
-        let last_updated_pkgs = match pkgs {
-            Some(_) => Some(time.clone()),
-            None => None,
-        };
-        let last_updated_conformity = match conformity {
-            Some(_) => Some(time.clone()),
-            None => None,
-        };
+        let last_updated_grains = grains.as_ref().map(|_| time);
+        let last_updated_pillars = pillars.as_ref().map(|_| time);
+        let last_updated_pkgs = pkgs.as_ref().map(|_| time);
+        let last_updated_conformity = conformity.as_ref().map(|_| time);
         let changeset = Minion {
             id: minion_id.clone(),
             last_seen: time,

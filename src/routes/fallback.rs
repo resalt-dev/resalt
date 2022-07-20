@@ -10,7 +10,7 @@ pub async fn route_fallback_redirect(
         .append_header((header::LOCATION, SConfig::sub_path()))
         .finish();
 
-    return Ok(ServiceResponse::new(req, res));
+    Ok(ServiceResponse::new(req, res))
 }
 
 pub async fn route_fallback_404(
@@ -20,5 +20,5 @@ pub async fn route_fallback_404(
 
     let res = HttpResponse::NotFound().body("Not found");
 
-    return Ok(ServiceResponse::new(req, res));
+    Ok(ServiceResponse::new(req, res))
 }

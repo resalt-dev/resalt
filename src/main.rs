@@ -28,7 +28,7 @@ async fn main() -> std::io::Result<()> {
     let database_url = SConfig::database_url();
     let db = Storage::connect(&database_url)
         .await
-        .expect(&format!("Error connecting to {}", &database_url));
+        .unwrap_or_else(|_| panic!("Error connecting to {}", &database_url));
     db.init().await;
 
     // Salt WebSocket
@@ -52,7 +52,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(web::Data::new(pipeline.clone()))
             .app_data(web::Data::new(db.clone()))
-            .app_data(web::Data::new(salt_api.clone()))
+            .app_data(web::Data::new(salt_api))
             // Prevent sniffing of content type
             .wrap(DefaultHeaders::new().add((header::X_CONTENT_TYPE_OPTIONS, "nosniff")))
             // Removes trailing slash in the URL to make is sowe don't need as many services

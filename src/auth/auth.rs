@@ -10,7 +10,7 @@ pub fn validate_auth_token(
         return Ok(None);
     }
 
-    let authtoken = match data.get_authtoken_by_id(&token) {
+    let authtoken = match data.get_authtoken_by_id(token) {
         Ok(authtoken) => match authtoken {
             Some(authtoken) => authtoken,
             None => return Ok(None),
@@ -46,8 +46,8 @@ pub fn validate_auth_token(
 
 pub fn auth_login_classic(
     data: &web::Data<Storage>,
-    username: &String,
-    password: &String,
+    username: &str,
+    password: &str,
 ) -> Result<Option<User>, actix_web::Error> {
     // Fetch user
     let user = match data.get_user_by_username(username) {
@@ -66,17 +66,17 @@ pub fn auth_login_classic(
         Some(user_pass) => user_pass,
         None => return Ok(None),
     };
-    if !verify_password(&password, user_pass) {
+    if !verify_password(password, user_pass) {
         return Ok(None);
     }
 
-    return Ok(Some(user));
+    Ok(Some(user))
 }
 
 pub async fn auth_login_ldap(
     data: &web::Data<Storage>,
-    username: &String,
-    password: &String,
+    username: &str,
+    password: &str,
 ) -> Result<Option<User>, actix_web::Error> {
     let uid = match LdapHandler::authenticate(username, password).await {
         Ok(Some(uid)) => uid,
@@ -106,5 +106,5 @@ pub async fn auth_login_ldap(
         };
     }
 
-    return Ok(user);
+    Ok(user)
 }

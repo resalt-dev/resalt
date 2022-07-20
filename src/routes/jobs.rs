@@ -41,8 +41,8 @@ pub async fn route_jobs_get(
     };
 
     // Pagination
-    let limit = query.limit.clone();
-    let offset = query.offset.clone();
+    let limit = query.limit;
+    let offset = query.offset;
 
     let jobs = match data.list_jobs(user, start_date, end_date, limit, offset) {
         Ok(jobs) => jobs,

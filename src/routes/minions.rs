@@ -15,8 +15,8 @@ pub async fn route_minions_get(
     query: web::Query<MinionsListGetQuery>,
 ) -> Result<impl Responder> {
     let id = query.id.clone();
-    let limit = query.limit.clone();
-    let offset = query.offset.clone();
+    let limit = query.limit;
+    let offset = query.offset;
 
     let minions = match data.list_minions(id, limit, offset) {
         Ok(minions) => minions,
@@ -70,7 +70,7 @@ pub async fn route_minions_refresh_post(
             return Err(api_error_unauthorized());
         }
     };
-    match salt.refresh_minions(&salt_token).await {
+    match salt.refresh_minions(salt_token).await {
         Ok(_) => (),
         Err(e) => {
             error!("refresh_minions {:?}", e);

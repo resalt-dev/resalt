@@ -168,7 +168,7 @@ impl SaltEventListener {
                     "state.apply" | "state.highstate" => {
                         // Check if empty args, or if empty args but test=True is only argument.
                         // If so, then we can assume this is a highstate run.
-                        let is_highstate = fun_args.len() == 0
+                        let is_highstate = fun_args.is_empty()
                             || (fun_args.len() == 1
                                 && fun_args[0].as_str().unwrap().to_lowercase() == "test=true");
                         if !is_highstate {

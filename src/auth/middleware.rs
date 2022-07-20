@@ -68,7 +68,7 @@ where
         let data = self.db.clone();
 
         let token = match req.headers().get("Authorization") {
-            Some(header) => header.to_str().unwrap().replace("Bearer ", "").clone(),
+            Some(header) => header.to_str().unwrap().replace("Bearer ", ""),
             None => {
                 // Try fetch value "token" from query params
                 let token = match Query::<HashMap<String, String>>::from_query(req.query_string()) {
@@ -158,7 +158,7 @@ where
 
             let fut = srv.call(req);
             let res = fut.await?;
-            return Ok(res);
+            Ok(res)
         })
     }
 }
