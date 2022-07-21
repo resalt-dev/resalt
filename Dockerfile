@@ -1,5 +1,5 @@
 # SHIP APP
-FROM alpine:latest
+FROM debian:buster-slim
 
 COPY ./target/release/resalt /usr/src/app/resalt
 
