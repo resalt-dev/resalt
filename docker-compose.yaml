@@ -44,8 +44,7 @@ services:
     user: "${UID:-1000}:${GID:-1000}"
     build:
       context: ./
-      dockerfile: Dockerfile
-      target: resalt-devel
+      dockerfile: Dockerfile-devel
     volumes:
       - .:/usr/src/app
     environment:
