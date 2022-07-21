@@ -7,4 +7,4 @@ ENV RESALT_FRONTEND_PROXY_ENABLED false
 EXPOSE 8000
 WORKDIR /usr/src/app
 
-ENTRYPOINT ./resalt
+CMD /usr/src/app/resalt
