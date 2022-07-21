@@ -28,5 +28,10 @@ jobs:
           npm run build
       - name: "Build backend"
         run: cargo build --release
-      - run: ls -lah ./frontend/public
-      - run: ls -lah ./target/release
+      - name: Read version number
+        run: |
+          echo "spec_version=$(grep "version = " Cargo.toml | head -n 1  | cut -d '"' -f 2)" >> $GITHUB_ENV
+      - name: Print version number
+        run: echo ${{ env.spec_version }}
+      # - name: Build Docker image
+      #   run: docker build --target resalt-run --label 
