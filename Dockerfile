@@ -1,5 +1,5 @@
 # SHIP APP
-FROM debian:buster-slim
+FROM debian:bullseye-slim
 
 # Upgrade System and Install dependencies
 RUN apt-get update && \
