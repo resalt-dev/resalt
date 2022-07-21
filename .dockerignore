@@ -4,4 +4,4 @@
 /target/release/deps
 /migrations
 /frontend
-/docker
+/docker/*/
