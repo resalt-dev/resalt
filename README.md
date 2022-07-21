@@ -3,9 +3,9 @@
 
 # RESALT
 
-Resalt is a free, open-source, self-hosted, web-based SaltStack administration and monitoring panel.
+Resalt is a free, open-source, self-hosted, web-based administration and monitoring panel for SaltStack.
 
-> *Resalt is a word play from "Result" and "Salt".*
+> *Resalt is a word play from "salt" and "result".*
 
 ## 🔧 Set-up
 
