@@ -17,7 +17,7 @@ lazy_static::lazy_static! {
     .add_source(config::File::with_name("resalt").required(false))
     // Add in settings from the environment (with a prefix of RESALT)
     // Eg.. `RESALT_DEBUG=1 ./target/app` would set the `debug` key
-    .add_source(config::Environment::with_prefix("resalt"))
+    .add_source(config::Environment::with_prefix("resalt").separator("_"))
     .set_default("salt.api.system_service_token", SYSTEM_TOKEN_FALLBACK.clone()).unwrap()
     .build()
     .unwrap());
