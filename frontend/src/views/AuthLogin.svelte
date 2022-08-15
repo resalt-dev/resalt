@@ -44,7 +44,7 @@
 
 <br />
 
-<form action="#" autocomplete="false">
+<form action="javascript:void(0);" autocomplete="false">
     <input
         bind:value={username}
         type="text"
