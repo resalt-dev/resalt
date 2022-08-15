@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { user } from "../stores";
+    import { currentUser } from "../stores";
 </script>
 
 <h1>Dashboard</h1>
 
-Hello {$user.username}!
+Hello {$currentUser.username}!

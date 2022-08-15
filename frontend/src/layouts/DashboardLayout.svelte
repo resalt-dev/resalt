@@ -1,8 +1,8 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { Router, Route, useNavigate } from "svelte-navigator";
-    import { user, theme } from "../stores";
-    import { loadUser, logout } from "../controller";
+    import { currentUser, theme } from "../stores";
+    import { loadCurrentUser, logout } from "../controller";
     import paths from "../paths";
     import Sidebar from "../components/Sidebar/Sidebar.svelte";
     import Topbar from "../components/Topbar.svelte";
@@ -24,14 +24,14 @@
     const navigate = useNavigate();
 
     onMount(() => {
-        loadUser().catch(() => {
+        loadCurrentUser().catch(() => {
             logout();
             navigate(paths.logout.path);
         });
     });
 </script>
 
-{#if $user == null}
+{#if $currentUser == null}
     <p>Loading...</p>
 {:else}
     <div class="d-flex flex-row h-100">

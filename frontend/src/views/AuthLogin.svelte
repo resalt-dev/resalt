@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import {
         AlertType,
-        loadUser,
+        loadCurrentUser,
         login,
         logout,
         showAlert,
@@ -23,7 +23,7 @@
     function handleClick() {
         login(username, password)
             .then(() => {
-                loadUser()
+                loadCurrentUser()
                     .then(() => {
                         navigate(paths.home.path);
                     })

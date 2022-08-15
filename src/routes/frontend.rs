@@ -3,9 +3,8 @@ use actix_web::{
     dev::{ServiceRequest, ServiceResponse},
     HttpResponse,
 };
-use chrono::format;
 use include_dir::{include_dir, Dir};
-use log::{debug, error, warn};
+use log::{error, warn};
 
 static FRONTEND_PUBLIC_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/frontend/public");
 
@@ -89,7 +88,7 @@ pub async fn route_frontend_static_get(
     let file_path = file.path().to_str().unwrap();
     let mime_type = match_mime(file_path);
 
-    // debug!("Serving file {} with mime type {}", file_path, mime_type);
+    // log::debug!("Serving file {} with mime type {}", file_path, mime_type);
 
     // Add content type header
     let mut response = HttpResponse::build(actix_web::http::StatusCode::OK);

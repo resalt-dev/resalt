@@ -1,8 +1,9 @@
 import constants from './constants';
 import type Minion from './models/Minion';
-import type User from './models/User';
+import type CurrentUser from './models/CurrentUser';
 import type SaltEvent from './models/SaltEvent';
 import type Job from './models/Job';
+import type PublicUser from './models/PublicUser';
 
 // API class is independent, and is not allowed to import svelte/store's.
 
@@ -61,7 +62,7 @@ export async function sendAuthenticatedRequest(
     return res.json();
 }
 
-export async function apiFetchUser(token: string): Promise<User> {
+export async function apiGetCurrentUser(token: string): Promise<CurrentUser> {
     return sendAuthenticatedRequest('GET', '/auth/user', token);
 }
 
@@ -82,17 +83,11 @@ export async function apiRefreshMinions(token: string): Promise<void> {
     await sendAuthenticatedRequest('POST', '/minions/refresh', token);
 }
 
-export async function apiListEvents(
+export async function apiGetMinionById(
     token: string,
-    limit?: number,
-    offset?: number,
-): Promise<Array<SaltEvent>> {
-    const args = new URLSearchParams();
-
-    if (limit) args.append('limit', limit.toString());
-    if (offset) args.append('offset', offset.toString());
-
-    return sendAuthenticatedRequest('GET', `/events?${args.toString()}`, token);
+    minionId: string,
+): Promise<Minion> {
+    return sendAuthenticatedRequest('GET', `/minions/${minionId}`, token);
 }
 
 export async function apiListJobs(
@@ -112,4 +107,37 @@ export async function apiListJobs(
     if (offset) args.append('offset', offset.toString());
 
     return sendAuthenticatedRequest('GET', `/jobs?${args.toString()}`, token);
+}
+
+export async function apiGetJobById(
+    token: string,
+    jobId: string,
+): Promise<Job> {
+    return sendAuthenticatedRequest('GET', `/jobs/${jobId}`, token);
+}
+
+export async function apiListEvents(
+    token: string,
+    limit?: number,
+    offset?: number,
+): Promise<Array<SaltEvent>> {
+    const args = new URLSearchParams();
+
+    if (limit) args.append('limit', limit.toString());
+    if (offset) args.append('offset', offset.toString());
+
+    return sendAuthenticatedRequest('GET', `/events?${args.toString()}`, token);
+}
+
+export async function apiListUsers(
+    token: string,
+): Promise<Array<PublicUser>> {
+    return sendAuthenticatedRequest('GET', `/users?`, token);
+}
+
+export async function apiGetUser(
+    token: string,
+    username: string,
+): Promise<PublicUser> {
+    return sendAuthenticatedRequest('GET', `/users/${username}`, token);
 }

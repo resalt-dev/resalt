@@ -1,7 +1,11 @@
 <script lang="ts">
     import { Link } from "svelte-navigator";
     import paths from "../../paths";
-    import { sidebarCollapsed as collapsed, theme, user } from "../../stores";
+    import {
+        sidebarCollapsed as collapsed,
+        theme,
+        currentUser,
+    } from "../../stores";
     import Icon from "../Icon.svelte";
     import Logo from "../Logo.svelte";
     import SidebarItem from "./SidebarItem.svelte";
@@ -78,7 +82,7 @@
                 style="margin-left: -4px;margin-right: 4px;"
             />
             {#if !$collapsed}
-                <strong class="me-1">{$user.username}</strong>
+                <strong class="me-1">{$currentUser.username}</strong>
             {/if}
         </a>
         <ul

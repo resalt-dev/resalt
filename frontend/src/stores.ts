@@ -19,4 +19,4 @@ export const theme = writable(`${prefix}theme`, {
     color: 'primary',
     dark: false,
 });
-export const user = writable(`${prefix}user`, null);
+export const currentUser = writable(`${prefix}currentUser`, null);

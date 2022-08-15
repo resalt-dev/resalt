@@ -1,23 +1,27 @@
 import { get } from 'svelte/store';
 import {
     auth as authStore,
-    user as userStore,
+    currentUser as currentUserStore,
     minions as minionsStore,
     socket as socketStore,
     alerts,
 } from './stores';
 import {
     apiCreateEventConnection,
-    apiListMinions,
+    apiGetCurrentUser,
+    apiGetJobById,
+    apiGetMinionById,
+    apiGetUser,
     apiListEvents,
-    apiRequestAuthToken,
     apiListJobs,
+    apiListMinions,
+    apiListUsers,
     apiRefreshMinions,
-    apiFetchUser,
+    apiRequestAuthToken,
 } from './api';
 import Alert from './models/Alert';
 import type Minion from './models/Minion';
-import type User from './models/User';
+import type CurrentUser from './models/CurrentUser';
 import type SaltEvent from './models/SaltEvent';
 import type Job from './models/Job';
 
@@ -63,7 +67,7 @@ export async function login(username: string, password: string): Promise<void> {
 
 export async function logout(): Promise<void> {
     authStore.set(null);
-    userStore.set(null);
+    currentUserStore.set(null);
 }
 
 let source: EventSource;
@@ -161,18 +165,19 @@ export async function connectEvents(timeout: number = 1000): Promise<EventSource
     return source;
 }
 
-export async function loadUser(): Promise<void> {
+export async function loadCurrentUser(): Promise<void> {
     const token = requireToken();
 
     try {
-        const user = await apiFetchUser(token);
-        userStore.set(user);
+        const currentUser = await apiGetCurrentUser(token);
+        currentUserStore.set(currentUser);
     } catch (e) {
         console.log(e);
         throw e;
     }
 }
 
+// TODO: Legacy
 export async function loadMinions() {
     const token = requireToken();
 
@@ -180,9 +185,9 @@ export async function loadMinions() {
     minionsStore.set(minions);
 }
 
-export async function getUser(): Promise<User> {
+export async function getCurrentUser(): Promise<CurrentUser> {
     const token = requireToken();
-    return apiFetchUser(token);
+    return apiGetCurrentUser(token);
 }
 
 export async function getMinions(limit?: number, offset?: number): Promise<Array<Minion>> {
@@ -195,9 +200,9 @@ export async function refreshMinions(): Promise<void> {
     await apiRefreshMinions(token);
 }
 
-export async function getEvents(limit?: number, offset?: number): Promise<Array<SaltEvent>> {
+export async function getMinionById(id: string): Promise<Minion> {
     const token = requireToken();
-    return apiListEvents(token, limit, offset);
+    return apiGetMinionById(token, id);
 }
 
 export async function getJobs(
@@ -209,4 +214,24 @@ export async function getJobs(
 ): Promise<Array<Job>> {
     const token = requireToken();
     return apiListJobs(token, user, startDate, endDate, limit, offset);
+}
+
+export async function getJobById(id: string): Promise<Job> {
+    const token = requireToken();
+    return apiGetJobById(token, id);
+}
+
+export async function getEvents(limit?: number, offset?: number): Promise<Array<SaltEvent>> {
+    const token = requireToken();
+    return apiListEvents(token, limit, offset);
+}
+
+export async function getUsers(): Promise<Array<CurrentUser>> {
+    const token = requireToken();
+    return apiListUsers(token);
+}
+
+export async function getUserById(id: string): Promise<CurrentUser> {
+    const token = requireToken();
+    return apiGetUser(token, id);
 }
