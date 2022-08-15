@@ -48,9 +48,6 @@ const dashboardPaths = [
     new Path('jobs', '/dashboard/jobs', 'Jobs', 'briefcase', true),
     new Path('events', '/dashboard/events', 'Events', 'list-ul', true),
 
-    new Path('schedule', '/dashboard/schedules/:scheduleId', 'Schedule', '', false, true),
-    new Path('schedules', '/dashboard/schedules', 'Schedules', 'calendar', true),
-
     new Path('keys', '/dashboard/keys', 'Keys', 'lock', true),
 
     // -----

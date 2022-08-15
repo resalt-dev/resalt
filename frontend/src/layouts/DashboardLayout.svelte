@@ -14,7 +14,6 @@
     import Run from "../views/Run.svelte";
     import Job from "../views/Job/Job.svelte";
     import Jobs from "../views/Jobs/Jobs.svelte";
-    import Schedules from "../views/Schedules.svelte";
     import Keys from "../views/Keys.svelte";
     import Events from "../views/Events.svelte";
     import Users from "../views/Users.svelte";
@@ -52,7 +51,6 @@
                     <Route path="run" component={Run} />
                     <Route path="jobs/:jobId/*" component={Job} />
                     <Route path="jobs" component={Jobs} />
-                    <Route path="schedules" component={Schedules} />
                     <Route path="keys" component={Keys} />
                     <Route path="events" component={Events} />
                     <Route path="users" component={Users} />
