@@ -108,6 +108,14 @@ async fn main() -> std::io::Result<()> {
                             .route("", web::get().to(route_pipeline_get))
                             .default_service(route_fallback_404),
                     )
+                    // users
+                    .service(
+                        web::scope("/users")
+                            .wrap(auth::RequireAuth::new())
+                            .route("", web::get().to(route_users_get))
+                            .route("/{id}", web::get().to(route_user_get))
+                            .default_service(route_fallback_404),
+                    )
                     // fallback to 404
                     .default_service(route_fallback_404),
             )

@@ -11,6 +11,7 @@ mod index;
 mod jobs;
 mod minions;
 mod pipeline;
+mod users;
 
 pub use self::config::*;
 pub use auth_login::*;
@@ -23,3 +24,4 @@ pub use index::*;
 pub use jobs::*;
 pub use minions::*;
 pub use pipeline::*;
+pub use users::*;

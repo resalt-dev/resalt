@@ -16,7 +16,8 @@
     import Jobs from "../views/Jobs/Jobs.svelte";
     import Keys from "../views/Keys.svelte";
     import Events from "../views/Events.svelte";
-    import Users from "../views/Users.svelte";
+    import User from "../views/User/User.svelte";
+    import Users from "../views/Users/Users.svelte";
     import Settings from "../views/Settings.svelte";
     import Preferences from "../views/Preferences/Preferences.svelte";
 
@@ -49,13 +50,14 @@
                     <Route path="minions/:minionId/*" component={Minion} />
                     <Route path="minions" component={Minions} />
                     <Route path="run" component={Run} />
-                    <Route path="jobs/:jobId/*" component={Job} />
+                    <Route path="jobs/:jobId" component={Job} />
                     <Route path="jobs" component={Jobs} />
                     <Route path="keys" component={Keys} />
                     <Route path="events" component={Events} />
+                    <Route path="users/:userId" component={User} />
                     <Route path="users" component={Users} />
-                    <Route path="settings" component={Settings} />
                     <Route path="preferences" component={Preferences} />
+                    <Route path="settings" component={Settings} />
                     <Route path="*">
                         <Redirect to={paths.home.path} />
                     </Route>

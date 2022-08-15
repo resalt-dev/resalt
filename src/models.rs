@@ -165,6 +165,15 @@ pub struct User {
     pub password: Option<String>,
 }
 
+impl User {
+    pub fn public(&self) -> serde_json::Value {
+        serde_json::json!({
+            "id": self.id,
+            "username": self.username,
+        })
+    }
+}
+
 /*
 ===========================
 =   NON-DATABASE MODELS   =

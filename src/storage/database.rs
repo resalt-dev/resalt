@@ -331,7 +331,6 @@ impl Storage {
 
     pub fn list_minions(
         &self,
-        id: Option<String>,
         limit: Option<i64>,
         offset: Option<i64>,
     ) -> Result<Vec<Minion>, String> {
@@ -340,9 +339,6 @@ impl Storage {
         query = query.order(minions::id.asc());
 
         // Filtering
-        if let Some(id) = id {
-            query = query.filter(minions::id.eq(id));
-        }
 
         // Pagination
         query = query.limit(limit.unwrap_or(100));
