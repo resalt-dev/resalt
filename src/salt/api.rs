@@ -373,7 +373,7 @@ impl SaltAPI {
                 return Err(SaltError::ResponseParseError(Some(e)));
             }
         };
-        debug!("client_async run body {:?}", body);
+        debug!("run_job run body {:?}", body);
 
         Ok(())
     }
@@ -443,22 +443,29 @@ impl SaltAPI {
     }
 
     pub async fn refresh_minions(&self, salt_token: &SaltToken) -> Result<(), SaltError> {
-        let state = self.run_job_local(
-            salt_token,
-            "*",
-            "state.highstate",
-            None,
-            None,
-            None,
-            Some(HashMap::from([("test".to_owned(), "True".to_owned())])),
-        );
-        let grains = self.run_job_local(salt_token, "*", "grains.items", None, None, None, None);
-        let pillar = self.run_job_local(salt_token, "*", "pillar.items", None, None, None, None);
-        let pkg = self.run_job_local(salt_token, "*", "pkg.list_pkgs", None, None, None, None);
+        let _state = self
+            .run_job_local_async(
+                salt_token,
+                "*",
+                "state.highstate",
+                Some(vec!["test=True"]),
+                None,
+                None,
+            )
+            .await;
+        let _grains = self
+            .run_job_local_async(salt_token, "*", "grains.items", None, None, None)
+            .await;
+        let _pillar = self
+            .run_job_local_async(salt_token, "*", "pillar.items", None, None, None)
+            .await;
+        let _pkg = self
+            .run_job_local_async(salt_token, "*", "pkg.list_pkgs", None, None, None)
+            .await;
 
         // TODO: sync with key-management, add non-responsive minions, and remove deleted ones
 
-        try_join!(state, grains, pillar, pkg).map(|_| ())
+        Ok(())
     }
 }
 
