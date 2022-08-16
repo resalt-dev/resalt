@@ -6,10 +6,10 @@
     export let minion;
     let rawData = false;
 
-    $: pkgs = JSON.parse(minion.pkgs);
+    $: pkgs = JSON.parse($minion.pkgs);
 </script>
 
-{#if !minion.pkgs}
+{#if !$minion.pkgs}
     <div class="p-3">No packages data. Please refresh minion.</div>
 {:else}
     <button
@@ -20,7 +20,7 @@
         {rawData ? "View List" : "View JSON"}
     </button>
     {#if rawData}
-        <JsonViewer code={minion.pkgs} />
+        <JsonViewer code={$minion.pkgs} />
     {:else}
         <div class="p-3">
             <div class="table-responsive card {$theme.dark ? 'bg-dark' : ''}">

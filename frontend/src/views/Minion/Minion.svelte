@@ -1,7 +1,13 @@
 <script lang="ts">
     import { Link } from "svelte-navigator";
-    import { showAlert, AlertType, loadMinions } from "../../controller";
-    import { minions, theme } from "../../stores";
+    import {
+        showAlert,
+        AlertType,
+        loadMinions,
+        getMinionById,
+    } from "../../controller";
+    import { theme } from "../../stores";
+    import { writable } from "svelte/store";
     import paths from "../../paths";
     import Redirect from "../../components/Redirect.svelte";
 
@@ -10,21 +16,30 @@
     import MinionPillars from "./MinionPillars.svelte";
     import MinionPackages from "./MinionPackages.svelte";
     import MinionConformity from "./MinionConformity.svelte";
+    import { onMount } from "svelte";
 
     // export let navigate;
     export let location;
-
     export let minionId;
 
-    $: minion = ($minions ?? []).filter((minion) => minion.id === minionId)[0];
-    $: minion === undefined &&
-        loadMinions().catch((err) => {
-            showAlert(AlertType.ERROR, "Failed fetching minions", err);
-        });
+    const minion = writable(null);
+
+    onMount(() => {
+        getMinionById(minionId)
+            .then((data) => {
+                minion.set(data);
+            })
+            .catch((err) => {
+                showAlert(
+                    AlertType.ERROR,
+                    "Failed fetching minion: " + minionId,
+                    err
+                );
+            });
+    });
 
     $: subPage = location.pathname.split("/")[4];
     $: console.log("location", location, subPage);
-
     $: subPagesNav = [
         {
             name: "General",
@@ -49,10 +64,10 @@
     ];
 </script>
 
-{#if !minion}
+{#if !$minion}
     <h1>Loading...</h1>
 {:else}
-    <h1>Minion {minion.id}</h1>
+    <h1>Minion {$minion.id}</h1>
 
     <div class="nav bg-dark w-100">
         {#each subPagesNav as item}

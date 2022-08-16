@@ -4,7 +4,7 @@
 
     export let minion;
 
-    $: grains = JSON.parse(minion.grains ?? "{}");
+    $: grains = JSON.parse($minion.grains ?? "{}");
     $: console.log(grains);
 
     function formatAsSize(megabytes) {
@@ -32,7 +32,7 @@
                         : ''}"
                 >
                     <strong>ID</strong>
-                    <span class="float-end">{minion.id}</span>
+                    <span class="float-end">{$minion.id}</span>
                 </li>
                 <li
                     class="list-group-item {$theme.dark
@@ -184,7 +184,7 @@
                         : ''}"
                 >
                     <strong>Last seen</strong>
-                    <span class="float-end">{minion.last_seen} UTC</span>
+                    <span class="float-end">{$minion.last_seen} UTC</span>
                 </li>
                 <li
                     class="list-group-item {$theme.dark
@@ -193,8 +193,8 @@
                 >
                     <strong>Conformity check</strong>
                     <span class="float-end"
-                        >{minion.last_updated_conformity != null
-                            ? minion.last_updated_conformity + " UTC"
+                        >{$minion.last_updated_conformity != null
+                            ? $minion.last_updated_conformity + " UTC"
                             : "Never"}</span
                     >
                 </li>
@@ -205,8 +205,8 @@
                 >
                     <strong>Grains fetched</strong>
                     <span class="float-end"
-                        >{minion.last_updated_grains != null
-                            ? minion.last_updated_grains + " UTC"
+                        >{$minion.last_updated_grains != null
+                            ? $minion.last_updated_grains + " UTC"
                             : "Never"}</span
                     >
                 </li>
@@ -217,8 +217,8 @@
                 >
                     <strong>Pillars fetched</strong>
                     <span class="float-end"
-                        >{minion.last_updated_pillars != null
-                            ? minion.last_updated_pillars + " UTC"
+                        >{$minion.last_updated_pillars != null
+                            ? $minion.last_updated_pillars + " UTC"
                             : "Never"}</span
                     >
                 </li>
@@ -229,8 +229,8 @@
                 >
                     <strong>Packages fetched</strong>
                     <span class="float-end"
-                        >{minion.last_updated_pkgs != null
-                            ? minion.last_updated_pkgs + " UTC"
+                        >{$minion.last_updated_pkgs != null
+                            ? $minion.last_updated_pkgs + " UTC"
                             : "Never"}</span
                     >
                 </li>

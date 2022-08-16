@@ -11,7 +11,7 @@ static FRONTEND_PUBLIC_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/frontend/pub
 pub async fn route_frontend_get(
     service_request: ServiceRequest,
 ) -> Result<ServiceResponse, actix_web::Error> {
-    if SConfig::frontend_proxy_enabled() {
+    if SConfig::http_frontend_proxy_enabled() {
         return route_frontend_proxy_get(service_request).await;
     } else {
         return route_frontend_static_get(service_request).await;
@@ -30,7 +30,7 @@ pub async fn route_frontend_proxy_get(
         .into_iter()
         .skip(SConfig::sub_path().len())
         .collect::<String>();
-    let target = format!("{}{}", SConfig::frontend_proxy_target(), target);
+    let target = format!("{}{}", SConfig::http_frontend_proxy_target(), target);
     let mut res = match awc::Client::new().get(&target).send().await {
         Ok(res) => res,
         Err(err) => {

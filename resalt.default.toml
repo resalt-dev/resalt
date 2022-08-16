@@ -1,36 +1,40 @@
 [auth.ldap]
 enabled = false
-
 url = "ldap://ldap.example.com"
-start_tls = false
-no_tls_verify = false
+basedn = "dc=example,dc=com"
 
-bind_dn = "cn=admin,dc=example,dc=com"
-bind_password = "secret"
+[auth.ldap.tls]
+starttls = false
+skipverify = true
 
-base_dn = "dc=example,dc=com"
+[auth.ldap.bind]
+dn = "cn=admin,dc=example,dc=com"
+password = "secret"
 
+[auth.ldap.user]
 # OpenLDAP: (&(objectClass=inetOrgPerson)(uid=%s))
 # Active Directory: (&(objectClass=user)(sAMAccountName=%s))
 # AD with username or email: (&(objectClass=user)(|(sAMAccountName=%s)(mail=%s)))
-user_filter = "(&(objectClass=inetOrgPerson)(uid=%s))"
-user_attribute = "uid"
+filter = "(&(objectClass=inetOrgPerson)(uid=%s))"
+# OpenLDAP: uid
+# Active Directory: sAMAccountName
+attribute = "uid"
 
-[auth.user]
-session_lifespan = 86400
+[auth.session]
+lifespan = 86400
 
 [database]
 url = "mysql://resalt:resalt@db/resalt"
 
-[frontend.proxy]
-enabled = true
-target = "http://frontend:5555"
-
 [salt.api]
 url = "https://master:8080"
-disable_tls_verification = true
 # head /dev/urandom | tr -dc A-Za-z0-9 | head -c512; echo
-#system_service_token = ""
+#token = ""
+[salt.api.tls]
+verify = false
 
 [http]
 port = 8000
+[http.frontend.proxy]
+enabled = true
+target = "http://frontend:5555"

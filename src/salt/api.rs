@@ -5,7 +5,7 @@ use awc::{
     error::{JsonPayloadError, SendRequestError},
     *,
 };
-use futures::{try_join, StreamExt};
+use futures::StreamExt;
 use log::*;
 use rustls::ClientConfig;
 use rustls_native_certs::load_native_certs;
@@ -100,7 +100,7 @@ lazy_static::lazy_static! {
             .with_root_certificates(root_store)
             .with_no_client_auth();
 
-        if SConfig::salt_api_disable_tls_verification() {
+        if !SConfig::salt_api_tls_verify() {
             config
                 .dangerous()
                 .set_certificate_verifier(Arc::new(danger::NoCertificateVerification));

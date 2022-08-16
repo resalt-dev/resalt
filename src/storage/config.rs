@@ -18,7 +18,7 @@ lazy_static::lazy_static! {
     // Add in settings from the environment (with a prefix of RESALT)
     // Eg.. `RESALT_DEBUG=1 ./target/app` would set the `debug` key
     .add_source(config::Environment::with_prefix("resalt").separator("_"))
-    .set_default("salt.api.system_service_token", SYSTEM_TOKEN_FALLBACK.clone()).unwrap()
+    .set_default("salt.api.token", SYSTEM_TOKEN_FALLBACK.clone()).unwrap()
     .build()
     .unwrap());
 }
@@ -41,11 +41,19 @@ impl SConfig {
             .unwrap()
     }
 
+    pub fn auth_ldap_base_dn() -> String {
+        SETTINGS
+            .read()
+            .unwrap()
+            .get_string("auth.ldap.basedn")
+            .unwrap()
+    }
+
     pub fn auth_ldap_start_tls() -> bool {
         SETTINGS
             .read()
             .unwrap()
-            .get_bool("auth.ldap.start_tls")
+            .get_bool("auth.ldap.tls.starttls")
             .unwrap()
     }
 
@@ -53,7 +61,7 @@ impl SConfig {
         SETTINGS
             .read()
             .unwrap()
-            .get_bool("auth.ldap.skip_tls_verify")
+            .get_bool("auth.ldap.tls.skipverify")
             .unwrap()
     }
 
@@ -61,7 +69,7 @@ impl SConfig {
         SETTINGS
             .read()
             .unwrap()
-            .get_string("auth.ldap.bind_dn")
+            .get_string("auth.ldap.bind.dn")
             .unwrap()
     }
 
@@ -69,15 +77,7 @@ impl SConfig {
         SETTINGS
             .read()
             .unwrap()
-            .get_string("auth.ldap.bind_password")
-            .unwrap()
-    }
-
-    pub fn auth_ldap_base_dn() -> String {
-        SETTINGS
-            .read()
-            .unwrap()
-            .get_string("auth.ldap.base_dn")
+            .get_string("auth.ldap.bind.password")
             .unwrap()
     }
 
@@ -85,7 +85,7 @@ impl SConfig {
         SETTINGS
             .read()
             .unwrap()
-            .get_string("auth.ldap.user_filter")
+            .get_string("auth.ldap.user.filter")
             .unwrap()
     }
 
@@ -93,15 +93,15 @@ impl SConfig {
         SETTINGS
             .read()
             .unwrap()
-            .get_string("auth.ldap.user_attribute")
+            .get_string("auth.ldap.user.attribute")
             .unwrap()
     }
 
-    pub fn auth_user_session_lifespan() -> u64 {
+    pub fn auth_session_lifespan() -> u64 {
         SETTINGS
             .read()
             .unwrap()
-            .get_int("auth.user.session_lifespan")
+            .get_int("auth.session.lifespan")
             .unwrap() as u64
     }
 
@@ -121,11 +121,11 @@ impl SConfig {
         SETTINGS.read().unwrap().get_string("salt.api.url").unwrap()
     }
 
-    pub fn salt_api_disable_tls_verification() -> bool {
+    pub fn salt_api_tls_verify() -> bool {
         SETTINGS
             .read()
             .unwrap()
-            .get_bool("salt.api.disable_tls_verification")
+            .get_bool("salt.api.tls.verify")
             .unwrap()
     }
 
@@ -133,28 +133,28 @@ impl SConfig {
         SETTINGS
             .read()
             .unwrap()
-            .get_string("salt.api.system_service_token")
-            .unwrap()
-    }
-
-    pub fn frontend_proxy_enabled() -> bool {
-        SETTINGS
-            .read()
-            .unwrap()
-            .get_bool("frontend.proxy.enabled")
-            .unwrap()
-    }
-
-    pub fn frontend_proxy_target() -> String {
-        SETTINGS
-            .read()
-            .unwrap()
-            .get_string("frontend.proxy.target")
+            .get_string("salt.api.token")
             .unwrap()
     }
 
     pub fn http_port() -> u16 {
         SETTINGS.read().unwrap().get_int("http.port").unwrap() as u16
+    }
+
+    pub fn http_frontend_proxy_enabled() -> bool {
+        SETTINGS
+            .read()
+            .unwrap()
+            .get_bool("http.frontend.proxy.enabled")
+            .unwrap()
+    }
+
+    pub fn http_frontend_proxy_target() -> String {
+        SETTINGS
+            .read()
+            .unwrap()
+            .get_string("http.frontend.proxy.target")
+            .unwrap()
     }
 
     pub fn sub_path() -> String {

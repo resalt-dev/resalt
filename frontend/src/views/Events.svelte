@@ -7,7 +7,6 @@
     import { useNavigate } from "svelte-navigator";
     import TablePaginate from "../components/TablePaginate.svelte";
     import { writable } from "svelte/store";
-    const navigate = useNavigate();
 
     let paginationSize: number = 20;
     let paginationPage: number = 1;

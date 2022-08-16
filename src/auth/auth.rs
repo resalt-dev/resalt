@@ -21,7 +21,7 @@ pub fn validate_auth_token(
         }
     };
 
-    let session_lifespan = SConfig::auth_user_session_lifespan();
+    let session_lifespan = SConfig::auth_session_lifespan();
 
     if (authtoken.timestamp.timestamp() as u64) + session_lifespan
         < chrono::Utc::now().timestamp() as u64
