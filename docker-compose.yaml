@@ -15,20 +15,21 @@ services:
       - "3306:3306"
 
   master:
+    image: saltstack/salt:3004rc1
     hostname: master
-    build:
-      context: ./docker
-      dockerfile: Dockerfile-master
-    command: honcho start
+    volumes:
+      - ./docker/saltconfig/etc/master:/etc/salt/master:ro
+      - ./docker/saltconfig/pillar:/srv/pillar:ro
+      - ./docker/saltconfig/salt:/srv/salt:ro
     environment:
       - PYTHONUNBUFFERED=true
     ports:
       - "8080:8080"
   minion:
     build:
-      context: ./docker
-      dockerfile: Dockerfile-minion
+    image: saltstack/salt:3004rc1
     command: salt-minion -l info
+      - ./docker/saltconfig/etc/minion:/etc/salt/minion:ro
     depends_on:
       - master
 

@@ -1360,7 +1360,4 @@ rest_cherrypy:
   port: 8080
   host: 0.0.0.0
   debug: True
-  #ssl_crt: /etc/pki/tls/certs/localhost.crt
-  #ssl_key: /etc/pki/tls/certs/localhost.key
-  ssl_crt: /etc/salt/pki-web/localhost.crt
-  ssl_key: /etc/salt/pki-web/secret.key
+  disable_ssl: True
