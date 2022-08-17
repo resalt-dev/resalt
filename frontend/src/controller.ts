@@ -2,7 +2,6 @@ import { get } from 'svelte/store';
 import {
     auth as authStore,
     currentUser as currentUserStore,
-    minions as minionsStore,
     socket as socketStore,
     alerts,
 } from './stores';
@@ -100,7 +99,7 @@ export async function connectEvents(timeout: number = 1000): Promise<EventSource
             const { content } = data;
 
             switch (data.type) {
-            case 'update_minion':
+            /*case 'update_minion':
                 minionsStore.update((minions: Array<Minion>) => {
                     // minions is a Vector of Minions.
                     // If minion exists, replace it. If not, then add it.
@@ -114,7 +113,7 @@ export async function connectEvents(timeout: number = 1000): Promise<EventSource
                     }
                     return minions;
                 });
-                break;
+                break;*/
             default:
                 console.log('Unknown event type', data.type);
             }
@@ -175,14 +174,6 @@ export async function loadCurrentUser(): Promise<void> {
         console.log(e);
         throw e;
     }
-}
-
-// TODO: Legacy
-export async function loadMinions() {
-    const token = requireToken();
-
-    const minions = await apiListMinions(token);
-    minionsStore.set(minions);
 }
 
 export async function getCurrentUser(): Promise<CurrentUser> {
