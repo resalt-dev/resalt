@@ -1,17 +1,16 @@
 <script lang="ts">
-    import { onMount, SvelteComponent } from "svelte";
+    import { onMount } from "svelte";
     import { writable } from "svelte/store";
     import { AlertType, getMinions, showAlert } from "../../controller";
     import { theme } from "../../stores";
     import Icon from "../../components/Icon.svelte";
     import paths from "../../paths";
-    import { Link, useNavigate } from "svelte-navigator";
+    import { Link } from "svelte-navigator";
     import { Table } from "sveltestrap";
     import TablePaginate from "../../components/TablePaginate.svelte";
     import Tabs from "../../components/Tabs.svelte";
     import MinionsTabSearch from "./MinionsTabSearch.svelte";
     import MinionsTabGroups from "./MinionsTabGroups.svelte";
-    const navigate = useNavigate();
 
     let paginationSize: number = 10;
     let paginationPage: number = 1;
@@ -154,13 +153,13 @@
             {:else}
                 {#each $minions as minion}
                     <tr>
-                        <th
-                            scope="row"
-                            class="mouse-pointer"
-                            on:click={() =>
-                                navigate(paths.minion.getPath(minion.id))}
-                            >{minion.id}</th
-                        >
+                        <th scope="row">
+                            <Link
+                                to={paths.minion.getPath(minion.id)}
+                                class="text-reset text-decoration-none"
+                                >{minion.id}</Link
+                            >
+                        </th>
                         <td>{minion.datatable_type}</td>
                         <td>{minion.last_seen}</td>
                         <td>
