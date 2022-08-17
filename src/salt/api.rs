@@ -443,7 +443,7 @@ impl SaltAPI {
     }
 
     pub async fn refresh_minions(&self, salt_token: &SaltToken) -> Result<(), SaltError> {
-        let _state = self
+        let state = self
             .run_job_local_async(
                 salt_token,
                 "*",
@@ -453,18 +453,30 @@ impl SaltAPI {
                 None,
             )
             .await;
-        let _grains = self
+        let grains = self
             .run_job_local_async(salt_token, "*", "grains.items", None, None, None)
             .await;
-        let _pillar = self
+        let pillar = self
             .run_job_local_async(salt_token, "*", "pillar.items", None, None, None)
             .await;
-        let _pkg = self
+        let pkg = self
             .run_job_local_async(salt_token, "*", "pkg.list_pkgs", None, None, None)
             .await;
 
         // TODO: sync with key-management, add non-responsive minions, and remove deleted ones
 
+        if let Err(e) = state {
+            return Err(e);
+        }
+        if let Err(e) = grains {
+            return Err(e);
+        }
+        if let Err(e) = pillar {
+            return Err(e);
+        }
+        if let Err(e) = pkg {
+            return Err(e);
+        }
         Ok(())
     }
 }
