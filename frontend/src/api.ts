@@ -131,8 +131,15 @@ export async function apiListEvents(
 
 export async function apiListUsers(
     token: string,
+    limit?: number,
+    offset?: number,
 ): Promise<Array<PublicUser>> {
-    return sendAuthenticatedRequest('GET', `/users?`, token);
+    const args = new URLSearchParams();
+
+    if (limit) args.append('limit', limit.toString());
+    if (offset) args.append('offset', offset.toString());
+    
+    return sendAuthenticatedRequest('GET', `/users?${args.toString()}`, token);
 }
 
 export async function apiGetUser(

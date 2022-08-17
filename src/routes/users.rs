@@ -3,8 +3,21 @@ use actix_web::{web, Responder, Result};
 use log::*;
 use serde::Deserialize;
 
-pub async fn route_users_get(data: web::Data<Storage>) -> Result<impl Responder> {
-    let users = match data.list_users() {
+#[derive(Deserialize)]
+pub struct UsersListGetQuery {
+    limit: Option<i64>,
+    offset: Option<i64>,
+}
+
+pub async fn route_users_get(
+    data: web::Data<Storage>,
+    query: web::Query<UsersListGetQuery>,
+) -> Result<impl Responder> {
+    // Pagination
+    let limit = query.limit;
+    let offset = query.offset;
+
+    let users = match data.list_users(limit, offset) {
         Ok(users) => users,
         Err(e) => {
             error!("{:?}", e);

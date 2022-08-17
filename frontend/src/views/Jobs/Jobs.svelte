@@ -1,13 +1,11 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { theme } from "../../stores";
-    import { useNavigate } from "svelte-navigator";
     import { AlertType, getJobs, showAlert } from "../../controller";
     import { Table, Tooltip } from "sveltestrap";
     import Icon from "../../components/Icon.svelte";
     import { writable } from "svelte/store";
     import TablePaginate from "../../components/TablePaginate.svelte";
-    const navigate = useNavigate();
 
     let filterUser: string | null = null;
     let filterStartDate: Date | null = null;
@@ -146,7 +144,7 @@
             {#if $jobs == null}
                 <p>Loading</p>
             {:else if $jobs.length == 0}
-                <div class="p-3">No events exist. Very unusal.</div>
+                <div class="p-3">No jobs exist. Very unusal.</div>
             {:else}
                 {#each $jobs as job}
                     <tr>

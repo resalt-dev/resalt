@@ -217,9 +217,9 @@ export async function getEvents(limit?: number, offset?: number): Promise<Array<
     return apiListEvents(token, limit, offset);
 }
 
-export async function getUsers(): Promise<Array<CurrentUser>> {
+export async function getUsers(limit?: number, offset?: number): Promise<Array<CurrentUser>> {
     const token = requireToken();
-    return apiListUsers(token);
+    return apiListUsers(token, limit, offset);
 }
 
 export async function getUserById(id: string): Promise<CurrentUser> {

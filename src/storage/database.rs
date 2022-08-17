@@ -6,6 +6,7 @@ use chrono::NaiveDateTime;
 use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
 use diesel_migrations::embed_migrations;
 use log::{error, warn};
+use rand::Rng;
 
 type DbPooledConnection = PooledConnection<ConnectionManager<MysqlConnection>>;
 
@@ -50,9 +51,20 @@ impl Storage {
 
     pub async fn init(&self) {
         // Create default user
-        if self.list_users().unwrap_or_default().is_empty() {
-            self.create_user("admin".to_string(), Some("admin".to_string()))
+        if self.get_user_by_username("admin").unwrap().is_none() {
+            let random_password = rand::thread_rng()
+                .sample_iter(&rand::distributions::Alphanumeric)
+                .take(15)
+                .map(|c| c.to_string())
+                .collect::<String>();
+            self.create_user("admin".to_string(), Some(random_password.to_string()))
                 .unwrap();
+            warn!("==============================");
+            warn!(
+                "CREATED DEFAULT USER: admin WITH PASSWORD: {}",
+                random_password
+            );
+            warn!("==============================");
         }
     }
 
@@ -84,9 +96,19 @@ impl Storage {
         Ok(user)
     }
 
-    pub fn list_users(&self) -> Result<Vec<User>, String> {
+    pub fn list_users(&self, limit: Option<i64>, offset: Option<i64>) -> Result<Vec<User>, String> {
         let connection = self.create_connection()?;
-        users::table
+        let mut query = users::table.into_boxed();
+        query = query.order(users::id.asc());
+
+        // Filtering
+
+        // Pagination
+        query = query.limit(limit.unwrap_or(100));
+        query = query.offset(offset.unwrap_or(0));
+
+        // Query
+        query
             .load::<User>(&connection)
             .map_err(|e| format!("{:?}", e))
     }
