@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { theme } from "../../stores";
+    import { theme, currentUser } from "../../stores";
     import { AlertType, getUsers, showAlert } from "../../controller";
     import { Badge, Table } from "sveltestrap";
     import Icon from "../../components/Icon.svelte";
@@ -57,7 +57,7 @@
                         <div class="col-auto align-self-center">Is Local</div>
                     </div>
                 </th>
-                <th />
+                <th scope="col" class="border-secondary" />
             </tr>
         </thead>
         <tbody class="align-middle">
@@ -74,6 +74,9 @@
                                 class="text-reset text-decoration-none"
                                 >{user.username}</Link
                             >
+                            {#if user.id == $currentUser.id}
+                                <span class="text-{$theme.color}"> (You)</span>
+                            {/if}
                         </th>
                         <td><small>{user.id}</small></td>
                         <td>

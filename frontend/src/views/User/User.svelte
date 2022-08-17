@@ -1,12 +1,11 @@
 <script lang="ts">
     import { showAlert, AlertType, getUserById } from "../../controller";
-    import { theme } from "../../stores";
+    import { theme, currentUser } from "../../stores";
     import { writable } from "svelte/store";
 
     import { onMount } from "svelte";
     import {
         Badge,
-        Button,
         Card,
         CardBody,
         CardHeader,
@@ -57,7 +56,12 @@
 {#if !$user}
     <h1>Loading...</h1>
 {:else}
-    <h1>User {$user.username}</h1>
+    <h1>
+        User {$user.username}
+        {#if $user.id == $currentUser.id}
+            <span class="text-{$theme.color}"> (You)</span>
+        {/if}
+    </h1>
 
     <Row>
         <Col xs="12" xxl="4" class="pb-3">
@@ -118,6 +122,7 @@
                         placeholder="New password"
                         class="form-control mb-3 d-inline"
                         style="width: 20rem;"
+                        disabled
                     />
                     <CardSubtitle class="mb-3">Confirm password:</CardSubtitle>
                     <Input
@@ -127,12 +132,14 @@
                         placeholder="Confirm password"
                         class="form-control mb-3 d-inline"
                         style="width: 20rem;"
+                        disabled
                     />
                     <br />
                     <button
+                        disabled
                         class="btn btn-{$theme.color}"
                         on:click={handleUpdatePassword}>Update</button
-                    >
+                    > Not yet implemented.
                 </CardBody>
             </Card>
         </Col>
