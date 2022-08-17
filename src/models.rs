@@ -170,6 +170,7 @@ impl User {
         serde_json::json!({
             "id": self.id,
             "username": self.username,
+            "isLocal": self.password.is_some(),
         })
     }
 }

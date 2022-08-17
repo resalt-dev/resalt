@@ -52,6 +52,7 @@ const dashboardPaths = [
 
     // -----
 
+    new Path('user', '/dashboard/users/:userId', 'User', '', false, true),
     new Path('users', '/dashboard/users', 'Users', 'user-circle', true),
     new Path('preferences', '/dashboard/preferences', 'Preferences', 'wrench', true),
     new Path('settings', '/dashboard/settings', 'Settings', 'cog', true),

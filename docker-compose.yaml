@@ -15,6 +15,7 @@ services:
       - "3306:3306"
 
   master:
+    hostname: master
     build:
       context: ./docker
       dockerfile: Dockerfile-master

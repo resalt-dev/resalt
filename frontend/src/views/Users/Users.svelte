@@ -6,6 +6,8 @@
     import Icon from "../../components/Icon.svelte";
     import { writable } from "svelte/store";
     import TablePaginate from "../../components/TablePaginate.svelte";
+    import paths from "../../paths";
+    import { Link } from "svelte-navigator";
 
     let paginationSize: number = 20;
     let paginationPage: number = 1;
@@ -60,7 +62,13 @@
             {:else}
                 {#each $users as user}
                     <tr>
-                        <th scope="row">{user.id}</th>
+                        <th scope="row">
+                            <Link
+                                to={paths.user.getPath(user.id)}
+                                class="text-reset text-decoration-none"
+                                >{user.id}</Link
+                            >
+                        </th>
                         <td>{user.username}</td>
                         <!--<td><small>{user.timestamp}</small></td>-->
                     </tr>

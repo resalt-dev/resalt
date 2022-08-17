@@ -1,13 +1,6 @@
 use crate::prelude::*;
 use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
-use serde::Serialize;
-
-#[derive(Serialize, Debug)]
-struct AuthUserResponse {
-    id: String,
-    username: String,
-}
 
 pub async fn route_auth_user_get(
     data: web::Data<Storage>,
@@ -28,9 +21,5 @@ pub async fn route_auth_user_get(
         }
     };
 
-    let response = AuthUserResponse {
-        id: user.id,
-        username: user.username,
-    };
-    Ok(web::Json(response))
+    Ok(web::Json(user.public()))
 }

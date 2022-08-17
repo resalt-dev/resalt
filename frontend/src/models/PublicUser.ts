@@ -3,8 +3,11 @@ export default class PublicUser {
 
     username: string;
 
-    constructor(id, username) {
+    isLocal: boolean;
+
+    constructor(id, username, isLocal) {
         this.id = id;
         this.username = username;
+        this.isLocal = isLocal;
     }
 }

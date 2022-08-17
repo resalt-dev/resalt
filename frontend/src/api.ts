@@ -1,6 +1,5 @@
 import constants from './constants';
 import type Minion from './models/Minion';
-import type CurrentUser from './models/CurrentUser';
 import type SaltEvent from './models/SaltEvent';
 import type Job from './models/Job';
 import type PublicUser from './models/PublicUser';
@@ -62,7 +61,7 @@ export async function sendAuthenticatedRequest(
     return res.json();
 }
 
-export async function apiGetCurrentUser(token: string): Promise<CurrentUser> {
+export async function apiGetCurrentUser(token: string): Promise<PublicUser> {
     return sendAuthenticatedRequest('GET', '/auth/user', token);
 }
 

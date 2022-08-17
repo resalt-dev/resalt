@@ -20,7 +20,7 @@ import {
 } from './api';
 import Alert from './models/Alert';
 import type Minion from './models/Minion';
-import type CurrentUser from './models/CurrentUser';
+import type PublicUser from './models/PublicUser';
 import type SaltEvent from './models/SaltEvent';
 import type Job from './models/Job';
 
@@ -176,7 +176,7 @@ export async function loadCurrentUser(): Promise<void> {
     }
 }
 
-export async function getCurrentUser(): Promise<CurrentUser> {
+export async function getCurrentUser(): Promise<PublicUser> {
     const token = requireToken();
     return apiGetCurrentUser(token);
 }
@@ -217,12 +217,12 @@ export async function getEvents(limit?: number, offset?: number): Promise<Array<
     return apiListEvents(token, limit, offset);
 }
 
-export async function getUsers(limit?: number, offset?: number): Promise<Array<CurrentUser>> {
+export async function getUsers(limit?: number, offset?: number): Promise<Array<PublicUser>> {
     const token = requireToken();
     return apiListUsers(token, limit, offset);
 }
 
-export async function getUserById(id: string): Promise<CurrentUser> {
+export async function getUserById(id: string): Promise<PublicUser> {
     const token = requireToken();
     return apiGetUser(token, id);
 }
