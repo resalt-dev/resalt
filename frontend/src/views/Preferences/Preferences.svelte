@@ -16,7 +16,7 @@
 <h1>Preferences</h1>
 
 <Row>
-    <Col>
+    <Col xs="12">
         <Card class="mb-3 {$theme.dark ? 'bg-dark' : ''}">
             <CardHeader>
                 <CardTitle class="mb-0">Theme</CardTitle>
