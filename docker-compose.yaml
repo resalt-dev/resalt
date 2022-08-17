@@ -26,9 +26,9 @@ services:
     ports:
       - "8080:8080"
   minion:
-    build:
     image: saltstack/salt:3004rc1
     command: salt-minion -l info
+    volumes:
       - ./docker/saltconfig/etc/minion:/etc/salt/minion:ro
     depends_on:
       - master
