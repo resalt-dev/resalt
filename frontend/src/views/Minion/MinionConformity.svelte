@@ -40,7 +40,7 @@
     let showError: boolean = true;
     let showCollapsed: boolean = true;
 
-    $: conformity = Object.entries(JSON.parse(minion.conformity) ?? [])
+    $: conformity = Object.entries(JSON.parse($minion.conformity) ?? [])
         .map(([key, v]) => {
             let value: any = v;
 
