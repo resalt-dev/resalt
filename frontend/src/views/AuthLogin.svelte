@@ -67,7 +67,6 @@
 
     <button
         on:click={handleClick}
-        class={`btn btn-${$theme.color} float-center px-5 fw-bold mb-3`}
-        >Login</button
+        class={`btn btn-${$theme.color} px-5 fw-bold mb-3`}>Login</button
     >
 </form>

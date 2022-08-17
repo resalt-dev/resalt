@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import { theme } from "../../stores";
     import { AlertType, getUsers, showAlert } from "../../controller";
-    import { Table } from "sveltestrap";
+    import { Badge, Table } from "sveltestrap";
     import Icon from "../../components/Icon.svelte";
     import { writable } from "svelte/store";
     import TablePaginate from "../../components/TablePaginate.svelte";
@@ -44,14 +44,20 @@
             <tr>
                 <th scope="col" class="border-secondary">
                     <div class="row g-1">
-                        <div class="col-auto align-self-center ps-2">ID</div>
+                        <div class="col-auto align-self-center ps-2">User</div>
                     </div>
                 </th>
                 <th scope="col" class="border-secondary">
                     <div class="row g-1">
-                        <div class="col-auto align-self-center">User</div>
+                        <div class="col-auto align-self-center">ID</div>
                     </div>
                 </th>
+                <th scope="col" class="border-secondary">
+                    <div class="row g-1">
+                        <div class="col-auto align-self-center">Is Local</div>
+                    </div>
+                </th>
+                <th />
             </tr>
         </thead>
         <tbody class="align-middle">
@@ -66,11 +72,29 @@
                             <Link
                                 to={paths.user.getPath(user.id)}
                                 class="text-reset text-decoration-none"
-                                >{user.id}</Link
+                                >{user.username}</Link
                             >
                         </th>
-                        <td>{user.username}</td>
-                        <!--<td><small>{user.timestamp}</small></td>-->
+                        <td><small>{user.id}</small></td>
+                        <td>
+                            {#if user.isLocal}
+                                <Badge
+                                    color={$theme.dark ? "secondary" : "dark"}
+                                    >Yes</Badge
+                                >
+                            {:else}
+                                <Badge color={null} class="bg-{$theme.color}"
+                                    >No</Badge
+                                >
+                            {/if}
+                        </td>
+                        <td>
+                            <Link
+                                to={paths.user.getPath(user.id)}
+                                class="btn btn-{$theme.color} btn-sm px-3"
+                                >View</Link
+                            >
+                        </td>
                     </tr>
                 {/each}
             {/if}

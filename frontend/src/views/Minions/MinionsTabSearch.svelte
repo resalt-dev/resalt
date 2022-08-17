@@ -13,12 +13,6 @@
             class="form-control ms-2 d-inline"
             style="width: 15rem;"
         />
-        <input
-            id="minionsSearch"
-            type="email"
-            class="form-control ms-2 d-inline"
-            style="width: 15rem;"
-        />
     </Col>
 </Row>
 

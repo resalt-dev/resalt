@@ -147,7 +147,7 @@ impl SaltAPI {
         {
             Ok(res) => res,
             Err(e) => {
-                error!("{:?}", e);
+                error!("login_err {:?}", e);
                 return Err(SaltError::RequestError(e));
             }
         };
@@ -193,7 +193,7 @@ impl SaltAPI {
             }
         };
 
-        debug!("{:?}", salt_token);
+        debug!("login {:?}", salt_token);
 
         Ok(salt_token)
     }

@@ -5,12 +5,15 @@
 
     import { onMount } from "svelte";
     import {
+        Badge,
+        Button,
         Card,
         CardBody,
         CardHeader,
         CardSubtitle,
         CardTitle,
         Col,
+        Input,
         Row,
     } from "sveltestrap";
 
@@ -18,7 +21,23 @@
     // export let location;
     export let userId;
 
+    let password = "";
+    let passwordRepeat = "";
+
     const user = writable(null);
+
+    function handleUpdatePassword() {
+        if (password !== passwordRepeat) {
+            showAlert(
+                AlertType.ERROR,
+                "Password mismatch",
+                "Passwords do not match, please verify and try again."
+            );
+            return;
+        }
+
+        // TODO: Update password
+    }
 
     onMount(() => {
         getUserById(userId)
@@ -38,20 +57,82 @@
 {#if !$user}
     <h1>Loading...</h1>
 {:else}
-    <h1>User {$user.id}</h1>
+    <h1>User {$user.username}</h1>
 
     <Row>
-        <Col>
-            <Card class="mb-3 {$theme.dark ? 'bg-dark' : ''}">
+        <Col xs="12" xxl="4" class="pb-3">
+            <Card class="h-100 {$theme.dark ? 'bg-dark' : ''}">
                 <CardHeader>
-                    <CardTitle class="mb-0">Theme</CardTitle>
+                    <CardTitle class="mb-0">General</CardTitle>
+                </CardHeader>
+                <ul class="list-group list-group-flush">
+                    <li
+                        class="list-group-item {$theme.dark
+                            ? 'bg-dark text-light'
+                            : ''}"
+                    >
+                        <strong>ID</strong>
+                        <span class="float-end">{$user.id}</span>
+                    </li>
+                    <li
+                        class="list-group-item {$theme.dark
+                            ? 'bg-dark text-light'
+                            : ''}"
+                    >
+                        <strong>Username</strong>
+                        <span class="float-end">{$user.username}</span>
+                    </li>
+                    <li
+                        class="list-group-item {$theme.dark
+                            ? 'bg-dark text-light'
+                            : ''}"
+                    >
+                        <strong>Is Local</strong>
+                        <span class="float-end">
+                            {#if $user.isLocal}
+                                <Badge
+                                    color={$theme.dark ? "secondary" : "dark"}
+                                    >Yes</Badge
+                                >
+                            {:else}
+                                <Badge color={null} class="bg-{$theme.color}"
+                                    >No</Badge
+                                >
+                            {/if}
+                        </span>
+                    </li>
+                </ul>
+            </Card>
+        </Col>
+        <Col xs="12" xxl="4" class="pb-3">
+            <Card class="h-100 {$theme.dark ? 'bg-dark' : ''}">
+                <CardHeader>
+                    <CardTitle class="mb-0">Password</CardTitle>
                 </CardHeader>
                 <CardBody>
-                    <CardSubtitle class="mb-3">Color:</CardSubtitle>
-                    AAA
-                    <hr />
-                    <CardSubtitle class="mb-3">Dark mode:</CardSubtitle>
-                    BBB
+                    <CardSubtitle class="mb-3">New password:</CardSubtitle>
+                    <Input
+                        bind:value={password}
+                        id="userNewPassword"
+                        type="password"
+                        placeholder="New password"
+                        class="form-control mb-3 d-inline"
+                        style="width: 20rem;"
+                    />
+                    <CardSubtitle class="mb-3">Confirm password:</CardSubtitle>
+                    <Input
+                        bind:value={passwordRepeat}
+                        id="userNewPasswordConfirm"
+                        type="password"
+                        placeholder="Confirm password"
+                        class="form-control mb-3 d-inline"
+                        style="width: 20rem;"
+                    />
+                    <br />
+                    <button
+                        class="btn btn-{$theme.color}"
+                        on:click={handleUpdatePassword}>Update</button
+                    >
                 </CardBody>
             </Card>
         </Col>
