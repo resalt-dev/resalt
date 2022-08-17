@@ -1,11 +1,6 @@
 <script lang="ts">
     import { Link } from "svelte-navigator";
-    import {
-        showAlert,
-        AlertType,
-        loadMinions,
-        getMinionById,
-    } from "../../controller";
+    import { showAlert, AlertType, getMinionById } from "../../controller";
     import { theme } from "../../stores";
     import { writable } from "svelte/store";
     import paths from "../../paths";

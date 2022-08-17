@@ -4,7 +4,6 @@
     import Icon from "../components/Icon.svelte";
     import { AlertType, getEvents, showAlert } from "../controller";
     import { theme } from "../stores";
-    import { useNavigate } from "svelte-navigator";
     import TablePaginate from "../components/TablePaginate.svelte";
     import { writable } from "svelte/store";
 
