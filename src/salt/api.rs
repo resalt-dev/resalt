@@ -9,7 +9,7 @@ use futures::StreamExt;
 use log::*;
 use rustls::ClientConfig;
 use rustls_native_certs::load_native_certs;
-use serde_json::json;
+use serde_json::{json, Value};
 use std::{
     collections::HashMap,
     sync::{Arc, Mutex},
@@ -28,6 +28,7 @@ pub enum SaltError {
     Forbidden,
     RequestError(SendRequestError),
     ResponseParseError(Option<JsonPayloadError>),
+    MissingExpectedDataError(String),
     FailedRequest(
         ClientResponse<
             actix_web::dev::Decompress<
@@ -45,6 +46,7 @@ pub enum SaltError {
     ),
 }
 
+#[allow(dead_code)]
 #[derive(Default)]
 pub enum SaltTgtType {
     #[default]
@@ -340,7 +342,7 @@ impl SaltAPI {
         &self,
         salt_token: &SaltToken,
         data: serde_json::Value,
-    ) -> Result<(), SaltError> {
+    ) -> Result<Value, SaltError> {
         let url = &SConfig::salt_api_url();
 
         let mut res = match self
@@ -375,7 +377,7 @@ impl SaltAPI {
         };
         debug!("run_job run body {:?}", body);
 
-        Ok(())
+        Ok(body)
     }
 
     async fn run_job_local<S: AsRef<str>>(
@@ -387,7 +389,7 @@ impl SaltAPI {
         timeout: Option<u64>,
         tgt_type: Option<SaltTgtType>,
         kwarg: Option<Dictionary>,
-    ) -> Result<(), SaltError> {
+    ) -> Result<Value, SaltError> {
         let data = json!({
             "client": "local",
             "tgt": tgt.as_ref(),
@@ -408,7 +410,7 @@ impl SaltAPI {
         arg: Option<Vec<S>>,
         tgt_type: Option<SaltTgtType>,
         kwarg: Option<Dictionary>,
-    ) -> Result<(), SaltError> {
+    ) -> Result<Value, SaltError> {
         let data = json!({
             "client": "local_async",
             "tgt": tgt.as_ref(),
@@ -429,7 +431,7 @@ impl SaltAPI {
         tgt_type: Option<SaltTgtType>,
         kwarg: Option<Dictionary>,
         batch: S,
-    ) -> Result<(), SaltError> {
+    ) -> Result<Value, SaltError> {
         let data = json!({
             "client": "local_batch",
             "tgt": tgt.as_ref(),
@@ -442,8 +444,157 @@ impl SaltAPI {
         self.run_job(salt_token, data).await
     }
 
+    async fn run_job_runner<S: AsRef<str>>(
+        &self,
+        salt_token: &SaltToken,
+        fun: S,
+        arg: Option<Vec<S>>,
+        kwarg: Option<Dictionary>,
+    ) -> Result<Value, SaltError> {
+        let data = json!({
+            "client": "runner",
+            "fun": fun.as_ref(),
+            "arg": arg.map(|v| v.iter().map(|s| s.as_ref()).collect::<String>()).unwrap_or_default(),
+            "kwarg": kwarg.unwrap_or_default(),
+        });
+        self.run_job(salt_token, data).await
+    }
+
+    async fn run_job_runner_async<S: AsRef<str>>(
+        &self,
+        salt_token: &SaltToken,
+        fun: S,
+        arg: Option<Vec<S>>,
+        kwarg: Option<Dictionary>,
+    ) -> Result<Value, SaltError> {
+        let data = json!({
+            "client": "runner_async",
+            "fun": fun.as_ref(),
+            "arg": arg.map(|v| v.iter().map(|s| s.as_ref()).collect::<String>()).unwrap_or_default(),
+            "kwarg": kwarg.unwrap_or_default(),
+        });
+        self.run_job(salt_token, data).await
+    }
+
+    async fn run_job_wheel<S: AsRef<str>>(
+        &self,
+        salt_token: &SaltToken,
+        fun: S,
+        arg: Option<Vec<S>>,
+        kwarg: Option<Dictionary>,
+    ) -> Result<Value, SaltError> {
+        let data = json!({
+            "client": "wheel",
+            "fun": fun.as_ref(),
+            "arg": arg.map(|v| v.iter().map(|s| s.as_ref()).collect::<String>()).unwrap_or_default(),
+            "kwarg": kwarg.unwrap_or_default(),
+        });
+        let data = match self.run_job(salt_token, data).await {
+            Ok(res) => res,
+            Err(e) => {
+                return Err(e);
+            }
+        };
+        let data = match data.get("return") {
+            Some(res) => res,
+            None => {
+                return Err(SaltError::MissingExpectedDataError(
+                    "run_job_wheel: missing return".to_owned(),
+                ));
+            }
+        };
+        let data = match data.get(0) {
+            Some(res) => res,
+            None => {
+                return Err(SaltError::MissingExpectedDataError(
+                    "run_job_wheel: missing return[0]".to_owned(),
+                ));
+            }
+        };
+        let data = match data.get("data") {
+            Some(res) => res,
+            None => {
+                return Err(SaltError::MissingExpectedDataError(
+                    "run_job_wheel: missing return[0]['data']".to_owned(),
+                ));
+            }
+        };
+        Ok(data.clone())
+    }
+
+    async fn run_job_wheel_async<S: AsRef<str>>(
+        &self,
+        salt_token: &SaltToken,
+        fun: S,
+        arg: Option<Vec<S>>,
+        kwarg: Option<Dictionary>,
+    ) -> Result<Value, SaltError> {
+        let data = json!({
+            "client": "wheel_async",
+            "fun": fun.as_ref(),
+            "arg": arg.map(|v| v.iter().map(|s| s.as_ref()).collect::<String>()).unwrap_or_default(),
+            "kwarg": kwarg.unwrap_or_default(),
+        });
+        self.run_job(salt_token, data).await
+    }
+
+    // Returns host:finger pair
+    pub async fn get_keys(
+        &self,
+        salt_token: &SaltToken,
+    ) -> Result<Vec<(String, String)>, SaltError> {
+        let data = match self
+            .run_job_wheel(salt_token, "key.finger", Some(vec!["*"]), None)
+            .await
+        {
+            Ok(data) => data,
+            Err(e) => return Err(e),
+        };
+        let data = match data.get("return") {
+            Some(data) => data,
+            None => {
+                return Err(SaltError::MissingExpectedDataError(
+                    "get_keys: missing return".to_owned(),
+                ));
+            }
+        };
+        let data = match data.get("minions") {
+            Some(data) => data,
+            None => {
+                return Err(SaltError::MissingExpectedDataError(
+                    "get_keys: missing return['minions']".to_owned(),
+                ));
+            }
+        };
+        let data = match data.as_object() {
+            Some(data) => data,
+            None => {
+                return Err(SaltError::MissingExpectedDataError(
+                    "get_keys: return['minions'] is not object".to_owned(),
+                ));
+            }
+        };
+        let mut keys = Vec::new();
+        for (host, finger) in data {
+            let finger = match finger.as_str() {
+                Some(finger) => finger,
+                None => {
+                    return Err(SaltError::MissingExpectedDataError(
+                        "get_keys: return['minions']['host'] is not string".to_owned(),
+                    ));
+                }
+            };
+            keys.push((host.to_owned(), finger.to_owned()));
+        }
+        Ok(keys)
+    }
+
     pub async fn refresh_minions(&self, salt_token: &SaltToken) -> Result<(), SaltError> {
-        let state = self
+        // TODO: move this to a /keys endpoint
+        // let keys = self.get_keys(salt_token).await?;
+        // info!("keys: {:?}", keys);
+
+        match self
             .run_job_local_async(
                 salt_token,
                 "*",
@@ -452,31 +603,42 @@ impl SaltAPI {
                 None,
                 None,
             )
-            .await;
-        let grains = self
+            .await
+        {
+            Ok(_) => (),
+            Err(e) => return Err(e),
+        };
+        match self
             .run_job_local_async(salt_token, "*", "grains.items", None, None, None)
-            .await;
-        let pillar = self
+            .await
+        {
+            Ok(_) => (),
+            Err(e) => return Err(e),
+        };
+        match self
             .run_job_local_async(salt_token, "*", "pillar.items", None, None, None)
-            .await;
-        let pkg = self
+            .await
+        {
+            Ok(_) => (),
+            Err(e) => return Err(e),
+        };
+        match self
             .run_job_local_async(salt_token, "*", "pkg.list_pkgs", None, None, None)
-            .await;
+            .await
+        {
+            Ok(_) => (),
+            Err(e) => return Err(e),
+        };
+        /*match self
+            .run_job_wheel_async(salt_token, "key.finger", Some(vec!["*"]), None)
+            .await
+        {
+            Ok(_) => (),
+            Err(e) => return Err(e),
+        };*/
 
         // TODO: sync with key-management, add non-responsive minions, and remove deleted ones
 
-        if let Err(e) = state {
-            return Err(e);
-        }
-        if let Err(e) = grains {
-            return Err(e);
-        }
-        if let Err(e) = pillar {
-            return Err(e);
-        }
-        if let Err(e) = pkg {
-            return Err(e);
-        }
         Ok(())
     }
 }
