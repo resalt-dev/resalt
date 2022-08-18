@@ -118,39 +118,38 @@
                                 <Button
                                     color="warning"
                                     size="sm"
+                                    class="key-btn me-1"
                                     on:click={() => {
                                         onClickReject(key.finger);
                                     }}>Reject</Button
-                                >
-                            {:else if key.status == "pre"}
+                                >{:else if key.status == "pre"}
                                 <Button
                                     color="success"
                                     size="sm"
+                                    class="key-btn me-1"
                                     on:click={() => {
                                         onClickAccept(key.finger);
                                     }}>Accept</Button
-                                >
-                            {:else if key.status == "rejected"}
+                                >{:else if key.status == "rejected"}
                                 <Button
                                     color="success"
                                     size="sm"
+                                    class="key-btn me-1"
                                     on:click={() => {
                                         onClickAccept(key.finger);
                                     }}>Accept</Button
-                                >
-                            {:else if key.status == "denied"}
+                                >{:else if key.status == "denied"}
                                 <Button
                                     color={null}
                                     size="sm"
-                                    class="btn-orange"
+                                    class="key-btn me-1 btn-orange"
                                     on:click={() => {
                                         onClickAccept(key.finger);
                                     }}>Force Accept</Button
-                                >
-                            {/if}
-                            <Button
+                                >{/if}<Button
                                 color="danger"
                                 size="sm"
+                                class="key-btn"
                                 on:click={() => {
                                     onClickDelete(key.finger);
                                 }}>Delete</Button
@@ -169,3 +168,9 @@
     last={$keys == null || $keys.length < paginationSize}
     updateData={fakePaginate}
 />
+
+<style>
+    :global(.key-btn) {
+        width: 4.5rem;
+    }
+</style>
