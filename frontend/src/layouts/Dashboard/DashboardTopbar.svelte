@@ -56,7 +56,7 @@
                     .replace(/\./g, ":")}</span
             >
         {:else}
-            <span class="text-danger font-monospace">Disconnected</span>
+            <span class="font-monospace pt-1 text-danger">Disconnected</span>
         {/if}
     </div>
     <Col xs="auto">
