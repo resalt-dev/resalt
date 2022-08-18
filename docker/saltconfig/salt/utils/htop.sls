@@ -13,5 +13,5 @@ hello test:
         - group: root
         - mode: 755
         - require:
-          - pkg: htop
+          - install htop
 

@@ -116,6 +116,13 @@ async fn main() -> std::io::Result<()> {
                             .route("/{id}", web::get().to(route_user_get))
                             .default_service(route_fallback_404),
                     )
+                    // keys
+                    .service(
+                        web::scope("/keys")
+                            .wrap(auth::RequireAuth::new())
+                            .route("", web::get().to(route_keys_get))
+                            .default_service(route_fallback_404),
+                    )
                     // fallback to 404
                     .default_service(route_fallback_404),
             )

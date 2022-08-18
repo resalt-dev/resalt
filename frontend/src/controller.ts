@@ -13,6 +13,7 @@ import {
     apiGetUser,
     apiListEvents,
     apiListJobs,
+    apiListKeys,
     apiListMinions,
     apiListUsers,
     apiRefreshMinions,
@@ -23,6 +24,7 @@ import type Minion from './models/Minion';
 import type PublicUser from './models/PublicUser';
 import type SaltEvent from './models/SaltEvent';
 import type Job from './models/Job';
+import type Key from './models/Key';
 
 /*
  * INTERNAL UTILS
@@ -225,4 +227,9 @@ export async function getUsers(limit?: number, offset?: number): Promise<Array<P
 export async function getUserById(id: string): Promise<PublicUser> {
     const token = requireToken();
     return apiGetUser(token, id);
+}
+
+export async function getKeys(): Promise<Array<Key>> {
+    const token = requireToken();
+    return apiListKeys(token);
 }

@@ -164,23 +164,17 @@
                         <td>{minion.last_seen}</td>
                         <td>
                             {#if minion.last_updated_conformity == null}
-                                <span class="badge align-middle bg-purple">
-                                    Unknown
-                                </span>
+                                <span class="badge bg-purple"> Unknown </span>
                             {:else}
-                                <span
-                                    class="badge align-middle bg-green fw-bold"
-                                >
+                                <span class="badge bg-green">
                                     {minion.conformity_success ?? "?"}
                                 </span>
                                 /
-                                <span
-                                    class="badge align-middle bg-warning fw-bold"
-                                >
+                                <span class="badge bg-warning">
                                     {minion.conformity_incorrect ?? "?"}
                                 </span>
                                 /
-                                <span class="badge align-middle bg-red fw-bold">
+                                <span class="badge bg-red">
                                     {minion.conformity_error ?? "?"}
                                 </span>
                             {/if}

@@ -345,6 +345,8 @@ impl SaltAPI {
     ) -> Result<Value, SaltError> {
         let url = &SConfig::salt_api_url();
 
+        warn!("run_job data {:?}", data);
+
         let mut res = match self
             .client
             .lock()
@@ -394,7 +396,14 @@ impl SaltAPI {
             "client": "local",
             "tgt": tgt.as_ref(),
             "fun": fun.as_ref(),
-            "arg": arg.map(|v| v.iter().map(|s| s.as_ref()).collect::<String>()).unwrap_or_default(),
+            // map arg to empty array if None
+            "arg": arg.map(|v| {
+                let mut args = Vec::new();
+                for s in v.iter() {
+                    args.push(s.as_ref().to_string());
+                }
+                args
+            }).unwrap_or(vec![]),
             "timeout": timeout,
             "tgt_type": (tgt_type.unwrap_or_default()).to_string(),
             "kwarg": kwarg.unwrap_or_default(),
@@ -415,7 +424,13 @@ impl SaltAPI {
             "client": "local_async",
             "tgt": tgt.as_ref(),
             "fun": fun.as_ref(),
-            "arg": arg.map(|v| v.iter().map(|s| s.as_ref()).collect::<String>()).unwrap_or_default(),
+            "arg": arg.map(|v| {
+                let mut args = Vec::new();
+                for s in v.iter() {
+                    args.push(s.as_ref().to_string());
+                }
+                args
+            }).unwrap_or(vec![]),
             "tgt_type": (tgt_type.unwrap_or_default()).to_string(),
             "kwarg": kwarg.unwrap_or_default(),
         });
@@ -436,7 +451,13 @@ impl SaltAPI {
             "client": "local_batch",
             "tgt": tgt.as_ref(),
             "fun": fun.as_ref(),
-            "arg": arg.map(|v| v.iter().map(|s| s.as_ref()).collect::<String>()).unwrap_or_default(),
+            "arg": arg.map(|v| {
+                let mut args = Vec::new();
+                for s in v.iter() {
+                    args.push(s.as_ref().to_string());
+                }
+                args
+            }).unwrap_or(vec![]),
             "tgt_type": (tgt_type.unwrap_or_default()).to_string(),
             "kwarg": kwarg.unwrap_or_default(),
             "batch": batch.as_ref(),
@@ -454,7 +475,13 @@ impl SaltAPI {
         let data = json!({
             "client": "runner",
             "fun": fun.as_ref(),
-            "arg": arg.map(|v| v.iter().map(|s| s.as_ref()).collect::<String>()).unwrap_or_default(),
+            "arg": arg.map(|v| {
+                let mut args = Vec::new();
+                for s in v.iter() {
+                    args.push(s.as_ref().to_string());
+                }
+                args
+            }).unwrap_or(vec![]),
             "kwarg": kwarg.unwrap_or_default(),
         });
         self.run_job(salt_token, data).await
@@ -470,7 +497,13 @@ impl SaltAPI {
         let data = json!({
             "client": "runner_async",
             "fun": fun.as_ref(),
-            "arg": arg.map(|v| v.iter().map(|s| s.as_ref()).collect::<String>()).unwrap_or_default(),
+            "arg": arg.map(|v| {
+                let mut args = Vec::new();
+                for s in v.iter() {
+                    args.push(s.as_ref().to_string());
+                }
+                args
+            }).unwrap_or(vec![]),
             "kwarg": kwarg.unwrap_or_default(),
         });
         self.run_job(salt_token, data).await
@@ -486,7 +519,13 @@ impl SaltAPI {
         let data = json!({
             "client": "wheel",
             "fun": fun.as_ref(),
-            "arg": arg.map(|v| v.iter().map(|s| s.as_ref()).collect::<String>()).unwrap_or_default(),
+            "arg": arg.map(|v| {
+                let mut args = Vec::new();
+                for s in v.iter() {
+                    args.push(s.as_ref().to_string());
+                }
+                args
+            }).unwrap_or(vec![]),
             "kwarg": kwarg.unwrap_or_default(),
         });
         let data = match self.run_job(salt_token, data).await {
@@ -532,17 +571,23 @@ impl SaltAPI {
         let data = json!({
             "client": "wheel_async",
             "fun": fun.as_ref(),
-            "arg": arg.map(|v| v.iter().map(|s| s.as_ref()).collect::<String>()).unwrap_or_default(),
+            "arg": arg.map(|v| {
+                let mut args = Vec::new();
+                for s in v.iter() {
+                    args.push(s.as_ref().to_string());
+                }
+                args
+            }).unwrap_or(vec![]),
             "kwarg": kwarg.unwrap_or_default(),
         });
         self.run_job(salt_token, data).await
     }
 
-    // Returns host:finger pair
+    /// Returns host:status:finger pair
     pub async fn get_keys(
         &self,
         salt_token: &SaltToken,
-    ) -> Result<Vec<(String, String)>, SaltError> {
+    ) -> Result<Vec<(String, String, String)>, SaltError> {
         let data = match self
             .run_job_wheel(salt_token, "key.finger", Some(vec!["*"]), None)
             .await
@@ -558,33 +603,88 @@ impl SaltAPI {
                 ));
             }
         };
-        let data = match data.get("minions") {
-            Some(data) => data,
-            None => {
-                return Err(SaltError::MissingExpectedDataError(
-                    "get_keys: missing return['minions']".to_owned(),
-                ));
-            }
-        };
-        let data = match data.as_object() {
-            Some(data) => data,
-            None => {
-                return Err(SaltError::MissingExpectedDataError(
-                    "get_keys: return['minions'] is not object".to_owned(),
-                ));
-            }
-        };
-        let mut keys = Vec::new();
-        for (host, finger) in data {
-            let finger = match finger.as_str() {
-                Some(finger) => finger,
+        // There are 4 string arrays: minions_rejected, minions_denied, minions_pre, minions
+        // Get them, and map to (host, status) tuples.
+        let minions_rejected = match data.get("minions_rejected") {
+            Some(data) => match data.as_object() {
+                Some(data) => Some(data),
                 None => {
                     return Err(SaltError::MissingExpectedDataError(
-                        "get_keys: return['minions']['host'] is not string".to_owned(),
+                        "get_keys: return['minions_rejected'] is not object".to_owned(),
                     ));
                 }
-            };
-            keys.push((host.to_owned(), finger.to_owned()));
+            },
+            None => None,
+        };
+        let minions_denied = match data.get("minions_denied") {
+            Some(data) => match data.as_object() {
+                Some(data) => Some(data),
+                None => {
+                    return Err(SaltError::MissingExpectedDataError(
+                        "get_keys: return['minions_denied'] is not object".to_owned(),
+                    ));
+                }
+            },
+            None => None,
+        };
+        let minions_pre = match data.get("minions_pre") {
+            Some(data) => match data.as_object() {
+                Some(data) => Some(data),
+                None => {
+                    return Err(SaltError::MissingExpectedDataError(
+                        "get_keys: return['minions_pre'] is not object".to_owned(),
+                    ));
+                }
+            },
+            None => None,
+        };
+        let minions = match data.get("minions") {
+            Some(data) => match data.as_object() {
+                Some(data) => Some(data),
+                None => {
+                    return Err(SaltError::MissingExpectedDataError(
+                        "get_keys: return['minions'] is not object".to_owned(),
+                    ));
+                }
+            },
+            None => None,
+        };
+        let mut keys = Vec::new();
+        if let Some(minions_rejected) = minions_rejected {
+            for (host, finger) in minions_rejected.iter() {
+                keys.push((
+                    host.clone(),
+                    "rejected".to_owned(),
+                    finger.as_str().unwrap().to_owned(),
+                ));
+            }
+        }
+        if let Some(minions_denied) = minions_denied {
+            for (host, finger) in minions_denied.iter() {
+                keys.push((
+                    host.clone(),
+                    "denied".to_owned(),
+                    finger.as_str().unwrap().to_owned(),
+                ));
+            }
+        }
+        if let Some(minions_pre) = minions_pre {
+            for (host, finger) in minions_pre.iter() {
+                keys.push((
+                    host.clone(),
+                    "pre".to_owned(),
+                    finger.as_str().unwrap().to_owned(),
+                ));
+            }
+        }
+        if let Some(minions) = minions {
+            for (host, finger) in minions.iter() {
+                keys.push((
+                    host.clone(),
+                    "accepted".to_owned(),
+                    finger.as_str().unwrap().to_owned(),
+                ));
+            }
         }
         Ok(keys)
     }

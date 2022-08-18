@@ -135,7 +135,7 @@
     }
 </script>
 
-{#if !minion.conformity}
+{#if !$minion.conformity}
     <div class="p-3">No conformity data. Please refresh minion.</div>
 {:else}
     <button
@@ -147,7 +147,7 @@
     </button>
 
     {#if rawData}
-        <JsonViewer code={minion.conformity} />
+        <JsonViewer code={$minion.conformity} />
     {:else}
         <div class="row p-3">
             <div class="col-3">

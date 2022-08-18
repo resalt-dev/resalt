@@ -3,7 +3,6 @@
     import { theme, currentUser } from "../../stores";
     import { AlertType, getUsers, showAlert } from "../../controller";
     import { Badge, Table } from "sveltestrap";
-    import Icon from "../../components/Icon.svelte";
     import { writable } from "svelte/store";
     import TablePaginate from "../../components/TablePaginate.svelte";
     import paths from "../../paths";
@@ -35,7 +34,6 @@
     <Table
         dark={$theme.dark}
         hover
-        id="jobListTable"
         class="b-0 mb-0 {$theme.dark ? 'text-light border-secondary' : ''}"
     >
         <thead

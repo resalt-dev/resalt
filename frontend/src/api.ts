@@ -3,6 +3,7 @@ import type Minion from './models/Minion';
 import type SaltEvent from './models/SaltEvent';
 import type Job from './models/Job';
 import type PublicUser from './models/PublicUser';
+import type Key from './models/Key';
 
 // API class is independent, and is not allowed to import svelte/store's.
 
@@ -146,4 +147,10 @@ export async function apiGetUser(
     username: string,
 ): Promise<PublicUser> {
     return sendAuthenticatedRequest('GET', `/users/${username}`, token);
+}
+
+export async function apiListKeys(
+    token: string,
+): Promise<Array<Key>> {
+    return sendAuthenticatedRequest('GET', `/keys`, token);
 }

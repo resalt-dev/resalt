@@ -44,7 +44,6 @@
     <Table
         dark={$theme.dark}
         hover
-        id="jobListTable"
         class="b-0 mb-0 {$theme.dark ? 'text-light border-secondary' : ''}"
     >
         <thead
