@@ -5,7 +5,7 @@ use crate::{prelude::*, schema::*};
 use chrono::NaiveDateTime;
 use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
 use diesel_migrations::embed_migrations;
-use log::{error, warn};
+use log::{error, info, warn};
 use rand::Rng;
 
 type DbPooledConnection = PooledConnection<ConnectionManager<MysqlConnection>>;
@@ -35,7 +35,7 @@ impl Storage {
 
                 match embedded_migrations::run(&*connection) {
                     Ok(()) => {
-                        warn!("Ran database migration!");
+                        info!("Data migration successfully completed and verified.");
                     }
                     Err(e) => {
                         error!("Failed to run database migrations: {:?}", e);

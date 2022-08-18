@@ -107,12 +107,12 @@ impl SConfig {
 
     pub fn database_url() -> String {
         // print all settings
-        log::info!("{:?}", SETTINGS.read().unwrap());
+        // log::info!("{:?}", SETTINGS.read().unwrap());
 
         // print out all env vars
-        for (key, value) in std::env::vars() {
-            log::info!("{}={}", key, value);
-        }
+        // for (key, value) in std::env::vars() {
+        //     log::info!("{}={}", key, value);
+        // }
 
         SETTINGS.read().unwrap().get_string("database.url").unwrap()
     }
