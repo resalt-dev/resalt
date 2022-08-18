@@ -26,6 +26,7 @@ pub struct SaltEvent {
 #[derive(Debug)]
 pub enum SaltError {
     Forbidden,
+    NotYetImplemented,
     RequestError(SendRequestError),
     ResponseParseError(Option<JsonPayloadError>),
     MissingExpectedDataError(String),
@@ -687,6 +688,18 @@ impl SaltAPI {
             }
         }
         Ok(keys)
+    }
+
+    pub async fn accept_key(&self, finger: &str) -> Result<(), SaltError> {
+        Err(SaltError::NotYetImplemented)
+    }
+
+    pub async fn reject_key(&self, finger: &str) -> Result<(), SaltError> {
+        Err(SaltError::NotYetImplemented)
+    }
+
+    pub async fn delete_key(&self, finger: &str) -> Result<(), SaltError> {
+        Err(SaltError::NotYetImplemented)
     }
 
     pub async fn refresh_minions(&self, salt_token: &SaltToken) -> Result<(), SaltError> {

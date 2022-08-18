@@ -154,3 +154,24 @@ export async function apiListKeys(
 ): Promise<Array<Key>> {
     return sendAuthenticatedRequest('GET', `/keys`, token);
 }
+
+export async function apiAcceptKey(
+    token: string,
+    finger: string,
+): Promise<void> {
+    await sendAuthenticatedRequest('PUT', `/keys/${finger}/accept`, token);
+}
+
+export async function apiRejectKey(
+    token: string,
+    finger: string,
+): Promise<void> {
+    await sendAuthenticatedRequest('PUT', `/keys/${finger}/reject`, token);
+}
+
+export async function apiDeleteKey(
+    token: string,
+    finger: string,
+): Promise<void> {
+    await sendAuthenticatedRequest('DELETE', `/keys/${finger}/delete`, token);
+}

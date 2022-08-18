@@ -32,6 +32,18 @@
         );
     }
 
+    function onClickAccept(finger: string) {
+        showAlert(AlertType.SUCCESS, "Key accepted", `Key ${finger} accepted`);
+    }
+
+    function onClickReject(finger: string) {
+        showAlert(AlertType.SUCCESS, "Key rejected", `Key ${finger} rejected`);
+    }
+
+    function onClickDelete(finger: string) {
+        showAlert(AlertType.SUCCESS, "Key deleted", `Key ${finger} deleted`);
+    }
+
     onMount(() => {
         updateData();
     });
@@ -107,7 +119,7 @@
                                     color="warning"
                                     size="sm"
                                     on:click={() => {
-                                        console.log("reject!");
+                                        onClickReject(key.finger);
                                     }}>Reject</Button
                                 >
                             {:else if key.status == "pre"}
@@ -115,7 +127,7 @@
                                     color="success"
                                     size="sm"
                                     on:click={() => {
-                                        console.log("accept!");
+                                        onClickAccept(key.finger);
                                     }}>Accept</Button
                                 >
                             {:else if key.status == "rejected"}
@@ -123,7 +135,7 @@
                                     color="success"
                                     size="sm"
                                     on:click={() => {
-                                        console.log("accept!");
+                                        onClickAccept(key.finger);
                                     }}>Accept</Button
                                 >
                             {:else if key.status == "denied"}
@@ -132,7 +144,7 @@
                                     size="sm"
                                     class="btn-orange"
                                     on:click={() => {
-                                        console.log("force accept!");
+                                        onClickAccept(key.finger);
                                     }}>Force Accept</Button
                                 >
                             {/if}
@@ -140,11 +152,7 @@
                                 color="danger"
                                 size="sm"
                                 on:click={() => {
-                                    showAlert(
-                                        AlertType.WARNING,
-                                        "Are you sure you want to delete this key?",
-                                        "This action cannot be undone"
-                                    );
+                                    onClickDelete(key.finger);
                                 }}>Delete</Button
                             >
                         </td>

@@ -6,7 +6,9 @@ import {
     alerts,
 } from './stores';
 import {
+    apiAcceptKey,
     apiCreateEventConnection,
+    apiDeleteKey,
     apiGetCurrentUser,
     apiGetJobById,
     apiGetMinionById,
@@ -17,6 +19,7 @@ import {
     apiListMinions,
     apiListUsers,
     apiRefreshMinions,
+    apiRejectKey,
     apiRequestAuthToken,
 } from './api';
 import Alert from './models/Alert';
@@ -232,4 +235,19 @@ export async function getUserById(id: string): Promise<PublicUser> {
 export async function getKeys(): Promise<Array<Key>> {
     const token = requireToken();
     return apiListKeys(token);
+}
+
+export async function acceptKey(finger: string): Promise<void> {
+    const token = requireToken();
+    await apiAcceptKey(token, finger);
+}
+
+export async function rejectKey(finger: string): Promise<void> {
+    const token = requireToken();
+    await apiRejectKey(token, finger);
+}
+
+export async function deleteKey(finger: string): Promise<void> {
+    const token = requireToken();
+    await apiDeleteKey(token, finger);
 }
