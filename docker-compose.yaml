@@ -23,6 +23,7 @@ services:
       - ./docker/saltconfig/salt:/srv/salt:ro
     environment:
       - PYTHONUNBUFFERED=true
+      - SALT_API_CONFIG={}
     ports:
       - "8080:8080"
   minion:
