@@ -95,7 +95,7 @@
         to={paths.logout.path}
         class="col-auto px-3 text-reset text-decoration-none"
     >
-        <Icon name="log-out" size="1.5" />
+        <Icon name="log-out" size="1.5" class="pe-1" />
         Logout
     </Link>
 </div>
