@@ -67,13 +67,13 @@
         class="{$theme.dark
             ? 'text-light'
             : 'text-white'} btn-dark bg-dark border-0 pt-3 pb-3 px-3 fw-light mouse-pointer d-flex align-items-center"
-        style="padding-top: 2px;"
         aria-current="page"
     >
         <Icon
             name={$collapsed ? "right-arrow-alt" : "left-arrow-alt"}
             class={$collapsed ? "" : "me-3"}
             size="2.5"
+            style="margin-bottom: -2px;"
         />
         {#if !$collapsed}
             <span class="fs-5">Collapse</span>
