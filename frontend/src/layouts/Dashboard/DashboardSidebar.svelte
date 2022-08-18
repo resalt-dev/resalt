@@ -6,9 +6,9 @@
         theme,
         currentUser,
     } from "../../stores";
-    import Icon from "../Icon.svelte";
-    import Logo from "../Logo.svelte";
-    import SidebarItem from "./SidebarItem.svelte";
+    import Icon from "../../components/../components/Icon.svelte";
+    import Logo from "../../components/../components/Logo.svelte";
+    import SidebarItem from "./DashboardSidebarItem.svelte";
 
     function handleClickCollapse() {
         collapsed.update((n) => !n);
@@ -60,56 +60,14 @@
         {/each}
     </ul>
 
-    <hr />
-
-    <div class="dropdown">
-        <!-- svelte-ignore a11y-invalid-attribute -->
-        <a
-            href="#"
-            class="d-flex align-items-center {$theme.dark
-                ? 'text-light'
-                : 'text-white'} text-decoration-none dropdown-toggle px-3"
-            id="dropdownUser1"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-        >
-            <img
-                src="https://github.com/Foorack.png"
-                alt=""
-                class="rounded-circle {$collapsed ? '' : 'me-3'}"
-                width="32"
-                height="32"
-                style="margin-left: -4px;margin-right: 4px;"
-            />
-            {#if !$collapsed}
-                <strong class="me-1">{$currentUser.username}</strong>
-            {/if}
-        </a>
-        <ul
-            class="dropdown-menu dropdown-menu-dark bg-darker ms-5"
-            aria-labelledby="dropdownUser1"
-        >
-            <li>
-                <Link to={paths.preferences.path} class="dropdown-item"
-                    >Preferences</Link
-                >
-            </li>
-            <li><hr class="dropdown-divider" /></li>
-            <li>
-                <Link to={paths.logout.path} class="dropdown-item"
-                    >Sign out</Link
-                >
-            </li>
-        </ul>
-    </div>
-
     <hr class="mb-0" />
 
     <div
         on:click={handleClickCollapse}
         class="{$theme.dark
             ? 'text-light'
-            : 'text-white'} btn-dark bg-dark border-0 pt-3 pb-2 px-3 fw-light mouse-pointer d-flex align-items-center"
+            : 'text-white'} btn-dark bg-dark border-0 pt-3 pb-3 px-3 fw-light mouse-pointer d-flex align-items-center"
+        style="padding-top: 2px;"
         aria-current="page"
     >
         <Icon
@@ -121,4 +79,12 @@
             <span class="fs-5">Collapse</span>
         {/if}
     </div>
+
+    <hr class="mt-0 mb-0" />
+
+    {#if $collapsed}
+        <div class="text-center text-secondary">0.0.x</div>
+    {:else}
+        <span class="text-center text-secondary">Resalt - 0.0.x</span>
+    {/if}
 </div>

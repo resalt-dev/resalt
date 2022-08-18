@@ -2,8 +2,8 @@
     import { Router, Route } from "svelte-navigator";
     import constants from "./constants";
     import paths from "./paths";
-    import DashboardLayout from "./layouts/DashboardLayout.svelte";
-    import DialogLayout from "./layouts/DialogLayout.svelte";
+    import DashboardLayout from "./layouts/Dashboard/DashboardLayout.svelte";
+    import PortalLayout from "./layouts/Portal/PortalLayout.svelte";
     import Redirect from "./components/Redirect.svelte";
     import SSEConnector from "./components/SSEConnector.svelte";
 
@@ -19,7 +19,7 @@
     <Router basepath={constants.basePath} primary={false}>
         <SSEConnector />
         <Route path="auth/*">
-            <DialogLayout />
+            <PortalLayout />
         </Route>
         <Route path="dashboard/*">
             <DashboardLayout />

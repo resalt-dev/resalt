@@ -259,6 +259,10 @@ samp {
     font-weight: 400;
 }
 
+.vr {
+    width: 1px;
+}
+
 .rounded-none {
     border-radius: 0;
 }

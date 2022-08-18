@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Link, useLocation } from "svelte-navigator";
     import { theme } from "../../stores";
-    import Icon from "../Icon.svelte";
+    import Icon from "../../components/Icon.svelte";
 
     export let route;
     export let collapsed;

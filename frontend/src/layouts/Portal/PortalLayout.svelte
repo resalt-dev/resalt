@@ -1,11 +1,11 @@
 <script lang="ts">
     import { Router, Route } from "svelte-navigator";
     import { Card, CardBody, CardText, CardTitle } from "sveltestrap";
-    import Logo from "../components/Logo.svelte";
-    import constants from "../constants";
-    import { alerts, theme } from "../stores";
-    import AuthLogin from "../views/AuthLogin.svelte";
-    import AuthLogout from "../views/AuthLogout.svelte";
+    import Logo from "../../components/Logo.svelte";
+    import constants from "../../constants";
+    import { alerts, theme } from "../../stores";
+    import AuthLogin from "../../views/AuthLogin.svelte";
+    import AuthLogout from "../../views/AuthLogout.svelte";
 
     let localAlerts = [];
 

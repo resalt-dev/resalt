@@ -1,25 +1,25 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { Router, Route, useNavigate } from "svelte-navigator";
-    import { currentUser, theme } from "../stores";
-    import { loadCurrentUser, logout } from "../controller";
-    import paths from "../paths";
-    import Sidebar from "../components/Sidebar/Sidebar.svelte";
-    import Topbar from "../components/Topbar.svelte";
-    import Redirect from "../components/Redirect.svelte";
+    import { currentUser, theme } from "../../stores";
+    import { loadCurrentUser, logout } from "../../controller";
+    import paths from "../../paths";
+    import Sidebar from "./DashboardSidebar.svelte";
+    import DashboardTopbar from "./DashboardTopbar.svelte";
+    import Redirect from "../../components/Redirect.svelte";
 
-    import Home from "../views/Home.svelte";
-    import Minion from "../views/Minion/Minion.svelte";
-    import Minions from "../views/Minions/Minions.svelte";
-    import Run from "../views/Run.svelte";
-    import Job from "../views/Job/Job.svelte";
-    import Jobs from "../views/Jobs/Jobs.svelte";
-    import Keys from "../views/Keys/Keys.svelte";
-    import Events from "../views/Events.svelte";
-    import User from "../views/User/User.svelte";
-    import Users from "../views/Users/Users.svelte";
-    import Settings from "../views/Settings.svelte";
-    import Preferences from "../views/Preferences/Preferences.svelte";
+    import Home from "../../views/Home.svelte";
+    import Minion from "../../views/Minion/Minion.svelte";
+    import Minions from "../../views/Minions/Minions.svelte";
+    import Run from "../../views/Run.svelte";
+    import Job from "../../views/Job/Job.svelte";
+    import Jobs from "../../views/Jobs/Jobs.svelte";
+    import Keys from "../../views/Keys/Keys.svelte";
+    import Events from "../../views/Events.svelte";
+    import User from "../../views/User/User.svelte";
+    import Users from "../../views/Users/Users.svelte";
+    import Settings from "../../views/Settings.svelte";
+    import Preferences from "../../views/Preferences/Preferences.svelte";
 
     const navigate = useNavigate();
 
@@ -43,7 +43,7 @@
                 ? 'bg-darker text-light'
                 : ''}"
         >
-            <Topbar />
+            <DashboardTopbar />
             <div class="px-4 py-3">
                 <Router primary={false}>
                     <Route path="home" component={Home} />

@@ -1,7 +1,9 @@
 <script lang="ts">
     import { useLocation, Link } from "svelte-navigator";
-    import { socket, theme } from "../stores";
-    import paths from "../paths";
+    import { currentUser, socket, theme } from "../../stores";
+    import paths from "../../paths";
+    import { Col } from "sveltestrap";
+    import Icon from "../../components/Icon.svelte";
 
     const location = useLocation();
 
@@ -44,7 +46,7 @@
     <div class="col-auto pe-3 d-flex align-items-center">
         {#if $socket.connected}
             <!-- display last_ping as hh:mm:ss -->
-            <span class="badge rounded-pill bg-success font-monospace"
+            <span class="font-monospace pt-1"
                 >Connected: {new Date($socket.last_ping)
                     .toLocaleTimeString("en-US", {
                         timeZone: "UTC",
@@ -54,9 +56,52 @@
                     .replace(/\./g, ":")}</span
             >
         {:else}
-            <span class="badge rounded-pill bg-danger font-monospace"
-                >Disconnected</span
-            >
+            <span class="text-danger font-monospace">Disconnected</span>
         {/if}
     </div>
+    <Col xs="auto">
+        <div class="vr" style="height: 1.5rem;background: rgba(0, 0, 0, 0.2)" />
+    </Col>
+    <Col xs="auto" class="px-3 text-reset text-decoration-none">
+        <Icon name="user" size="1.5" type="solid" class="pe-1" />
+        {$currentUser.username}
+        <!-- <ul
+            class="dropdown-menu dropdown-menu-dark bg-darker ms-5"
+            aria-labelledby="dropdownUser1"
+        >
+            <li>
+                <Link to={paths.preferences.path} class="dropdown-item"
+                    >Preferences</Link
+                >
+            </li>
+            <li><hr class="dropdown-divider" /></li>
+            <li>
+                <Link to={paths.logout.path} class="dropdown-item"
+                    >Sign out</Link
+                >
+            </li>
+        </ul> -->
+    </Col>
+    <Col xs="auto">
+        <div class="vr" style="height: 1.5rem;background: rgba(0, 0, 0, 0.2)" />
+    </Col>
+    <Col xs="auto" class="px-3 text-reset text-decoration-none">
+        <Icon name="bell" size="1.5" />
+    </Col>
+    <Col xs="auto">
+        <div class="vr" style="height: 1.5rem;background: rgba(0, 0, 0, 0.2)" />
+    </Col>
+    <Link
+        to={paths.logout.path}
+        class="col-auto px-3 text-reset text-decoration-none"
+    >
+        <Icon name="log-out" size="1.5" />
+        Logout
+    </Link>
 </div>
+
+<style>
+    * {
+        /* outline: 1px solid red; */
+    }
+</style>
