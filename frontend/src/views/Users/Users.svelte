@@ -72,13 +72,16 @@
                             <Link
                                 to={paths.user.getPath(user.id)}
                                 class="text-reset text-decoration-none"
-                                >{user.username}</Link
                             >
-                            {#if user.id == $currentUser.id}
-                                <span class="text-{$theme.color}"> (You)</span>
-                            {/if}
+                                {user.username}
+                                {#if user.id == $currentUser.id}
+                                    <span class="text-{$theme.color}">
+                                        (You)</span
+                                    >
+                                {/if}
+                            </Link>
                         </th>
-                        <td><small>{user.id}</small></td>
+                        <td>{user.id}</td>
                         <td>
                             {#if user.isLocal}
                                 <Badge
