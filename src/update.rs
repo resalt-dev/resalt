@@ -5,8 +5,7 @@ use cargo_toml::Manifest;
 use lazy_static::lazy_static;
 use log::warn;
 
-pub(crate) static UPDATE_URL: &str =
-    "https://raw.githubusercontent.com/Foorack/resalt/main/Cargo.toml";
+const UPDATE_URL: &str = "https://raw.githubusercontent.com/Foorack/resalt/main/Cargo.toml";
 
 struct UpdateCache {
     version: Option<String>,
@@ -14,7 +13,7 @@ struct UpdateCache {
 
 lazy_static! {
     static ref CACHE: Arc<Mutex<UpdateCache>> = Arc::new(Mutex::new(UpdateCache { version: None }));
-    static ref CURRENT_VERSION: String = env!("CARGO_PKG_VERSION").to_string();
+    pub static ref CURRENT_VERSION: String = env!("CARGO_PKG_VERSION").to_string();
 }
 
 async fn fetch_remote_version() -> Result<String, String> {
