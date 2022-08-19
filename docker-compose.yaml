@@ -51,6 +51,7 @@ services:
     volumes:
       - .:/usr/src/app
     environment:
+      - RUST_BACKTRACE=1
       - CARGO_HOME=/tmp/.cargo
       - RUST_LOG_STYLE=always # Add color to logs
       - RESALT_AUTH_LDAP_ENABLED=${RESALT_AUTH_LDAP_ENABLED:-false}
