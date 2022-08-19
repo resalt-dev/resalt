@@ -143,7 +143,7 @@
             {#if $jobs == null}
                 <p>Loading</p>
             {:else if $jobs.length == 0}
-                <div class="p-3">No jobs exist. Very unusal.</div>
+                <!-- <div class="p-3">No jobs exist. Very unusal.</div> -->
             {:else}
                 {#each $jobs as job}
                     <tr>
