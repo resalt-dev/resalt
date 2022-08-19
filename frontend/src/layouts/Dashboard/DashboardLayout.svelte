@@ -31,7 +31,7 @@
     });
 </script>
 
-{#if $currentUser == null}
+{#if $currentUser === null}
     <p>Loading...</p>
 {:else}
     <div class="d-flex flex-row h-100">

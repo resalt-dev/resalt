@@ -14,7 +14,7 @@
 <i
     bind:this={htmlElement}
     on:click
-    class="bx {full_name} {cssClass.indexOf('align-') == -1
+    class="bx {full_name} {cssClass.indexOf('align-') === -1
         ? 'align-middle'
         : ''} {cssClass}"
     style="font-size: {size}rem;{style}"

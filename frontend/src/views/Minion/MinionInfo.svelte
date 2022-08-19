@@ -8,7 +8,7 @@
     $: console.log(grains);
 
     function formatAsSize(megabytes) {
-        if (megabytes == undefined) {
+        if (megabytes === undefined) {
             return null;
         }
         if (megabytes < 1024) {

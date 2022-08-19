@@ -58,7 +58,7 @@
 {:else}
     <h1>
         User {$user.username}
-        {#if $user.id == $currentUser.id}
+        {#if $user.id === $currentUser.id}
             <span class="text-{$theme.color}"> (You)</span>
         {/if}
     </h1>

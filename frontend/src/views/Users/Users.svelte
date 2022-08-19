@@ -59,9 +59,9 @@
             </tr>
         </thead>
         <tbody class="align-middle">
-            {#if $users == null}
+            {#if $users === null}
                 <p>Loading</p>
-            {:else if $users.length == 0}
+            {:else if $users.length === 0 && paginationPage === 1}
                 <div class="p-3">No users exist. How are you seeing this?</div>
             {:else}
                 {#each $users as user}
@@ -72,7 +72,7 @@
                                 class="text-reset text-decoration-none"
                             >
                                 {user.username}
-                                {#if user.id == $currentUser.id}
+                                {#if user.id === $currentUser.id}
                                     <span class="text-{$theme.color}">
                                         (You)</span
                                     >
@@ -109,6 +109,6 @@
 <TablePaginate
     bind:size={paginationSize}
     bind:page={paginationPage}
-    last={$users == null || $users.length < paginationSize}
+    last={$users === null || $users.length < paginationSize}
     {updateData}
 />

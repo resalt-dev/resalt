@@ -140,10 +140,10 @@
             </tr>
         </thead>
         <tbody class="align-middle">
-            {#if $jobs == null}
+            {#if $jobs === null}
                 <p>Loading</p>
-            {:else if $jobs.length == 0}
-                <!-- <div class="p-3">No jobs exist. Very unusal.</div> -->
+            {:else if $jobs.length === 0 && paginationPage === 1}
+                <div class="p-3">No jobs exist. Very unusal.</div>
             {:else}
                 {#each $jobs as job}
                     <tr>
@@ -161,6 +161,6 @@
 <TablePaginate
     bind:size={paginationSize}
     bind:page={paginationPage}
-    last={$jobs == null || $jobs.length < paginationSize}
+    last={$jobs === null || $jobs.length < paginationSize}
     {updateData}
 />

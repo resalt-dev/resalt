@@ -80,9 +80,9 @@
             </tr>
         </thead>
         <tbody class="align-middle">
-            {#if $keys == null}
+            {#if $keys === null}
                 <p>Loading</p>
-            {:else if $keys.length == 0}
+            {:else if $keys.length === 0 && paginationPage === 1}
                 <div class="p-3">No users exist. How are you seeing this?</div>
             {:else}
                 {#each keysView as key}
@@ -96,13 +96,13 @@
                             </Link>
                         </th>
                         <td>
-                            {#if key.status == "accepted"}
+                            {#if key.status === "accepted"}
                                 <Badge color="success">Accepted</Badge>
-                            {:else if key.status == "pre"}
+                            {:else if key.status === "pre"}
                                 <Badge color="danger">Unaccepted</Badge>
-                            {:else if key.status == "rejected"}
+                            {:else if key.status === "rejected"}
                                 <Badge color="warning">Rejected</Badge>
-                            {:else if key.status == "denied"}
+                            {:else if key.status === "denied"}
                                 <Badge color={null} class="bg-purple"
                                     >Denied</Badge
                                 >
@@ -114,7 +114,7 @@
                         </td>
                         <td>{key.finger}</td>
                         <td>
-                            {#if key.status == "accepted"}
+                            {#if key.status === "accepted"}
                                 <Button
                                     color="warning"
                                     size="sm"
@@ -122,7 +122,7 @@
                                     on:click={() => {
                                         onClickReject(key.finger);
                                     }}>Reject</Button
-                                >{:else if key.status == "pre"}
+                                >{:else if key.status === "pre"}
                                 <Button
                                     color="success"
                                     size="sm"
@@ -130,7 +130,7 @@
                                     on:click={() => {
                                         onClickAccept(key.finger);
                                     }}>Accept</Button
-                                >{:else if key.status == "rejected"}
+                                >{:else if key.status === "rejected"}
                                 <Button
                                     color="success"
                                     size="sm"
@@ -138,7 +138,7 @@
                                     on:click={() => {
                                         onClickAccept(key.finger);
                                     }}>Accept</Button
-                                >{:else if key.status == "denied"}
+                                >{:else if key.status === "denied"}
                                 <Button
                                     color={null}
                                     size="sm"
@@ -165,7 +165,7 @@
 <TablePaginate
     bind:size={paginationSize}
     bind:page={paginationPage}
-    last={$keys == null || $keys.length < paginationSize}
+    last={$keys === null || $keys.length < paginationSize}
     updateData={fakePaginate}
 />
 

@@ -25,7 +25,7 @@
 </script>
 
 <main>
-    {#if $config == null}
+    {#if $config === null}
         <p>Loading...</p>
     {:else}
         <Router basepath={constants.basePath} primary={false}>

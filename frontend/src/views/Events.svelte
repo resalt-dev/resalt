@@ -170,9 +170,9 @@
             </tr>
         </thead>
         <tbody class="align-middle">
-            {#if $events == null}
+            {#if $events === null}
                 <p>Loading</p>
-            {:else if $events.length == 0}
+            {:else if $events.length === 0 && paginationPage === 1}
                 <div class="p-3">No events exist. Very unusal.</div>
             {:else}
                 {#each $events as event}
@@ -220,6 +220,6 @@
 <TablePaginate
     bind:size={paginationSize}
     bind:page={paginationPage}
-    last={$events == null || $events.length < paginationSize}
+    last={$events === null || $events.length < paginationSize}
     {updateData}
 />

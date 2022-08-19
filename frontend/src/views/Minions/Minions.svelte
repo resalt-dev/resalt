@@ -146,9 +146,9 @@
             </tr>
         </thead>
         <tbody class="align-middle">
-            {#if $minions == null}
+            {#if $minions === null}
                 <p>Loading</p>
-            {:else if $minions.length == 0}
+            {:else if $minions.length === 0 && paginationPage === 1}
                 <div class="p-3">No minions detected. Try force reload.</div>
             {:else}
                 {#each $minions as minion}
@@ -163,7 +163,7 @@
                         <td>{minion.datatable_type}</td>
                         <td>{minion.last_seen}</td>
                         <td>
-                            {#if minion.last_updated_conformity == null}
+                            {#if minion.last_updated_conformity === null}
                                 <span class="badge bg-purple"> Unknown </span>
                             {:else}
                                 <span class="badge bg-green">
@@ -196,6 +196,6 @@
 <TablePaginate
     bind:size={paginationSize}
     bind:page={paginationPage}
-    last={$minions == null || $minions.length < paginationSize}
+    last={$minions === null || $minions.length < paginationSize}
     {updateData}
 />
