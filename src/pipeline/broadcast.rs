@@ -7,16 +7,23 @@
 use actix_web::web::{Bytes, Data};
 use actix_web::Error;
 use futures::Stream;
+use std::collections::HashMap;
 use std::pin::Pin;
 use std::sync::Mutex;
 use std::task::{Context, Poll};
 use std::time::Duration;
+use tokio::sync::mpsc::error::TrySendError;
 use tokio::sync::mpsc::{channel, Receiver, Sender};
 use tokio::task;
 use tokio::time::{interval_at, Instant};
 
+pub enum BroadcasterError {
+    SendError(TrySendError<Bytes>),
+    MissingClient,
+}
+
 pub struct Broadcaster {
-    clients: Vec<Sender<Bytes>>,
+    clients: HashMap<String, Sender<Bytes>>,
 }
 
 impl Broadcaster {
@@ -32,7 +39,7 @@ impl Broadcaster {
 
     pub fn new() -> Self {
         Broadcaster {
-            clients: Vec::new(),
+            clients: HashMap::new(),
         }
     }
 
@@ -51,7 +58,7 @@ impl Broadcaster {
     }
 
     pub fn remove_stale_clients(&mut self) {
-        let mut ok_clients = Vec::new();
+        let mut ok_clients: HashMap<String, Sender<Bytes>> = HashMap::new();
 
         let ping = serde_json::json!({
             "time": chrono::Utc::now().naive_utc().format("%Y-%m-%d %H:%M:%S").to_string()
@@ -60,29 +67,40 @@ impl Broadcaster {
 
         // debug!("pinging {} clients", self.clients.len());
 
-        for client in self.clients.iter() {
+        for (user_id, client) in self.clients.iter() {
             let result = client
                 .clone()
                 .try_send(Bytes::from(["event: ping\ndata: ", &ping, "\n\n"].concat()));
 
             if let Ok(()) = result {
-                ok_clients.push(client.clone());
+                ok_clients.insert(user_id.to_string(), client.clone());
             }
         }
         self.clients = ok_clients;
     }
 
-    pub fn new_client(&mut self) -> Client {
+    pub fn new_client(&mut self, user_id: String) -> Client {
         let (tx, rx) = channel(100);
-        self.clients.push(tx);
+        self.clients.insert(user_id, tx);
         Client(rx)
     }
 
     pub fn send(&self, msg: &str) {
         let msg = Bytes::from(["event: message\n", "data: ", msg, "\n\n"].concat());
 
-        for client in self.clients.iter() {
+        for (user_id, client) in self.clients.iter() {
             client.clone().try_send(msg.clone()).unwrap_or(());
+        }
+    }
+
+    pub fn send_to(&self, user_id: &str, msg: &str) -> Result<(), BroadcasterError> {
+        let msg = Bytes::from(["event: message\n", "data: ", msg, "\n\n"].concat());
+        match self.clients.get(user_id) {
+            Some(client) => match client.clone().try_send(msg.clone()) {
+                Ok(()) => Ok(()),
+                Err(e) => Err(BroadcasterError::SendError(e)),
+            },
+            None => Err(BroadcasterError::MissingClient),
         }
     }
 }

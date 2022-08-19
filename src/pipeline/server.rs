@@ -17,8 +17,8 @@ impl PipelineServer {
     }
 
     // call broadcaster.handle_client
-    pub fn new_client(&self) -> Client {
-        self.broadcaster.lock().unwrap().new_client()
+    pub fn new_client(&self, user_id: String) -> Client {
+        self.broadcaster.lock().unwrap().new_client(user_id)
     }
 
     pub fn update_minion(&self, minion: Minion) {
@@ -36,5 +36,16 @@ impl PipelineServer {
             "content": value,
         });
         self.broadcaster.lock().unwrap().send(&packet.to_string());
+    }
+
+    fn send_to(&self, user_id: &str, name: &str, value: Value) -> Result<(), BroadcasterError> {
+        let packet = json!({
+            "type": name,
+            "content": value,
+        });
+        self.broadcaster
+            .lock()
+            .unwrap()
+            .send_to(user_id, &packet.to_string())
     }
 }
