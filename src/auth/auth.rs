@@ -2,6 +2,45 @@ use crate::prelude::*;
 use actix_web::{web, Result};
 use log::*;
 
+pub async fn update_token_salt_token(
+    data: &Storage,
+    salt: &SaltAPI,
+    user_id: &str,
+    token: &str,
+) -> Result<(), actix_web::Error> {
+    // Fetch username of user
+    let user = match data.get_user_by_id(user_id) {
+        Ok(user) => match user {
+            Some(user) => user,
+            None => return Err(api_error_internal_error()),
+        },
+        Err(e) => {
+            error!("{:?}", e);
+            return Err(api_error_database());
+        }
+    };
+
+    // Create Salt session
+    let salt_token = match salt.login(&user.username, token).await {
+        Ok(salt_token) => salt_token,
+        Err(e) => {
+            error!("update_token_salt_token salt login {:?}", e);
+            return Err(api_error_internal_error());
+        }
+    };
+
+    // Update token with salt session
+    match data.update_authtoken_salttoken(token, &Some(salt_token)) {
+        Ok(_) => {}
+        Err(e) => {
+            error!("update_token_salt_token update_salttoken {:?}", e);
+            return Err(api_error_database());
+        }
+    };
+
+    Ok(())
+}
+
 pub fn validate_auth_token(
     data: &Storage,
     token: &str,

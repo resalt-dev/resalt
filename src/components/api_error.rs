@@ -10,6 +10,10 @@ pub fn api_error_unauthorized() -> actix_web::Error {
     actix_web::error::ErrorUnauthorized("Missing valid credentials".to_string())
 }
 
+pub fn api_error_forbidden() -> actix_web::Error {
+    actix_web::error::ErrorForbidden("Missing valid credentials".to_string())
+}
+
 pub fn api_error_database() -> actix_web::Error {
     actix_web::error::ErrorInternalServerError("Database error".to_string())
 }

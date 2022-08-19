@@ -15,11 +15,12 @@ use std::{collections::HashMap, pin::Pin};
 // 2. Middleware's call method gets called with normal request.
 pub struct ValidateAuth {
     db: Storage,
+    salt: SaltAPI,
 }
 
 impl ValidateAuth {
-    pub fn new(db: Storage) -> Self {
-        Self { db }
+    pub fn new(db: Storage, salt: SaltAPI) -> Self {
+        Self { db, salt }
     }
 }
 
@@ -42,6 +43,7 @@ where
         ok(ValidateAuthMiddleware {
             service: Rc::new(service),
             db: self.db.clone(),
+            salt: self.salt.clone(),
         })
     }
 }
@@ -49,6 +51,7 @@ where
 pub struct ValidateAuthMiddleware<S: 'static> {
     service: Rc<S>,
     db: Storage,
+    salt: SaltAPI,
 }
 
 impl<S, B> Service<ServiceRequest> for ValidateAuthMiddleware<S>
@@ -66,6 +69,7 @@ where
     fn call(&self, req: ServiceRequest) -> Self::Future {
         let srv = self.service.clone();
         let data = self.db.clone();
+        let salt = self.salt.clone();
 
         let token = match req.headers().get("Authorization") {
             Some(header) => header.to_str().unwrap().replace("Bearer ", ""),
@@ -85,14 +89,48 @@ where
         Box::pin(async move {
             // We need to make sure the locking of data looses scope before calling srv.call.await
             {
-                let auth_status = match validate_auth_token(&data, &token) {
-                    Ok(user_id) => user_id,
+                let mut auth_status = match validate_auth_token(&data, &token) {
+                    Ok(auth_status) => auth_status,
                     Err(e) => {
                         error!("{:?}", e);
                         return Err(e);
                     }
                 };
 
+                if let Some(auth_status2) = auth_status.clone() {
+                    // Check if salttoken has expired
+                    match auth_status2.salt_token {
+                        Some(salt_token) => {
+                            if salt_token.expired() {
+                                warn!("Salt token expired for {}!", auth_status2.user_id);
+
+                                match update_token_salt_token(
+                                    &data,
+                                    &salt,
+                                    &auth_status2.user_id,
+                                    &token,
+                                )
+                                .await
+                                {
+                                    Ok(_) => {}
+                                    Err(e) => {
+                                        error!("{:?}", e);
+                                        return Err(e);
+                                    }
+                                }
+
+                                auth_status = match validate_auth_token(&data, &token) {
+                                    Ok(auth_status) => auth_status,
+                                    Err(e) => {
+                                        error!("{:?}", e);
+                                        return Err(e);
+                                    }
+                                };
+                            }
+                        }
+                        None => (),
+                    };
+                }
                 if let Some(auth_status) = auth_status {
                     req.extensions_mut().insert(auth_status);
                 }

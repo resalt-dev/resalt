@@ -25,7 +25,8 @@ pub struct SaltEvent {
 
 #[derive(Debug)]
 pub enum SaltError {
-    Forbidden,
+    Unauthorized, // 401
+    Forbidden,    // 403
     NotYetImplemented,
     RequestError(SendRequestError),
     ResponseParseError(Option<JsonPayloadError>),
@@ -346,7 +347,7 @@ impl SaltAPI {
     ) -> Result<Value, SaltError> {
         let url = &SConfig::salt_api_url();
 
-        warn!("run_job data {:?}", data);
+        // debug!("run_job data {:?}", data);
 
         let mut res = match self
             .client
@@ -366,6 +367,10 @@ impl SaltAPI {
         // If access denied (e.g. missing permissions)
         if res.status() == StatusCode::FORBIDDEN {
             return Err(SaltError::Forbidden);
+        }
+        // If unauthorized (e.g. invalid token)
+        if res.status() == StatusCode::UNAUTHORIZED {
+            return Err(SaltError::Unauthorized);
         }
         // If status != 200, something went wrong
         if res.status() != StatusCode::OK {

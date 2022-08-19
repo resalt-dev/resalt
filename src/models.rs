@@ -181,7 +181,7 @@ impl User {
 ===========================
 */
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SaltToken {
     pub token: String,
     pub start: f64,
@@ -191,7 +191,13 @@ pub struct SaltToken {
     pub perms: serde_json::Value,
 }
 
-#[derive(Debug, PartialEq)]
+impl SaltToken {
+    pub fn expired(&self) -> bool {
+        self.expire < chrono::Utc::now().timestamp() as f64
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
 pub struct AuthStatus {
     pub user_id: String,
     pub salt_token: Option<SaltToken>,

@@ -46,7 +46,7 @@ pub async fn route_auth_login_post(
     debug!("User {} found, generating token", &user.username);
 
     // Create token
-    let authtoken = match data.create_authtoken(user.id) {
+    let authtoken = match data.create_authtoken(user.id.clone()) {
         Ok(authtoken) => authtoken,
         Err(e) => {
             error!("{:?}", e);
@@ -55,22 +55,13 @@ pub async fn route_auth_login_post(
     };
 
     // Create Salt session
-    let salt_token = match salt.login(&user.username, &authtoken.id).await {
-        Ok(salt_token) => salt_token,
-        Err(e) => {
-            error!("route_auth_login_post salt login {:?}", e);
-            return Err(api_error_internal_error());
-        }
-    };
-
-    // Update token with salt session
-    match data.update_authtoken_salttoken(&authtoken.id, &Some(salt_token)) {
+    match update_token_salt_token(&data, &salt, &user.id, &authtoken.id).await {
         Ok(_) => {}
         Err(e) => {
-            error!("route_auth_login_post update_salttoken {:?}", e);
+            error!("{:?}", e);
             return Err(api_error_database());
         }
-    }
+    };
 
     // Return
     let response = LoginResponse {

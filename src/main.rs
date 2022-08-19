@@ -60,7 +60,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(web::Data::new(pipeline.clone()))
             .app_data(web::Data::new(db.clone()))
-            .app_data(web::Data::new(salt_api))
+            .app_data(web::Data::new(salt_api.clone()))
             .app_data(web::Data::new(scheduler.clone()))
             // Prevent sniffing of content type
             .wrap(DefaultHeaders::new().add((header::X_CONTENT_TYPE_OPTIONS, "nosniff")))
@@ -70,7 +70,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
             .service(
                 web::scope(&format!("{}/api/1", &SConfig::sub_path()))
-                    .wrap(auth::ValidateAuth::new(db.clone()))
+                    .wrap(auth::ValidateAuth::new(db.clone(), salt_api.clone()))
                     .route("/", web::get().to(route_index_get))
                     .route("/config", web::get().to(route_config_get))
                     // auth
