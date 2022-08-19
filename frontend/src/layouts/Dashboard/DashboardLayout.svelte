@@ -24,10 +24,12 @@
     const navigate = useNavigate();
 
     onMount(() => {
-        loadCurrentUser().catch(() => {
-            logout();
-            navigate(paths.logout.path);
-        });
+        loadCurrentUser()
+            .then((data) => {})
+            .catch((err) => {
+                logout();
+                navigate(paths.logout.path);
+            });
     });
 </script>
 

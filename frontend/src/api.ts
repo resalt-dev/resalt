@@ -8,28 +8,6 @@ import type Config from './models/Config';
 
 // API class is independent, and is not allowed to import svelte/store's.
 
-export async function apiRequestAuthToken(
-    username: string,
-    password: string,
-): Promise<String> {
-    const res = await fetch(`${constants.apiUrl}/auth/login`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            username,
-            password,
-        }),
-    });
-
-    if (res.status !== 200) {
-        throw new Error(await res.text());
-    }
-
-    return (await res.json()).token;
-}
-
 export async function apiCreateEventConnection(
     token: string,
 ): Promise<EventSource> {
@@ -37,7 +15,7 @@ export async function apiCreateEventConnection(
     return stream;
 }
 
-export async function sendAuthenticatedRequest(
+async function sendAuthenticatedRequest(
     method: string,
     path: string,
     token: string,
@@ -63,8 +41,38 @@ export async function sendAuthenticatedRequest(
     return res.json();
 }
 
-export async function apiGetConfig(token: string): Promise<Config> {
-    return sendAuthenticatedRequest('GET', '/config', token);
+async function sendUnauthenticatedRequest(
+    method: string,
+    path: string,
+    body?: any,
+): Promise<any> {
+    const res = await fetch(constants.apiUrl + path, {
+        method,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: body ? JSON.stringify(body) : undefined,
+    });
+
+    if (res.status !== 200) {
+        throw new Error(await res.text());
+    }
+
+    return res.json();
+}
+
+export async function apiRequestAuthToken(
+    username: string,
+    password: string,
+): Promise<String> {
+    return (await sendUnauthenticatedRequest('POST', '/auth/login', {
+        username,
+        password,
+    })).token;
+}
+
+export async function apiGetConfig(): Promise<Config> {
+    return sendUnauthenticatedRequest('GET', '/config');
 }
 
 export async function apiGetCurrentUser(token: string): Promise<PublicUser> {

@@ -172,10 +172,8 @@ export async function connectEvents(timeout: number = 1000): Promise<EventSource
 }
 
 export async function loadConfig(): Promise<void> {
-    const token = requireToken();
-
     try {
-        const config = await apiGetConfig(token);
+        const config = await apiGetConfig();
         configStore.set(config);
     } catch (e) {
         console.log(e);

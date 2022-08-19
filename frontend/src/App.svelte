@@ -18,9 +18,12 @@
     }
 
     onMount(() => {
-        loadConfig().catch(() => {
-            alert("Critical API error");
-        });
+        loadConfig()
+            .then((data) => {})
+            .catch((err) => {
+                console.error(err);
+                alert("Critical API error");
+            });
     });
 </script>
 
