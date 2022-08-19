@@ -3,12 +3,12 @@ use serde::Serialize;
 
 #[derive(Debug, Serialize)]
 struct ApiConfig {
-    health: String,
+    version: String,
 }
 
 pub async fn route_config_get() -> Result<impl Responder> {
     let config = ApiConfig {
-        health: "ok".to_string(),
+        version: env!("CARGO_PKG_VERSION").to_string(),
     };
     Ok(web::Json(config))
 }
