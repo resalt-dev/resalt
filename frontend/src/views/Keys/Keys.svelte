@@ -116,6 +116,7 @@
                         <td>
                             {#if key.status === "accepted"}
                                 <Button
+                                    disabled
                                     color="warning"
                                     size="sm"
                                     class="key-btn me-1"
@@ -124,6 +125,7 @@
                                     }}>Reject</Button
                                 >{:else if key.status === "pre"}
                                 <Button
+                                    disabled
                                     color="success"
                                     size="sm"
                                     class="key-btn me-1"
@@ -132,6 +134,7 @@
                                     }}>Accept</Button
                                 >{:else if key.status === "rejected"}
                                 <Button
+                                    disabled
                                     color="success"
                                     size="sm"
                                     class="key-btn me-1"
@@ -140,6 +143,7 @@
                                     }}>Accept</Button
                                 >{:else if key.status === "denied"}
                                 <Button
+                                    disabled
                                     color={null}
                                     size="sm"
                                     class="key-btn me-1 btn-orange"
@@ -147,6 +151,7 @@
                                         onClickAccept(key.finger);
                                     }}>Force Accept</Button
                                 >{/if}<Button
+                                disabled
                                 color="danger"
                                 size="sm"
                                 class="key-btn"
