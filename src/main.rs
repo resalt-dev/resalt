@@ -14,8 +14,10 @@ mod pipeline;
 mod prelude;
 mod routes;
 mod salt;
+mod scheduler;
 mod schema;
 mod storage;
+mod update;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -45,6 +47,11 @@ async fn main() -> std::io::Result<()> {
         });
     });
 
+    // Scheduler
+    let mut scheduler = scheduler::Scheduler::new();
+    scheduler.add_system_jobs();
+    scheduler.start();
+
     HttpServer::new(move || {
         // Salt API
         let salt_api = SaltAPI::new();
@@ -53,6 +60,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(pipeline.clone()))
             .app_data(web::Data::new(db.clone()))
             .app_data(web::Data::new(salt_api))
+            .app_data(web::Data::new(scheduler.clone()))
             // Prevent sniffing of content type
             .wrap(DefaultHeaders::new().add((header::X_CONTENT_TYPE_OPTIONS, "nosniff")))
             // Removes trailing slash in the URL to make is sowe don't need as many services
