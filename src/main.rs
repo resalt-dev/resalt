@@ -4,6 +4,7 @@ extern crate diesel;
 extern crate diesel_migrations;
 
 use actix_web::{http::header, middleware::*, web, App, HttpServer};
+use log::error;
 use prelude::*;
 use tokio::task;
 
@@ -147,5 +148,12 @@ async fn main() -> std::io::Result<()> {
     })
     .bind(("0.0.0.0", SConfig::http_port()))?
     .run()
-    .await
+    .await?;
+
+    // run update check
+    if let Err(e) = update::get_remote_version().await {
+        error!("{}", e);
+    }
+
+    Ok(())
 }

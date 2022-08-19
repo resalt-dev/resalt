@@ -9,7 +9,7 @@ pub struct UsersListGetQuery {
     offset: Option<i64>,
 }
 
-pub async fn route_users_get(
+pub(crate) async fn route_users_get(
     data: web::Data<Storage>,
     query: web::Query<UsersListGetQuery>,
 ) -> Result<impl Responder> {
@@ -36,7 +36,7 @@ pub struct UserGetInfo {
     id: String,
 }
 
-pub async fn route_user_get(
+pub(crate) async fn route_user_get(
     data: web::Data<Storage>,
     info: web::Path<UserGetInfo>,
 ) -> Result<impl Responder> {

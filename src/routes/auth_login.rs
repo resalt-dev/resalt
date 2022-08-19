@@ -14,7 +14,7 @@ struct LoginResponse {
     token: String,
 }
 
-pub async fn route_auth_login_post(
+pub(crate) async fn route_auth_login_post(
     data: web::Data<Storage>,
     salt: web::Data<SaltAPI>,
     input: web::Json<LoginRequest>,

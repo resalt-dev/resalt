@@ -9,7 +9,7 @@ pub struct MinionsListGetQuery {
     offset: Option<i64>,
 }
 
-pub async fn route_minions_get(
+pub(crate) async fn route_minions_get(
     data: web::Data<Storage>,
     query: web::Query<MinionsListGetQuery>,
 ) -> Result<impl Responder> {
@@ -32,7 +32,7 @@ pub struct MinionGetInfo {
     id: String,
 }
 
-pub async fn route_minion_get(
+pub(crate) async fn route_minion_get(
     data: web::Data<Storage>,
     info: web::Path<MinionGetInfo>,
 ) -> Result<impl Responder> {
@@ -54,7 +54,7 @@ pub async fn route_minion_get(
     Ok(web::Json(minion))
 }
 
-pub async fn route_minions_refresh_post(
+pub(crate) async fn route_minions_refresh_post(
     salt: web::Data<SaltAPI>,
     req: HttpRequest,
 ) -> Result<impl Responder> {

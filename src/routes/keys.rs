@@ -4,7 +4,10 @@ use log::*;
 use serde::Deserialize;
 use serde_json::{json, Value};
 
-pub async fn route_keys_get(salt: web::Data<SaltAPI>, req: HttpRequest) -> Result<impl Responder> {
+pub(crate) async fn route_keys_get(
+    salt: web::Data<SaltAPI>,
+    req: HttpRequest,
+) -> Result<impl Responder> {
     let ext = req.extensions_mut();
     let auth = ext.get::<AuthStatus>().unwrap();
 
@@ -38,7 +41,7 @@ pub struct KeyFingerInfo {
     finger: String,
 }
 
-pub async fn route_key_accept_put(
+pub(crate) async fn route_key_accept_put(
     salt: web::Data<SaltAPI>,
     info: web::Path<KeyFingerInfo>,
 ) -> Result<impl Responder> {
@@ -51,7 +54,7 @@ pub async fn route_key_accept_put(
     }
 }
 
-pub async fn route_key_reject_put(
+pub(crate) async fn route_key_reject_put(
     salt: web::Data<SaltAPI>,
     info: web::Path<KeyFingerInfo>,
 ) -> Result<impl Responder> {
@@ -64,7 +67,7 @@ pub async fn route_key_reject_put(
     }
 }
 
-pub async fn route_key_delete_delete(
+pub(crate) async fn route_key_delete_delete(
     salt: web::Data<SaltAPI>,
     info: web::Path<KeyFingerInfo>,
 ) -> Result<impl Responder> {

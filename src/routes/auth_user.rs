@@ -2,7 +2,7 @@ use crate::prelude::*;
 use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 
-pub async fn route_auth_user_get(
+pub(crate) async fn route_auth_user_get(
     data: web::Data<Storage>,
     req: HttpRequest,
 ) -> Result<impl Responder> {

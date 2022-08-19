@@ -132,7 +132,11 @@ impl SaltAPI {
         }
     }
 
-    pub async fn login(&self, username: &str, authtoken: &str) -> Result<SaltToken, SaltError> {
+    pub(crate) async fn login(
+        &self,
+        username: &str,
+        authtoken: &str,
+    ) -> Result<SaltToken, SaltError> {
         let url = format!("{}/login", &SConfig::salt_api_url());
         // Send POST request to Salt API for auth token
         // This will contact us back on the /token endpoint to validate auth token
@@ -585,7 +589,7 @@ impl SaltAPI {
     }
 
     /// Returns host:status:finger pair
-    pub async fn get_keys(
+    pub(crate) async fn get_keys(
         &self,
         salt_token: &SaltToken,
     ) -> Result<Vec<(String, String, String)>, SaltError> {
@@ -690,19 +694,19 @@ impl SaltAPI {
         Ok(keys)
     }
 
-    pub async fn accept_key(&self, finger: &str) -> Result<(), SaltError> {
+    pub(crate) async fn accept_key(&self, finger: &str) -> Result<(), SaltError> {
         Err(SaltError::NotYetImplemented)
     }
 
-    pub async fn reject_key(&self, finger: &str) -> Result<(), SaltError> {
+    pub(crate) async fn reject_key(&self, finger: &str) -> Result<(), SaltError> {
         Err(SaltError::NotYetImplemented)
     }
 
-    pub async fn delete_key(&self, finger: &str) -> Result<(), SaltError> {
+    pub(crate) async fn delete_key(&self, finger: &str) -> Result<(), SaltError> {
         Err(SaltError::NotYetImplemented)
     }
 
-    pub async fn refresh_minions(&self, salt_token: &SaltToken) -> Result<(), SaltError> {
+    pub(crate) async fn refresh_minions(&self, salt_token: &SaltToken) -> Result<(), SaltError> {
         // TODO: move this to a /keys endpoint
         // let keys = self.get_keys(salt_token).await?;
         // info!("keys: {:?}", keys);

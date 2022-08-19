@@ -8,7 +8,7 @@ use log::{error, warn};
 
 static FRONTEND_PUBLIC_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/frontend/public");
 
-pub async fn route_frontend_get(
+pub(crate) async fn route_frontend_get(
     service_request: ServiceRequest,
 ) -> Result<ServiceResponse, actix_web::Error> {
     if SConfig::http_frontend_proxy_enabled() {
@@ -18,7 +18,7 @@ pub async fn route_frontend_get(
     }
 }
 
-pub async fn route_frontend_proxy_get(
+pub(crate) async fn route_frontend_proxy_get(
     service_request: ServiceRequest,
 ) -> Result<ServiceResponse, actix_web::Error> {
     let (req, _payload) = service_request.into_parts();
@@ -57,7 +57,7 @@ pub async fn route_frontend_proxy_get(
     Ok(ServiceResponse::new(req.clone(), response))
 }
 
-pub async fn route_frontend_static_get(
+pub(crate) async fn route_frontend_static_get(
     service_request: ServiceRequest,
 ) -> Result<ServiceResponse, actix_web::Error> {
     let (req, _payload) = service_request.into_parts();

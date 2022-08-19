@@ -12,7 +12,7 @@ pub struct TokenValidateRequest {
     password: String,
 }
 
-pub async fn route_auth_token_post(
+pub(crate) async fn route_auth_token_post(
     data: web::Data<Storage>,
     input: web::Form<TokenValidateRequest>,
 ) -> Result<impl Responder> {

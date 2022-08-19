@@ -21,7 +21,7 @@ pub struct Storage {
 }
 
 impl Storage {
-    pub async fn connect(database_url: &str) -> Result<Self, String> {
+    pub(crate) async fn connect(database_url: &str) -> Result<Self, String> {
         let manager = ConnectionManager::<MysqlConnection>::new(database_url);
         let pool = Pool::builder().build(manager);
 
@@ -49,7 +49,7 @@ impl Storage {
         }
     }
 
-    pub async fn init(&self) {
+    pub(crate) async fn init(&self) {
         // Create default user
         if self.get_user_by_username("admin").unwrap().is_none() {
             let random_password = rand::thread_rng()
@@ -59,12 +59,12 @@ impl Storage {
                 .collect::<String>();
             self.create_user("admin".to_string(), Some(random_password.to_string()))
                 .unwrap();
-            warn!("==============================");
+            warn!("============================================================");
             warn!(
-                "CREATED DEFAULT USER: admin WITH PASSWORD: {}",
+                "==  CREATED DEFAULT USER: admin WITH PASSWORD: {}  ==",
                 random_password
             );
-            warn!("==============================");
+            warn!("============================================================");
         }
     }
 
