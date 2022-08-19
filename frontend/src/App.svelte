@@ -6,6 +6,9 @@
     import PortalLayout from "./layouts/Portal/PortalLayout.svelte";
     import Redirect from "./components/Redirect.svelte";
     import SSEConnector from "./components/SSEConnector.svelte";
+    import { loadConfig } from "./controller";
+    import { onMount } from "svelte";
+    import { config } from "./stores";
 
     // check if URL starts with basePath, if not then redirect
     const basePath = constants.basePath;
@@ -13,21 +16,31 @@
     if (!path.startsWith(basePath)) {
         window.location.href = basePath;
     }
+
+    onMount(() => {
+        loadConfig().catch(() => {
+            alert("Critical API error");
+        });
+    });
 </script>
 
 <main>
-    <Router basepath={constants.basePath} primary={false}>
-        <SSEConnector />
-        <Route path="auth/*">
-            <PortalLayout />
-        </Route>
-        <Route path="dashboard/*">
-            <DashboardLayout />
-        </Route>
-        <Route path="*">
-            <Redirect to={paths.home.path} />
-        </Route>
-    </Router>
+    {#if $config == null}
+        <p>Loading...</p>
+    {:else}
+        <Router basepath={constants.basePath} primary={false}>
+            <SSEConnector />
+            <Route path="auth/*">
+                <PortalLayout />
+            </Route>
+            <Route path="dashboard/*">
+                <DashboardLayout />
+            </Route>
+            <Route path="*">
+                <Redirect to={paths.home.path} />
+            </Route>
+        </Router>
+    {/if}
 </main>
 
 <style>

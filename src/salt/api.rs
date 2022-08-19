@@ -119,7 +119,7 @@ pub struct SaltAPI {
 }
 
 impl SaltAPI {
-    pub(crate) fn create_awc_client() -> awc::Client {
+    pub fn create_awc_client() -> awc::Client {
         awc::Client::builder()
             .connector(Connector::new().rustls(Arc::new(AWC_CONFIG.to_owned())))
             .finish()
@@ -132,11 +132,7 @@ impl SaltAPI {
         }
     }
 
-    pub(crate) async fn login(
-        &self,
-        username: &str,
-        authtoken: &str,
-    ) -> Result<SaltToken, SaltError> {
+    pub async fn login(&self, username: &str, authtoken: &str) -> Result<SaltToken, SaltError> {
         let url = format!("{}/login", &SConfig::salt_api_url());
         // Send POST request to Salt API for auth token
         // This will contact us back on the /token endpoint to validate auth token
@@ -589,7 +585,7 @@ impl SaltAPI {
     }
 
     /// Returns host:status:finger pair
-    pub(crate) async fn get_keys(
+    pub async fn get_keys(
         &self,
         salt_token: &SaltToken,
     ) -> Result<Vec<(String, String, String)>, SaltError> {
@@ -694,19 +690,19 @@ impl SaltAPI {
         Ok(keys)
     }
 
-    pub(crate) async fn accept_key(&self, finger: &str) -> Result<(), SaltError> {
+    pub async fn accept_key(&self, finger: &str) -> Result<(), SaltError> {
         Err(SaltError::NotYetImplemented)
     }
 
-    pub(crate) async fn reject_key(&self, finger: &str) -> Result<(), SaltError> {
+    pub async fn reject_key(&self, finger: &str) -> Result<(), SaltError> {
         Err(SaltError::NotYetImplemented)
     }
 
-    pub(crate) async fn delete_key(&self, finger: &str) -> Result<(), SaltError> {
+    pub async fn delete_key(&self, finger: &str) -> Result<(), SaltError> {
         Err(SaltError::NotYetImplemented)
     }
 
-    pub(crate) async fn refresh_minions(&self, salt_token: &SaltToken) -> Result<(), SaltError> {
+    pub async fn refresh_minions(&self, salt_token: &SaltToken) -> Result<(), SaltError> {
         // TODO: move this to a /keys endpoint
         // let keys = self.get_keys(salt_token).await?;
         // info!("keys: {:?}", keys);

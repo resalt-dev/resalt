@@ -1,6 +1,7 @@
 import { get } from 'svelte/store';
 import {
     auth as authStore,
+    config as configStore,
     currentUser as currentUserStore,
     socket as socketStore,
     alerts,
@@ -9,6 +10,7 @@ import {
     apiAcceptKey,
     apiCreateEventConnection,
     apiDeleteKey,
+    apiGetConfig,
     apiGetCurrentUser,
     apiGetJobById,
     apiGetMinionById,
@@ -167,6 +169,18 @@ export async function connectEvents(timeout: number = 1000): Promise<EventSource
     );
 
     return source;
+}
+
+export async function loadConfig(): Promise<void> {
+    const token = requireToken();
+
+    try {
+        const config = await apiGetConfig(token);
+        configStore.set(config);
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
 }
 
 export async function loadCurrentUser(): Promise<void> {

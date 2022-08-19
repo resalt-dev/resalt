@@ -365,7 +365,6 @@ samp {
 }
 
 .btn:not(.disabled):hover, .btn:not(.disabled):active {
-    margin-top: 0;
     border-bottom-width: 0.25rem;
 }
 

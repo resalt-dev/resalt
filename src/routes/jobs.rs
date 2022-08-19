@@ -13,7 +13,7 @@ pub struct JobsListGetQuery {
     offset: Option<i64>,
 }
 
-pub(crate) async fn route_jobs_get(
+pub async fn route_jobs_get(
     data: web::Data<Storage>,
     query: web::Query<JobsListGetQuery>,
 ) -> Result<impl Responder> {
@@ -66,7 +66,7 @@ pub struct JobGetResponse {
     returns: Vec<Event>,
 }
 
-pub(crate) async fn route_job_get(
+pub async fn route_job_get(
     data: web::Data<Storage>,
     info: web::Path<JobGetInfo>,
 ) -> Result<impl Responder> {

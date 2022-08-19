@@ -251,7 +251,7 @@ impl SaltEventListener {
         self.pipeline.update_minion(minion);
     }
 
-    pub(crate) async fn start(&self) {
+    pub async fn start(&self) {
         loop {
             self.listen().await;
             tokio::time::sleep(std::time::Duration::from_secs(1)).await;

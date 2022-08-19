@@ -9,7 +9,7 @@ pub struct EventsListGetQuery {
     offset: Option<i64>,
 }
 
-pub(crate) async fn route_events_get(
+pub async fn route_events_get(
     data: web::Data<Storage>,
     query: web::Query<EventsListGetQuery>,
 ) -> Result<impl Responder> {

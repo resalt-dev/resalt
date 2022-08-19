@@ -5,10 +5,13 @@ use std::{
 
 // Scheduler, and trait for .seconds(), .minutes(), etc.
 use clokwerk::TimeUnits;
-use log::info;
+use log::{error, info};
+use tokio::task;
+
+use crate::update;
 
 #[derive(Clone)]
-pub(crate) struct Scheduler {
+pub struct Scheduler {
     scheduler: Arc<Mutex<clokwerk::Scheduler>>,
 }
 
@@ -20,12 +23,20 @@ impl Scheduler {
     }
 
     pub fn add_system_jobs(&mut self) {
-        self.scheduler.lock().unwrap().every(5.minutes()).run(|| {
-            println!("system job");
-        });
-        // Update checker
+        // self.scheduler.lock().unwrap().every(5.minutes()).run(|| {
+        //     println!("system job");
+        // });
+
         self.scheduler.lock().unwrap().every(1.hour()).run(|| {
-            println!("update checker");
+            info!("Running update checker");
+            let rt = tokio::runtime::Runtime::new().unwrap();
+            let ls = task::LocalSet::new();
+            ls.block_on(&rt, async {
+                // run update check
+                if let Err(e) = update::get_remote_version().await {
+                    error!("{}", e);
+                }
+            });
         });
     }
 

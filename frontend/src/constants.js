@@ -14,7 +14,8 @@ const themeColors = [
     "purple",
     "magenta",
 ];
+const githubUrl = "https://github.com/foorack/resalt";
 
 const apiUrl = basePath + '/api/1';
 
-export default { apiUrl, appName, basePath, themeColors };
+export default { apiUrl, appName, basePath, themeColors, githubUrl };

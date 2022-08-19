@@ -1,4 +1,5 @@
 use actix_web::{web, Responder, Result};
+use log::error;
 use serde::Serialize;
 
 use crate::update;
@@ -10,13 +11,13 @@ struct ApiConfig {
     latestVersion: String,
 }
 
-pub(crate) async fn route_config_get() -> Result<impl Responder> {
+pub async fn route_config_get() -> Result<impl Responder> {
     let config = ApiConfig {
         currentVersion: update::CURRENT_VERSION.to_string(),
         latestVersion: match update::get_remote_version().await {
             Ok(version) => version,
             Err(e) => {
-                format!("Error checking latest version: {}", e);
+                error!("{}", e);
                 "unknown".to_string()
             }
         },

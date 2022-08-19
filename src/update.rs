@@ -60,12 +60,15 @@ async fn fetch_remote_version() -> Result<String, String> {
         warn!("==  Please update to the latest version! Understand, ===");
         warn!("==  running an older version entails SECURITY risk.  ===");
         warn!("========================================================");
+        warn!("==  Current version: {}", CURRENT_VERSION.as_str());
+        warn!("==  Latest version: {}", version);
+        warn!("========================================================");
     }
 
     Ok(version)
 }
 
-pub(crate) async fn get_remote_version() -> Result<String, String> {
+pub async fn get_remote_version() -> Result<String, String> {
     let mut cache = CACHE.lock().unwrap();
     if let Some(version) = cache.version.clone() {
         return Ok(version);

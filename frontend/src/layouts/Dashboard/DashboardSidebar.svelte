@@ -1,18 +1,24 @@
 <script lang="ts">
-    import { Link } from "svelte-navigator";
     import paths from "../../paths";
-    import {
-        sidebarCollapsed as collapsed,
-        theme,
-        currentUser,
-    } from "../../stores";
-    import Icon from "../../components/../components/Icon.svelte";
-    import Logo from "../../components/../components/Logo.svelte";
+    import { sidebarCollapsed as collapsed, theme, config } from "../../stores";
+    import Icon from "../../components/Icon.svelte";
+    import Logo from "../../components/Logo.svelte";
     import SidebarItem from "./DashboardSidebarItem.svelte";
+    import constants from "../../constants";
+    import {
+        Button,
+        Modal,
+        ModalBody,
+        ModalFooter,
+        ModalHeader,
+    } from "sveltestrap";
 
     function handleClickCollapse() {
         collapsed.update((n) => !n);
     }
+
+    let openUpdate = false;
+    const toggleUpdate = () => (openUpdate = !openUpdate);
 </script>
 
 <div
@@ -82,9 +88,84 @@
 
     <hr class="mt-0 mb-0" />
 
-    {#if $collapsed}
-        <div class="text-center text-secondary">0.0.x</div>
-    {:else}
-        <span class="text-center text-secondary">Resalt - 0.0.x</span>
-    {/if}
+    <!-- svelte-ignore a11y-invalid-attribute -->
+    <span
+        class="text-center {$config.latestVersion === 'unknown'
+            ? 'link-danger text-decoration-underline mouse-pointer'
+            : $config.currentVersion !== $config.latestVersion
+            ? 'link-warning text-decoration-underline mouse-pointer'
+            : 'text-secondary'}"
+        on:click={$config.currentVersion !== $config.latestVersion
+            ? toggleUpdate
+            : null}
+    >
+        {#if $collapsed}
+            {$config.currentVersion}
+        {:else}
+            {constants.appName} - {$config.currentVersion}
+        {/if}
+    </span>
+</div>
+
+<div>
+    <Modal
+        isOpen={openUpdate}
+        toggle={toggleUpdate}
+        contentClassName={$theme.dark ? "bg-darker text-white" : ""}
+    >
+        <ModalHeader
+            toggle={toggleUpdate}
+            class={$config.latestVersion === "unknown"
+                ? "bg-danger"
+                : "bg-warning text-dark"}
+        >
+            {#if $config.latestVersion === "unknown"}
+                Update Error!
+            {:else}
+                Update Warning
+            {/if}
+        </ModalHeader>
+        <ModalBody>
+            {#if $config.latestVersion === "unknown"}
+                Current version: <code>"{$config.currentVersion}"</code>
+                <br />
+                <br />
+                There was a critical error while trying to check for updates. Especially
+                in a software that interracts with SaltStack, it is
+                <b>CRITICAL</b> to run the latest version for security reasons.
+                <br />
+                <br />
+                Double-check that the Resalt container is able to access
+                <code>raw.githubusercontent.com</code> and without a proxy. Please
+                contact your administrator or the Resalt development team if this
+                issue persists.
+            {:else}
+                Current version: <code>"{$config.currentVersion}"</code>
+                <br />
+                Latest version: <code>"{$config.latestVersion}"</code>
+                <br />
+                <br />
+                Upgrading to the latest version is
+                <b>CRITICAL FOR SECURITY</b>.
+                <br />
+                <br />
+                By not updating, you risk compromising the security and integrity
+                of your infrastructure by not taking use of the latest bug fixes
+                and security patches.
+                <br />
+                <hr class="bg-light" />
+                You can upgrade by increasing the version number of the Docker image
+                in your compose/stack file to the latest version. If you have any
+                questions, please reach out on GitHub (<a
+                    target="_blank"
+                    href={constants.githubUrl}
+                >
+                    {constants.githubUrl}</a
+                >).
+            {/if}
+        </ModalBody>
+        <ModalFooter>
+            <Button color="secondary" on:click={toggleUpdate}>Close</Button>
+        </ModalFooter>
+    </Modal>
 </div>

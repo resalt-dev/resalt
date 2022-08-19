@@ -4,6 +4,7 @@ import type SaltEvent from './models/SaltEvent';
 import type Job from './models/Job';
 import type PublicUser from './models/PublicUser';
 import type Key from './models/Key';
+import type Config from './models/Config';
 
 // API class is independent, and is not allowed to import svelte/store's.
 
@@ -60,6 +61,10 @@ export async function sendAuthenticatedRequest(
     }
 
     return res.json();
+}
+
+export async function apiGetConfig(token: string): Promise<Config> {
+    return sendAuthenticatedRequest('GET', '/config', token);
 }
 
 export async function apiGetCurrentUser(token: string): Promise<PublicUser> {

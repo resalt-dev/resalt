@@ -73,7 +73,7 @@ pub fn auth_login_classic(
     Ok(Some(user))
 }
 
-pub(crate) async fn auth_login_ldap(
+pub async fn auth_login_ldap(
     data: &web::Data<Storage>,
     username: &str,
     password: &str,

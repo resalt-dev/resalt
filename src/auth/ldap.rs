@@ -98,10 +98,7 @@ impl LdapHandler {
      * @param password The password of the user.
      * @returns The user's unique identifier if authenticated, None otherwise.
      */
-    pub(crate) async fn authenticate(
-        username: &str,
-        password: &str,
-    ) -> Result<Option<String>, LdapError> {
+    pub async fn authenticate(username: &str, password: &str) -> Result<Option<String>, LdapError> {
         if !LdapHandler::is_enabled() {
             return Ok(None);
         }

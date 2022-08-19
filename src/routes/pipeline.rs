@@ -3,7 +3,7 @@ use actix_web::{
     http::header, web::Data, HttpMessage, HttpRequest, HttpResponse, Responder, Result,
 };
 
-pub(crate) async fn route_pipeline_get(
+pub async fn route_pipeline_get(
     pipeline: Data<PipelineServer>,
     req: HttpRequest,
 ) -> Result<impl Responder> {

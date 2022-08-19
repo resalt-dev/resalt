@@ -10,6 +10,7 @@ export const sidebarCollapsed = writable(`${prefix}sidebarCollapsed`, false);
 
 export const alerts = writable(`${prefix}alerts`, []);
 export const auth = writable(`${prefix}auth`, null);
+export const config = writable(`${prefix}config`, null);
 export const socket = writable(`${prefix}socket`, {
     connected: false,
     last_ping: null,
