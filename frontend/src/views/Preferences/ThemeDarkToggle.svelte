@@ -9,11 +9,11 @@
 
 <div class="form-check form-switch">
     <input
-        checked={$theme.dark}
+        id="toggleDarkModeSwitch"
+        type="checkbox"
         style="margin-left: -1em;"
         class="form-check-input fs-3 mt-0 mb-3 mouse-pointer"
-        type="checkbox"
-        id="toggleDarkModeSwitch"
+        checked={$theme.dark}
         on:click={toggleDarkMode}
     />
 </div>

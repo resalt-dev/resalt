@@ -42,10 +42,6 @@
     onMount(() => {
         updateData();
     });
-
-    let mappingA = new Map<string, any>();
-    mappingA.set("search", MinionsTabSearch);
-    mappingA.set("groups", MinionsTabGroups);
 </script>
 
 <h1>Minions</h1>

@@ -60,9 +60,7 @@ pub enum SaltTgtType {
     Pillar,
     PillarPCRE,
     NodeGroup,
-    NodeGroupPCRE,
     Range,
-    RangePCRE,
     Compound,
     IPCIDR,
 }
@@ -78,9 +76,7 @@ impl ToString for SaltTgtType {
             SaltTgtType::Pillar => "pillar".to_string(),
             SaltTgtType::PillarPCRE => "pillar_pcre".to_string(),
             SaltTgtType::NodeGroup => "nodegroup".to_string(),
-            SaltTgtType::NodeGroupPCRE => "nodegroup_pcre".to_string(),
             SaltTgtType::Range => "range".to_string(),
-            SaltTgtType::RangePCRE => "range_pcre".to_string(),
             SaltTgtType::Compound => "compound".to_string(),
             SaltTgtType::IPCIDR => "ipcidr".to_string(),
         }
