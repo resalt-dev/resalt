@@ -122,6 +122,28 @@ export async function apiListJobs(
     return sendAuthenticatedRequest('GET', `/jobs?${args.toString()}`, token);
 }
 
+export async function apiRunJob(
+    token: string,
+    tgtType: string,
+    tgt: string,
+    fun: string,
+    arg: Array<string>,
+    kwarg: Map<string, string>,
+    batchSize: string,
+    timeout: number,
+): Promise<Job> {
+    return sendAuthenticatedRequest('POST', '/jobs', token, {
+        tgtType,
+        tgt,
+        fun,
+        arg,
+        kwarg,
+        batchSize,
+        timeout,
+    });
+}
+
+
 export async function apiGetJobById(
     token: string,
     jobId: string,

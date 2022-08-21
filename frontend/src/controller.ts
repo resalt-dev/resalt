@@ -23,6 +23,7 @@ import {
     apiRefreshMinions,
     apiRejectKey,
     apiRequestAuthToken,
+    apiRunJob,
 } from './api';
 import Alert from './models/Alert';
 import type Minion from './models/Minion';
@@ -225,6 +226,19 @@ export async function getJobs(
 ): Promise<Array<Job>> {
     const token = requireToken();
     return apiListJobs(token, user, startDate, endDate, limit, offset);
+}
+
+export async function runJob(
+    tgtType: string,
+    tgt: string,
+    fun: string,
+    arg: Array<string>,
+    kwarg: Map<string, string>,
+    batchSize: string,
+    timeout: number,
+): Promise<Job> {
+    const token = requireToken();
+    return apiRunJob(token, tgtType, tgt, fun, arg, kwarg, batchSize, timeout);
 }
 
 export async function getJobById(id: string): Promise<Job> {

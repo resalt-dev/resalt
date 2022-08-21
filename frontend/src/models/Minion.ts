@@ -1,23 +1,23 @@
 /* eslint-disable camelcase */
 /* {
     "id": Math.floor(Math.random() * 1000000) + "",
-    "last_seen": new Date().toISOString().slice(0, 19),
+    "lastSeen": new Date().toISOString().slice(0, 19),
     "grains": null,
     "pillars": null,
     "pkgs": null,
-    "last_updated_grains": null,
-    "last_updated_pillars": null,
-    "last_updated_pkgs": null,
+    "lastUpdated_grains": null,
+    "lastUpdatedPillars": null,
+    "lastUpdatedPkgs": null,
     "conformity": null,
-    "conformity_success": 0,
-    "conformity_incorrect": 0,
-    "conformity_error": 0,
-    "last_updated_conformity": null,
+    "conformitySuccess": 0,
+    "conformityIncorrect": 0,
+    "conformityError": 0,
+    "lastUpdatedConformity": null,
 } */
 export default class Minion {
     id: string;
 
-    last_seen: string;
+    lastSeen: string;
 
     grains: string | null;
 
@@ -25,49 +25,49 @@ export default class Minion {
 
     pkgs: string | null;
 
-    last_updated_grains: string | null;
+    lastUpdated_grains: string | null;
 
-    last_updated_pillars: string | null;
+    lastUpdatedPillars: string | null;
 
-    last_updated_pkgs: string | null;
+    lastUpdatedPkgs: string | null;
 
     conformity: string | null;
 
-    conformity_success: number;
+    conformitySuccess: number;
 
-    conformity_incorrect: number;
+    conformityIncorrect: number;
 
-    conformity_error: number;
+    conformityError: number;
 
-    last_updated_conformity: string | null;
+    lastUpdatedConformity: string | null;
 
     constructor(
         id: string,
-        last_seen: string,
+        lastSeen: string,
         grains: string | null = null,
         pillars: string | null = null,
         pkgs: string | null = null,
-        last_updated_grains: string | null = null,
-        last_updated_pillars: string | null = null,
-        last_updated_pkgs: string | null = null,
+        lastUpdated_grains: string | null = null,
+        lastUpdatedPillars: string | null = null,
+        lastUpdatedPkgs: string | null = null,
         conformity: string | null = null,
-        conformity_success: number = 0,
-        conformity_incorrect: number = 0,
-        conformity_error: number = 0,
-        last_updated_conformity: string | null = null,
+        conformitySuccess: number = 0,
+        conformityIncorrect: number = 0,
+        conformityError: number = 0,
+        lastUpdatedConformity: string | null = null,
     ) {
         this.id = id;
-        this.last_seen = last_seen;
+        this.lastSeen = lastSeen;
         this.grains = grains;
         this.pillars = pillars;
         this.pkgs = pkgs;
-        this.last_updated_grains = last_updated_grains;
-        this.last_updated_pillars = last_updated_pillars;
-        this.last_updated_pkgs = last_updated_pkgs;
+        this.lastUpdated_grains = lastUpdated_grains;
+        this.lastUpdatedPillars = lastUpdatedPillars;
+        this.lastUpdatedPkgs = lastUpdatedPkgs;
         this.conformity = conformity;
-        this.conformity_success = conformity_success;
-        this.conformity_incorrect = conformity_incorrect;
-        this.conformity_error = conformity_error;
-        this.last_updated_conformity = last_updated_conformity;
+        this.conformitySuccess = conformitySuccess;
+        this.conformityIncorrect = conformityIncorrect;
+        this.conformityError = conformityError;
+        this.lastUpdatedConformity = lastUpdatedConformity;
     }
 }

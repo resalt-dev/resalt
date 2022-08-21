@@ -141,18 +141,18 @@ impl Serialize for Minion {
 
         let mut state = serializer.serialize_struct("Minion", 13)?;
         state.serialize_field("id", &self.id)?;
-        state.serialize_field("last_seen", &last_seen)?;
+        state.serialize_field("lastSeen", &last_seen)?;
         state.serialize_field("grains", &self.grains)?;
         state.serialize_field("pillars", &self.pillars)?;
         state.serialize_field("pkgs", &self.pkgs)?;
-        state.serialize_field("last_updated_grains", &last_updated_grains)?;
-        state.serialize_field("last_updated_pillars", &last_updated_pillars)?;
-        state.serialize_field("last_updated_pkgs", &last_updated_pkgs)?;
+        state.serialize_field("lastUpdatedGrains", &last_updated_grains)?;
+        state.serialize_field("lastUpdatedPillars", &last_updated_pillars)?;
+        state.serialize_field("lastUpdatedPkgs", &last_updated_pkgs)?;
         state.serialize_field("conformity", &self.conformity)?;
-        state.serialize_field("conformity_success", &self.conformity_success)?;
-        state.serialize_field("conformity_incorrect", &self.conformity_incorrect)?;
-        state.serialize_field("conformity_error", &self.conformity_error)?;
-        state.serialize_field("last_updated_conformity", &last_updated_conformity)?;
+        state.serialize_field("conformitySuccess", &self.conformity_success)?;
+        state.serialize_field("conformityIncorrect", &self.conformity_incorrect)?;
+        state.serialize_field("conformityError", &self.conformity_error)?;
+        state.serialize_field("lastUpdatedConformity", &last_updated_conformity)?;
         state.end()
     }
 }

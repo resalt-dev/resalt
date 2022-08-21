@@ -9,6 +9,7 @@ use futures::StreamExt;
 use log::*;
 use rustls::ClientConfig;
 use rustls_native_certs::load_native_certs;
+use serde::Deserialize;
 use serde_json::{json, Value};
 use std::{
     collections::HashMap,
@@ -48,20 +49,30 @@ pub enum SaltError {
     ),
 }
 
-#[allow(dead_code)]
-#[derive(Default)]
+#[derive(Clone, Default, Deserialize)]
 pub enum SaltTgtType {
     #[default]
+    #[serde(rename = "glob")]
     Glob,
+    #[serde(rename = "pcre")]
     PCRE,
+    #[serde(rename = "list")]
     List,
+    #[serde(rename = "grain")]
     Grain,
+    #[serde(rename = "grain_pcre")]
     GrainPCRE,
+    #[serde(rename = "pillar")]
     Pillar,
+    #[serde(rename = "pillar_pcre")]
     PillarPCRE,
+    #[serde(rename = "nodegroup")]
     NodeGroup,
+    #[serde(rename = "range")]
     Range,
+    #[serde(rename = "compound")]
     Compound,
+    #[serde(rename = "ipcidr")]
     IPCIDR,
 }
 
@@ -83,7 +94,40 @@ impl ToString for SaltTgtType {
     }
 }
 
-type Dictionary = HashMap<String, String>;
+#[derive(Default, Deserialize)]
+pub enum SaltClientType {
+    #[default]
+    #[serde(rename = "local")]
+    Local,
+    #[serde(rename = "local_async")]
+    LocalAsync,
+    #[serde(rename = "local_batch")]
+    LocalBatch,
+    #[serde(rename = "runner")]
+    Runner,
+    #[serde(rename = "runner_async")]
+    RunnerAsync,
+    #[serde(rename = "wheel")]
+    Wheel,
+    #[serde(rename = "wheel_async")]
+    WheelAsync,
+}
+
+impl ToString for SaltClientType {
+    fn to_string(&self) -> String {
+        match self {
+            SaltClientType::Local => "local".to_string(),
+            SaltClientType::LocalAsync => "local_async".to_string(),
+            SaltClientType::LocalBatch => "local_batch".to_string(),
+            SaltClientType::Runner => "runner".to_string(),
+            SaltClientType::RunnerAsync => "runner_async".to_string(),
+            SaltClientType::Wheel => "wheel".to_string(),
+            SaltClientType::WheelAsync => "wheel_async".to_string(),
+        }
+    }
+}
+
+pub type Dictionary = HashMap<String, String>;
 
 lazy_static::lazy_static! {
     static ref AWC_CONFIG: ClientConfig = {
@@ -384,7 +428,7 @@ impl SaltAPI {
         Ok(body)
     }
 
-    async fn run_job_local<S: AsRef<str>>(
+    pub async fn run_job_local<S: AsRef<str>>(
         &self,
         salt_token: &SaltToken,
         tgt: S,
@@ -395,7 +439,7 @@ impl SaltAPI {
         kwarg: Option<Dictionary>,
     ) -> Result<Value, SaltError> {
         let data = json!({
-            "client": "local",
+            "client": SaltClientType::Local.to_string(),
             "tgt": tgt.as_ref(),
             "fun": fun.as_ref(),
             // map arg to empty array if None
@@ -413,7 +457,7 @@ impl SaltAPI {
         self.run_job(salt_token, data).await
     }
 
-    async fn run_job_local_async<S: AsRef<str>>(
+    pub async fn run_job_local_async<S: AsRef<str>>(
         &self,
         salt_token: &SaltToken,
         tgt: S,
@@ -423,7 +467,7 @@ impl SaltAPI {
         kwarg: Option<Dictionary>,
     ) -> Result<Value, SaltError> {
         let data = json!({
-            "client": "local_async",
+            "client": SaltClientType::LocalAsync.to_string(),
             "tgt": tgt.as_ref(),
             "fun": fun.as_ref(),
             "arg": arg.map(|v| {
@@ -439,7 +483,7 @@ impl SaltAPI {
         self.run_job(salt_token, data).await
     }
 
-    async fn run_job_local_batch<S: AsRef<str>>(
+    pub async fn run_job_local_batch<S: AsRef<str>>(
         &self,
         salt_token: &SaltToken,
         tgt: S,
@@ -450,7 +494,7 @@ impl SaltAPI {
         batch: S,
     ) -> Result<Value, SaltError> {
         let data = json!({
-            "client": "local_batch",
+            "client": SaltClientType::LocalBatch.to_string(),
             "tgt": tgt.as_ref(),
             "fun": fun.as_ref(),
             "arg": arg.map(|v| {
@@ -467,7 +511,7 @@ impl SaltAPI {
         self.run_job(salt_token, data).await
     }
 
-    async fn run_job_runner<S: AsRef<str>>(
+    pub async fn run_job_runner<S: AsRef<str>>(
         &self,
         salt_token: &SaltToken,
         fun: S,
@@ -475,7 +519,7 @@ impl SaltAPI {
         kwarg: Option<Dictionary>,
     ) -> Result<Value, SaltError> {
         let data = json!({
-            "client": "runner",
+            "client": SaltClientType::Runner.to_string(),
             "fun": fun.as_ref(),
             "arg": arg.map(|v| {
                 let mut args = Vec::new();
@@ -489,7 +533,7 @@ impl SaltAPI {
         self.run_job(salt_token, data).await
     }
 
-    async fn run_job_runner_async<S: AsRef<str>>(
+    pub async fn run_job_runner_async<S: AsRef<str>>(
         &self,
         salt_token: &SaltToken,
         fun: S,
@@ -497,7 +541,7 @@ impl SaltAPI {
         kwarg: Option<Dictionary>,
     ) -> Result<Value, SaltError> {
         let data = json!({
-            "client": "runner_async",
+            "client": SaltClientType::RunnerAsync.to_string(),
             "fun": fun.as_ref(),
             "arg": arg.map(|v| {
                 let mut args = Vec::new();
@@ -511,7 +555,7 @@ impl SaltAPI {
         self.run_job(salt_token, data).await
     }
 
-    async fn run_job_wheel<S: AsRef<str>>(
+    pub async fn run_job_wheel<S: AsRef<str>>(
         &self,
         salt_token: &SaltToken,
         fun: S,
@@ -519,7 +563,7 @@ impl SaltAPI {
         kwarg: Option<Dictionary>,
     ) -> Result<Value, SaltError> {
         let data = json!({
-            "client": "wheel",
+            "client": SaltClientType::Wheel.to_string(),
             "fun": fun.as_ref(),
             "arg": arg.map(|v| {
                 let mut args = Vec::new();
@@ -563,7 +607,7 @@ impl SaltAPI {
         Ok(data.clone())
     }
 
-    async fn run_job_wheel_async<S: AsRef<str>>(
+    pub async fn run_job_wheel_async<S: AsRef<str>>(
         &self,
         salt_token: &SaltToken,
         fun: S,
@@ -571,7 +615,7 @@ impl SaltAPI {
         kwarg: Option<Dictionary>,
     ) -> Result<Value, SaltError> {
         let data = json!({
-            "client": "wheel_async",
+            "client": SaltClientType::WheelAsync.to_string(),
             "fun": fun.as_ref(),
             "arg": arg.map(|v| {
                 let mut args = Vec::new();
