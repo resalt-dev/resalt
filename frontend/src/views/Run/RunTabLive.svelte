@@ -20,6 +20,10 @@
     let runBatchSize = "";
     let runTimeout = null;
 
+    $: if (runBatch) {
+        runAsync = false;
+    }
+
     function formSaveTemplate() {}
 
     function formApproval() {}
@@ -46,33 +50,27 @@
         </Col>
         <Col class="form-check ps-3 mb-0" md="1" />
         <Col class="form-check ps-3 mb-0" md="2">
-            Async
-            <br />
-            <FormGroup class="mt-2 pt-1 form-check form-switch ps-0">
-                <input
-                    id="async"
-                    type="checkbox"
-                    class="form-check-input fs-3 ms-0 mt-0 mouse-pointer"
-                    checked={runAsync}
-                    on:click={() => {
-                        runAsync = !runAsync;
-                    }}
-                />
-            </FormGroup>
+            {#if !runBatch}
+                <Label for="async" class="mb-0">Async</Label>
+                <FormGroup class="mt-2 pt-1 form-check form-switch ps-0">
+                    <input
+                        id="async"
+                        type="checkbox"
+                        class="form-check-input fs-3 ms-0 mt-0 mouse-pointer"
+                        bind:checked={runAsync}
+                    />
+                </FormGroup>
+            {/if}
         </Col>
         <Col class="form-check ps-3 mb-0" md="1">
             {#if runClientType === "local"}
                 <Label for="batch" class="mb-0">Batch</Label>
-                <br />
                 <FormGroup class="mt-2 pt-1 form-switch ps-0">
                     <input
                         id="batch"
                         type="checkbox"
                         class="form-check-input fs-3 ms-1 mt-0 mouse-pointer"
-                        checked={runBatch}
-                        on:click={() => {
-                            runBatch = !runBatch;
-                        }}
+                        bind:checked={runBatch}
                     />
                 </FormGroup>
             {/if}

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { theme } from "../../stores";
 
-    function toggleDarkMode(event) {
+    function toggleDarkMode() {
         console.log("toggleDarkMode");
         theme.update((t) => ({ ...t, dark: !t.dark }));
     }
