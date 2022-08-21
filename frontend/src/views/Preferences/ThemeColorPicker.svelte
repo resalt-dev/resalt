@@ -1,7 +1,7 @@
 <script lang="ts">
     import Icon from "../../components/Icon.svelte";
     import constants from "../../constants";
-    import { theme } from "../../stores";
+    import { config, theme } from "../../stores";
 
     $: currentColor = $theme.color;
     $: console.log("currentColor", currentColor);
@@ -11,7 +11,11 @@
             .filter((i) => i.startsWith("text"))[0]
             .split("-")[1];
         console.log("selectColor", color);
-        theme.update((t) => ({ ...t, color }));
+        if (color === "reset") {
+            $theme.color = $config.themeColor;
+        } else {
+            $theme.color = color;
+        }
     }
 </script>
 
@@ -23,4 +27,10 @@
         class="mouse-pointer text-{color}"
         on:click={selectColor}
     />
-{/each}
+{/each}<Icon
+    type="regular"
+    size="2"
+    name="reset"
+    class="mouse-pointer text-reset"
+    on:click={selectColor}
+/>

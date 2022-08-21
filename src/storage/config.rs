@@ -149,6 +149,14 @@ impl SConfig {
             .unwrap()
     }
 
+    pub fn http_frontend_theme_color() -> String {
+        SETTINGS
+            .read()
+            .unwrap()
+            .get_string("http.frontend.theme.color")
+            .unwrap()
+    }
+
     pub fn http_frontend_proxy_target() -> String {
         SETTINGS
             .read()

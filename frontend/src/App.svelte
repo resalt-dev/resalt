@@ -8,7 +8,8 @@
     import SSEConnector from "./components/SSEConnector.svelte";
     import { loadConfig } from "./controller";
     import { onMount } from "svelte";
-    import { config } from "./stores";
+    import { config, theme } from "./stores";
+    import type Config from "./models/Config";
 
     // check if URL starts with basePath, if not then redirect
     const basePath = constants.basePath;
@@ -19,7 +20,12 @@
 
     onMount(() => {
         loadConfig()
-            .then((data) => {})
+            .then((data: Config) => {
+                // set default color if theme.color is null
+                if (!$theme.color) {
+                    $theme.color = data.themeColor;
+                }
+            })
             .catch((err) => {
                 console.error(err);
                 alert("Critical API error");
@@ -28,7 +34,7 @@
 </script>
 
 <main>
-    {#if $config === null}
+    {#if $config === null || $theme.color === null}
         <p>Loading...</p>
     {:else}
         <Router basepath={constants.basePath} primary={false}>

@@ -39,10 +39,10 @@ const authPaths = [
 const dashboardPaths = [
     new Path('home', '/dashboard/home', 'Dashboard', 'home', true),
 
+    new Path('run', '/dashboard/run', 'Run', 'play', true),
+
     new Path('minion', '/dashboard/minions/:minionId/:subPage', 'Minion', '', false, true),
     new Path('minions', '/dashboard/minions', 'Minions', 'server', true),
-
-    new Path('run', '/dashboard/run', 'Run', 'play', true),
 
     new Path('job', '/dashboard/jobs/:jobId', 'Job', '', false, true),
     new Path('jobs', '/dashboard/jobs', 'Jobs', 'briefcase', true),

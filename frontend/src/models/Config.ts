@@ -3,8 +3,11 @@ export default class Key {
 
     latestVersion: string;
 
-    constructor(currentVersion, latestVersion) {
+    themeColor: string;
+
+    constructor(currentVersion, latestVersion, themeColor) {
         this.currentVersion = currentVersion;
         this.latestVersion = latestVersion;
+        this.themeColor = themeColor;
     }
 }

@@ -30,6 +30,7 @@ import type PublicUser from './models/PublicUser';
 import type SaltEvent from './models/SaltEvent';
 import type Job from './models/Job';
 import type Key from './models/Key';
+import type Config from './models/Config';
 
 /*
  * INTERNAL UTILS
@@ -171,22 +172,24 @@ export async function connectEvents(timeout: number = 1000): Promise<EventSource
     return source;
 }
 
-export async function loadConfig(): Promise<void> {
+export async function loadConfig(): Promise<Config> {
     try {
         const config = await apiGetConfig();
         configStore.set(config);
+        return config;
     } catch (e) {
         console.log(e);
         throw e;
     }
 }
 
-export async function loadCurrentUser(): Promise<void> {
+export async function loadCurrentUser(): Promise<PublicUser> {
     const token = requireToken();
 
     try {
         const currentUser = await apiGetCurrentUser(token);
         currentUserStore.set(currentUser);
+        return currentUser;
     } catch (e) {
         console.log(e);
         throw e;

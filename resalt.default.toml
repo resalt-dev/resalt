@@ -35,6 +35,8 @@ verify = false
 
 [http]
 port = 8000
+[http.frontend.theme]
+color = "primary"
 [http.frontend.proxy]
 enabled = true
 target = "http://frontend:5555"

@@ -16,7 +16,7 @@ export const socket = writable(`${prefix}socket`, {
     last_ping: null,
 });
 export const theme = writable(`${prefix}theme`, {
-    color: 'primary',
+    color: null,
     dark: false,
 });
 export const currentUser = writable(`${prefix}currentUser`, null);
