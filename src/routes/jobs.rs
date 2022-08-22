@@ -91,7 +91,7 @@ pub async fn route_jobs_post(
                 salt_token,
                 input.tgt.clone(),
                 input.fun.clone(),
-                Some(input.arg.clone()),
+                Some(input.arg.clone().into_iter().map(|a| SV::S(a)).collect()),
                 input.timeout,
                 Some(input.tgt_type.clone()),
                 Some(input.kwarg.clone()),
@@ -103,7 +103,7 @@ pub async fn route_jobs_post(
                 salt_token,
                 input.tgt.clone(),
                 input.fun.clone(),
-                Some(input.arg.clone()),
+                Some(input.arg.clone().into_iter().map(|a| SV::S(a)).collect()),
                 Some(input.tgt_type.clone()),
                 Some(input.kwarg.clone()),
             )
@@ -114,7 +114,7 @@ pub async fn route_jobs_post(
                 salt_token,
                 input.tgt.clone(),
                 input.fun.clone(),
-                Some(input.arg.clone()),
+                Some(input.arg.clone().into_iter().map(|a| SV::S(a)).collect()),
                 Some(input.tgt_type.clone()),
                 Some(input.kwarg.clone()),
                 input.batch_size.clone(),
@@ -125,7 +125,7 @@ pub async fn route_jobs_post(
             salt.run_job_runner(
                 salt_token,
                 input.fun.clone(),
-                Some(input.arg.clone()),
+                Some(input.arg.clone().into_iter().map(|a| SV::S(a)).collect()),
                 Some(input.kwarg.clone()),
             )
             .await
@@ -134,7 +134,7 @@ pub async fn route_jobs_post(
             salt.run_job_runner_async(
                 salt_token,
                 input.fun.clone(),
-                Some(input.arg.clone()),
+                Some(input.arg.clone().into_iter().map(|a| SV::S(a)).collect()),
                 Some(input.kwarg.clone()),
             )
             .await
@@ -143,7 +143,7 @@ pub async fn route_jobs_post(
             salt.run_job_wheel(
                 salt_token,
                 input.fun.clone(),
-                Some(input.arg.clone()),
+                Some(input.arg.clone().into_iter().map(|a| SV::S(a)).collect()),
                 Some(input.kwarg.clone()),
             )
             .await
@@ -152,7 +152,7 @@ pub async fn route_jobs_post(
             salt.run_job_wheel_async(
                 salt_token,
                 input.fun.clone(),
-                Some(input.arg.clone()),
+                Some(input.arg.clone().into_iter().map(|a| SV::S(a)).collect()),
                 Some(input.kwarg.clone()),
             )
             .await

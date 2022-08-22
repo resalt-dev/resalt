@@ -28,7 +28,6 @@ pub struct SaltEvent {
 pub enum SaltError {
     Unauthorized, // 401
     Forbidden,    // 403
-    NotYetImplemented,
     RequestError(SendRequestError),
     ResponseParseError(Option<JsonPayloadError>),
     MissingExpectedDataError(String),
@@ -123,6 +122,44 @@ impl ToString for SaltClientType {
             SaltClientType::RunnerAsync => "runner_async".to_string(),
             SaltClientType::Wheel => "wheel".to_string(),
             SaltClientType::WheelAsync => "wheel_async".to_string(),
+        }
+    }
+}
+
+#[derive(Default, Deserialize)]
+pub enum SaltKeyState {
+    #[default]
+    #[serde(rename = "minions")]
+    Accepted,
+    #[serde(rename = "minions_pre")]
+    Pending,
+    #[serde(rename = "minions_rejected")]
+    Rejected,
+    #[serde(rename = "minions_denied")]
+    Denied,
+}
+
+impl ToString for SaltKeyState {
+    fn to_string(&self) -> String {
+        match self {
+            SaltKeyState::Accepted => "minions".to_string(),
+            SaltKeyState::Pending => "minions_pre".to_string(),
+            SaltKeyState::Rejected => "minions_rejected".to_string(),
+            SaltKeyState::Denied => "minions_denied".to_string(),
+        }
+    }
+}
+
+pub enum SV {
+    S(String),
+    V(Value),
+}
+
+impl SV {
+    pub fn as_value(&self) -> Value {
+        match self {
+            SV::S(s) => json!(s),
+            SV::V(v) => v.clone(),
         }
     }
 }
@@ -433,7 +470,7 @@ impl SaltAPI {
         salt_token: &SaltToken,
         tgt: S,
         fun: S,
-        arg: Option<Vec<S>>,
+        arg: Option<Vec<SV>>,
         timeout: Option<u64>,
         tgt_type: Option<SaltTgtType>,
         kwarg: Option<Dictionary>,
@@ -446,7 +483,7 @@ impl SaltAPI {
             "arg": arg.map(|v| {
                 let mut args = Vec::new();
                 for s in v.iter() {
-                    args.push(s.as_ref().to_string());
+                    args.push(s.as_value());
                 }
                 args
             }).unwrap_or(vec![]),
@@ -462,7 +499,7 @@ impl SaltAPI {
         salt_token: &SaltToken,
         tgt: S,
         fun: S,
-        arg: Option<Vec<S>>,
+        arg: Option<Vec<SV>>,
         tgt_type: Option<SaltTgtType>,
         kwarg: Option<Dictionary>,
     ) -> Result<Value, SaltError> {
@@ -473,7 +510,7 @@ impl SaltAPI {
             "arg": arg.map(|v| {
                 let mut args = Vec::new();
                 for s in v.iter() {
-                    args.push(s.as_ref().to_string());
+                    args.push(s.as_value());
                 }
                 args
             }).unwrap_or(vec![]),
@@ -488,7 +525,7 @@ impl SaltAPI {
         salt_token: &SaltToken,
         tgt: S,
         fun: S,
-        arg: Option<Vec<S>>,
+        arg: Option<Vec<SV>>,
         tgt_type: Option<SaltTgtType>,
         kwarg: Option<Dictionary>,
         batch: S,
@@ -500,7 +537,7 @@ impl SaltAPI {
             "arg": arg.map(|v| {
                 let mut args = Vec::new();
                 for s in v.iter() {
-                    args.push(s.as_ref().to_string());
+                    args.push(s.as_value());
                 }
                 args
             }).unwrap_or(vec![]),
@@ -515,7 +552,7 @@ impl SaltAPI {
         &self,
         salt_token: &SaltToken,
         fun: S,
-        arg: Option<Vec<S>>,
+        arg: Option<Vec<SV>>,
         kwarg: Option<Dictionary>,
     ) -> Result<Value, SaltError> {
         let data = json!({
@@ -524,7 +561,7 @@ impl SaltAPI {
             "arg": arg.map(|v| {
                 let mut args = Vec::new();
                 for s in v.iter() {
-                    args.push(s.as_ref().to_string());
+                    args.push(s.as_value());
                 }
                 args
             }).unwrap_or(vec![]),
@@ -537,7 +574,7 @@ impl SaltAPI {
         &self,
         salt_token: &SaltToken,
         fun: S,
-        arg: Option<Vec<S>>,
+        arg: Option<Vec<SV>>,
         kwarg: Option<Dictionary>,
     ) -> Result<Value, SaltError> {
         let data = json!({
@@ -546,7 +583,7 @@ impl SaltAPI {
             "arg": arg.map(|v| {
                 let mut args = Vec::new();
                 for s in v.iter() {
-                    args.push(s.as_ref().to_string());
+                    args.push(s.as_value());
                 }
                 args
             }).unwrap_or(vec![]),
@@ -559,7 +596,7 @@ impl SaltAPI {
         &self,
         salt_token: &SaltToken,
         fun: S,
-        arg: Option<Vec<S>>,
+        arg: Option<Vec<SV>>,
         kwarg: Option<Dictionary>,
     ) -> Result<Value, SaltError> {
         let data = json!({
@@ -568,7 +605,7 @@ impl SaltAPI {
             "arg": arg.map(|v| {
                 let mut args = Vec::new();
                 for s in v.iter() {
-                    args.push(s.as_ref().to_string());
+                    args.push(s.as_value());
                 }
                 args
             }).unwrap_or(vec![]),
@@ -611,7 +648,7 @@ impl SaltAPI {
         &self,
         salt_token: &SaltToken,
         fun: S,
-        arg: Option<Vec<S>>,
+        arg: Option<Vec<SV>>,
         kwarg: Option<Dictionary>,
     ) -> Result<Value, SaltError> {
         let data = json!({
@@ -620,7 +657,7 @@ impl SaltAPI {
             "arg": arg.map(|v| {
                 let mut args = Vec::new();
                 for s in v.iter() {
-                    args.push(s.as_ref().to_string());
+                    args.push(s.as_value());
                 }
                 args
             }).unwrap_or(vec![]),
@@ -635,7 +672,12 @@ impl SaltAPI {
         salt_token: &SaltToken,
     ) -> Result<Vec<(String, String, String)>, SaltError> {
         let data = match self
-            .run_job_wheel(salt_token, "key.finger", Some(vec!["*"]), None)
+            .run_job_wheel(
+                salt_token,
+                "key.finger",
+                Some(vec![SV::S("*".to_owned())]),
+                None,
+            )
             .await
         {
             Ok(data) => data,
@@ -700,7 +742,7 @@ impl SaltAPI {
             for (host, finger) in minions_rejected.iter() {
                 keys.push((
                     host.clone(),
-                    "rejected".to_owned(),
+                    SaltKeyState::Rejected.to_string(),
                     finger.as_str().unwrap().to_owned(),
                 ));
             }
@@ -709,7 +751,7 @@ impl SaltAPI {
             for (host, finger) in minions_denied.iter() {
                 keys.push((
                     host.clone(),
-                    "denied".to_owned(),
+                    SaltKeyState::Denied.to_string(),
                     finger.as_str().unwrap().to_owned(),
                 ));
             }
@@ -718,7 +760,7 @@ impl SaltAPI {
             for (host, finger) in minions_pre.iter() {
                 keys.push((
                     host.clone(),
-                    "pre".to_owned(),
+                    SaltKeyState::Pending.to_string(),
                     finger.as_str().unwrap().to_owned(),
                 ));
             }
@@ -727,7 +769,7 @@ impl SaltAPI {
             for (host, finger) in minions.iter() {
                 keys.push((
                     host.clone(),
-                    "accepted".to_owned(),
+                    SaltKeyState::Accepted.to_string(),
                     finger.as_str().unwrap().to_owned(),
                 ));
             }
@@ -735,16 +777,155 @@ impl SaltAPI {
         Ok(keys)
     }
 
-    pub async fn accept_key(&self, id: &str) -> Result<(), SaltError> {
-        Err(SaltError::NotYetImplemented)
+    pub async fn accept_key(
+        &self,
+        salt_token: &SaltToken,
+        state: &SaltKeyState,
+        id: &str,
+    ) -> Result<(), SaltError> {
+        let mut kwargs = HashMap::new();
+        kwargs.insert("include_rejected".to_owned(), "True".to_owned());
+        kwargs.insert("include_denied".to_owned(), "True".to_owned());
+        let data = match self
+            .run_job_wheel(
+                salt_token,
+                "key.accept_dict",
+                Some(vec![SV::V(json!({
+                    state.to_string(): vec![id.to_owned()],
+                }))]),
+                Some(kwargs),
+            )
+            .await
+        {
+            Ok(data) => data,
+            Err(e) => return Err(e),
+        };
+        let data = match data.get("return") {
+            Some(data) => data,
+            None => {
+                return Err(SaltError::MissingExpectedDataError(
+                    "accept_key: missing return".to_owned(),
+                ));
+            }
+        };
+        let list = match data.get(SaltKeyState::Accepted.to_string()) {
+            Some(data) => match data.as_array() {
+                Some(data) => data,
+                None => {
+                    return Err(SaltError::MissingExpectedDataError(
+                        "accept_key: return[SaltKeyState::Accepted] is not array".to_owned(),
+                    ));
+                }
+            },
+            None => {
+                return Err(SaltError::MissingExpectedDataError(
+                    "accept_key: missing return[SaltKeyState::Accepted]".to_owned(),
+                ));
+            }
+        };
+        if list.len() == 0 {
+            return Err(SaltError::MissingExpectedDataError(
+                "accept_key: return[SaltKeyState::Accepted] is empty".to_owned(),
+            ));
+        }
+        Ok(())
     }
 
-    pub async fn reject_key(&self, id: &str) -> Result<(), SaltError> {
-        Err(SaltError::NotYetImplemented)
+    pub async fn reject_key(
+        &self,
+        salt_token: &SaltToken,
+        state: &SaltKeyState,
+        id: &str,
+    ) -> Result<(), SaltError> {
+        let mut kwargs = HashMap::new();
+        kwargs.insert("include_accepted".to_owned(), "True".to_owned());
+        kwargs.insert("include_denied".to_owned(), "True".to_owned());
+        let data = match self
+            .run_job_wheel(
+                salt_token,
+                "key.reject_dict",
+                Some(vec![SV::V(json!({
+                    state.to_string(): vec![id.to_owned()],
+                }))]),
+                Some(kwargs),
+            )
+            .await
+        {
+            Ok(data) => data,
+            Err(e) => return Err(e),
+        };
+        let data = match data.get("return") {
+            Some(data) => data,
+            None => {
+                return Err(SaltError::MissingExpectedDataError(
+                    "reject_key: missing return".to_owned(),
+                ));
+            }
+        };
+        let list = match data.get(SaltKeyState::Rejected.to_string()) {
+            Some(data) => match data.as_array() {
+                Some(data) => data,
+                None => {
+                    return Err(SaltError::MissingExpectedDataError(
+                        "reject_key: return[state] is not array".to_owned(),
+                    ));
+                }
+            },
+            None => {
+                return Err(SaltError::MissingExpectedDataError(
+                    "reject_key: missing return[state]".to_owned(),
+                ));
+            }
+        };
+        if list.len() == 0 {
+            return Err(SaltError::MissingExpectedDataError(
+                "reject_key: return[state] is empty".to_owned(),
+            ));
+        }
+        Ok(())
     }
 
-    pub async fn delete_key(&self, id: &str) -> Result<(), SaltError> {
-        Err(SaltError::NotYetImplemented)
+    pub async fn delete_key(
+        &self,
+        salt_token: &SaltToken,
+        state: &SaltKeyState,
+        id: &str,
+    ) -> Result<(), SaltError> {
+        let data = match self
+            .run_job_wheel(
+                salt_token,
+                "key.delete_dict",
+                Some(vec![SV::V(json!({
+                    state.to_string(): vec![id.to_owned()],
+                }))]),
+                None,
+            )
+            .await
+        {
+            Ok(data) => data,
+            Err(e) => return Err(e),
+        };
+        let data = match data.get("success") {
+            Some(data) => match data.as_bool() {
+                Some(data) => data,
+                None => {
+                    return Err(SaltError::MissingExpectedDataError(
+                        "delete_key: success is not boolean".to_owned(),
+                    ));
+                }
+            },
+            None => {
+                return Err(SaltError::MissingExpectedDataError(
+                    "delete_key: missing return".to_owned(),
+                ));
+            }
+        };
+        if !data {
+            return Err(SaltError::MissingExpectedDataError(
+                "delete_key: success is false".to_owned(),
+            ));
+        }
+        Ok(())
     }
 
     pub async fn refresh_minions(&self, salt_token: &SaltToken) -> Result<(), SaltError> {
@@ -752,15 +933,10 @@ impl SaltAPI {
         // let keys = self.get_keys(salt_token).await?;
         // info!("keys: {:?}", keys);
 
+        let mut map = HashMap::new();
+        map.insert("test".to_owned(), "test".to_owned());
         match self
-            .run_job_local_async(
-                salt_token,
-                "*",
-                "state.highstate",
-                Some(vec!["test=True"]),
-                None,
-                None,
-            )
+            .run_job_local_async(salt_token, "*", "state.highstate", None, None, Some(map))
             .await
         {
             Ok(_) => (),

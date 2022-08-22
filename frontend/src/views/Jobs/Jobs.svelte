@@ -1,11 +1,12 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { theme } from "../../stores";
-    import { AlertType, getJobs, showAlert } from "../../controller";
+    import { getJobs, showAlert } from "../../controller";
     import { Table, Tooltip } from "sveltestrap";
     import Icon from "../../components/Icon.svelte";
     import { writable } from "svelte/store";
     import TablePaginate from "../../components/TablePaginate.svelte";
+    import { AlertType } from "../../models/AlertType";
 
     let filterUser: string | null = null;
     let filterStartDate: Date | null = null;

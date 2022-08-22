@@ -48,18 +48,6 @@ function requireToken(): string {
 /*
  * UTIL
  */
-// eslint-disable-next-line no-shadow
-export enum AlertType {
-    // eslint-disable-next-line no-unused-vars
-    INFO = 'info',
-    // eslint-disable-next-line no-unused-vars
-    SUCCESS = 'success',
-    // eslint-disable-next-line no-unused-vars
-    WARNING = 'warning',
-    // eslint-disable-next-line no-unused-vars
-    ERROR = 'danger',
-}
-
 export function showAlert(type: string, title: string, message: string): void {
     alerts.update((mAlerts) => [...mAlerts, new Alert(type, title, message)]);
 }
@@ -266,17 +254,17 @@ export async function getKeys(): Promise<Array<Key>> {
     return apiListKeys(token);
 }
 
-export async function acceptKey(id: string): Promise<void> {
+export async function acceptKey(key: Key): Promise<void> {
     const token = requireToken();
-    await apiAcceptKey(token, id);
+    await apiAcceptKey(token, key);
 }
 
-export async function rejectKey(id: string): Promise<void> {
+export async function rejectKey(key: Key): Promise<void> {
     const token = requireToken();
-    await apiRejectKey(token, id);
+    await apiRejectKey(token, key);
 }
 
-export async function deleteKey(id: string): Promise<void> {
+export async function deleteKey(key: Key): Promise<void> {
     const token = requireToken();
-    await apiDeleteKey(token, id);
+    await apiDeleteKey(token, key);
 }

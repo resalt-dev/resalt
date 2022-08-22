@@ -131,10 +131,10 @@ async fn main() -> std::io::Result<()> {
                         web::scope("/keys")
                             .wrap(auth::RequireAuth::new())
                             .route("", web::get().to(route_keys_get))
-                            .route("/{id}/accept", web::put().to(route_key_accept_put))
-                            .route("/{id}/reject", web::put().to(route_key_reject_put))
+                            .route("/{state}/{id}/accept", web::put().to(route_key_accept_put))
+                            .route("/{state}/{id}/reject", web::put().to(route_key_reject_put))
                             .route(
-                                "/{id}/delete",
+                                "/{state}/{id}/delete",
                                 web::delete().to(route_key_delete_delete),
                             )
                             .default_service(route_fallback_404),

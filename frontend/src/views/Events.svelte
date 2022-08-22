@@ -2,9 +2,10 @@
     import { onMount } from "svelte";
     import { Table } from "sveltestrap";
     import Icon from "../components/Icon.svelte";
-    import { AlertType, getEvents, showAlert } from "../controller";
+    import { getEvents, showAlert } from "../controller";
     import { theme } from "../stores";
     import TablePaginate from "../components/TablePaginate.svelte";
+    import { AlertType } from "../models/AlertType";
     import { writable } from "svelte/store";
 
     let paginationSize: number = 20;

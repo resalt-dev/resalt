@@ -1,15 +1,10 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import {
-        AlertType,
-        loadCurrentUser,
-        login,
-        logout,
-        showAlert,
-    } from "../controller";
+    import { loadCurrentUser, login, logout, showAlert } from "../controller";
     import { theme } from "../stores";
     import paths from "../paths";
     import { useNavigate } from "svelte-navigator";
+    import { AlertType } from "../models/AlertType";
     const navigate = useNavigate();
 
     let username = "";

@@ -1,12 +1,13 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { theme, currentUser } from "../../stores";
-    import { AlertType, getUsers, showAlert } from "../../controller";
+    import { getUsers, showAlert } from "../../controller";
     import { Badge, Table } from "sveltestrap";
     import { writable } from "svelte/store";
     import TablePaginate from "../../components/TablePaginate.svelte";
     import paths from "../../paths";
     import { Link } from "svelte-navigator";
+    import { AlertType } from "../../models/AlertType";
 
     let paginationSize: number = 20;
     let paginationPage: number = 1;

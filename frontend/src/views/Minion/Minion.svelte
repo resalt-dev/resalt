@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Link } from "svelte-navigator";
-    import { showAlert, AlertType, getMinionById } from "../../controller";
+    import { showAlert, getMinionById } from "../../controller";
     import { theme } from "../../stores";
     import { writable } from "svelte/store";
     import paths from "../../paths";
@@ -12,6 +12,7 @@
     import MinionPackages from "./MinionPackages.svelte";
     import MinionConformity from "./MinionConformity.svelte";
     import { onMount } from "svelte";
+    import { AlertType } from "../../models/AlertType";
 
     // export let navigate;
     export let location;

@@ -1,12 +1,20 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { theme } from "../../stores";
-    import { AlertType, getKeys, showAlert } from "../../controller";
+    import {
+        acceptKey,
+        deleteKey,
+        getKeys,
+        rejectKey,
+        showAlert,
+    } from "../../controller";
     import { Badge, Button, Table } from "sveltestrap";
     import { writable } from "svelte/store";
     import TablePaginate from "../../components/TablePaginate.svelte";
     import paths from "../../paths";
     import { Link } from "svelte-navigator";
+    import type Key from "../../models/Key";
+    import { AlertType } from "../../models/AlertType";
 
     let paginationSize: number = 20;
     let paginationPage: number = 1;
@@ -32,16 +40,49 @@
         );
     }
 
-    function onClickAccept(finger: string) {
-        showAlert(AlertType.SUCCESS, "Key accepted", `Key ${finger} accepted`);
+    function onClickAccept(key: Key) {
+        acceptKey(key)
+            .then(() => {
+                updateData();
+                showAlert(
+                    AlertType.SUCCESS,
+                    "Key accepted",
+                    `Key ${key.id} accepted`
+                );
+            })
+            .catch((err) => {
+                showAlert(AlertType.ERROR, "Failed accepting key", err);
+            });
     }
 
-    function onClickReject(finger: string) {
-        showAlert(AlertType.SUCCESS, "Key rejected", `Key ${finger} rejected`);
+    function onClickReject(key: Key) {
+        rejectKey(key)
+            .then(() => {
+                updateData();
+                showAlert(
+                    AlertType.SUCCESS,
+                    "Key rejected",
+                    `Key ${key.id} rejected`
+                );
+            })
+            .catch((err) => {
+                showAlert(AlertType.ERROR, "Failed rejecting key", err);
+            });
     }
 
-    function onClickDelete(finger: string) {
-        showAlert(AlertType.SUCCESS, "Key deleted", `Key ${finger} deleted`);
+    function onClickDelete(key: Key) {
+        deleteKey(key)
+            .then(() => {
+                updateData();
+                showAlert(
+                    AlertType.SUCCESS,
+                    "Key deleted",
+                    `Key ${key.id} deleted`
+                );
+            })
+            .catch((err) => {
+                showAlert(AlertType.ERROR, "Failed deleting key", err);
+            });
     }
 
     onMount(() => {
@@ -83,7 +124,7 @@
             {#if $keys === null}
                 <p>Loading</p>
             {:else if $keys.length === 0 && paginationPage === 1}
-                <div class="p-3">No users exist. How are you seeing this?</div>
+                <div class="p-3">No keys exist.</div>
             {:else}
                 {#each keysView as key}
                     <tr>
@@ -96,13 +137,13 @@
                             </Link>
                         </th>
                         <td>
-                            {#if key.status === "accepted"}
+                            {#if key.state === "minions"}
                                 <Badge color="success">Accepted</Badge>
-                            {:else if key.status === "pre"}
+                            {:else if key.state === "minions_pre"}
                                 <Badge color="danger">Unaccepted</Badge>
-                            {:else if key.status === "rejected"}
+                            {:else if key.state === "minions_rejected"}
                                 <Badge color="warning">Rejected</Badge>
-                            {:else if key.status === "denied"}
+                            {:else if key.state === "minions_denied"}
                                 <Badge color={null} class="bg-purple"
                                     >Denied</Badge
                                 >
@@ -114,49 +155,44 @@
                         </td>
                         <td>{key.finger}</td>
                         <td>
-                            {#if key.status === "accepted"}
+                            {#if key.state === "minions"}
                                 <Button
-                                    disabled
                                     color="warning"
                                     size="sm"
                                     class="key-btn me-1"
                                     on:click={() => {
-                                        onClickReject(key.finger);
+                                        onClickReject(key);
                                     }}>Reject</Button
-                                >{:else if key.status === "pre"}
+                                >{:else if key.state === "minions_pre"}
                                 <Button
-                                    disabled
                                     color="success"
                                     size="sm"
                                     class="key-btn me-1"
                                     on:click={() => {
-                                        onClickAccept(key.finger);
+                                        onClickAccept(key);
                                     }}>Accept</Button
-                                >{:else if key.status === "rejected"}
+                                >{:else if key.state === "minions_rejected"}
                                 <Button
-                                    disabled
                                     color="success"
                                     size="sm"
                                     class="key-btn me-1"
                                     on:click={() => {
-                                        onClickAccept(key.finger);
+                                        onClickAccept(key);
                                     }}>Accept</Button
-                                >{:else if key.status === "denied"}
+                                >{:else if key.state === "minions_denied"}
                                 <Button
-                                    disabled
-                                    color={null}
+                                    color="success"
                                     size="sm"
-                                    class="key-btn me-1 btn-orange"
+                                    class="key-btn me-1"
                                     on:click={() => {
-                                        onClickAccept(key.finger);
-                                    }}>Force Accept</Button
+                                        onClickAccept(key);
+                                    }}>Accept</Button
                                 >{/if}<Button
-                                disabled
                                 color="danger"
                                 size="sm"
                                 class="key-btn"
                                 on:click={() => {
-                                    onClickDelete(key.finger);
+                                    onClickDelete(key);
                                 }}>Delete</Button
                             >
                         </td>

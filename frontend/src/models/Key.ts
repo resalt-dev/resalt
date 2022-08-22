@@ -3,11 +3,11 @@ export default class Key {
 
     finger: string;
 
-    status: string;
+    state: string;
 
-    constructor(id, finger, status) {
+    constructor(id, finger, state) {
         this.id = id;
         this.finger = finger;
-        this.status = status;
+        this.state = state;
     }
 }

@@ -27,7 +27,7 @@ pub async fn route_keys_get(salt: web::Data<SaltAPI>, req: HttpRequest) -> Resul
     // map tuples to object
     let keys = keys
         .into_iter()
-        .map(|(id, status, finger)| json!({ "id": id, "finger": finger, "status": status }))
+        .map(|(id, state, finger)| json!({ "id": id, "finger": finger, "state": state }))
         .collect::<Vec<Value>>();
 
     Ok(web::Json(keys))
@@ -35,14 +35,27 @@ pub async fn route_keys_get(salt: web::Data<SaltAPI>, req: HttpRequest) -> Resul
 
 #[derive(Deserialize)]
 pub struct KeyInfo {
+    state: SaltKeyState,
     id: String,
 }
 
 pub async fn route_key_accept_put(
     salt: web::Data<SaltAPI>,
     info: web::Path<KeyInfo>,
+    req: HttpRequest,
 ) -> Result<impl Responder> {
-    match salt.accept_key(&info.id).await {
+    let ext = req.extensions_mut();
+    let auth = ext.get::<AuthStatus>().unwrap();
+
+    let salt_token = match &auth.salt_token {
+        Some(salt_token) => salt_token,
+        None => {
+            error!("No salt token found");
+            return Err(api_error_unauthorized());
+        }
+    };
+
+    match salt.accept_key(salt_token, &info.state, &info.id).await {
         Ok(()) => Ok(web::Json({})),
         Err(e) => {
             error!("{:?}", e);
@@ -54,8 +67,20 @@ pub async fn route_key_accept_put(
 pub async fn route_key_reject_put(
     salt: web::Data<SaltAPI>,
     info: web::Path<KeyInfo>,
+    req: HttpRequest,
 ) -> Result<impl Responder> {
-    match salt.reject_key(&info.id).await {
+    let ext = req.extensions_mut();
+    let auth = ext.get::<AuthStatus>().unwrap();
+
+    let salt_token = match &auth.salt_token {
+        Some(salt_token) => salt_token,
+        None => {
+            error!("No salt token found");
+            return Err(api_error_unauthorized());
+        }
+    };
+
+    match salt.reject_key(salt_token, &info.state, &info.id).await {
         Ok(()) => Ok(web::Json({})),
         Err(e) => {
             error!("{:?}", e);
@@ -67,8 +92,20 @@ pub async fn route_key_reject_put(
 pub async fn route_key_delete_delete(
     salt: web::Data<SaltAPI>,
     info: web::Path<KeyInfo>,
+    req: HttpRequest,
 ) -> Result<impl Responder> {
-    match salt.delete_key(&info.id).await {
+    let ext = req.extensions_mut();
+    let auth = ext.get::<AuthStatus>().unwrap();
+
+    let salt_token = match &auth.salt_token {
+        Some(salt_token) => salt_token,
+        None => {
+            error!("No salt token found");
+            return Err(api_error_unauthorized());
+        }
+    };
+
+    match salt.delete_key(salt_token, &info.state, &info.id).await {
         Ok(()) => Ok(web::Json({})),
         Err(e) => {
             error!("{:?}", e);

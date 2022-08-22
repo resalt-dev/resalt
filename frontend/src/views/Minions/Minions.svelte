@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { writable } from "svelte/store";
-    import { AlertType, getMinions, showAlert } from "../../controller";
+    import { getMinions, showAlert } from "../../controller";
     import { theme } from "../../stores";
     import Icon from "../../components/Icon.svelte";
     import paths from "../../paths";
@@ -11,6 +11,7 @@
     import Tabs from "../../components/Tabs.svelte";
     import MinionsTabSearch from "./MinionsTabSearch.svelte";
     import MinionsTabGroups from "./MinionsTabGroups.svelte";
+    import { AlertType } from "../../models/AlertType";
 
     let paginationSize: number = 10;
     let paginationPage: number = 1;

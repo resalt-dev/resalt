@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { showAlert, AlertType, getUserById } from "../../controller";
+    import { showAlert, getUserById } from "../../controller";
     import { theme, currentUser } from "../../stores";
     import { writable } from "svelte/store";
 
@@ -15,6 +15,7 @@
         Input,
         Row,
     } from "sveltestrap";
+    import { AlertType } from "../../models/AlertType";
 
     // export let navigate;
     // export let location;
