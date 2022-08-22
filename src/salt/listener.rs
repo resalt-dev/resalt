@@ -170,7 +170,18 @@ impl SaltEventListener {
                         // If so, then we can assume this is a highstate run.
                         let is_highstate = fun_args.is_empty()
                             || (fun_args.len() == 1
-                                && fun_args[0].as_str().unwrap().to_lowercase() == "test=true");
+                                && ((fun_args[0].is_string()
+                                    && fun_args[0].as_str().unwrap() == "test=True")
+                                    || (fun_args[0].is_object()
+                                        && fun_args[0]
+                                            .as_object()
+                                            .unwrap()
+                                            .get("test")
+                                            .unwrap()
+                                            .as_str()
+                                            .unwrap()
+                                            .to_lowercase()
+                                            == "true")));
                         if !is_highstate {
                             continue;
                         }

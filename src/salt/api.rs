@@ -934,7 +934,7 @@ impl SaltAPI {
         // info!("keys: {:?}", keys);
 
         let mut map = HashMap::new();
-        map.insert("test".to_owned(), "test".to_owned());
+        map.insert("test".to_owned(), "True".to_owned());
         match self
             .run_job_local_async(salt_token, "*", "state.highstate", None, None, Some(map))
             .await
