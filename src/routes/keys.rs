@@ -34,15 +34,15 @@ pub async fn route_keys_get(salt: web::Data<SaltAPI>, req: HttpRequest) -> Resul
 }
 
 #[derive(Deserialize)]
-pub struct KeyFingerInfo {
-    finger: String,
+pub struct KeyInfo {
+    id: String,
 }
 
 pub async fn route_key_accept_put(
     salt: web::Data<SaltAPI>,
-    info: web::Path<KeyFingerInfo>,
+    info: web::Path<KeyInfo>,
 ) -> Result<impl Responder> {
-    match salt.accept_key(&info.finger).await {
+    match salt.accept_key(&info.id).await {
         Ok(()) => Ok(web::Json({})),
         Err(e) => {
             error!("{:?}", e);
@@ -53,9 +53,9 @@ pub async fn route_key_accept_put(
 
 pub async fn route_key_reject_put(
     salt: web::Data<SaltAPI>,
-    info: web::Path<KeyFingerInfo>,
+    info: web::Path<KeyInfo>,
 ) -> Result<impl Responder> {
-    match salt.reject_key(&info.finger).await {
+    match salt.reject_key(&info.id).await {
         Ok(()) => Ok(web::Json({})),
         Err(e) => {
             error!("{:?}", e);
@@ -66,9 +66,9 @@ pub async fn route_key_reject_put(
 
 pub async fn route_key_delete_delete(
     salt: web::Data<SaltAPI>,
-    info: web::Path<KeyFingerInfo>,
+    info: web::Path<KeyInfo>,
 ) -> Result<impl Responder> {
-    match salt.delete_key(&info.finger).await {
+    match salt.delete_key(&info.id).await {
         Ok(()) => Ok(web::Json({})),
         Err(e) => {
             error!("{:?}", e);

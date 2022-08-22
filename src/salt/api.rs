@@ -735,15 +735,15 @@ impl SaltAPI {
         Ok(keys)
     }
 
-    pub async fn accept_key(&self, finger: &str) -> Result<(), SaltError> {
+    pub async fn accept_key(&self, id: &str) -> Result<(), SaltError> {
         Err(SaltError::NotYetImplemented)
     }
 
-    pub async fn reject_key(&self, finger: &str) -> Result<(), SaltError> {
+    pub async fn reject_key(&self, id: &str) -> Result<(), SaltError> {
         Err(SaltError::NotYetImplemented)
     }
 
-    pub async fn delete_key(&self, finger: &str) -> Result<(), SaltError> {
+    pub async fn delete_key(&self, id: &str) -> Result<(), SaltError> {
         Err(SaltError::NotYetImplemented)
     }
 

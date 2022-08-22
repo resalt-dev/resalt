@@ -192,21 +192,21 @@ export async function apiListKeys(
 
 export async function apiAcceptKey(
     token: string,
-    finger: string,
+    id: string,
 ): Promise<void> {
-    await sendAuthenticatedRequest('PUT', `/keys/${finger}/accept`, token);
+    await sendAuthenticatedRequest('PUT', `/keys/${id}/accept`, token);
 }
 
 export async function apiRejectKey(
     token: string,
-    finger: string,
+    id: string,
 ): Promise<void> {
-    await sendAuthenticatedRequest('PUT', `/keys/${finger}/reject`, token);
+    await sendAuthenticatedRequest('PUT', `/keys/${id}/reject`, token);
 }
 
 export async function apiDeleteKey(
     token: string,
-    finger: string,
+    id: string,
 ): Promise<void> {
-    await sendAuthenticatedRequest('DELETE', `/keys/${finger}/delete`, token);
+    await sendAuthenticatedRequest('DELETE', `/keys/${id}/delete`, token);
 }

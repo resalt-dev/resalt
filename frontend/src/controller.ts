@@ -266,17 +266,17 @@ export async function getKeys(): Promise<Array<Key>> {
     return apiListKeys(token);
 }
 
-export async function acceptKey(finger: string): Promise<void> {
+export async function acceptKey(id: string): Promise<void> {
     const token = requireToken();
-    await apiAcceptKey(token, finger);
+    await apiAcceptKey(token, id);
 }
 
-export async function rejectKey(finger: string): Promise<void> {
+export async function rejectKey(id: string): Promise<void> {
     const token = requireToken();
-    await apiRejectKey(token, finger);
+    await apiRejectKey(token, id);
 }
 
-export async function deleteKey(finger: string): Promise<void> {
+export async function deleteKey(id: string): Promise<void> {
     const token = requireToken();
-    await apiDeleteKey(token, finger);
+    await apiDeleteKey(token, id);
 }
