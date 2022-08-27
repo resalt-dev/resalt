@@ -265,7 +265,7 @@
                                 >{minion.id}</Link
                             >
                         </th>
-                        <td>{minion.osType}</td>
+                        <td>{minion.osType ?? "Unknown"}</td>
                         <td>{minion.lastSeen}</td>
                         <td>
                             {#if minion.lastUpdatedConformity === null}
