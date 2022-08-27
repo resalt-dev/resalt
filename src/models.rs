@@ -98,6 +98,7 @@ pub struct Minion {
     pub conformity_incorrect: Option<i32>,
     pub conformity_error: Option<i32>,
     pub last_updated_conformity: Option<chrono::NaiveDateTime>,
+    pub os_type: Option<String>,
 }
 
 impl Default for Minion {
@@ -116,6 +117,7 @@ impl Default for Minion {
             conformity_incorrect: None,
             conformity_error: None,
             last_updated_conformity: None,
+            os_type: None,
         }
     }
 }
@@ -153,6 +155,7 @@ impl Serialize for Minion {
         state.serialize_field("conformityIncorrect", &self.conformity_incorrect)?;
         state.serialize_field("conformityError", &self.conformity_error)?;
         state.serialize_field("lastUpdatedConformity", &last_updated_conformity)?;
+        state.serialize_field("osType", &self.os_type)?;
         state.end()
     }
 }

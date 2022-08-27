@@ -52,6 +52,7 @@ table! {
         conformity_incorrect -> Nullable<Integer>,
         conformity_error -> Nullable<Integer>,
         last_updated_conformity -> Nullable<Timestamp>,
+        os_type -> Nullable<Varchar>,
     }
 }
 
@@ -63,11 +64,4 @@ table! {
     }
 }
 
-allow_tables_to_appear_in_same_query!(
-    authtokens,
-    events,
-    jobs,
-    job_returns,
-    minions,
-    users,
-);
+allow_tables_to_appear_in_same_query!(authtokens, events, jobs, job_returns, minions, users,);

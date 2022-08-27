@@ -191,9 +191,13 @@ export async function getCurrentUser(): Promise<PublicUser> {
     return apiGetCurrentUser(token);
 }
 
-export async function getMinions(limit?: number, offset?: number): Promise<Array<Minion>> {
+export async function getMinions(
+    sort?: string,
+    limit?: number,
+    offset?: number,
+): Promise<Array<Minion>> {
     const token = requireToken();
-    return apiListMinions(token, limit, offset);
+    return apiListMinions(token, sort, limit, offset);
 }
 
 export async function refreshMinions(): Promise<void> {

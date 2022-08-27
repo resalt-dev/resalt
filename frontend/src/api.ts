@@ -81,11 +81,13 @@ export async function apiGetCurrentUser(token: string): Promise<PublicUser> {
 
 export async function apiListMinions(
     token: string,
+    sort?: string,
     limit?: number,
     offset?: number,
 ): Promise<Array<Minion>> {
     const args = new URLSearchParams();
 
+    if (sort) args.append('sort', sort);
     if (limit) args.append('limit', limit.toString());
     if (offset) args.append('offset', offset.toString());
 

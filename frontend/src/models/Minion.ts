@@ -41,6 +41,8 @@ export default class Minion {
 
     lastUpdatedConformity: string | null;
 
+    osType: string | null;
+
     constructor(
         id: string,
         lastSeen: string,
@@ -55,6 +57,7 @@ export default class Minion {
         conformityIncorrect: number = 0,
         conformityError: number = 0,
         lastUpdatedConformity: string | null = null,
+        osType: string | null = null,
     ) {
         this.id = id;
         this.lastSeen = lastSeen;
@@ -69,5 +72,6 @@ export default class Minion {
         this.conformityIncorrect = conformityIncorrect;
         this.conformityError = conformityError;
         this.lastUpdatedConformity = lastUpdatedConformity;
+        this.osType = osType;
     }
 }

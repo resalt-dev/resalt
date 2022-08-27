@@ -5,6 +5,7 @@ use serde::Deserialize;
 
 #[derive(Deserialize)]
 pub struct MinionsListGetQuery {
+    sort: Option<String>,
     limit: Option<i64>,
     offset: Option<i64>,
 }
@@ -13,10 +14,11 @@ pub async fn route_minions_get(
     data: web::Data<Storage>,
     query: web::Query<MinionsListGetQuery>,
 ) -> Result<impl Responder> {
+    let sort = query.sort.clone();
     let limit = query.limit;
     let offset = query.offset;
 
-    let minions = match data.list_minions(limit, offset) {
+    let minions = match data.list_minions(sort, limit, offset) {
         Ok(minions) => minions,
         Err(e) => {
             error!("{:?}", e);

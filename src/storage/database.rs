@@ -203,6 +203,20 @@ impl Storage {
         let last_updated_pillars = pillars.as_ref().map(|_| time);
         let last_updated_pkgs = pkgs.as_ref().map(|_| time);
         let last_updated_conformity = conformity.as_ref().map(|_| time);
+
+        // Parse grains as JSON, and fetch osfullname+osrelease as os_type.
+        let parsed_grains = grains
+            .as_ref()
+            .map(|grains| serde_json::from_str::<serde_json::Value>(grains).unwrap());
+        let os_type = match parsed_grains {
+            Some(grains) => {
+                let osfullname = grains["osfullname"].as_str().unwrap_or("Unknown");
+                let osrelease = grains["osrelease"].as_str().unwrap_or("");
+                Some(format!("{} {}", osfullname, osrelease).trim().to_string())
+            }
+            None => None,
+        };
+
         let changeset = Minion {
             id: minion_id.clone(),
             last_seen: time,
@@ -217,6 +231,7 @@ impl Storage {
             conformity_incorrect,
             conformity_error,
             last_updated_conformity,
+            os_type,
         };
 
         // Update if it exists, insert if it doesn't
@@ -353,6 +368,7 @@ impl Storage {
 
     pub fn list_minions(
         &self,
+        sort: Option<String>,
         limit: Option<i64>,
         offset: Option<i64>,
     ) -> Result<Vec<Minion>, String> {
@@ -361,6 +377,23 @@ impl Storage {
         query = query.order(minions::id.asc());
 
         // Filtering
+
+        // Sorting
+        match sort.unwrap_or(String::from("id.asc")).as_str() {
+            "id.asc" => query = query.order(minions::id.asc()),
+            "id.desc" => query = query.order(minions::id.desc()),
+            "lastSeen.asc" => query = query.order(minions::last_seen.asc()),
+            "lastSeen.desc" => query = query.order(minions::last_seen.desc()),
+            "conformitySuccess.asc" => query = query.order(minions::conformity_success.asc()),
+            "conformitySuccess.desc" => query = query.order(minions::conformity_success.desc()),
+            "conformityIncorrect.asc" => query = query.order(minions::conformity_incorrect.asc()),
+            "conformityIncorrect.desc" => query = query.order(minions::conformity_incorrect.desc()),
+            "conformityError.asc" => query = query.order(minions::conformity_error.asc()),
+            "conformityError.desc" => query = query.order(minions::conformity_error.desc()),
+            "osType.asc" => query = query.order(minions::os_type.asc()),
+            "osType.desc" => query = query.order(minions::os_type.desc()),
+            _ => {}
+        }
 
         // Pagination
         query = query.limit(limit.unwrap_or(100));
