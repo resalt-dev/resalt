@@ -15,7 +15,7 @@ services:
       - "3306:3306"
 
   master:
-    image: saltstack/salt:3004rc1
+    image: saltstack/salt:3005
     hostname: master
     volumes:
       - ./docker/saltconfig/etc/master:/etc/salt/master:ro
@@ -27,7 +27,7 @@ services:
     ports:
       - "8080:8080"
   minion:
-    image: saltstack/salt:3004rc1
+    image: saltstack/salt:3005
     command: salt-minion -l info
     volumes:
       - ./docker/saltconfig/etc/minion:/etc/salt/minion:ro
