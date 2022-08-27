@@ -371,6 +371,17 @@ impl Storage {
             .map_err(|e| format!("{:?}", e))
     }
 
+    // Delete minions not in the list of ID's
+    // ID's are Varchars
+    pub fn prune_minions(&self, ids: Vec<String>) -> Result<(), String> {
+        let filter = minions::id.ne_all(ids);
+        let table = minions::table.filter(filter);
+        diesel::delete(table)
+            .execute(&self.create_connection()?)
+            .map_err(|e| format!("{:?}", e))?;
+        Ok(())
+    }
+
     //////////////
     /// Events ///
     //////////////

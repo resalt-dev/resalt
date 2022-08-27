@@ -202,3 +202,10 @@ pub struct AuthStatus {
     pub user_id: String,
     pub salt_token: Option<SaltToken>,
 }
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SaltMinionKey {
+    pub id: String,
+    pub state: String,
+    pub finger: String,
+}

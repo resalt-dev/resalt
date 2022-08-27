@@ -2,9 +2,12 @@ use crate::prelude::*;
 use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 use serde::Deserialize;
-use serde_json::{json, Value};
 
-pub async fn route_keys_get(salt: web::Data<SaltAPI>, req: HttpRequest) -> Result<impl Responder> {
+pub async fn route_keys_get(
+    salt: web::Data<SaltAPI>,
+    data: web::Data<Storage>,
+    req: HttpRequest,
+) -> Result<impl Responder> {
     let ext = req.extensions_mut();
     let auth = ext.get::<AuthStatus>().unwrap();
 
@@ -24,11 +27,19 @@ pub async fn route_keys_get(salt: web::Data<SaltAPI>, req: HttpRequest) -> Resul
         }
     };
 
-    // map tuples to object
-    let keys = keys
+    // Clean out non-existing minions
+    let ids = keys
+        .clone()
         .into_iter()
-        .map(|(id, state, finger)| json!({ "id": id, "finger": finger, "state": state }))
-        .collect::<Vec<Value>>();
+        .map(|key| key.id)
+        .collect::<Vec<String>>();
+    match data.prune_minions(ids) {
+        Ok(_) => (),
+        Err(e) => {
+            error!("{:?}", e);
+            return Err(api_error_internal_error());
+        }
+    };
 
     Ok(web::Json(keys))
 }
