@@ -462,7 +462,24 @@ impl SaltAPI {
         };
         debug!("run_job run body {:?}", body);
 
-        Ok(body)
+        let body = match body.get("return") {
+            Some(body) => body,
+            None => {
+                return Err(SaltError::MissingExpectedDataError(
+                    "run_job: missing return".to_string(),
+                ));
+            }
+        };
+        let body = match body.get(0) {
+            Some(body) => body,
+            None => {
+                return Err(SaltError::MissingExpectedDataError(
+                    "run_job: missing return[0]".to_owned(),
+                ));
+            }
+        };
+
+        Ok(body.clone())
     }
 
     pub async fn run_job_local<S: AsRef<str>>(
@@ -617,27 +634,11 @@ impl SaltAPI {
                 return Err(e);
             }
         };
-        let data = match data.get("return") {
-            Some(res) => res,
-            None => {
-                return Err(SaltError::MissingExpectedDataError(
-                    "run_job_wheel: missing return".to_owned(),
-                ));
-            }
-        };
-        let data = match data.get(0) {
-            Some(res) => res,
-            None => {
-                return Err(SaltError::MissingExpectedDataError(
-                    "run_job_wheel: missing return[0]".to_owned(),
-                ));
-            }
-        };
         let data = match data.get("data") {
             Some(res) => res,
             None => {
                 return Err(SaltError::MissingExpectedDataError(
-                    "run_job_wheel: missing return[0]['data']".to_owned(),
+                    "run_job_wheel: missing ['data']".to_owned(),
                 ));
             }
         };

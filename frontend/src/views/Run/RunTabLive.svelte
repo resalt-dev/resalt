@@ -13,6 +13,11 @@
     } from "sveltestrap";
     import { quoteSplit } from "../../utils";
     import { theme } from "../../stores";
+    import { runJob } from "../../controller";
+    import RunResult from "../../models/RunResult";
+    import RunCommand from "../../models/RunCommand";
+
+    export let tabData: any;
 
     let runConfirmDialog = false;
 
@@ -27,10 +32,8 @@
     let runBatchSize = "";
     let runTimeout = null;
 
-    // These are pre-comupted before showing the confirmation modal.
-    let client = "";
-    let arg: string[] = [];
-    let kwarg: Map<string, string> = new Map();
+    // Pre-comupted before showing the confirmation modal.
+    let command: RunCommand = null;
 
     function formSaveTemplate() {}
 
@@ -50,6 +53,7 @@
 
     function openRunNowDialog() {
         // client
+        let client = null;
         switch (runClientType) {
             case "local":
                 if (runBatch) {
@@ -76,13 +80,27 @@
                 break;
         }
         // arg
-        arg = quoteSplit(runArguments);
+        let arg = quoteSplit(runArguments);
         // kwarg
-        kwarg.clear();
+        let kwarg = new Map<string, string>();
         quoteSplit(runKeywordArguments).forEach((item) => {
             let [key, value] = item.split("=");
             kwarg.set(key, value);
         });
+
+        // Clone / keep a local copy of all run parameters,
+        // in case they change between running the job and storing
+        // the result in results array.
+        command = new RunCommand(
+            client,
+            runTargetType,
+            runTarget,
+            runFunction,
+            arg,
+            kwarg,
+            runBatchSize,
+            runTimeout
+        );
 
         // Show confirm dialog
         runConfirmDialog = true;
@@ -93,16 +111,27 @@
     }
 
     function executeRunNow() {
-        /*
-        export async function runJob(
-    tgtType: string,
-    tgt: string,
-    fun: string,
-    arg: Array<string>,
-    kwarg: Map<string, string>,
-    batchSize: string,
-    timeout: number,
-): Promise<Job> {*/
+        runJob(
+            command.client,
+            command.targetType,
+            command.target,
+            command.fun,
+            command.arg,
+            command.kwarg,
+            command.batchSize,
+            command.timeout
+        )
+            .then((result) => {
+                console.log(result);
+                tabData.returns.update((returns: RunResult[]) => [
+                    new RunResult(command, returns.length, result),
+                    ...returns,
+                ]);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+        closeRunNowDialog();
     }
 </script>
 
@@ -267,21 +296,28 @@
             You are about to execute the following job:
             <br />
             <br />
-            Client Type: <b>{client}</b>
+            Client Type: <b>{command.client}</b>
             <br />
-            Target Type: <b>{runTargetType}</b>
+            Target Type: <b>{command.targetType}</b>
             <br />
-            Target: <b>{runTarget}</b>
+            Target: <b>{command.target}</b>
             <br />
-            Function: <b>{runFunction}</b>
+            Function: <b>{command.fun}</b>
             <br />
-            Arguments: <b>{JSON.stringify(arg)}</b>
+            Arguments: <b>{JSON.stringify(command.arg)}</b>
             <br />
             Keyword Arguments:
-            <pre class="fw-bold"><b
-                    >{JSON.stringify(Object.fromEntries(kwarg), null, 4)}</b
+            <pre class="fw-bold d-inline"><b
+                    >{JSON.stringify(
+                        Object.fromEntries(command.kwarg),
+                        null,
+                        4
+                    )}</b
                 ></pre>
-            Timeout:{" "}<b>{runTimeout}</b>
+            <br />
+            Timeout:{" "}<b
+                >{command.timeout == null ? "none" : command.timeout}</b
+            >
             <br />
         </ModalBody>
         <ModalFooter>

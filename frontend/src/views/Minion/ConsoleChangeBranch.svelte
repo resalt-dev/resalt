@@ -1,8 +1,12 @@
 <script lang="ts">
-    export let changes;
-    export let shift;
+    export let data: any;
+    export let shift: number;
 
-    function rightShiftLines(str, paddingLength, char = " ") {
+    function rightShiftLines(
+        str: string,
+        paddingLength: number,
+        char: string = " "
+    ) {
         // Append paddingLength of spaces to all lines
         let lines = str.split("\n");
         let padding = "";
@@ -15,32 +19,34 @@
         }
         return paddedLines.join("\n");
     }
+
+    $: console.log("data2", data);
 </script>
 
-{#if typeof changes === "object"}
-    {#if Object.keys(changes).length != 0}
+{#if typeof data === "object" && data != null}
+    {#if Object.keys(data).length != 0}
         <pre class="text-console m-0 text-cyan">{rightShiftLines(
                 "----------",
                 shift
             )}</pre>
-        {#each Object.entries(changes) as [changeKey, changeValue]}
+        {#each Object.entries(data) as [changeKey, changeValue]}
             <pre class="text-console m-0 text-cyan">{rightShiftLines(
                     changeKey,
                     shift
-                )}</pre>
-            {#if typeof changes === "string"}
+                )}<span class="text-light">:</span></pre>
+            {#if typeof data === "string"}
                 <pre class="text-console m-0 text-green">{rightShiftLines(
-                        (changes + "").trim(),
+                        (data + "").trim(),
                         shift
                     )}</pre>
             {:else}
-                <svelte:self changes={changeValue} shift={shift + 4} />
+                <svelte:self data={changeValue} shift={shift + 4} />
             {/if}
         {/each}
     {/if}
 {:else}
     <pre class="text-console m-0 text-green">{rightShiftLines(
-            (changes + "").trim(),
+            (data + "").trim(),
             shift
         )}</pre>
 {/if}

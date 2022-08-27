@@ -3,6 +3,7 @@
     import { theme } from "../stores";
 
     export let children = [];
+    export let tabData: any = {};
     let selected: number = 0;
 </script>
 
@@ -30,6 +31,7 @@
         <svelte:component
             this={children[selected].component}
             label={children[selected].label}
+            {tabData}
         />
     </CardBody>
 </Card>

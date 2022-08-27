@@ -93,10 +93,11 @@ export async function connectEvents(timeout: number = 1000): Promise<EventSource
             const data = JSON.parse(e.data);
             console.log('data', data);
 
+            // eslint-disable-next-line no-unused-vars
             const { content } = data;
 
             switch (data.type) {
-            /*case 'update_minion':
+            /* case 'update_minion':
                 minionsStore.update((minions: Array<Minion>) => {
                     // minions is a Vector of Minions.
                     // If minion exists, replace it. If not, then add it.
@@ -110,7 +111,7 @@ export async function connectEvents(timeout: number = 1000): Promise<EventSource
                     }
                     return minions;
                 });
-                break;*/
+                break; */
             default:
                 console.log('Unknown event type', data.type);
             }
@@ -217,6 +218,7 @@ export async function getJobs(
 }
 
 export async function runJob(
+    client: string,
     tgtType: string,
     tgt: string,
     fun: string,
@@ -224,9 +226,9 @@ export async function runJob(
     kwarg: Map<string, string>,
     batchSize: string,
     timeout: number,
-): Promise<Job> {
+): Promise<any> {
     const token = requireToken();
-    return apiRunJob(token, tgtType, tgt, fun, arg, kwarg, batchSize, timeout);
+    return apiRunJob(token, client, tgtType, tgt, fun, arg, kwarg, batchSize, timeout);
 }
 
 export async function getJobById(id: string): Promise<Job> {

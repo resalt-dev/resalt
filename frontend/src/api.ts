@@ -124,6 +124,7 @@ export async function apiListJobs(
 
 export async function apiRunJob(
     token: string,
+    client: string,
     tgtType: string,
     tgt: string,
     fun: string,
@@ -131,8 +132,9 @@ export async function apiRunJob(
     kwarg: Map<string, string>,
     batchSize: string,
     timeout: number,
-): Promise<Job> {
+): Promise<any> {
     return sendAuthenticatedRequest('POST', '/jobs', token, {
+        client,
         tgtType,
         tgt,
         fun,
@@ -142,7 +144,6 @@ export async function apiRunJob(
         timeout,
     });
 }
-
 
 export async function apiGetJobById(
     token: string,
@@ -173,7 +174,7 @@ export async function apiListUsers(
 
     if (limit) args.append('limit', limit.toString());
     if (offset) args.append('offset', offset.toString());
-    
+
     return sendAuthenticatedRequest('GET', `/users?${args.toString()}`, token);
 }
 
@@ -187,7 +188,7 @@ export async function apiGetUser(
 export async function apiListKeys(
     token: string,
 ): Promise<Array<Key>> {
-    return sendAuthenticatedRequest('GET', `/keys`, token);
+    return sendAuthenticatedRequest('GET', '/keys', token);
 }
 
 export async function apiAcceptKey(

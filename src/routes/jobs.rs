@@ -64,7 +64,7 @@ pub struct JobRunRequest {
     fun: String,
     arg: Vec<String>,
     kwarg: Dictionary,
-    #[serde(rename = "batch_size")]
+    #[serde(rename = "batchSize")]
     batch_size: String,
     timeout: Option<u64>,
 }

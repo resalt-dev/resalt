@@ -1,5 +1,6 @@
 <script lang="ts">
     import JsonViewer from "../../components/JsonViewer.svelte";
+    import ResultBox from "../../components/ResultBox.svelte";
     import { theme } from "../../stores";
     import ConsoleChangeBranch from "./ConsoleChangeBranch.svelte";
 
@@ -107,32 +108,6 @@
                     return 0;
             }
         });
-
-    function leftPadToTotalLength(
-        str: string,
-        maxLength: number,
-        char: string = " "
-    ) {
-        return char.repeat(maxLength - str.length) + str;
-    }
-    function rightShiftLinesExceptFirst(
-        str: string,
-        paddingLength: number,
-        char: string = " "
-    ) {
-        // Append paddingLength of spaces to each line except the first
-        let lines = str.split("\n");
-        let firstLine = lines.shift() ?? "";
-        let padding = "";
-        for (let i = 0; i < paddingLength; i++) {
-            padding += char;
-        }
-        let paddedLines = [firstLine];
-        for (let line of lines) {
-            paddedLines.push(padding + line);
-        }
-        return paddedLines.join("\n");
-    }
 </script>
 
 {#if !$minion.conformity}
@@ -267,9 +242,7 @@
                 <div class="d-grid">
                     {#each conformity as conform}
                         <div
-                            class="card mb-3 {$theme.dark
-                                ? 'bg-secondary'
-                                : ''} startside-{conform.color} {!(
+                            class=" {!(
                                 (showSuccess && conform.data.result === true) ||
                                 (showIncorrect &&
                                     conform.data.result === null) ||
@@ -278,93 +251,25 @@
                                 ? 'd-none'
                                 : ''}"
                         >
-                            <div
-                                type="button"
-                                class="card-header"
-                                data-bs-toggle="collapse"
-                                data-bs-target="#conformityCollapse{conform.data
-                                    .__run_num__}"
-                            >
-                                <span class=" fw-bold"
-                                    >{conform.data.__sls__} :
-                                </span>
-                                {conform.data.__id__}
-                                <small class="text-muted">({conform.fun})</small
-                                >
-                                <small class="float-end text-muted pt-1">
-                                    # {conform.data.__run_num__}
-                                </small>
-                            </div>
-                            <div
-                                class="collapse {(showSuccess &&
+                            <ResultBox
+                                color={conform.color}
+                                num={conform.data.__run_num__}
+                                sls={conform.data.__sls__}
+                                stateName={conform.data.__id__}
+                                fun={conform.fun}
+                                name={conform.data.name}
+                                result={conform.data.result}
+                                comment={conform.data.comment}
+                                startTime={conform.data.start_time}
+                                duration={conform.data.duration}
+                                changes={conform.data.changes}
+                                show={(showSuccess &&
                                     conform.data.result === true) ||
-                                (showIncorrect &&
-                                    conform.data.result === null) ||
-                                (showError && conform.data.result === false)
-                                    ? 'show'
-                                    : ''}"
-                                id="conformityCollapse{conform.data
-                                    .__run_num__}"
-                            >
-                                <div class="card-body bg-dark text-light">
-                                    <div class="card-text">
-                                        <pre
-                                            class="text-console m-0 text-{conform.color}">{leftPadToTotalLength(
-                                                "ID",
-                                                SHIFT
-                                            )}: {conform.data.__id__}</pre>
-                                        <pre
-                                            class="text-console m-0 text-{conform.color}">{leftPadToTotalLength(
-                                                "Function",
-                                                SHIFT
-                                            )}: {conform.fun}</pre>
-                                        <pre
-                                            class="text-console m-0 text-{conform.color}">{leftPadToTotalLength(
-                                                "Name",
-                                                SHIFT
-                                            )}: {conform.data.name}</pre>
-                                        <pre
-                                            class="text-console m-0 text-{conform.color}">{leftPadToTotalLength(
-                                                "Result",
-                                                SHIFT
-                                            )}: <span
-                                                style="text-transform:capitalize;"
-                                                >{conform.data.result === null
-                                                    ? "None"
-                                                    : conform.data.result}</span
-                                            ></pre>
-                                        <pre
-                                            class="text-console m-0 text-{conform.color}">{leftPadToTotalLength(
-                                                "Comment",
-                                                SHIFT
-                                            )}: {rightShiftLinesExceptFirst(
-                                                conform.data.comment,
-                                                SHIFT + 2
-                                            )}</pre>
-                                        <pre
-                                            class="text-console m-0 text-{conform.color}">{leftPadToTotalLength(
-                                                "Started",
-                                                SHIFT
-                                            )}: {conform.data.start_time}</pre>
-                                        <pre
-                                            class="text-console m-0 text-{conform.color}">{leftPadToTotalLength(
-                                                "Duration",
-                                                SHIFT
-                                            )}: {conform.data.duration}</pre>
-                                        <pre
-                                            class="text-console m-0 text-{conform.color}">{leftPadToTotalLength(
-                                                "Changes",
-                                                SHIFT
-                                            )}:</pre>
-                                        {#if Object.keys(conform.data.changes).length != 0}
-                                            <ConsoleChangeBranch
-                                                changes={conform.data.changes}
-                                                shift={SHIFT + 2}
-                                            />
-                                        {/if}
-                                    </div>
-                                </div>
-                            </div>
+                                    (showIncorrect &&
+                                        conform.data.result === null) ||
+                                    (showError &&
+                                        conform.data.result === false)}
+                            />
                         </div>
                     {/each}
                 </div>
