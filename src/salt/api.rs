@@ -668,10 +668,7 @@ impl SaltAPI {
     }
 
     /// Returns host:status:finger pair
-    pub async fn get_keys(
-        &self,
-        salt_token: &SaltToken,
-    ) -> Result<Vec<(String, String, String)>, SaltError> {
+    pub async fn get_keys(&self, salt_token: &SaltToken) -> Result<Vec<SaltMinionKey>, SaltError> {
         let data = match self
             .run_job_wheel(
                 salt_token,
@@ -741,38 +738,38 @@ impl SaltAPI {
         let mut keys = Vec::new();
         if let Some(minions_rejected) = minions_rejected {
             for (host, finger) in minions_rejected.iter() {
-                keys.push((
-                    host.clone(),
-                    SaltKeyState::Rejected.to_string(),
-                    finger.as_str().unwrap().to_owned(),
-                ));
+                keys.push(SaltMinionKey {
+                    id: host.clone(),
+                    state: SaltKeyState::Rejected.to_string(),
+                    finger: finger.as_str().unwrap().to_owned(),
+                });
             }
         }
         if let Some(minions_denied) = minions_denied {
             for (host, finger) in minions_denied.iter() {
-                keys.push((
-                    host.clone(),
-                    SaltKeyState::Denied.to_string(),
-                    finger.as_str().unwrap().to_owned(),
-                ));
+                keys.push(SaltMinionKey {
+                    id: host.clone(),
+                    state: SaltKeyState::Denied.to_string(),
+                    finger: finger.as_str().unwrap().to_owned(),
+                });
             }
         }
         if let Some(minions_pre) = minions_pre {
             for (host, finger) in minions_pre.iter() {
-                keys.push((
-                    host.clone(),
-                    SaltKeyState::Pending.to_string(),
-                    finger.as_str().unwrap().to_owned(),
-                ));
+                keys.push(SaltMinionKey {
+                    id: host.clone(),
+                    state: SaltKeyState::Pending.to_string(),
+                    finger: finger.as_str().unwrap().to_owned(),
+                });
             }
         }
         if let Some(minions) = minions {
             for (host, finger) in minions.iter() {
-                keys.push((
-                    host.clone(),
-                    SaltKeyState::Accepted.to_string(),
-                    finger.as_str().unwrap().to_owned(),
-                ));
+                keys.push(SaltMinionKey {
+                    id: host.clone(),
+                    state: SaltKeyState::Accepted.to_string(),
+                    finger: finger.as_str().unwrap().to_owned(),
+                });
             }
         }
         Ok(keys)
