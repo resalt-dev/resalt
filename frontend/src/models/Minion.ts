@@ -25,7 +25,7 @@ export default class Minion {
 
     pkgs: string | null;
 
-    lastUpdated_grains: string | null;
+    lastUpdatedGrains: string | null;
 
     lastUpdatedPillars: string | null;
 
@@ -47,7 +47,7 @@ export default class Minion {
         grains: string | null = null,
         pillars: string | null = null,
         pkgs: string | null = null,
-        lastUpdated_grains: string | null = null,
+        lastUpdatedGrains: string | null = null,
         lastUpdatedPillars: string | null = null,
         lastUpdatedPkgs: string | null = null,
         conformity: string | null = null,
@@ -61,7 +61,7 @@ export default class Minion {
         this.grains = grains;
         this.pillars = pillars;
         this.pkgs = pkgs;
-        this.lastUpdated_grains = lastUpdated_grains;
+        this.lastUpdatedGrains = lastUpdatedGrains;
         this.lastUpdatedPillars = lastUpdatedPillars;
         this.lastUpdatedPkgs = lastUpdatedPkgs;
         this.conformity = conformity;

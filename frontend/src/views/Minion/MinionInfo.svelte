@@ -97,8 +97,7 @@
                         : ''}"
                 >
                     <strong>Number of CPUs</strong>
-                    <span class="float-end">{grains.num_cpus ?? "Unknown"}</span
-                    >
+                    <span class="float-end">{grains.numCpus ?? "Unknown"}</span>
                 </li>
                 <li
                     class="list-group-item {$theme.dark
@@ -184,7 +183,7 @@
                         : ''}"
                 >
                     <strong>Last seen</strong>
-                    <span class="float-end">{$minion.last_seen} UTC</span>
+                    <span class="float-end">{$minion.lastSeen} UTC</span>
                 </li>
                 <li
                     class="list-group-item {$theme.dark
@@ -193,8 +192,8 @@
                 >
                     <strong>Conformity check</strong>
                     <span class="float-end"
-                        >{$minion.last_updated_conformity != null
-                            ? $minion.last_updated_conformity + " UTC"
+                        >{$minion.lastUpdatedConformity != null
+                            ? $minion.lastUpdatedConformity + " UTC"
                             : "Never"}</span
                     >
                 </li>
@@ -205,8 +204,8 @@
                 >
                     <strong>Grains fetched</strong>
                     <span class="float-end"
-                        >{$minion.last_updated_grains != null
-                            ? $minion.last_updated_grains + " UTC"
+                        >{$minion.lastUpdatedGrains != null
+                            ? $minion.lastUpdatedGrains + " UTC"
                             : "Never"}</span
                     >
                 </li>
@@ -217,8 +216,8 @@
                 >
                     <strong>Pillars fetched</strong>
                     <span class="float-end"
-                        >{$minion.last_updated_pillars != null
-                            ? $minion.last_updated_pillars + " UTC"
+                        >{$minion.lastUpdatedPillars != null
+                            ? $minion.lastUpdatedPillars + " UTC"
                             : "Never"}</span
                     >
                 </li>
@@ -229,8 +228,8 @@
                 >
                     <strong>Packages fetched</strong>
                     <span class="float-end"
-                        >{$minion.last_updated_pkgs != null
-                            ? $minion.last_updated_pkgs + " UTC"
+                        >{$minion.lastUpdatedPkgs != null
+                            ? $minion.lastUpdatedPkgs + " UTC"
                             : "Never"}</span
                     >
                 </li>

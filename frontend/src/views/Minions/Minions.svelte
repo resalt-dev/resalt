@@ -26,7 +26,7 @@
                         const grains = JSON.parse(minion.grains ?? "{}");
                         return {
                             ...minion,
-                            datatable_type: (
+                            datatableType: (
                                 (grains["osfullname"] ?? "Unknown") +
                                 " " +
                                 (grains["osrelease"] ?? "")
@@ -157,22 +157,22 @@
                                 >{minion.id}</Link
                             >
                         </th>
-                        <td>{minion.datatable_type}</td>
-                        <td>{minion.last_seen}</td>
+                        <td>{minion.datatableType}</td>
+                        <td>{minion.lastSeen}</td>
                         <td>
-                            {#if minion.last_updated_conformity === null}
+                            {#if minion.lastUpdatedConformity === null}
                                 <span class="badge bg-purple"> Unknown </span>
                             {:else}
                                 <span class="badge bg-green">
-                                    {minion.conformity_success ?? "?"}
+                                    {minion.conformitySuccess ?? "?"}
                                 </span>
                                 /
                                 <span class="badge bg-warning">
-                                    {minion.conformity_incorrect ?? "?"}
+                                    {minion.conformityIncorrect ?? "?"}
                                 </span>
                                 /
                                 <span class="badge bg-red">
-                                    {minion.conformity_error ?? "?"}
+                                    {minion.conformityError ?? "?"}
                                 </span>
                             {/if}
                         </td>
