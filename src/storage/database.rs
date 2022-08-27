@@ -372,7 +372,6 @@ impl Storage {
     }
 
     // Delete minions not in the list of ID's
-    // ID's are Varchars
     pub fn prune_minions(&self, ids: Vec<String>) -> Result<(), String> {
         let filter = minions::id.ne_all(ids);
         let table = minions::table.filter(filter);
