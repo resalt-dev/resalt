@@ -35,7 +35,7 @@
     });
 
     $: subPage = location.pathname.split("/")[4];
-    $: console.log("location", location, subPage);
+    //$: console.log("location", location, subPage);
     $: subPagesNav = [
         {
             name: "General",

@@ -7,48 +7,81 @@
     import { ensureSyntaxTree } from "@codemirror/language";
     import { json } from "@codemirror/lang-json";
     import { onDestroy, onMount } from "svelte";
+    import { theme } from "../stores";
 
-    export let code;
+    export let data: any;
 
-    let editorElement;
-    let view = undefined;
+    let editorElement: HTMLElement | null = null;
+    let cm = undefined;
 
-    $: code = JSON.stringify(JSON.parse(code), null, 2);
+    $: dataFormatted = JSON.stringify(data, null, 2);
     $: {
-        if (view) {
+        if (cm) {
             // Update value
-            view.dispatch({
+            cm.dispatch({
                 changes: {
                     from: 0,
-                    to: view.state.doc.length,
-                    insert: code,
+                    to: cm.state.doc.length,
+                    insert: dataFormatted,
                 },
             });
+            console.log(cm);
             console.log("code view updated!");
         }
     }
 
     onMount(() => {
         let state = EditorState.create({
-            doc: code,
+            doc: dataFormatted,
             extensions: [basicSetup, EditorState.readOnly.of(true), json()],
         });
-        view = new EditorView({ state });
-        editorElement.replaceChildren(view.dom);
+        cm = new EditorView({ state });
+        editorElement.replaceChildren(cm.dom);
         ensureSyntaxTree(state, state.doc.length, 5000);
-        view.dispatch({});
+        cm.dispatch({});
     });
 
     onDestroy(() => {
         editorElement.replaceChildren();
-        view = undefined;
+        cm = undefined;
     });
 </script>
 
-<div bind:this={editorElement} />
+<div
+    class="cm-resalt cm-resalt-{$theme.dark ? 'dark' : 'light'}"
+    bind:this={editorElement}
+/>
 
 <style>
-    :global(.CodeMirror) {
-        height: 100%;
+    :global(.cm-resalt-dark) {
+        background: var(--black);
+        color: var(--light);
+    }
+
+    :global(.cm-resalt-light) {
+        background: var(--white);
+        color: var(--black);
+    }
+
+    /* string */
+    :global(.cm-resalt .ͼe) {
+        color: var(--primary);
+    }
+
+    /* bool */
+    :global(.cm-resalt .ͼc) {
+        color: var(--orange);
+        font-weight: bold;
+    }
+
+    /* number */
+    :global(.cm-resalt .ͼd) {
+        color: var(--magenta);
+    }
+
+    /* null */
+    :global(.cm-resalt .ͼb) {
+        color: var(--purple);
+        font-style: italic;
     }
 </style>

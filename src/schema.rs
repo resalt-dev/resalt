@@ -61,6 +61,8 @@ table! {
         id -> Varchar,
         username -> Varchar,
         password -> Nullable<Varchar>,
+        perms -> Nullable<Text>,
+        last_login -> Nullable<Timestamp>,
     }
 }
 

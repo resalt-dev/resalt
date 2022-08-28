@@ -407,14 +407,38 @@ external_auth:
     apiuser:
       - test.ping
       - minion\*:
-          - network.*
+        - network.*
       - '@wheel':
-          - key.list_all
+        - key.list_all
       - minion2:
-          - network.*
-          - state.*
+        - network.*
+        - state.*
       - 'G@os:RedHat':
-          - kmod.*
+        - kmod.*
+      - web*:
+        - 'my_mod.*':
+            args:
+              - 'a.*'
+              - 'b.*'
+            kwargs:
+              'kwa': 'kwa.*'
+              'kwb': 'kwb'
+      - '*':
+        - 'my_mod.*':
+            args:
+              - 'a.*'
+              - 'b.*'
+            kwargs:
+              'kwa': 'kwa.*'
+              'kwb': 'kwb'
+      - '@runner':
+        - 'runner_mod.*':
+            args:
+            - 'a.*'
+            - 'b.*'
+            kwargs:
+              'kwa': 'kwa.*'
+              'kwb': 'kwb'
     admin:
       - .*
       - '@runner'

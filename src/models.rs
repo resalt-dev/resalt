@@ -1,5 +1,6 @@
 use crate::schema::*;
 use serde::{ser::SerializeStruct, *};
+use serde_json::Value;
 
 /*
 =========================
@@ -166,14 +167,43 @@ pub struct User {
     pub id: String,
     pub username: String,
     pub password: Option<String>,
+    pub perms: Option<String>,
+    pub last_login: Option<chrono::NaiveDateTime>,
+}
+
+impl Serialize for User {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let last_login = self
+            .last_login
+            .map(|d| d.format("%Y-%m-%d %H:%M:%S").to_string());
+        let mut state = serializer.serialize_struct("User", 5)?;
+        state.serialize_field("id", &self.id)?;
+        state.serialize_field("username", &self.username)?;
+        state.serialize_field("password", &self.password)?;
+        state.serialize_field("perms", &self.perms)?;
+        state.serialize_field("lastLogin", &last_login)?;
+        state.end()
+    }
 }
 
 impl User {
     pub fn public(&self) -> serde_json::Value {
+        let perms: Option<Value> = match self.perms {
+            Some(ref perms) => match serde_json::from_str(perms) {
+                Ok(perms) => Some(perms),
+                Err(_) => None,
+            },
+            None => None,
+        };
         serde_json::json!({
             "id": self.id,
             "username": self.username,
             "isLocal": self.password.is_some(),
+            "perms": perms,
+            "lastLogin": self.last_login.map(|d| d.format("%Y-%m-%d %H:%M:%S").to_string()),
         })
     }
 }

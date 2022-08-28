@@ -1,6 +1,6 @@
 <script lang="ts">
     import { showAlert, getUserById } from "../../controller";
-    import { theme, currentUser } from "../../stores";
+    import { theme, currentUser, config } from "../../stores";
     import { writable } from "svelte/store";
 
     import { onMount } from "svelte";
@@ -16,6 +16,7 @@
         Row,
     } from "sveltestrap";
     import { AlertType } from "../../models/AlertType";
+    import JsonViewer from "../../components/JsonViewer.svelte";
 
     // export let navigate;
     // export let location;
@@ -106,6 +107,20 @@
                             {/if}
                         </span>
                     </li>
+                    <li
+                        class="list-group-item {$theme.dark
+                            ? 'bg-dark text-light'
+                            : ''}"
+                    >
+                        <strong>Last Login</strong>
+                        <span class="float-end">
+                            {#if $user.lastLogin}
+                                {$user.lastLogin}
+                            {:else}
+                                <em>Never</em>
+                            {/if}
+                        </span>
+                    </li>
                 </ul>
             </Card>
         </Col>
@@ -142,6 +157,22 @@
                         on:click={handleUpdatePassword}>Update</button
                     > Not yet implemented.
                 </CardBody>
+            </Card>
+        </Col>
+        <Col xs="12" xxl="4" class="pb-3">
+            <Card class="h-100 {$theme.dark ? 'bg-dark' : ''}">
+                <CardHeader>
+                    <CardTitle class="mb-0">Permissions</CardTitle>
+                </CardHeader>
+                <JsonViewer data={$user.perms} />
+                <CardSubtitle class="my-3">
+                    {#if $user.isLocal}
+                        <em>
+                            Permissions can only be modified in Salt's master
+                            config.
+                        </em>
+                    {/if}
+                </CardSubtitle>
             </Card>
         </Col>
     </Row>

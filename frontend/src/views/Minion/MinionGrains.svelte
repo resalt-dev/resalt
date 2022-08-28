@@ -7,5 +7,5 @@
 {#if !$minion.grains}
     <div class="p-3">No grains data. Please refresh minion.</div>
 {:else}
-    <JsonViewer code={$minion.grains} />
+    <JsonViewer data={JSON.parse($minion.grains)} />
 {/if}

@@ -311,7 +311,7 @@
                     >{JSON.stringify(
                         Object.fromEntries(command.kwarg),
                         null,
-                        4
+                        2
                     )}</b
                 ></pre>
             <br />

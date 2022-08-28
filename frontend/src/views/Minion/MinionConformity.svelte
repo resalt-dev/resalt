@@ -122,7 +122,7 @@
     </button>
 
     {#if rawData}
-        <JsonViewer code={$minion.conformity} />
+        <JsonViewer data={JSON.parse($minion.conformity)} />
     {:else}
         <div class="row p-3">
             <div class="col-3">

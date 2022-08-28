@@ -20,7 +20,7 @@
         {rawData ? "View List" : "View JSON"}
     </button>
     {#if rawData}
-        <JsonViewer code={$minion.pkgs} />
+        <JsonViewer data={JSON.parse($minion.pkgs)} />
     {:else}
         <div class="p-3">
             <div class="table-responsive card {$theme.dark ? 'bg-dark' : ''}">

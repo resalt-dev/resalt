@@ -86,6 +86,8 @@ impl Storage {
             id,
             username,
             password: password.map(|v| hash_password(&v)),
+            perms: None,
+            last_login: None,
         };
 
         diesel::insert_into(users::table)
@@ -140,13 +142,20 @@ impl Storage {
         let id = format!("auth_{}", uuid::Uuid::new_v4());
         let authtoken = AuthToken {
             id,
-            user_id,
+            user_id: user_id.clone(),
             timestamp: chrono::Utc::now().naive_utc(),
             salt_token: None,
         };
 
+        // Insert auth token
         diesel::insert_into(authtokens::table)
             .values(&authtoken)
+            .execute(&connection)
+            .map_err(|e| format!("{:?}", e))?;
+
+        // Update user's last_login
+        diesel::update(users::table.filter(users::id.eq(&user_id)))
+            .set(users::last_login.eq(&authtoken.timestamp))
             .execute(&connection)
             .map_err(|e| format!("{:?}", e))?;
 
@@ -159,15 +168,30 @@ impl Storage {
         salt_token: &Option<SaltToken>,
     ) -> Result<(), String> {
         let connection = self.create_connection()?;
-        let salt_token = salt_token
-            .as_ref()
-            .map(|salt_token| serde_json::to_string(salt_token).unwrap());
 
+        let salt_token_str = salt_token
+            .as_ref()
+            .map(|st| serde_json::to_string(st).unwrap());
+
+        // Update authtoken with salttoken
         diesel::update(authtokens::table)
             .filter(authtokens::id.eq(auth_token))
-            .set(authtokens::salt_token.eq(salt_token))
+            .set(authtokens::salt_token.eq(salt_token_str))
             .execute(&connection)
             .map_err(|e| format!("{:?}", e))?;
+
+        // Update user object
+        match salt_token {
+            Some(st) => {
+                let perms_str = serde_json::to_string(&st.perms).unwrap();
+                diesel::update(users::table)
+                    .filter(users::username.eq(&st.user))
+                    .set(users::perms.eq(perms_str))
+                    .execute(&connection)
+                    .map_err(|e| format!("{:?}", e))?;
+            }
+            None => (),
+        }
 
         Ok(())
     }
