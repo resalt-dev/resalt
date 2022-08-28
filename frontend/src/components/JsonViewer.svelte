@@ -8,13 +8,18 @@
         foldCode,
         foldable,
     } from "@codemirror/language";
-    import { EditorState } from "@codemirror/state";
+    import { EditorState, EditorSelection } from "@codemirror/state";
     import { json } from "@codemirror/lang-json";
     import { onDestroy, onMount } from "svelte";
     import { theme } from "../stores";
     import { resaltDark } from "./codemirror-resalt-theme-dark";
     import { resaltLight } from "./codemirror-resalt-theme-light";
-    import { Tree, SyntaxNode } from "@lezer/common";
+    import type {
+        Tree,
+        TreeBuffer,
+        SyntaxNode,
+        SyntaxNodeRef,
+    } from "@lezer/common";
 
     export let data: any;
 
@@ -25,37 +30,35 @@
     $: {
         if (cm) {
             createJSONView("$ update");
-            let nodes = findLongNodes(tree);
+
+            // Find all array nodes
+            let arrayNodes: SyntaxNode[] = [];
+            tree.iterate({
+                enter: (ref: SyntaxNodeRef) => {
+                    //console.log("enter", node.type.name, node);
+                    if (ref.type.name === "Array") {
+                        console.log("Array", ref.type.name, ref);
+                        arrayNodes.push(ref.node);
+                        foldInside(ref.node);
+                    }
+                },
+                leave: (node) => {
+                    //console.log("leave", node);
+                },
+                from: 0,
+                to: tree.length,
+            });
+
+            console.log("arrayNodes", arrayNodes);
+
+            // Convert SyntaxNode's to SelectionRange's
+
+            // Select them
+            cm.dispatch({
+                //selection: EditorSelection.create(
+            });
         }
     }
-
-    function findLongNodes(node: Tree): SyntaxNode[] {
-        let nodes: SyntaxNode[] = [];
-        if (node.type.name === "Array") {
-            console.log("Array", node);
-        }
-        for (let child of node.children) {
-            if (child instanceof Tree) {
-                nodes.push(...findLongNodes(child));
-            } else {
-                // console.log("TreeBuffer", child);
-            }
-        }
-        return nodes;
-    }
-
-    // const foldAllByNode = (view: EditorView, node: SyntaxNode) => {
-    //     let { state } = view,
-    //         effects = [];
-    //     for (let pos = 0; pos < state.doc.length; ) {
-    //         let line = view.lineBlockAt(pos),
-    //             range = foldable(state, line.from, line.to);
-    //         //if (range) effects.push(foldEffect.of(range));
-    //         pos = (range ? view.lineBlockAt(range.to) : line).to + 1;
-    //     }
-    //     if (effects.length) view.dispatch({ effects });
-    //     return !!effects.length;
-    // };
 
     function createJSONView(caller: string) {
         console.log("createJSONView caller: " + caller);
