@@ -165,10 +165,10 @@
                     <CardTitle class="mb-0">Permissions</CardTitle>
                 </CardHeader>
                 <JsonViewer data={$user.perms} />
-                <CardSubtitle class="my-3">
+                <CardSubtitle class="m-3">
                     {#if $user.isLocal}
                         <em>
-                            Permissions can only be modified in Salt's master
+                            Permissions can only be modified from Salt's master
                             config.
                         </em>
                     {/if}
