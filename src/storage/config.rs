@@ -74,11 +74,23 @@ impl SConfig {
     }
 
     pub fn auth_ldap_bind_password() -> String {
-        SETTINGS
+        let mut password = SETTINGS
             .read()
             .unwrap()
             .get_string("auth.ldap.bind.password")
+            .unwrap();
+        let password_file = SETTINGS
+            .read()
             .unwrap()
+            .get_string("auth.ldap.bind.passwordfile")
+            .unwrap();
+        match password_file.len() {
+            0 => {}
+            _ => {
+                password = std::fs::read_to_string(password_file).unwrap();
+            }
+        }
+        password
     }
 
     pub fn auth_ldap_user_filter() -> String {
@@ -114,7 +126,44 @@ impl SConfig {
         //     log::info!("{}={}", key, value);
         // }
 
-        SETTINGS.read().unwrap().get_string("database.url").unwrap()
+        let username = SETTINGS
+            .read()
+            .unwrap()
+            .get_string("database.username")
+            .unwrap();
+        let mut password = SETTINGS
+            .read()
+            .unwrap()
+            .get_string("database.password")
+            .unwrap();
+        let password_file = SETTINGS
+            .read()
+            .unwrap()
+            .get_string("database.passwordfile")
+            .unwrap();
+        match password_file.len() {
+            0 => {}
+            _ => {
+                password = std::fs::read_to_string(password_file).unwrap();
+            }
+        }
+        let host = SETTINGS
+            .read()
+            .unwrap()
+            .get_string("database.host")
+            .unwrap();
+        let port = SETTINGS.read().unwrap().get_int("database.port").unwrap();
+        let database = SETTINGS
+            .read()
+            .unwrap()
+            .get_string("database.database")
+            .unwrap();
+
+        let url = format!(
+            "mysql://{}:{}@{}:{}/{}",
+            username, password, host, port, database
+        );
+        return url;
     }
 
     pub fn salt_api_url() -> String {

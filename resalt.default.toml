@@ -10,6 +10,7 @@ skipverify = true
 [auth.ldap.bind]
 dn = "cn=admin,dc=example,dc=com"
 password = "secret"
+passwordfile = ""
 
 [auth.ldap.user]
 # OpenLDAP: (&(objectClass=inetOrgPerson)(uid=%s))
@@ -24,7 +25,12 @@ attribute = "uid"
 lifespan = 86400
 
 [database]
-url = "mysql://resalt:resalt@db/resalt"
+username = "resalt"
+password = "resalt"
+passwordfile = ""
+host = "db"
+port = "3306"
+database = "resalt"
 
 [salt.api]
 url = "https://master:8080"
