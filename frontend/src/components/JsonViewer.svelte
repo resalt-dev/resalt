@@ -51,6 +51,10 @@
 
             console.log("arrayNodes", arrayNodes);
 
+            if (!(data instanceof Array)) {
+                foldAll(cm);
+            }
+
             // Convert SyntaxNode's to SelectionRange's
 
             // Select them
@@ -83,13 +87,19 @@
         //cm.dispatch({});
     }
 
+    let unsub = null;
     onMount(() => {
-        theme.subscribe((newTheme) => {
+        if (unsub != null) {
+            unsub();
+            unsub = null;
+        }
+        unsub = theme.subscribe((newTheme) => {
             createJSONView("theme.subscribe");
         });
     });
 
     onDestroy(() => {
+        unsub();
         editorElement.replaceChildren();
         cm = undefined;
     });
