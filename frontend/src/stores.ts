@@ -1,3 +1,4 @@
+import { writable as writableTemp } from 'svelte/store';
 import { writable } from 'svelte-local-storage-store';
 import constants from './constants';
 
@@ -11,7 +12,7 @@ export const sidebarCollapsed = writable(`${prefix}sidebarCollapsed`, false);
 export const alerts = writable(`${prefix}alerts`, []);
 export const auth = writable(`${prefix}auth`, null);
 export const config = writable(`${prefix}config`, null);
-export const socket = writable(`${prefix}socket`, {
+export const socket = writableTemp({
     connected: false,
     last_ping: null,
 });
