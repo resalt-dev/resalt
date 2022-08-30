@@ -6,6 +6,8 @@ RUN apt-get update && \
   apt-get upgrade -y -o DPkg::Options::=--force-confold && \
   apt-get install -y -o DPkg::Options::=--force-confold build-essential pkg-config libssl-dev mariadb-client libmariadb-dev default-libmysqlclient-dev
 
+RUN rustup update nightly
+
 RUN cargo install cargo-watch
 RUN cargo install diesel_cli --no-default-features --features "mysql"
 RUN mkdir -p /.cache/sccache && chmod a+rwx /.cache/sccache
@@ -19,4 +21,4 @@ EXPOSE 8000
 WORKDIR /usr/src/app
 
 # Remember to mount source code to the container as volume!
-CMD cargo watch --poll -w src -x run
+CMD cargo watch --poll -w src -x "+nightly -Z sparse-registry run"
