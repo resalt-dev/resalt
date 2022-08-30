@@ -1,9 +1,11 @@
 [auth.ldap]
 enabled = false
-url = "ldap://ldap.example.com"
+host = "ldap.example.com"
+port = "389"
 basedn = "dc=example,dc=com"
 
 [auth.ldap.tls]
+ldaps = false
 starttls = false
 skipverify = true
 
@@ -36,8 +38,9 @@ database = "resalt"
 url = "https://master:8080"
 # head /dev/urandom | tr -dc A-Za-z0-9 | head -c512; echo
 #token = ""
+tokenfile = ""
 [salt.api.tls]
-verify = false
+skipverify = true
 
 [http]
 port = 8000

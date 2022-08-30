@@ -181,7 +181,7 @@ lazy_static::lazy_static! {
             .with_root_certificates(root_store)
             .with_no_client_auth();
 
-        if !SConfig::salt_api_tls_verify() {
+        if SConfig::salt_api_tls_skipverify() {
             config
                 .dangerous()
                 .set_certificate_verifier(Arc::new(danger::NoCertificateVerification));

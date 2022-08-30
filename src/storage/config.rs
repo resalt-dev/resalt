@@ -34,11 +34,23 @@ impl SConfig {
     }
 
     pub fn auth_ldap_url() -> String {
-        SETTINGS
+        let host = SETTINGS
             .read()
             .unwrap()
-            .get_string("auth.ldap.url")
+            .get_string("auth.ldap.host")
+            .unwrap();
+        let port = SETTINGS
+            .read()
             .unwrap()
+            .get_string("auth.ldap.port")
+            .unwrap();
+        let ldaps = SETTINGS
+            .read()
+            .unwrap()
+            .get_bool("auth.ldap.ldaps")
+            .unwrap();
+        let proto = if ldaps { "ldaps" } else { "ldap" };
+        format!("{}://{}:{}", proto, host, port)
     }
 
     pub fn auth_ldap_base_dn() -> String {
@@ -152,7 +164,11 @@ impl SConfig {
             .unwrap()
             .get_string("database.host")
             .unwrap();
-        let port = SETTINGS.read().unwrap().get_int("database.port").unwrap();
+        let port = SETTINGS
+            .read()
+            .unwrap()
+            .get_string("database.port")
+            .unwrap();
         let database = SETTINGS
             .read()
             .unwrap()
@@ -170,20 +186,32 @@ impl SConfig {
         SETTINGS.read().unwrap().get_string("salt.api.url").unwrap()
     }
 
-    pub fn salt_api_tls_verify() -> bool {
+    pub fn salt_api_tls_skipverify() -> bool {
         SETTINGS
             .read()
             .unwrap()
-            .get_bool("salt.api.tls.verify")
+            .get_bool("salt.api.tls.skipverify")
             .unwrap()
     }
 
     pub fn salt_api_system_service_token() -> String {
-        SETTINGS
+        let mut token = SETTINGS
             .read()
             .unwrap()
             .get_string("salt.api.token")
+            .unwrap();
+        let token_file = SETTINGS
+            .read()
             .unwrap()
+            .get_string("salt.api.tokenfile")
+            .unwrap();
+        match token_file.len() {
+            0 => {}
+            _ => {
+                token = std::fs::read_to_string(token_file).unwrap();
+            }
+        }
+        token
     }
 
     pub fn http_port() -> u16 {
