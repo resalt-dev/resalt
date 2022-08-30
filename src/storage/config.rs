@@ -1,5 +1,6 @@
 use std::sync::RwLock;
 
+use log::info;
 use rand::Rng;
 
 pub struct SConfig {}
@@ -23,6 +24,19 @@ lazy_static::lazy_static! {
     .unwrap());
 }
 
+/// Strip beginning and ending quote if both exist
+macro_rules! strip_quotes {
+    ($s:expr) => {
+        if $s.starts_with('"') && $s.ends_with('"') {
+            $s[1..$s.len() - 1].to_string()
+        } else if $s.starts_with('\'') && $s.ends_with('\'') {
+            $s[1..$s.len() - 1].to_string()
+        } else {
+            $s.to_string()
+        }
+    };
+}
+
 #[allow(dead_code)]
 impl SConfig {
     pub fn auth_ldap_enabled() -> bool {
@@ -34,16 +48,16 @@ impl SConfig {
     }
 
     pub fn auth_ldap_url() -> String {
-        let host = SETTINGS
+        let host = strip_quotes!(SETTINGS
             .read()
             .unwrap()
             .get_string("auth.ldap.host")
-            .unwrap();
-        let port = SETTINGS
+            .unwrap());
+        let port = strip_quotes!(SETTINGS
             .read()
             .unwrap()
             .get_string("auth.ldap.port")
-            .unwrap();
+            .unwrap());
         let ldaps = SETTINGS
             .read()
             .unwrap()
@@ -54,11 +68,11 @@ impl SConfig {
     }
 
     pub fn auth_ldap_base_dn() -> String {
-        SETTINGS
+        strip_quotes!(SETTINGS
             .read()
             .unwrap()
             .get_string("auth.ldap.basedn")
-            .unwrap()
+            .unwrap())
     }
 
     pub fn auth_ldap_start_tls() -> bool {
@@ -78,24 +92,24 @@ impl SConfig {
     }
 
     pub fn auth_ldap_bind_dn() -> String {
-        SETTINGS
+        strip_quotes!(SETTINGS
             .read()
             .unwrap()
             .get_string("auth.ldap.bind.dn")
-            .unwrap()
+            .unwrap())
     }
 
     pub fn auth_ldap_bind_password() -> String {
-        let mut password = SETTINGS
+        let mut password = strip_quotes!(SETTINGS
             .read()
             .unwrap()
             .get_string("auth.ldap.bind.password")
-            .unwrap();
-        let password_file = SETTINGS
+            .unwrap());
+        let password_file = strip_quotes!(SETTINGS
             .read()
             .unwrap()
             .get_string("auth.ldap.bind.passwordfile")
-            .unwrap();
+            .unwrap());
         match password_file.len() {
             0 => {}
             _ => {
@@ -106,19 +120,19 @@ impl SConfig {
     }
 
     pub fn auth_ldap_user_filter() -> String {
-        SETTINGS
+        strip_quotes!(SETTINGS
             .read()
             .unwrap()
             .get_string("auth.ldap.user.filter")
-            .unwrap()
+            .unwrap())
     }
 
     pub fn auth_ldap_user_attribute() -> String {
-        SETTINGS
+        strip_quotes!(SETTINGS
             .read()
             .unwrap()
             .get_string("auth.ldap.user.attribute")
-            .unwrap()
+            .unwrap())
     }
 
     pub fn auth_session_lifespan() -> u64 {
@@ -138,52 +152,54 @@ impl SConfig {
         //     log::info!("{}={}", key, value);
         // }
 
-        let username = SETTINGS
+        let username = strip_quotes!(SETTINGS
             .read()
             .unwrap()
             .get_string("database.username")
-            .unwrap();
-        let mut password = SETTINGS
+            .unwrap());
+        let mut password = strip_quotes!(SETTINGS
             .read()
             .unwrap()
             .get_string("database.password")
-            .unwrap();
-        let password_file = SETTINGS
+            .unwrap());
+        let password_file = strip_quotes!(SETTINGS
             .read()
             .unwrap()
             .get_string("database.passwordfile")
-            .unwrap();
+            .unwrap());
+        info!("password_file: {}", password_file);
         match password_file.len() {
             0 => {}
             _ => {
                 password = std::fs::read_to_string(password_file).unwrap();
             }
         }
-        let host = SETTINGS
+        let host = strip_quotes!(SETTINGS
             .read()
             .unwrap()
             .get_string("database.host")
-            .unwrap();
-        let port = SETTINGS
+            .unwrap());
+        let port = strip_quotes!(SETTINGS
             .read()
             .unwrap()
             .get_string("database.port")
-            .unwrap();
-        let database = SETTINGS
+            .unwrap());
+        let database = strip_quotes!(SETTINGS
             .read()
             .unwrap()
             .get_string("database.database")
-            .unwrap();
+            .unwrap());
 
         let url = format!(
             "mysql://{}:{}@{}:{}/{}",
             username, password, host, port, database
         );
+        info!("Database URL: {}", url);
         return url;
     }
 
     pub fn salt_api_url() -> String {
-        SETTINGS.read().unwrap().get_string("salt.api.url").unwrap()
+        strip_quotes!(SETTINGS.read().unwrap().get_string("salt.api.url").unwrap())
     }
 
     pub fn salt_api_tls_skipverify() -> bool {
@@ -195,16 +211,16 @@ impl SConfig {
     }
 
     pub fn salt_api_system_service_token() -> String {
-        let mut token = SETTINGS
+        let mut token = strip_quotes!(SETTINGS
             .read()
             .unwrap()
             .get_string("salt.api.token")
-            .unwrap();
-        let token_file = SETTINGS
+            .unwrap());
+        let token_file = strip_quotes!(SETTINGS
             .read()
             .unwrap()
             .get_string("salt.api.tokenfile")
-            .unwrap();
+            .unwrap());
         match token_file.len() {
             0 => {}
             _ => {
@@ -227,19 +243,19 @@ impl SConfig {
     }
 
     pub fn http_frontend_theme_color() -> String {
-        SETTINGS
+        strip_quotes!(SETTINGS
             .read()
             .unwrap()
             .get_string("http.frontend.theme.color")
-            .unwrap()
+            .unwrap())
     }
 
     pub fn http_frontend_proxy_target() -> String {
-        SETTINGS
+        strip_quotes!(SETTINGS
             .read()
             .unwrap()
             .get_string("http.frontend.proxy.target")
-            .unwrap()
+            .unwrap())
     }
 
     pub fn sub_path() -> String {
