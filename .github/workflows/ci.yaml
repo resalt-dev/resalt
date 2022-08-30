@@ -30,7 +30,9 @@ jobs:
           npm run build
 
       - name: "Build backend"
-        run: cargo build --release
+        run: |
+          cargo build --release
+          cp ./target/release/resalt ./resalt
 
       - uses: katyo/publish-crates@v1
         if: ${{ startsWith(github.ref, 'refs/tags/') }}

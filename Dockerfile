@@ -8,7 +8,7 @@ RUN apt-get update && \
 COPY ./docker/libmysqlclient21_8.0.29-0ubuntu0.20.04.3_amd64.deb /tmp/libmysqlclient21_8.0.29-0ubuntu0.20.04.3_amd64.deb
 RUN dpkg -i /tmp/libmysqlclient21_8.0.29-0ubuntu0.20.04.3_amd64.deb
 
-COPY ./target/release/resalt /usr/src/app/resalt
+COPY ./resalt /usr/src/app/resalt
 
 ENV RESALT_FRONTEND_PROXY_ENABLED false
 EXPOSE 8000
