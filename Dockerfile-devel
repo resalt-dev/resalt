@@ -12,6 +12,9 @@ RUN mkdir -p /.cache/sccache && chmod a+rwx /.cache/sccache
 RUN cargo install sccache
 ENV RUSTC_WRAPPER sccache
 
+ENV RUST_LOG_STYLE always
+ENV RUST_BACKTRACE 1
+ENV CARGO_HOME /tmp/.cargo
 EXPOSE 8000
 WORKDIR /usr/src/app
 
