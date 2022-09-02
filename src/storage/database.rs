@@ -7,6 +7,7 @@ use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
 use diesel_migrations::embed_migrations;
 use log::{error, info, warn};
 use rand::Rng;
+use serde_json::{json, Value};
 
 type DbPooledConnection = PooledConnection<ConnectionManager<MysqlConnection>>;
 
@@ -52,13 +53,34 @@ impl Storage {
     pub async fn init(&self) {
         // Create default user
         if self.get_user_by_username("admin").unwrap().is_none() {
+            // Generate random password instead of using default
             let random_password = rand::thread_rng()
                 .sample_iter(&rand::distributions::Alphanumeric)
                 .take(15)
                 .map(|c| c.to_string())
                 .collect::<String>();
-            self.create_user("admin".to_string(), Some(random_password.to_string()))
+
+            // Create initial admin user
+            let user = self
+                .create_user("admin".to_string(), Some(random_password.to_string()))
                 .unwrap();
+
+            // Give permissions to admmin
+            let mut perms: Value = json!([
+                ".*".to_string(),
+                "@runner".to_string(),
+                "@wheel".to_string(),
+            ]);
+            // Add object permission. The array is of both strings and objects...
+            perms.as_array_mut().unwrap().push(json!({
+                "@resalt": [
+                    "admin.superadmin".to_string(),
+                ],
+            }));
+            let perms = serde_json::to_string(&perms).unwrap();
+            self.update_user_permissions(&user.id, &perms).unwrap();
+
+            // Announce randomly generated password
             warn!("============================================================");
             warn!(
                 "==  CREATED DEFAULT USER: admin WITH PASSWORD: {}  ==",
@@ -86,7 +108,7 @@ impl Storage {
             id,
             username,
             password: password.map(|v| hash_password(&v)),
-            perms: None,
+            perms: "[]".to_string(),
             last_login: None,
         };
 
@@ -130,6 +152,17 @@ impl Storage {
             .filter(users::username.eq(username))
             .first(&connection)
             .optional()
+            .map_err(|e| format!("{:?}", e))
+    }
+
+    pub fn update_user_permissions(&self, id: &str, perms_str: &str) -> Result<(), String> {
+        let connection = self.create_connection()?;
+
+        diesel::update(users::table)
+            .filter(users::id.eq(&id))
+            .set(users::perms.eq(perms_str))
+            .execute(&connection)
+            .map(|_| ())
             .map_err(|e| format!("{:?}", e))
     }
 
@@ -179,19 +212,6 @@ impl Storage {
             .set(authtokens::salt_token.eq(salt_token_str))
             .execute(&connection)
             .map_err(|e| format!("{:?}", e))?;
-
-        // Update user object
-        match salt_token {
-            Some(st) => {
-                let perms_str = serde_json::to_string(&st.perms).unwrap();
-                diesel::update(users::table)
-                    .filter(users::username.eq(&st.user))
-                    .set(users::perms.eq(perms_str))
-                    .execute(&connection)
-                    .map_err(|e| format!("{:?}", e))?;
-            }
-            None => (),
-        }
 
         Ok(())
     }

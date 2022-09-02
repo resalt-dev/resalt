@@ -66,4 +66,11 @@ table! {
     }
 }
 
-allow_tables_to_appear_in_same_query!(authtokens, events, jobs, job_returns, minions, users,);
+allow_tables_to_appear_in_same_query!(
+    authtokens,
+    events,
+    jobs,
+    job_returns,
+    minions,
+    users,
+);

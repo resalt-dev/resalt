@@ -404,45 +404,7 @@
 external_auth:
   rest:
     ^url: http://backend:8000/resalt/api/1/auth/token
-    apiuser:
-      - test.ping
-      - minion\*:
-        - network.*
-      - '@wheel':
-        - key.list_all
-      - minion2:
-        - network.*
-        - state.*
-      - 'G@os:RedHat':
-        - kmod.*
-      - web*:
-        - 'my_mod.*':
-            args:
-              - 'a.*'
-              - 'b.*'
-            kwargs:
-              'kwa': 'kwa.*'
-              'kwb': 'kwb'
-      - '*':
-        - 'my_mod.*':
-            args:
-              - 'a.*'
-              - 'b.*'
-            kwargs:
-              'kwa': 'kwa.*'
-              'kwb': 'kwb'
-      - '@runner':
-        - 'runner_mod.*':
-            args:
-            - 'a.*'
-            - 'b.*'
-            kwargs:
-              'kwa': 'kwa.*'
-              'kwb': 'kwb'
-    admin:
-      - .*
-      - '@runner'
-      - '@wheel'
+
 
 
 #

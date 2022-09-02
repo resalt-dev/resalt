@@ -103,11 +103,13 @@ impl LdapHandler {
             return Ok(None);
         }
 
+        // Find user full DN
         let (dn, user_id) = match LdapHandler::find_dn(username).await? {
             Some(dn) => dn,
             None => return Ok(None),
         };
 
+        // Bind with user credentials
         let mut user_ldap = LdapHandler::create_connection().await?;
         let user_id = match user_ldap.simple_bind(&dn, password).await?.success() {
             Ok(_) => {
