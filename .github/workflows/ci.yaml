@@ -45,9 +45,9 @@ jobs:
       - name: Print version number
         run: echo ${{ env.spec_version }}
       - name: Build Docker image
-        run: docker build . -t ghcr.io/foorack/resalt:${{ env.spec_version }}
+        run: docker build . -t ghcr.io/resalt-dev/resalt:${{ env.spec_version }}
       - name: Log in to Github Registry
         run: |
           echo ${{ secrets.GITHUB_TOKEN }} | docker login -u ${{ github.actor }} --password-stdin ${{ env.REGISTRY }}
       - name: Push Docker image
-        run: docker push ghcr.io/foorack/resalt:${{ env.spec_version }}
+        run: docker push ghcr.io/resalt-dev/resalt:${{ env.spec_version }}
