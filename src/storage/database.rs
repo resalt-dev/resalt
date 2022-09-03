@@ -15,8 +15,8 @@ use serde_json::{json, Value};
 type DbPooledConnection = PooledConnection<ConnectionManager<MysqlConnection>>;
 
 // This macro from `diesel_migrations` defines an `embedded_migrations` module
-// containing a function named `run`. This allows the example to be run and
-// tested without any outside setup of the database.
+// containing a function named `run_pending_migrations`. This allows the code
+// to be run and tested without any outside setup of the database.
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
 
 #[derive(Clone)]
