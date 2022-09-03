@@ -1,19 +1,23 @@
 extern crate diesel;
 
+use std::collections::HashMap;
+
 use self::diesel::prelude::*;
+use crate::diesel_migrations::MigrationHarness;
 use crate::{prelude::*, schema::*};
 use chrono::NaiveDateTime;
 use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
-use diesel_migrations::embed_migrations;
+use diesel_migrations::EmbeddedMigrations;
 use log::{error, info, warn};
 use rand::Rng;
+use serde_json::Value;
 
 type DbPooledConnection = PooledConnection<ConnectionManager<MysqlConnection>>;
 
 // This macro from `diesel_migrations` defines an `embedded_migrations` module
 // containing a function named `run`. This allows the example to be run and
 // tested without any outside setup of the database.
-embed_migrations!();
+pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
 
 #[derive(Clone)]
 pub struct Storage {
@@ -28,13 +32,10 @@ impl Storage {
         match pool {
             Ok(pool) => {
                 let own = Self { pool };
-                let connection = match own.create_connection() {
-                    Ok(conn) => conn,
-                    Err(e) => return Err(e),
-                };
+                let mut connection = own.create_connection()?;
 
-                match embedded_migrations::run(&*connection) {
-                    Ok(()) => {
+                match connection.run_pending_migrations(MIGRATIONS) {
+                    Ok(_) => {
                         info!("Data migration successfully completed and verified.");
                     }
                     Err(e) => {
@@ -80,7 +81,7 @@ impl Storage {
     /////////////
 
     pub fn create_user(&self, username: String, password: Option<String>) -> Result<User, String> {
-        let connection = self.create_connection()?;
+        let mut connection = self.create_connection()?;
         let id = format!("usr_{}", uuid::Uuid::new_v4());
         let user = User {
             id,
@@ -92,14 +93,14 @@ impl Storage {
 
         diesel::insert_into(users::table)
             .values(&user)
-            .execute(&connection)
+            .execute(&mut connection)
             .map_err(|e| format!("{:?}", e))?;
 
         Ok(user)
     }
 
     pub fn list_users(&self, limit: Option<i64>, offset: Option<i64>) -> Result<Vec<User>, String> {
-        let connection = self.create_connection()?;
+        let mut connection = self.create_connection()?;
         let mut query = users::table.into_boxed();
         query = query.order(users::id.asc());
 
@@ -111,24 +112,24 @@ impl Storage {
 
         // Query
         query
-            .load::<User>(&connection)
+            .load::<User>(&mut connection)
             .map_err(|e| format!("{:?}", e))
     }
 
     pub fn get_user_by_id(&self, id: &str) -> Result<Option<User>, String> {
-        let connection = self.create_connection()?;
+        let mut connection = self.create_connection()?;
         users::table
             .filter(users::id.eq(id))
-            .first(&connection)
+            .first(&mut connection)
             .optional()
             .map_err(|e| format!("{:?}", e))
     }
 
     pub fn get_user_by_username(&self, username: &str) -> Result<Option<User>, String> {
-        let connection = self.create_connection()?;
+        let mut connection = self.create_connection()?;
         users::table
             .filter(users::username.eq(username))
-            .first(&connection)
+            .first(&mut connection)
             .optional()
             .map_err(|e| format!("{:?}", e))
     }
@@ -138,7 +139,7 @@ impl Storage {
     ///////////////////
 
     pub fn create_authtoken(&self, user_id: String) -> Result<AuthToken, String> {
-        let connection = self.create_connection()?;
+        let mut connection = self.create_connection()?;
         let id = format!("auth_{}", uuid::Uuid::new_v4());
         let authtoken = AuthToken {
             id,
@@ -150,13 +151,13 @@ impl Storage {
         // Insert auth token
         diesel::insert_into(authtokens::table)
             .values(&authtoken)
-            .execute(&connection)
+            .execute(&mut connection)
             .map_err(|e| format!("{:?}", e))?;
 
         // Update user's last_login
         diesel::update(users::table.filter(users::id.eq(&user_id)))
             .set(users::last_login.eq(&authtoken.timestamp))
-            .execute(&connection)
+            .execute(&mut connection)
             .map_err(|e| format!("{:?}", e))?;
 
         Ok(authtoken)
@@ -167,7 +168,7 @@ impl Storage {
         auth_token: &str,
         salt_token: &Option<SaltToken>,
     ) -> Result<(), String> {
-        let connection = self.create_connection()?;
+        let mut connection = self.create_connection()?;
 
         let salt_token_str = salt_token
             .as_ref()
@@ -177,7 +178,7 @@ impl Storage {
         diesel::update(authtokens::table)
             .filter(authtokens::id.eq(auth_token))
             .set(authtokens::salt_token.eq(salt_token_str))
-            .execute(&connection)
+            .execute(&mut connection)
             .map_err(|e| format!("{:?}", e))?;
 
         // Update user object
@@ -187,7 +188,7 @@ impl Storage {
                 diesel::update(users::table)
                     .filter(users::username.eq(&st.user))
                     .set(users::perms.eq(perms_str))
-                    .execute(&connection)
+                    .execute(&mut connection)
                     .map_err(|e| format!("{:?}", e))?;
             }
             None => (),
@@ -197,10 +198,10 @@ impl Storage {
     }
 
     pub fn get_authtoken_by_id(&self, id: &str) -> Result<Option<AuthToken>, String> {
-        let connection = self.create_connection()?;
+        let mut connection = self.create_connection()?;
         authtokens::table
             .filter(authtokens::id.eq(id))
-            .first(&connection)
+            .first(&mut connection)
             .optional()
             .map_err(|e| format!("{:?}", e))
     }
@@ -221,7 +222,7 @@ impl Storage {
         conformity_incorrect: Option<i32>,
         conformity_error: Option<i32>,
     ) -> Result<(), String> {
-        let connection = self.create_connection()?;
+        let mut connection = self.create_connection()?;
 
         let last_updated_grains = grains.as_ref().map(|_| time);
         let last_updated_pillars = pillars.as_ref().map(|_| time);
@@ -263,13 +264,13 @@ impl Storage {
         let result = diesel::update(minions::table)
             .filter(minions::id.eq(&minion_id))
             .set(&changeset)
-            .execute(&connection)
+            .execute(&mut connection)
             .map_err(|e| format!("{:?}", e))?;
 
         if result == 0 {
             match diesel::insert_into(minions::table)
                 .values(&changeset)
-                .execute(&connection)
+                .execute(&mut connection)
             {
                 Ok(_) => {}
                 Err(e) => {
@@ -282,7 +283,7 @@ impl Storage {
                             diesel::update(minions::table)
                                 .filter(minions::id.eq(minion_id))
                                 .set(&changeset)
-                                .execute(&connection)
+                                .execute(&mut connection)
                                 .map_err(|e| format!("{:?}", e))?;
                         }
                         e => return Err(format!("{:?}", e)),
@@ -382,10 +383,10 @@ impl Storage {
     }
 
     pub fn get_minion_by_id(&self, id: &str) -> Result<Option<Minion>, String> {
-        let connection = self.create_connection()?;
+        let mut connection = self.create_connection()?;
         minions::table
             .filter(minions::id.eq(id))
-            .first(&connection)
+            .first(&mut connection)
             .optional()
             .map_err(|e| format!("{:?}", e))
     }
@@ -396,7 +397,7 @@ impl Storage {
         limit: Option<i64>,
         offset: Option<i64>,
     ) -> Result<Vec<Minion>, String> {
-        let connection = self.create_connection()?;
+        let mut connection = self.create_connection()?;
         let mut query = minions::table.into_boxed();
         query = query.order(minions::id.asc());
 
@@ -424,17 +425,18 @@ impl Storage {
         query = query.offset(offset.unwrap_or(0));
 
         query
-            .load::<Minion>(&connection)
+            .load::<Minion>(&mut connection)
             .map_err(|e| format!("{:?}", e))
     }
 
     // Delete minions not in the list of ID's
     pub fn prune_minions(&self, ids: Vec<String>) -> Result<(), String> {
-        let filter = minions::id.ne_all(ids);
-        let table = minions::table.filter(filter);
-        diesel::delete(table)
-            .execute(&self.create_connection()?)
+        let mut connection = self.create_connection()?;
+
+        diesel::delete(minions::table.filter(minions::id.ne_all(ids)))
+            .execute(&mut connection)
             .map_err(|e| format!("{:?}", e))?;
+
         Ok(())
     }
 
@@ -448,7 +450,7 @@ impl Storage {
         data: String,
         timestamp: NaiveDateTime,
     ) -> Result<String, String> {
-        let connection = self.create_connection()?;
+        let mut connection = self.create_connection()?;
         let id = format!("evnt_{}", uuid::Uuid::new_v4());
         let event = Event {
             id: id.clone(),
@@ -458,7 +460,7 @@ impl Storage {
         };
         diesel::insert_into(events::table)
             .values(&event)
-            .execute(&connection)
+            .execute(&mut connection)
             .map_err(|e| format!("{:?}", e))?;
         Ok(id)
     }
@@ -468,7 +470,7 @@ impl Storage {
         limit: Option<i64>,
         offset: Option<i64>,
     ) -> Result<Vec<Event>, String> {
-        let connection = self.create_connection()?;
+        let mut connection = self.create_connection()?;
         let mut query = events::table.into_boxed();
         query = query.order(events::timestamp.desc());
 
@@ -480,7 +482,7 @@ impl Storage {
 
         // Query
         query
-            .load::<Event>(&connection)
+            .load::<Event>(&mut connection)
             .map_err(|e| format!("{:?}", e))
     }
 
@@ -495,7 +497,7 @@ impl Storage {
         event_id: Option<String>,
         timestamp: NaiveDateTime,
     ) -> Result<(), String> {
-        let connection = self.create_connection()?;
+        let mut connection = self.create_connection()?;
         let id = format!("job_{}", uuid::Uuid::new_v4());
         let job = Job {
             id,
@@ -506,16 +508,16 @@ impl Storage {
         };
         diesel::insert_into(jobs::table)
             .values(&job)
-            .execute(&connection)
+            .execute(&mut connection)
             .map_err(|e| format!("{:?}", e))?;
         Ok(())
     }
 
     pub fn get_job_by_jid(&self, jid: &str) -> Result<Option<Job>, String> {
-        let connection = self.create_connection()?;
+        let mut connection = self.create_connection()?;
         jobs::table
             .filter(jobs::jid.eq(jid))
-            .first(&connection)
+            .first(&mut connection)
             .optional()
             .map_err(|e| format!("{:?}", e))
     }
@@ -528,7 +530,7 @@ impl Storage {
         limit: Option<i64>,
         offset: Option<i64>,
     ) -> Result<Vec<Job>, String> {
-        let connection = self.create_connection()?;
+        let mut connection = self.create_connection()?;
         let mut query = jobs::table.into_boxed();
         query = query.order(jobs::timestamp.desc());
 
@@ -549,7 +551,7 @@ impl Storage {
 
         // Query
         query
-            .load::<Job>(&connection)
+            .load::<Job>(&mut connection)
             .map_err(|e| format!("{:?}", e))
     }
 
@@ -565,7 +567,7 @@ impl Storage {
         minion_id: String,
         timestamp: NaiveDateTime,
     ) -> Result<(), String> {
-        let connection = self.create_connection()?;
+        let mut connection = self.create_connection()?;
         let id = format!("jret_{}", uuid::Uuid::new_v4());
         let job_return = JobReturn {
             id,
@@ -577,18 +579,138 @@ impl Storage {
         };
         diesel::insert_into(job_returns::table)
             .values(&job_return)
-            .execute(&connection)
+            .execute(&mut connection)
             .map_err(|e| format!("{:?}", e))?;
         Ok(())
     }
 
     pub fn get_job_returns_by_job(&self, job: &Job) -> Result<Vec<Event>, String> {
-        let connection = self.create_connection()?;
+        let mut connection = self.create_connection()?;
         events::table
             .inner_join(job_returns::table.on(events::id.eq(job_returns::event_id)))
             .filter(job_returns::job_id.eq(&job.id))
-            .load::<(Event, JobReturn)>(&connection)
+            .load::<(Event, JobReturn)>(&mut connection)
             .map(|v: Vec<(Event, JobReturn)>| v.into_iter().map(|(e, _)| e).collect())
             .map_err(|e| format!("{:?}", e))
+    }
+
+    ///////////////
+    /// Metrics ///
+    ///////////////
+
+    pub fn get_metric_results(&self) -> Result<Vec<MetricResult>, String> {
+        let mut connection = self.create_connection()?;
+        let mut results: Vec<MetricResult> = Vec::new();
+
+        //
+        // Gather data
+        //
+        let mut custom_grains_metrics: Vec<(&str, &str)> =
+            vec![("osfinger", "Operating System"), ("ipv4", "IPv4")];
+        let minions = minions::table
+            .load::<Minion>(&mut connection)
+            .map_err(|e| format!("{:?}", e))?;
+
+        let mut minions_success = 0;
+        let mut minions_incorrect = 0;
+        let mut minions_error = 0;
+        let mut minions_unknown = 0;
+        let mut grains: Vec<Option<Value>> = Vec::new();
+        for minion in minions {
+            // Minion compliance
+            if minion.conformity_success.is_none() {
+                minions_unknown += 1;
+            } else {
+                let conf_incorrect = minion.conformity_incorrect.unwrap_or(0);
+                let conf_error = minion.conformity_error.unwrap_or(0);
+
+                if conf_error > 0 {
+                    minions_error += 1;
+                } else if conf_incorrect > 0 {
+                    minions_incorrect += 1;
+                } else {
+                    minions_success += 1;
+                }
+            }
+
+            // Grains
+            grains.push(match minion.grains {
+                Some(ref grains) => match serde_json::from_str(grains) {
+                    Ok(grains) => Some(grains),
+                    Err(e) => {
+                        error!(
+                            "Failed to deserialize grains for minion {}: {}",
+                            minion.id, e
+                        );
+                        None
+                    }
+                },
+                None => None,
+            });
+        }
+        results.push(MetricResult {
+            title: "Conformity".to_string(),
+            chart: "pie".to_string(),
+            labels: vec![
+                "Correct".to_string(),
+                "Incorrect".to_string(),
+                "Error".to_string(),
+                "Unknown".to_string(),
+            ],
+            data: vec![MetricResultData {
+                label: String::new(), // this label is unused on pie charts
+                data: vec![
+                    minions_success,
+                    minions_incorrect,
+                    minions_error,
+                    minions_unknown,
+                ],
+            }],
+        });
+
+        //
+        // Custom grain metrics
+        //
+        for (mid, mname) in &mut custom_grains_metrics {
+            let mut founds: HashMap<String, i32> = HashMap::new();
+            for grain in grains.iter() {
+                let value = match grain {
+                    Some(ggg) => ggg
+                        .get(mid.clone())
+                        .and_then(|v| {
+                            if v.is_string() {
+                                Some(v.as_str().unwrap().to_string())
+                            } else {
+                                Some(v.to_string())
+                            }
+                        })
+                        .unwrap_or("Missing".to_string()),
+                    None => "Unknown".to_string(),
+                };
+                let counter = founds.get(&value).unwrap_or(&0);
+                founds.insert(value, counter + 1);
+            }
+
+            // Insert final metric
+            let mut founds: Vec<(String, i32)> = founds.into_iter().collect();
+            founds.sort_by(|a, b| b.1.cmp(&a.1));
+            let mut labels: Vec<String> = Vec::new();
+            let mut data: Vec<i32> = Vec::new();
+            for (label, value) in founds {
+                labels.push(label);
+                data.push(value);
+            }
+            results.push(MetricResult {
+                title: mname.to_string(),
+                chart: "pie".to_string(),
+                labels,
+                data: vec![MetricResultData {
+                    label: String::new(), // this label is unused on pie charts
+                    data,
+                }],
+            });
+        }
+
+        Ok(results)
     }
 }

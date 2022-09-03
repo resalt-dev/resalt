@@ -86,6 +86,13 @@ async fn main() -> std::io::Result<()> {
                             )
                             .default_service(route_fallback_404),
                     )
+                    // metrics
+                    .service(
+                        web::scope("/metrics")
+                            .wrap(auth::RequireAuth::new())
+                            .route("", web::get().to(route_metrics_get))
+                            .default_service(route_fallback_404),
+                    )
                     // minions
                     .service(
                         web::scope("/minions")

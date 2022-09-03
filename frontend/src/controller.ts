@@ -18,6 +18,7 @@ import {
     apiListEvents,
     apiListJobs,
     apiListKeys,
+    apiListMetricResults,
     apiListMinions,
     apiListUsers,
     apiRefreshMinions,
@@ -32,6 +33,7 @@ import type SaltEvent from './models/SaltEvent';
 import type Job from './models/Job';
 import type Key from './models/Key';
 import type Config from './models/Config';
+import type MetricResult from './models/MetricResult';
 
 /*
  * INTERNAL UTILS
@@ -273,4 +275,9 @@ export async function rejectKey(key: Key): Promise<void> {
 export async function deleteKey(key: Key): Promise<void> {
     const token = requireToken();
     await apiDeleteKey(token, key);
+}
+
+export async function getMetricResults(): Promise<Array<MetricResult>> {
+    const token = requireToken();
+    return apiListMetricResults(token);
 }

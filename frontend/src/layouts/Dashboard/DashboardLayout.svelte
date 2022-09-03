@@ -8,7 +8,7 @@
     import DashboardTopbar from "./DashboardTopbar.svelte";
     import Redirect from "../../components/Redirect.svelte";
 
-    import Home from "../../views/Home.svelte";
+    import Home from "../../views/Home/Home.svelte";
     import Minion from "../../views/Minion/Minion.svelte";
     import Minions from "../../views/Minions/Minions.svelte";
     import Run from "../../views/Run/Run.svelte";

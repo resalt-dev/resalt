@@ -9,8 +9,8 @@ use serde_json::Value;
 */
 
 #[derive(Debug, Identifiable, Associations, Insertable, PartialEq, Queryable)]
-#[belongs_to(User, foreign_key = "user_id")]
-#[table_name = "authtokens"]
+#[diesel(belongs_to(User, foreign_key = user_id))]
+#[diesel(table_name = authtokens)]
 pub struct AuthToken {
     pub id: String,
     pub user_id: String,
@@ -19,7 +19,7 @@ pub struct AuthToken {
 }
 
 #[derive(Debug, Identifiable, Insertable, PartialEq, Queryable)]
-#[table_name = "events"]
+#[diesel(table_name = events)]
 pub struct Event {
     pub id: String,
     pub timestamp: chrono::NaiveDateTime,
@@ -43,8 +43,8 @@ impl Serialize for Event {
 }
 
 #[derive(Debug, Identifiable, Associations, Insertable, PartialEq, Queryable)]
-#[belongs_to(Event, foreign_key = "event_id")]
-#[table_name = "jobs"]
+#[diesel(belongs_to(Event, foreign_key = event_id))]
+#[diesel(table_name = jobs)]
 pub struct Job {
     pub id: String,
     pub timestamp: chrono::NaiveDateTime,
@@ -70,10 +70,10 @@ impl Serialize for Job {
 }
 
 #[derive(Debug, Identifiable, Associations, Insertable, PartialEq, Queryable)]
-#[belongs_to(Job, foreign_key = "job_id")]
-#[belongs_to(Event, foreign_key = "event_id")]
-#[belongs_to(Minion, foreign_key = "minion_id")]
-#[table_name = "job_returns"]
+#[diesel(belongs_to(Job, foreign_key = job_id))]
+#[diesel(belongs_to(Event, foreign_key = event_id))]
+#[diesel(belongs_to(Minion, foreign_key = minion_id))]
+#[diesel(table_name = job_returns)]
 pub struct JobReturn {
     pub id: String,
     pub timestamp: chrono::NaiveDateTime,
@@ -84,7 +84,7 @@ pub struct JobReturn {
 }
 
 #[derive(Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset)]
-#[table_name = "minions"]
+#[diesel(table_name = minions)]
 pub struct Minion {
     pub id: String,
     pub last_seen: chrono::NaiveDateTime,
@@ -162,7 +162,7 @@ impl Serialize for Minion {
 }
 
 #[derive(Debug, Identifiable, Insertable, PartialEq, Queryable)]
-#[table_name = "users"]
+#[diesel(table_name = users)]
 pub struct User {
     pub id: String,
     pub username: String,
@@ -241,4 +241,18 @@ pub struct SaltMinionKey {
     pub id: String,
     pub state: String,
     pub finger: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct MetricResult {
+    pub title: String,
+    pub chart: String,
+    pub labels: Vec<String>,
+    pub data: Vec<MetricResultData>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct MetricResultData {
+    pub label: String,
+    pub data: Vec<i32>,
 }

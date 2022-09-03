@@ -5,6 +5,7 @@ import type Job from './models/Job';
 import type PublicUser from './models/PublicUser';
 import type Key from './models/Key';
 import type Config from './models/Config';
+import type MetricResult from './models/MetricResult';
 
 // API class is independent, and is not allowed to import svelte/store's.
 
@@ -212,4 +213,10 @@ export async function apiDeleteKey(
     key: Key,
 ): Promise<void> {
     await sendAuthenticatedRequest('DELETE', `/keys/${key.state}/${key.id}/delete`, token);
+}
+
+export async function apiListMetricResults(
+    token: string,
+): Promise<Array<MetricResult>> {
+    return sendAuthenticatedRequest('GET', '/metrics', token);
 }
