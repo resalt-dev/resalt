@@ -1,6 +1,6 @@
-use crate::schema::*;
+use crate::{prelude::evalute_resalt_permission, schema::*};
 use serde::{ser::SerializeStruct, *};
-use serde_json::Value;
+use serde_json::{json, Value};
 
 /*
 =========================
@@ -167,7 +167,7 @@ pub struct User {
     pub id: String,
     pub username: String,
     pub password: Option<String>,
-    pub perms: Option<String>,
+    pub perms: String,
     pub last_login: Option<chrono::NaiveDateTime>,
 }
 
@@ -191,12 +191,9 @@ impl Serialize for User {
 
 impl User {
     pub fn public(&self) -> serde_json::Value {
-        let perms: Option<Value> = match self.perms {
-            Some(ref perms) => match serde_json::from_str(perms) {
-                Ok(perms) => Some(perms),
-                Err(_) => None,
-            },
-            None => None,
+        let perms: Value = match serde_json::from_str(&self.perms) {
+            Ok(perms) => perms,
+            Err(_) => json!(Vec::<String>::new()),
         };
         serde_json::json!({
             "id": self.id,
@@ -205,6 +202,15 @@ impl User {
             "perms": perms,
             "lastLogin": self.last_login.map(|d| d.format("%Y-%m-%d %H:%M:%S").to_string()),
         })
+    }
+
+    pub fn has_permission(&self, perm: &str) -> bool {
+        let perms: Value = match serde_json::from_str(&self.perms) {
+            Ok(perms) => perms,
+            Err(_) => return false,
+        };
+        evalute_resalt_permission(&perms, perm)
+            || evalute_resalt_permission(&perms, "admin.superadmin")
     }
 }
 

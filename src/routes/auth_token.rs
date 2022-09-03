@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use crate::prelude::*;
 use actix_web::{web, HttpResponse, Responder, Result};
 use log::*;
@@ -25,14 +23,11 @@ pub async fn route_auth_token_post(
     if username == RESALT_SALT_SYSTEM_SERVICE_USERNAME {
         if token == SConfig::salt_api_system_service_token() {
             info!("System service token OK");
-            return Ok(HttpResponse::Ok().json(HashMap::from([(
-                username,
-                HashMap::from([
-                    (".*".to_string(), Value::Null),
-                    ("@runner".to_string(), Value::Null),
-                    ("@wheel".to_string(), Value::Null),
-                ]),
-            )])));
+            return Ok(HttpResponse::Ok().json([
+                ".*".to_string(),
+                "@runner".to_string(),
+                "@wheel".to_string(),
+            ]));
         } else {
             return Err(api_error_unauthorized());
         }
@@ -41,8 +36,28 @@ pub async fn route_auth_token_post(
     match validate_auth_token(&db, &token) {
         Ok(Some(auth_status)) => {
             info!("Token validated for {:?}", auth_status.user_id);
-            // send {username: None} as JSON response
-            Ok(HttpResponse::Ok().json(HashMap::from([(username, serde_json::Value::Null)])))
+
+            let user = match db.get_user_by_id(&auth_status.user_id) {
+                Ok(user) => match user {
+                    Some(user) => user,
+                    None => {
+                        return Err(api_error_unauthorized());
+                    }
+                },
+                Err(err) => {
+                    error!("Error getting user: {:?}", err);
+                    return Err(api_error_internal_error());
+                }
+            };
+
+            let perms: Result<Value, serde_json::Error> = serde_json::from_str(&user.perms);
+            match perms {
+                Ok(perms) => return Ok(HttpResponse::Ok().json(perms)),
+                Err(e) => {
+                    error!("Error parsing permissions: {:?}", e);
+                    return Err(api_error_internal_error());
+                }
+            }
         }
         Ok(None) => {
             info!("Invalid token from Salt validation");

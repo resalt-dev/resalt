@@ -1,6 +1,6 @@
 use std::sync::RwLock;
 
-use log::info;
+use log::{info, warn};
 use rand::Rng;
 
 pub struct SConfig {}
@@ -61,10 +61,12 @@ impl SConfig {
         let ldaps = SETTINGS
             .read()
             .unwrap()
-            .get_bool("auth.ldap.ldaps")
+            .get_bool("auth.ldap.tls.ldaps")
             .unwrap();
         let proto = if ldaps { "ldaps" } else { "ldap" };
-        format!("{}://{}:{}", proto, host, port)
+        let url = format!("{}://{}:{}", proto, host, port);
+        warn!("LDAP URL: {}", url);
+        return url;
     }
 
     pub fn auth_ldap_base_dn() -> String {

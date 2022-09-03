@@ -266,13 +266,20 @@ impl SaltAPI {
             }
         };
         // Convert to SaltToken object
-        let salt_token: SaltToken = match serde_json::from_value(salt_token.clone()) {
+        let mut salt_token: SaltToken = match serde_json::from_value(salt_token.clone()) {
             Ok(salt_token) => salt_token,
             Err(e) => {
                 error!("{:?}", e);
                 return Err(SaltError::ResponseParseError(None));
             }
         };
+
+        // If the array is completely empty, then Salt annoyingly returns
+        // an empty Object instead of an empty array. In order to keep our
+        // data more clean, convert this to an empty array instead.
+        if salt_token.perms.is_object() {
+            salt_token.perms = json!(Vec::<String>::new());
+        }
 
         debug!("login {:?}", salt_token);
 
