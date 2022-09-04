@@ -2,10 +2,11 @@ import constants from './constants';
 import type Minion from './models/Minion';
 import type SaltEvent from './models/SaltEvent';
 import type Job from './models/Job';
-import type PublicUser from './models/PublicUser';
+import type User from './models/User';
 import type Key from './models/Key';
 import type Config from './models/Config';
 import type MetricResult from './models/MetricResult';
+import type PermissionGroup from './models/PermissionGroup';
 
 // API class is independent, and is not allowed to import svelte/store's.
 
@@ -76,9 +77,61 @@ export async function apiGetConfig(): Promise<Config> {
     return sendUnauthenticatedRequest('GET', '/config');
 }
 
-export async function apiGetCurrentUser(token: string): Promise<PublicUser> {
+export async function apiGetCurrentUser(token: string): Promise<User> {
     return sendAuthenticatedRequest('GET', '/auth/user', token);
 }
+
+///
+/// Users
+///
+
+export async function apiListUsers(
+    token: string,
+    limit?: number,
+    offset?: number,
+): Promise<Array<User>> {
+    const args = new URLSearchParams();
+
+    if (limit) args.append('limit', limit.toString());
+    if (offset) args.append('offset', offset.toString());
+
+    return sendAuthenticatedRequest('GET', `/users?${args.toString()}`, token);
+}
+
+export async function apiGetUser(
+    token: string,
+    userId: string,
+): Promise<User> {
+    return sendAuthenticatedRequest('GET', `/users/${userId}`, token);
+}
+
+export async function apiAddUserToPermissionGroup(
+    token: string,
+    userId: string,
+    groupId: string,
+): Promise<void> {
+    return sendAuthenticatedRequest(
+        'POST',
+        `/users/${userId}/permissions/${groupId}`,
+        token,
+    );
+}
+
+export async function apiRemoveUserFromPermissionGroup(
+    token: string,
+    userId: string,
+    groupId: string,
+): Promise<void> {
+    return sendAuthenticatedRequest(
+        'DELETE',
+        `/users/${userId}/permissions/${groupId}`,
+        token,
+    );
+}
+
+///
+/// Minions
+///
 
 export async function apiListMinions(
     token: string,
@@ -105,6 +158,27 @@ export async function apiGetMinionById(
 ): Promise<Minion> {
     return sendAuthenticatedRequest('GET', `/minions/${minionId}`, token);
 }
+
+///
+/// Events
+///
+
+export async function apiListEvents(
+    token: string,
+    limit?: number,
+    offset?: number,
+): Promise<Array<SaltEvent>> {
+    const args = new URLSearchParams();
+
+    if (limit) args.append('limit', limit.toString());
+    if (offset) args.append('offset', offset.toString());
+
+    return sendAuthenticatedRequest('GET', `/events?${args.toString()}`, token);
+}
+
+///
+/// Jobs
+///
 
 export async function apiListJobs(
     token: string,
@@ -155,38 +229,9 @@ export async function apiGetJobById(
     return sendAuthenticatedRequest('GET', `/jobs/${jobId}`, token);
 }
 
-export async function apiListEvents(
-    token: string,
-    limit?: number,
-    offset?: number,
-): Promise<Array<SaltEvent>> {
-    const args = new URLSearchParams();
-
-    if (limit) args.append('limit', limit.toString());
-    if (offset) args.append('offset', offset.toString());
-
-    return sendAuthenticatedRequest('GET', `/events?${args.toString()}`, token);
-}
-
-export async function apiListUsers(
-    token: string,
-    limit?: number,
-    offset?: number,
-): Promise<Array<PublicUser>> {
-    const args = new URLSearchParams();
-
-    if (limit) args.append('limit', limit.toString());
-    if (offset) args.append('offset', offset.toString());
-
-    return sendAuthenticatedRequest('GET', `/users?${args.toString()}`, token);
-}
-
-export async function apiGetUser(
-    token: string,
-    username: string,
-): Promise<PublicUser> {
-    return sendAuthenticatedRequest('GET', `/users/${username}`, token);
-}
+///
+/// Keys
+///
 
 export async function apiListKeys(
     token: string,
@@ -215,8 +260,66 @@ export async function apiDeleteKey(
     await sendAuthenticatedRequest('DELETE', `/keys/${key.state}/${key.id}/delete`, token);
 }
 
+///
+/// Metrics
+///
+
 export async function apiListMetricResults(
     token: string,
 ): Promise<Array<MetricResult>> {
     return sendAuthenticatedRequest('GET', '/metrics', token);
+}
+
+///
+/// Permission Groups
+///
+
+export async function apiListPermissionGroups(
+    token: string,
+    limit?: number,
+    offset?: number,
+): Promise<Array<PermissionGroup>> {
+    const args = new URLSearchParams();
+
+    if (limit) args.append('limit', limit.toString());
+    if (offset) args.append('offset', offset.toString());
+
+    return sendAuthenticatedRequest('GET', `/permissions?${args.toString()}`, token);
+}
+
+export async function apiGetPermissionGroup(
+    token: string,
+    id: string,
+): Promise<PermissionGroup> {
+    return sendAuthenticatedRequest('GET', `/permissions/${id}`, token);
+}
+
+export async function apiCreatePermissionGroup(
+    token: string,
+    name: string,
+): Promise<PermissionGroup> {
+    return sendAuthenticatedRequest('POST', '/permissions', token, {
+        name,
+    });
+}
+
+export async function apiDeletePermissionGroup(
+    token: string,
+    id: string,
+): Promise<void> {
+    await sendAuthenticatedRequest('DELETE', `/permissions/${id}`, token);
+}
+
+export async function apiUpdatePermissionGroup(
+    token: string,
+    id: string,
+    name: string,
+    perms: any[],
+    ldapSync: string | null,
+): Promise<void> {
+    return sendAuthenticatedRequest('PUT', `/permissions/${id}`, token, {
+        name,
+        perms: JSON.stringify(perms),
+        ldapSync,
+    });
 }

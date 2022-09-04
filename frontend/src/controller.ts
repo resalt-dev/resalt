@@ -8,32 +8,39 @@ import {
 } from './stores';
 import {
     apiAcceptKey,
+    apiAddUserToPermissionGroup,
     apiCreateEventConnection,
+    apiCreatePermissionGroup,
     apiDeleteKey,
+    apiDeletePermissionGroup,
     apiGetConfig,
     apiGetCurrentUser,
     apiGetJobById,
     apiGetMinionById,
+    apiGetPermissionGroup,
     apiGetUser,
     apiListEvents,
     apiListJobs,
     apiListKeys,
     apiListMetricResults,
     apiListMinions,
+    apiListPermissionGroups,
     apiListUsers,
     apiRefreshMinions,
     apiRejectKey,
     apiRequestAuthToken,
     apiRunJob,
+    apiUpdatePermissionGroup,
 } from './api';
 import Alert from './models/Alert';
 import type Minion from './models/Minion';
-import type PublicUser from './models/PublicUser';
+import type User from './models/User';
 import type SaltEvent from './models/SaltEvent';
 import type Job from './models/Job';
 import type Key from './models/Key';
 import type Config from './models/Config';
 import type MetricResult from './models/MetricResult';
+import type PermissionGroup from './models/PermissionGroup';
 
 /*
  * INTERNAL UTILS
@@ -175,7 +182,7 @@ export async function loadConfig(): Promise<Config> {
     }
 }
 
-export async function loadCurrentUser(): Promise<PublicUser> {
+export async function loadCurrentUser(): Promise<User> {
     const token = requireToken();
 
     try {
@@ -188,10 +195,44 @@ export async function loadCurrentUser(): Promise<PublicUser> {
     }
 }
 
-export async function getCurrentUser(): Promise<PublicUser> {
+export async function getCurrentUser(): Promise<User> {
     const token = requireToken();
     return apiGetCurrentUser(token);
 }
+
+///
+/// Users
+///
+
+export async function getUsers(limit?: number, offset?: number): Promise<Array<User>> {
+    const token = requireToken();
+    return apiListUsers(token, limit, offset);
+}
+
+export async function getUserById(id: string): Promise<User> {
+    const token = requireToken();
+    return apiGetUser(token, id);
+}
+
+export async function addUserToPermissionGroup(
+    userId: string,
+    permissionGroupId: string,
+): Promise<void> {
+    const token = requireToken();
+    return apiAddUserToPermissionGroup(token, userId, permissionGroupId);
+}
+
+export async function removeUserFromPermissionGroup(
+    userId: string,
+    permissionGroupId: string,
+): Promise<void> {
+    const token = requireToken();
+    return apiAddUserToPermissionGroup(token, userId, permissionGroupId);
+}
+
+///
+/// Minions
+///
 
 export async function getMinions(
     sort?: string,
@@ -211,6 +252,19 @@ export async function getMinionById(id: string): Promise<Minion> {
     const token = requireToken();
     return apiGetMinionById(token, id);
 }
+
+///
+/// Events
+///
+
+export async function getEvents(limit?: number, offset?: number): Promise<Array<SaltEvent>> {
+    const token = requireToken();
+    return apiListEvents(token, limit, offset);
+}
+
+///
+/// Jobs
+///
 
 export async function getJobs(
     user?: string,
@@ -242,20 +296,9 @@ export async function getJobById(id: string): Promise<Job> {
     return apiGetJobById(token, id);
 }
 
-export async function getEvents(limit?: number, offset?: number): Promise<Array<SaltEvent>> {
-    const token = requireToken();
-    return apiListEvents(token, limit, offset);
-}
-
-export async function getUsers(limit?: number, offset?: number): Promise<Array<PublicUser>> {
-    const token = requireToken();
-    return apiListUsers(token, limit, offset);
-}
-
-export async function getUserById(id: string): Promise<PublicUser> {
-    const token = requireToken();
-    return apiGetUser(token, id);
-}
+///
+/// Keys
+///
 
 export async function getKeys(): Promise<Array<Key>> {
     const token = requireToken();
@@ -277,7 +320,47 @@ export async function deleteKey(key: Key): Promise<void> {
     await apiDeleteKey(token, key);
 }
 
+///
+/// Metrics
+///
+
 export async function getMetricResults(): Promise<Array<MetricResult>> {
     const token = requireToken();
     return apiListMetricResults(token);
+}
+
+///
+/// Permission Groups
+///
+
+export async function getPermissionGroups(): Promise<Array<PermissionGroup>> {
+    const token = requireToken();
+    return apiListPermissionGroups(token);
+}
+
+export async function getPermissionGroup(id: string): Promise<PermissionGroup> {
+    const token = requireToken();
+    return apiGetPermissionGroup(token, id);
+}
+
+export async function createPermissionGroup(
+    name: string,
+): Promise<PermissionGroup> {
+    const token = requireToken();
+    return apiCreatePermissionGroup(token, name);
+}
+
+export async function deletePermissionGroup(id: string): Promise<void> {
+    const token = requireToken();
+    return apiDeletePermissionGroup(token, id);
+}
+
+export async function updatePermissionGroup(
+    id: string,
+    name: string,
+    perms: any[],
+    ldapSync: string | null,
+): Promise<void> {
+    const token = requireToken();
+    return apiUpdatePermissionGroup(token, id, name, perms, ldapSync);
 }

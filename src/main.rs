@@ -161,6 +161,7 @@ async fn main() -> std::io::Result<()> {
                             .wrap(auth::RequireAuth::new())
                             .route("", web::get().to(route_permissions_get))
                             .route("", web::post().to(route_permissions_post))
+                            .route("/{id}", web::get().to(route_permission_get))
                             .route("/{id}", web::put().to(route_permission_update))
                             .route("/{id}", web::delete().to(route_permission_delete))
                             .default_service(route_fallback_404),

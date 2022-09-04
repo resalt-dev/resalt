@@ -14,7 +14,7 @@
     import { AlertType } from "../../models/AlertType";
 
     let sort: string = null;
-    let paginationSize: number = 10;
+    let paginationSize: number = 20;
     let paginationPage: number = 1;
 
     const SORT_COLOR = "text-orange";

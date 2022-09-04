@@ -171,26 +171,8 @@ pub struct User {
     pub last_login: Option<chrono::NaiveDateTime>,
 }
 
-impl Serialize for User {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        let last_login = self
-            .last_login
-            .map(|d| d.format("%Y-%m-%d %H:%M:%S").to_string());
-        let mut state = serializer.serialize_struct("User", 5)?;
-        state.serialize_field("id", &self.id)?;
-        state.serialize_field("username", &self.username)?;
-        state.serialize_field("password", &self.password)?;
-        state.serialize_field("perms", &self.perms)?;
-        state.serialize_field("lastLogin", &last_login)?;
-        state.end()
-    }
-}
-
 impl User {
-    pub fn public(&self) -> serde_json::Value {
+    pub fn public(&self, permission_groups: Vec<PermissionGroup>) -> serde_json::Value {
         let perms: Value = match serde_json::from_str(&self.perms) {
             Ok(perms) => perms,
             Err(_) => json!(Vec::<String>::new()),
@@ -201,6 +183,11 @@ impl User {
             "isLocal": self.password.is_some(),
             "perms": perms,
             "lastLogin": self.last_login.map(|d| d.format("%Y-%m-%d %H:%M:%S").to_string()),
+            "permissionGroups": permission_groups.iter().map(|g| json!({
+                "id": g.id,
+                "name": g.name,
+            })).collect::<Vec<Value>>(),
+
         })
     }
 
@@ -214,13 +201,32 @@ impl User {
     }
 }
 
-#[derive(Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset, Serialize)]
+#[derive(Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset)]
 #[diesel(table_name = permission_groups)]
 pub struct PermissionGroup {
     pub id: String,
     pub name: String,
     pub perms: String,
     pub ldap_sync: Option<String>,
+}
+
+impl PermissionGroup {
+    pub fn public(&self, users: Vec<User>) -> serde_json::Value {
+        let perms: Value = match serde_json::from_str(&self.perms) {
+            Ok(perms) => perms,
+            Err(_) => json!(Vec::<String>::new()),
+        };
+        serde_json::json!({
+            "id": self.id,
+            "name": self.name,
+            "perms": perms,
+            "ldapSync": self.ldap_sync,
+            "users": users.iter().map(|u| json!({
+                "id": u.id,
+                "username": u.username,
+            })).collect::<Vec<Value>>(),
+        })
+    }
 }
 
 #[derive(Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset, Associations)]

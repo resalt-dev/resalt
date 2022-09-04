@@ -751,9 +751,23 @@ impl Storage {
         Ok(())
     }
 
-    pub fn list_permission_groups(&self) -> Result<Vec<PermissionGroup>, String> {
+    pub fn list_permission_groups(
+        &self,
+        limit: Option<i64>,
+        offset: Option<i64>,
+    ) -> Result<Vec<PermissionGroup>, String> {
         let mut connection = self.create_connection()?;
-        permission_groups::table
+        let mut query = permission_groups::table.into_boxed();
+        query = query.order(permission_groups::id.asc());
+
+        // Filtering
+
+        // Pagination
+        query = query.limit(limit.unwrap_or(100));
+        query = query.offset(offset.unwrap_or(0));
+
+        // Query
+        query
             .load::<PermissionGroup>(&mut connection)
             .map_err(|e| format!("{:?}", e))
     }
@@ -765,6 +779,20 @@ impl Storage {
             .first::<PermissionGroup>(&mut connection)
             .optional()
             .map_err(|e| format!("{:?}", e))
+    }
+
+    pub fn is_user_member_of_group(&self, user_id: &str, group_id: &str) -> Result<bool, String> {
+        let mut connection = self.create_connection()?;
+        match permission_group_users::table
+            .filter(permission_group_users::user_id.eq(user_id))
+            .filter(permission_group_users::group_id.eq(group_id))
+            .first::<PermissionGroupUser>(&mut connection)
+            .optional()
+            .map_err(|e| format!("{:?}", e))?
+        {
+            Some(_) => Ok(true),
+            None => Ok(false),
+        }
     }
 
     pub fn update_permission_group(
@@ -787,9 +815,9 @@ impl Storage {
         Ok(())
     }
 
-    //////////////////////////////////////
+    /////////////////////////////////
     /// Permission Groups (Users) ///
-    //////////////////////////////////////
+    /////////////////////////////////
 
     pub fn insert_permission_group_user(
         &self,

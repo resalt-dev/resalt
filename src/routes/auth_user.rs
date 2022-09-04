@@ -21,5 +21,12 @@ pub async fn route_auth_user_get(
         }
     };
 
-    Ok(web::Json(user.public()))
+    let permission_groups = match db.list_permission_groups_by_user_id(&user.id) {
+        Ok(permission_groups) => permission_groups,
+        Err(e) => {
+            error!("{:?}", e);
+            return Err(api_error_database());
+        }
+    };
+    Ok(web::Json(user.public(permission_groups)))
 }
