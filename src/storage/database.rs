@@ -61,7 +61,7 @@ impl Storage {
                 .collect::<String>();
 
             // Create initial admin user
-            let user = self
+            let mut user = self
                 .create_user("admin".to_string(), Some(random_password.to_string()))
                 .unwrap();
 
@@ -77,8 +77,8 @@ impl Storage {
                     "admin.superadmin".to_string(),
                 ],
             }));
-            let perms = serde_json::to_string(&perms).unwrap();
-            self.update_user_permissions(&user.id, &perms).unwrap();
+            user.perms = serde_json::to_string(&perms).unwrap();
+            self.update_user(&user).unwrap();
 
             // Announce randomly generated password
             warn!("============================================================");
@@ -155,15 +155,13 @@ impl Storage {
             .map_err(|e| format!("{:?}", e))
     }
 
-    pub fn update_user_permissions(&self, id: &str, perms_str: &str) -> Result<(), String> {
+    pub fn update_user(&self, user: &User) -> Result<(), String> {
         let mut connection = self.create_connection()?;
-
-        diesel::update(users::table)
-            .filter(users::id.eq(&id))
-            .set(users::perms.eq(perms_str))
+        diesel::update(users::table.filter(users::id.eq(&user.id)))
+            .set(user)
             .execute(&mut connection)
-            .map(|_| ())
-            .map_err(|e| format!("{:?}", e))
+            .map_err(|e| format!("{:?}", e))?;
+        Ok(())
     }
 
     ///////////////////
@@ -195,6 +193,15 @@ impl Storage {
         Ok(authtoken)
     }
 
+    pub fn get_authtoken_by_id(&self, id: &str) -> Result<Option<AuthToken>, String> {
+        let mut connection = self.create_connection()?;
+        authtokens::table
+            .filter(authtokens::id.eq(id))
+            .first(&mut connection)
+            .optional()
+            .map_err(|e| format!("{:?}", e))
+    }
+
     pub fn update_authtoken_salttoken(
         &self,
         auth_token: &str,
@@ -216,18 +223,56 @@ impl Storage {
         Ok(())
     }
 
-    pub fn get_authtoken_by_id(&self, id: &str) -> Result<Option<AuthToken>, String> {
+    ///////////////
+    /// Minions ///
+    ///////////////
+
+    pub fn list_minions(
+        &self,
+        sort: Option<String>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+    ) -> Result<Vec<Minion>, String> {
         let mut connection = self.create_connection()?;
-        authtokens::table
-            .filter(authtokens::id.eq(id))
+        let mut query = minions::table.into_boxed();
+        query = query.order(minions::id.asc());
+
+        // Filtering
+
+        // Sorting
+        match sort.unwrap_or(String::from("id.asc")).as_str() {
+            "id.asc" => query = query.order(minions::id.asc()),
+            "id.desc" => query = query.order(minions::id.desc()),
+            "lastSeen.asc" => query = query.order(minions::last_seen.asc()),
+            "lastSeen.desc" => query = query.order(minions::last_seen.desc()),
+            "conformitySuccess.asc" => query = query.order(minions::conformity_success.asc()),
+            "conformitySuccess.desc" => query = query.order(minions::conformity_success.desc()),
+            "conformityIncorrect.asc" => query = query.order(minions::conformity_incorrect.asc()),
+            "conformityIncorrect.desc" => query = query.order(minions::conformity_incorrect.desc()),
+            "conformityError.asc" => query = query.order(minions::conformity_error.asc()),
+            "conformityError.desc" => query = query.order(minions::conformity_error.desc()),
+            "osType.asc" => query = query.order(minions::os_type.asc()),
+            "osType.desc" => query = query.order(minions::os_type.desc()),
+            _ => {}
+        }
+
+        // Pagination
+        query = query.limit(limit.unwrap_or(100));
+        query = query.offset(offset.unwrap_or(0));
+
+        query
+            .load::<Minion>(&mut connection)
+            .map_err(|e| format!("{:?}", e))
+    }
+
+    pub fn get_minion_by_id(&self, id: &str) -> Result<Option<Minion>, String> {
+        let mut connection = self.create_connection()?;
+        minions::table
+            .filter(minions::id.eq(id))
             .first(&mut connection)
             .optional()
             .map_err(|e| format!("{:?}", e))
     }
-
-    ///////////////
-    /// Minions ///
-    ///////////////
 
     fn update_minion(
         &self,
@@ -401,53 +446,6 @@ impl Storage {
         )
     }
 
-    pub fn get_minion_by_id(&self, id: &str) -> Result<Option<Minion>, String> {
-        let mut connection = self.create_connection()?;
-        minions::table
-            .filter(minions::id.eq(id))
-            .first(&mut connection)
-            .optional()
-            .map_err(|e| format!("{:?}", e))
-    }
-
-    pub fn list_minions(
-        &self,
-        sort: Option<String>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-    ) -> Result<Vec<Minion>, String> {
-        let mut connection = self.create_connection()?;
-        let mut query = minions::table.into_boxed();
-        query = query.order(minions::id.asc());
-
-        // Filtering
-
-        // Sorting
-        match sort.unwrap_or(String::from("id.asc")).as_str() {
-            "id.asc" => query = query.order(minions::id.asc()),
-            "id.desc" => query = query.order(minions::id.desc()),
-            "lastSeen.asc" => query = query.order(minions::last_seen.asc()),
-            "lastSeen.desc" => query = query.order(minions::last_seen.desc()),
-            "conformitySuccess.asc" => query = query.order(minions::conformity_success.asc()),
-            "conformitySuccess.desc" => query = query.order(minions::conformity_success.desc()),
-            "conformityIncorrect.asc" => query = query.order(minions::conformity_incorrect.asc()),
-            "conformityIncorrect.desc" => query = query.order(minions::conformity_incorrect.desc()),
-            "conformityError.asc" => query = query.order(minions::conformity_error.asc()),
-            "conformityError.desc" => query = query.order(minions::conformity_error.desc()),
-            "osType.asc" => query = query.order(minions::os_type.asc()),
-            "osType.desc" => query = query.order(minions::os_type.desc()),
-            _ => {}
-        }
-
-        // Pagination
-        query = query.limit(limit.unwrap_or(100));
-        query = query.offset(offset.unwrap_or(0));
-
-        query
-            .load::<Minion>(&mut connection)
-            .map_err(|e| format!("{:?}", e))
-    }
-
     // Delete minions not in the list of ID's
     pub fn prune_minions(&self, ids: Vec<String>) -> Result<(), String> {
         let mut connection = self.create_connection()?;
@@ -532,15 +530,6 @@ impl Storage {
         Ok(())
     }
 
-    pub fn get_job_by_jid(&self, jid: &str) -> Result<Option<Job>, String> {
-        let mut connection = self.create_connection()?;
-        jobs::table
-            .filter(jobs::jid.eq(jid))
-            .first(&mut connection)
-            .optional()
-            .map_err(|e| format!("{:?}", e))
-    }
-
     pub fn list_jobs(
         &self,
         user: Option<String>,
@@ -571,6 +560,15 @@ impl Storage {
         // Query
         query
             .load::<Job>(&mut connection)
+            .map_err(|e| format!("{:?}", e))
+    }
+
+    pub fn get_job_by_jid(&self, jid: &str) -> Result<Option<Job>, String> {
+        let mut connection = self.create_connection()?;
+        jobs::table
+            .filter(jobs::jid.eq(jid))
+            .first(&mut connection)
+            .optional()
             .map_err(|e| format!("{:?}", e))
     }
 
@@ -731,5 +729,123 @@ impl Storage {
         }
 
         Ok(results)
+    }
+
+    /////////////////////////
+    /// Permission Groups ///
+    /////////////////////////
+
+    pub fn insert_permission_group(&self, name: &str) -> Result<(), String> {
+        let mut connection = self.create_connection()?;
+        let id = format!("pg_{}", uuid::Uuid::new_v4());
+        let permission_group = PermissionGroup {
+            id,
+            name: name.to_owned(),
+            perms: "[]".to_string(),
+            ldap_sync: None,
+        };
+        diesel::insert_into(permission_groups::table)
+            .values(&permission_group)
+            .execute(&mut connection)
+            .map_err(|e| format!("{:?}", e))?;
+        Ok(())
+    }
+
+    pub fn list_permission_groups(&self) -> Result<Vec<PermissionGroup>, String> {
+        let mut connection = self.create_connection()?;
+        permission_groups::table
+            .load::<PermissionGroup>(&mut connection)
+            .map_err(|e| format!("{:?}", e))
+    }
+
+    pub fn get_permission_group_by_id(&self, id: &str) -> Result<Option<PermissionGroup>, String> {
+        let mut connection = self.create_connection()?;
+        permission_groups::table
+            .filter(permission_groups::id.eq(id))
+            .first::<PermissionGroup>(&mut connection)
+            .optional()
+            .map_err(|e| format!("{:?}", e))
+    }
+
+    pub fn update_permission_group(
+        &self,
+        permission_group: &PermissionGroup,
+    ) -> Result<(), String> {
+        let mut connection = self.create_connection()?;
+        diesel::update(permission_groups::table)
+            .set(permission_group)
+            .execute(&mut connection)
+            .map_err(|e| format!("{:?}", e))?;
+        Ok(())
+    }
+
+    pub fn delete_permission_group(&self, id: &str) -> Result<(), String> {
+        let mut connection = self.create_connection()?;
+        diesel::delete(permission_groups::table.filter(permission_groups::id.eq(id)))
+            .execute(&mut connection)
+            .map_err(|e| format!("{:?}", e))?;
+        Ok(())
+    }
+
+    //////////////////////////////////////
+    /// Permission Groups (Users) ///
+    //////////////////////////////////////
+
+    pub fn insert_permission_group_user(
+        &self,
+        user_id: &str,
+        group_id: &str,
+    ) -> Result<(), String> {
+        let mut connection = self.create_connection()?;
+        let id = format!("pgu_{}", uuid::Uuid::new_v4());
+        let permission_group_user = PermissionGroupUser {
+            id,
+            user_id: user_id.to_string(),
+            group_id: group_id.to_string(),
+        };
+        diesel::insert_into(permission_group_users::table)
+            .values(&permission_group_user)
+            .execute(&mut connection)
+            .map_err(|e| format!("{:?}", e))?;
+        Ok(())
+    }
+
+    pub fn list_permission_groups_by_user_id(
+        &self,
+        user_id: &str,
+    ) -> Result<Vec<PermissionGroup>, String> {
+        let mut connection = self.create_connection()?;
+        permission_groups::table
+            .inner_join(permission_group_users::table)
+            .filter(permission_group_users::user_id.eq(user_id))
+            .select(permission_groups::all_columns)
+            .load(&mut connection)
+            .map_err(|e| format!("{:?}", e))
+    }
+
+    pub fn list_users_by_permission_group_id(&self, group_id: &str) -> Result<Vec<User>, String> {
+        let mut connection = self.create_connection()?;
+        users::table
+            .inner_join(permission_group_users::table)
+            .filter(permission_group_users::group_id.eq(group_id))
+            .select(users::all_columns)
+            .load(&mut connection)
+            .map_err(|e| format!("{:?}", e))
+    }
+
+    pub fn delete_permission_group_user(
+        &self,
+        user_id: &str,
+        group_id: &str,
+    ) -> Result<(), String> {
+        let mut connection = self.create_connection()?;
+        diesel::delete(
+            permission_group_users::table
+                .filter(permission_group_users::user_id.eq(user_id))
+                .filter(permission_group_users::group_id.eq(group_id)),
+        )
+        .execute(&mut connection)
+        .map_err(|e| format!("{:?}", e))?;
+        Ok(())
     }
 }

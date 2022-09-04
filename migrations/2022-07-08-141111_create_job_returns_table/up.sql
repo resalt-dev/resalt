@@ -1,5 +1,3 @@
--- resalt.events definition
-
 CREATE TABLE `job_returns` (
   `id` varchar(50) NOT NULL,
   `timestamp` timestamp(6) NOT NULL DEFAULT current_timestamp(6) ON UPDATE current_timestamp(6),

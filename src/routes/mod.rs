@@ -12,6 +12,7 @@ mod jobs;
 mod keys;
 mod metrics;
 mod minions;
+mod permissions;
 mod pipeline;
 mod users;
 
@@ -27,5 +28,6 @@ pub use jobs::*;
 pub use keys::*;
 pub use metrics::*;
 pub use minions::*;
+pub use permissions::*;
 pub use pipeline::*;
 pub use users::*;

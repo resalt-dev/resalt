@@ -1,4 +1,6 @@
-table! {
+// @generated automatically by Diesel CLI.
+
+diesel::table! {
     authtokens (id) {
         id -> Varchar,
         user_id -> Varchar,
@@ -7,7 +9,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     events (id) {
         id -> Varchar,
         timestamp -> Timestamp,
@@ -16,17 +18,7 @@ table! {
     }
 }
 
-table! {
-    jobs (id) {
-        id -> Varchar,
-        timestamp -> Timestamp,
-        jid -> Varchar,
-        user -> Nullable<Varchar>,
-        event_id -> Nullable<Varchar>,
-    }
-}
-
-table! {
+diesel::table! {
     job_returns (id) {
         id -> Varchar,
         timestamp -> Timestamp,
@@ -37,7 +29,17 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
+    jobs (id) {
+        id -> Varchar,
+        timestamp -> Timestamp,
+        jid -> Varchar,
+        user -> Nullable<Varchar>,
+        event_id -> Nullable<Varchar>,
+    }
+}
+
+diesel::table! {
     minions (id) {
         id -> Varchar,
         last_seen -> Timestamp,
@@ -56,7 +58,24 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
+    permission_group_users (id) {
+        id -> Varchar,
+        user_id -> Varchar,
+        group_id -> Varchar,
+    }
+}
+
+diesel::table! {
+    permission_groups (id) {
+        id -> Varchar,
+        name -> Varchar,
+        perms -> Text,
+        ldap_sync -> Nullable<Varchar>,
+    }
+}
+
+diesel::table! {
     users (id) {
         id -> Varchar,
         username -> Varchar,
@@ -66,4 +85,16 @@ table! {
     }
 }
 
-allow_tables_to_appear_in_same_query!(authtokens, events, jobs, job_returns, minions, users,);
+diesel::joinable!(permission_group_users -> permission_groups (group_id));
+diesel::joinable!(permission_group_users -> users (user_id));
+
+diesel::allow_tables_to_appear_in_same_query!(
+    authtokens,
+    events,
+    job_returns,
+    jobs,
+    minions,
+    permission_group_users,
+    permission_groups,
+    users,
+);

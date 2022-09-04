@@ -130,7 +130,16 @@ async fn main() -> std::io::Result<()> {
                         web::scope("/users")
                             .wrap(auth::RequireAuth::new())
                             .route("", web::get().to(route_users_get))
-                            .route("/{id}", web::get().to(route_user_get))
+                            .route("/{user_id}", web::get().to(route_user_get))
+                            //.route("/{id}/password", web::post().to(route_user_password_post))
+                            .route(
+                                "/{user_id}/permissions/{group_id}",
+                                web::post().to(route_user_permission_post),
+                            )
+                            .route(
+                                "/{user_id}/permissions/{group_id}",
+                                web::delete().to(route_user_permission_delete),
+                            )
                             .default_service(route_fallback_404),
                     )
                     // keys
@@ -144,6 +153,16 @@ async fn main() -> std::io::Result<()> {
                                 "/{state}/{id}/delete",
                                 web::delete().to(route_key_delete_delete),
                             )
+                            .default_service(route_fallback_404),
+                    )
+                    // permissions
+                    .service(
+                        web::scope("/permissions")
+                            .wrap(auth::RequireAuth::new())
+                            .route("", web::get().to(route_permissions_get))
+                            .route("", web::post().to(route_permissions_post))
+                            .route("/{id}", web::put().to(route_permission_update))
+                            .route("/{id}", web::delete().to(route_permission_delete))
                             .default_service(route_fallback_404),
                     )
                     // fallback to 404
