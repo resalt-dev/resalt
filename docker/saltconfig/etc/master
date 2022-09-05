@@ -427,6 +427,7 @@ external_auth:
 # file. This is disabled by default and the auth list is calculated or requested
 # from the eauth driver each time.
 #keep_acl_in_token: False
+keep_acl_in_token: True
 
 # Auth subsystem module to use to get authorized access list for a user. By default it's
 # the same module used for external authentication.
@@ -1187,7 +1188,7 @@ file_roots:
 # The following log levels are considered INSECURE and may log sensitive data:
 # ['garbage', 'trace', 'debug']
 #
-log_level: trace
+log_level: debug
 
 # The level of messages to send to the log file.
 # One of 'garbage', 'trace', 'debug', 'info', 'warning', 'error', 'critical'.

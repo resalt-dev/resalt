@@ -1,33 +1,15 @@
 <script lang="ts">
-    import {
-        Card,
-        CardHeader,
-        CardTitle,
-        CardSubtitle,
-        CardBody,
-        Row,
-        Col,
-    } from "sveltestrap";
-    import { theme } from "../../stores";
-    import ThemeColorPicker from "./ThemeColorPicker.svelte";
-    import ThemeDarkToggle from "./ThemeDarkToggle.svelte";
+    import Tabs from "../../components/Tabs.svelte";
+    import PreferencesTabTheme from "./PreferencesTabTheme.svelte";
 </script>
 
 <h1>Preferences</h1>
 
-<Row>
-    <Col xs="12">
-        <Card class="mb-3 {$theme.dark ? 'bg-dark' : ''}">
-            <CardHeader>
-                <CardTitle class="mb-0">Theme</CardTitle>
-            </CardHeader>
-            <CardBody>
-                <CardSubtitle class="mb-3">Color:</CardSubtitle>
-                <ThemeColorPicker />
-                <hr />
-                <CardSubtitle class="mb-3">Dark mode:</CardSubtitle>
-                <ThemeDarkToggle />
-            </CardBody>
-        </Card>
-    </Col>
-</Row>
+<Tabs
+    children={[
+        {
+            label: "Themeing",
+            component: PreferencesTabTheme,
+        },
+    ]}
+/>

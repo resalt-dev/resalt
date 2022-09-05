@@ -9,6 +9,7 @@
     import { resaltLight } from "./codemirror-resalt-theme-light";
 
     export let data: any;
+    export let collapse: boolean = true;
 
     let editorElement: HTMLElement;
     let cm: EditorView = undefined;
@@ -17,7 +18,7 @@
         if (cm) {
             createJSONView("$ update");
 
-            if (!(data instanceof Array)) {
+            if (!(data instanceof Array) && collapse) {
                 foldAll(cm);
             }
         }

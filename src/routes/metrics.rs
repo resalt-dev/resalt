@@ -11,7 +11,5 @@ pub async fn route_metrics_get(data: web::Data<Storage>) -> Result<impl Responde
         }
     };
 
-    log::warn!("Metrics: {:?}", results);
-
     Ok(web::Json(results))
 }

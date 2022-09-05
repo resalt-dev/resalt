@@ -21,6 +21,7 @@ services:
       - ./docker/saltconfig/etc/master:/etc/salt/master:ro
       - ./docker/saltconfig/pillar:/srv/pillar:ro
       - ./docker/saltconfig/salt:/srv/salt:ro
+      - ./docker/saltconfig/rest_cherrypy_app.py:/usr/local/lib/python3.7/site-packages/salt/netapi/rest_cherrypy/app.py:ro
     environment:
       - PYTHONUNBUFFERED=true
       - SALT_API_CONFIG={}

@@ -18,7 +18,7 @@
     import Events from "../../views/Events.svelte";
     import User from "../../views/User/User.svelte";
     import Users from "../../views/Users/Users.svelte";
-    import Settings from "../../views/Settings.svelte";
+    import Settings from "../../views/Settings/Settings.svelte";
     import Preferences from "../../views/Preferences/Preferences.svelte";
 
     const navigate = useNavigate();
