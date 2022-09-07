@@ -2,9 +2,10 @@
     import { Link, useLocation } from "svelte-navigator";
     import { theme } from "../../stores";
     import Icon from "../../components/Icon.svelte";
+    import type { Path } from "../../paths";
 
-    export let route;
-    export let collapsed;
+    export let route: Path;
+    export let collapsed: boolean;
 
     const location = useLocation();
     // $: isActive = $location.pathname === route.path;

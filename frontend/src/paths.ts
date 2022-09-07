@@ -1,4 +1,4 @@
-class Path {
+export class Path {
     name: string;
 
     path: string;
