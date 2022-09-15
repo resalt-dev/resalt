@@ -404,7 +404,7 @@
 external_auth:
   rest:
     ^url: http://backend:8000/resalt/api/1/auth/token
-
+keep_acl_in_token: True
 
 
 #
@@ -427,7 +427,6 @@ external_auth:
 # file. This is disabled by default and the auth list is calculated or requested
 # from the eauth driver each time.
 #keep_acl_in_token: False
-keep_acl_in_token: True
 
 # Auth subsystem module to use to get authorized access list for a user. By default it's
 # the same module used for external authentication.
