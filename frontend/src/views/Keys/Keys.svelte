@@ -8,7 +8,7 @@
         rejectKey,
         showAlert,
     } from "../../controller";
-    import { Badge, Button, Table } from "sveltestrap";
+    import { Badge, Button, Card, Table } from "sveltestrap";
     import { writable } from "svelte/store";
     import TablePaginate from "../../components/TablePaginate.svelte";
     import paths from "../../paths";
@@ -92,7 +92,7 @@
 
 <h1>Key Management</h1>
 
-<div class="table-responsive card {$theme.dark ? 'bg-dark' : ''}">
+<Card class="table-responsive border-bottom-0 {$theme.dark ? 'bg-dark' : ''}">
     <Table
         dark={$theme.dark}
         hover
@@ -201,7 +201,7 @@
             {/if}
         </tbody>
     </Table>
-</div>
+</Card>
 
 <TablePaginate
     bind:size={paginationSize}

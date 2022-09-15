@@ -333,9 +333,9 @@ export async function getMetricResults(): Promise<Array<MetricResult>> {
 /// Permission Groups
 ///
 
-export async function getPermissionGroups(): Promise<Array<PermissionGroup>> {
+export async function getPermissionGroups(limit: number, offset: number): Promise<Array<PermissionGroup>> {
     const token = requireToken();
-    return apiListPermissionGroups(token);
+    return apiListPermissionGroups(token, limit, offset);
 }
 
 export async function getPermissionGroup(id: string): Promise<PermissionGroup> {

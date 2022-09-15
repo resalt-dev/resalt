@@ -6,7 +6,7 @@
     import Icon from "../../components/Icon.svelte";
     import paths from "../../paths";
     import { Link } from "svelte-navigator";
-    import { Table } from "sveltestrap";
+    import { Card, Table } from "sveltestrap";
     import TablePaginate from "../../components/TablePaginate.svelte";
     import Tabs from "../../components/Tabs.svelte";
     import MinionsTabSearch from "./MinionsTabSearch.svelte";
@@ -72,7 +72,7 @@
     ]}
 />
 
-<div class="table-responsive card {$theme.dark ? 'bg-dark' : ''}">
+<Card class="table-responsive border-bottom-0 {$theme.dark ? 'bg-dark' : ''}">
     <Table
         dark={$theme.dark}
         hover
@@ -296,7 +296,7 @@
             {/if}
         </tbody>
     </Table>
-</div>
+</Card>
 
 <TablePaginate
     bind:size={paginationSize}

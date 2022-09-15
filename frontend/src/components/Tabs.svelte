@@ -2,9 +2,14 @@
     import { Card, CardBody } from "sveltestrap";
     import { theme } from "../stores";
 
-    export let children = [];
-    export let tabData: any = {};
-    let selected: number = 0;
+    export let children: {
+        label: string;
+        component: any;
+        data?: any;
+        class?: string;
+    }[] = [];
+    export let selected: number = 0;
+    export let onSelect: (index: number) => void = () => {};
 </script>
 
 <div class="nav bg-dark w-100 no-select">
@@ -17,6 +22,7 @@
                 : 'text-white'}"
             on:click={() => {
                 selected = i;
+                onSelect(i);
             }}
         >
             {tab.label}
@@ -24,14 +30,15 @@
     {/each}
 </div>
 <Card
-    class="mb-3 {$theme.dark ? 'bg-dark border-0' : ''}"
-    style="border-radius: 0px !important"
+    class="mb-3 border-4 border-{$theme.color} rounded-none {$theme.dark
+        ? 'bg-darker'
+        : ''}"
 >
-    <CardBody>
+    <CardBody class={children[selected].class || ""}>
         <svelte:component
             this={children[selected].component}
             label={children[selected].label}
-            {tabData}
+            tabData={children[selected].data || undefined}
         />
     </CardBody>
 </Card>

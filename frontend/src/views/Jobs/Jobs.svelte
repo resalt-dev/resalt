@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import { theme } from "../../stores";
     import { getJobs, showAlert } from "../../controller";
-    import { Table, Tooltip } from "sveltestrap";
+    import { Card, Table, Tooltip } from "sveltestrap";
     import Icon from "../../components/Icon.svelte";
     import { writable } from "svelte/store";
     import TablePaginate from "../../components/TablePaginate.svelte";
@@ -41,7 +41,7 @@
 
 <h1>Jobs</h1>
 
-<div class="table-responsive card {$theme.dark ? 'bg-dark' : ''}">
+<Card class="table-responsive border-bottom-0 {$theme.dark ? 'bg-dark' : ''}">
     <Table
         dark={$theme.dark}
         hover
@@ -157,7 +157,7 @@
             {/if}
         </tbody>
     </Table>
-</div>
+</Card>
 
 <TablePaginate
     bind:size={paginationSize}

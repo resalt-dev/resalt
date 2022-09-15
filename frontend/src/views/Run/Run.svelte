@@ -17,11 +17,9 @@
         {
             label: "Live Run",
             component: RunTabLive,
+            data: { returns },
         },
     ]}
-    tabData={{
-        returns: returns,
-    }}
 />
 
 {#each $returns as ret}

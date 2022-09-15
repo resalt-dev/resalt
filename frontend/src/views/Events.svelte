@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { Table } from "sveltestrap";
+    import { Card, Table } from "sveltestrap";
     import Icon from "../components/Icon.svelte";
     import { getEvents, showAlert } from "../controller";
     import { theme } from "../stores";
@@ -60,7 +60,7 @@
 
 <h1>Events</h1>
 
-<div class="table-responsive card {$theme.dark ? 'bg-dark' : ''}">
+<Card class="table-responsive border-bottom-0 {$theme.dark ? 'bg-dark' : ''}">
     <Table
         dark={$theme.dark}
         hover
@@ -216,7 +216,7 @@
             {/if}
         </tbody>
     </Table>
-</div>
+</Card>
 
 <TablePaginate
     bind:size={paginationSize}

@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import { theme, currentUser } from "../../stores";
     import { getUsers, showAlert } from "../../controller";
-    import { Badge, Table } from "sveltestrap";
+    import { Badge, Card, Table } from "sveltestrap";
     import { writable } from "svelte/store";
     import TablePaginate from "../../components/TablePaginate.svelte";
     import paths from "../../paths";
@@ -31,7 +31,7 @@
 
 <h1>Users</h1>
 
-<div class="table-responsive card {$theme.dark ? 'bg-dark' : ''}">
+<Card class="table-responsive border-bottom-0 {$theme.dark ? 'bg-dark' : ''}">
     <Table
         dark={$theme.dark}
         hover
@@ -105,7 +105,7 @@
             {/if}
         </tbody>
     </Table>
-</div>
+</Card>
 
 <TablePaginate
     bind:size={paginationSize}

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Table } from "sveltestrap";
+    import { Card, Table } from "sveltestrap";
     import JsonViewer from "../../components/JsonViewer.svelte";
     import { theme } from "../../stores";
 
@@ -23,7 +23,11 @@
         <JsonViewer data={JSON.parse($minion.pkgs)} />
     {:else}
         <div class="p-3">
-            <div class="table-responsive card {$theme.dark ? 'bg-dark' : ''}">
+            <Card
+                class="table-responsive border-bottom-0 {$theme.dark
+                    ? 'bg-dark'
+                    : ''}"
+            >
                 <Table
                     dark={$theme.dark}
                     hover
@@ -56,7 +60,7 @@
                         {/each}
                     </tbody>
                 </Table>
-            </div>
+            </Card>
         </div>
     {/if}
 {/if}

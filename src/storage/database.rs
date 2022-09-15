@@ -758,7 +758,7 @@ impl Storage {
     ) -> Result<Vec<PermissionGroup>, String> {
         let mut connection = self.create_connection()?;
         let mut query = permission_groups::table.into_boxed();
-        query = query.order(permission_groups::id.asc());
+        query = query.order(permission_groups::name.asc());
 
         // Filtering
 

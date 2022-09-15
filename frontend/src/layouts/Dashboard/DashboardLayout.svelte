@@ -59,7 +59,7 @@
                     <Route path="users/:userId" component={User} />
                     <Route path="users" component={Users} />
                     <Route path="preferences" component={Preferences} />
-                    <Route path="settings" component={Settings} />
+                    <Route path="settings/*" component={Settings} />
                     <Route path="*">
                         <Redirect to={paths.home.path} />
                     </Route>

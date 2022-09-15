@@ -266,6 +266,13 @@ samp {
 .rounded-none {
     border-radius: 0;
 }
+/* When BOTH table-responsive and card */
+.table-responsive.card {
+    border-radius: 0;
+}
+.progress {
+    border-radius: 0 !important;
+}
 
 .btn {
     border-top: 0;
