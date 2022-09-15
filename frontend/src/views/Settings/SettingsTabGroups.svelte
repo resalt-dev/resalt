@@ -156,6 +156,29 @@
                                 <Label for="arguments">Group Name</Label>
                             </FormGroup>
                         </Col>
+                        <Col class="form-check ps-3 mb-0" md="12">
+                            <FormGroup floating={true}>
+                                <Input
+                                    id="groupLdapSync"
+                                    type="text"
+                                    bind:value={$selectedGroup.ldapSync}
+                                />
+                                <Label for="arguments"
+                                    >LDAP Sync Group (optional)</Label
+                                >
+                            </FormGroup>
+                        </Col>
+                        <Col class="form-check ps-3 mb-0" md="12">
+                            <h3>Members</h3>
+                            <!-- simple list -->
+                            <ul class="list-group">
+                                {#each $selectedGroup.users as user}
+                                    <li class="list-group-item">
+                                        {user.username}
+                                    </li>
+                                {/each}
+                            </ul>
+                        </Col>
                     </Row>
                 {/if}
             </CardBody>
