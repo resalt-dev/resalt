@@ -143,14 +143,20 @@
                                 <th
                                     scope="row"
                                     class={$selectedGroup?.id === group.id
-                                        ? "bg-" + $theme.color
+                                        ? "bg-" +
+                                          $theme.color +
+                                          " border-" +
+                                          $theme.color
                                         : ""}
                                 >
                                     {group.name}
                                 </th>
                                 <td
                                     class={$selectedGroup?.id === group.id
-                                        ? "bg-" + $theme.color
+                                        ? "bg-" +
+                                          $theme.color +
+                                          " border-" +
+                                          $theme.color
                                         : ""}
                                 >
                                     {group.users.length}
