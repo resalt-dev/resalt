@@ -4,6 +4,30 @@ use log::*;
 use serde::Deserialize;
 use serde_json::Value;
 
+async fn get_group(data: &web::Data<Storage>, group_id: &String) -> Result<impl Responder> {
+    let permission_group = match data.get_permission_group_by_id(group_id) {
+        Ok(permission_group) => permission_group,
+        Err(e) => {
+            error!("{:?}", e);
+            return Err(api_error_database());
+        }
+    };
+
+    let permission_group = match permission_group {
+        Some(permission_group) => permission_group,
+        None => return Err(api_error_not_found()),
+    };
+
+    let users = match data.list_users_by_permission_group_id(group_id) {
+        Ok(users) => users,
+        Err(e) => {
+            error!("{:?}", e);
+            return Err(api_error_database());
+        }
+    };
+    Ok(web::Json(permission_group.public(users)))
+}
+
 #[derive(Deserialize)]
 pub struct PermissionGroupsListGetQuery {
     limit: Option<i64>,
@@ -50,14 +74,32 @@ pub async fn route_permissions_post(
     data: web::Data<Storage>,
     input: web::Json<PermissionGroupCreateRequest>,
 ) -> Result<impl Responder> {
-    let permission_group = match data.insert_permission_group(&input.name) {
-        Ok(permission_group) => permission_group,
+    let permission_group_id = match data.create_permission_group(&input.name) {
+        Ok(id) => id,
         Err(e) => {
             error!("{:?}", e);
             return Err(api_error_database());
         }
     };
-    Ok(web::Json(permission_group))
+    let permission_group = match data.get_permission_group_by_id(&permission_group_id) {
+        Ok(permission_group) => match permission_group {
+            Some(permission_group) => permission_group,
+            None => return Err(api_error_database()),
+        },
+        Err(e) => {
+            error!("{:?}", e);
+            return Err(api_error_database());
+        }
+    };
+    let permission_group_users = match data.list_users_by_permission_group_id(&permission_group_id)
+    {
+        Ok(permission_group_users) => permission_group_users,
+        Err(e) => {
+            error!("{:?}", e);
+            return Err(api_error_database());
+        }
+    };
+    Ok(web::Json(permission_group.public(permission_group_users)))
 }
 
 #[derive(Deserialize)]
@@ -69,27 +111,7 @@ pub async fn route_permission_get(
     data: web::Data<Storage>,
     info: web::Path<PermissionInfo>,
 ) -> Result<impl Responder> {
-    let permission_group = match data.get_permission_group_by_id(&info.id) {
-        Ok(permission_group) => permission_group,
-        Err(e) => {
-            error!("{:?}", e);
-            return Err(api_error_database());
-        }
-    };
-
-    let permission_group = match permission_group {
-        Some(permission_group) => permission_group,
-        None => return Err(api_error_not_found()),
-    };
-
-    let users = match data.list_users_by_permission_group_id(&info.id) {
-        Ok(users) => users,
-        Err(e) => {
-            error!("{:?}", e);
-            return Err(api_error_database());
-        }
-    };
-    Ok(web::Json(permission_group.public(users)))
+    get_group(&data, &info.id).await
 }
 
 #[derive(Deserialize)]
@@ -132,7 +154,7 @@ pub async fn route_permission_update(
         }
     };
 
-    Ok(web::Json(()))
+    get_group(&data, &info.id).await
 }
 
 /// # Route: /permissions/{id} (DELETE)
@@ -140,12 +162,15 @@ pub async fn route_permission_delete(
     data: web::Data<Storage>,
     info: web::Path<PermissionInfo>,
 ) -> Result<impl Responder> {
-    let permission_group = match data.delete_permission_group(&info.id) {
-        Ok(permission_group) => permission_group,
+    let group = get_group(&data, &info.id).await?;
+
+    match &data.delete_permission_group(&info.id) {
+        Ok(()) => (),
         Err(e) => {
             error!("{:?}", e);
             return Err(api_error_database());
         }
     };
-    Ok(web::Json(permission_group))
+
+    Ok(group)
 }

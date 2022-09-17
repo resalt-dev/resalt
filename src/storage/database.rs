@@ -88,6 +88,44 @@ impl Storage {
             );
             warn!("============================================================");
         }
+        // Create default permission group
+        if self
+            .get_permission_group_by_name("$superadmins")
+            .unwrap()
+            .is_none()
+        {
+            self.create_permission_group("$superadmins").unwrap();
+            let mut group = self
+                .get_permission_group_by_name("$superadmins")
+                .unwrap()
+                .unwrap();
+            group.perms = json!([
+                ".*".to_string(),
+                "@runner".to_string(),
+                "@wheel".to_string(),
+                {
+                    "@resalt": [
+                        "admin.superadmin".to_string(),
+                    ]
+                }
+            ])
+            .to_string();
+            self.update_permission_group(&group).unwrap();
+        }
+        // Add admin to $superadmins if not member
+        let superadmins_group_id = self
+            .get_permission_group_by_name("$superadmins")
+            .unwrap()
+            .unwrap()
+            .id;
+        let admin_user_id = self.get_user_by_username("admin").unwrap().unwrap().id;
+        if !self
+            .is_user_member_of_group(&admin_user_id, &superadmins_group_id)
+            .unwrap()
+        {
+            self.insert_permission_group_user(&admin_user_id, &superadmins_group_id)
+                .unwrap();
+        }
     }
 
     fn create_connection(&self) -> Result<DbPooledConnection, String> {
@@ -735,11 +773,11 @@ impl Storage {
     /// Permission Groups ///
     /////////////////////////
 
-    pub fn insert_permission_group(&self, name: &str) -> Result<(), String> {
+    pub fn create_permission_group(&self, name: &str) -> Result<String, String> {
         let mut connection = self.create_connection()?;
         let id = format!("pg_{}", uuid::Uuid::new_v4());
         let permission_group = PermissionGroup {
-            id,
+            id: id.clone(),
             name: name.to_owned(),
             perms: "[]".to_string(),
             ldap_sync: None,
@@ -748,7 +786,7 @@ impl Storage {
             .values(&permission_group)
             .execute(&mut connection)
             .map_err(|e| format!("{:?}", e))?;
-        Ok(())
+        Ok(id)
     }
 
     pub fn list_permission_groups(
@@ -776,6 +814,18 @@ impl Storage {
         let mut connection = self.create_connection()?;
         permission_groups::table
             .filter(permission_groups::id.eq(id))
+            .first::<PermissionGroup>(&mut connection)
+            .optional()
+            .map_err(|e| format!("{:?}", e))
+    }
+
+    pub fn get_permission_group_by_name(
+        &self,
+        name: &str,
+    ) -> Result<Option<PermissionGroup>, String> {
+        let mut connection = self.create_connection()?;
+        permission_groups::table
+            .filter(permission_groups::name.eq(name))
             .first::<PermissionGroup>(&mut connection)
             .optional()
             .map_err(|e| format!("{:?}", e))

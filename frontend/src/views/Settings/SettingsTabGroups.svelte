@@ -2,6 +2,7 @@
     import { onMount } from "svelte";
     import { writable } from "svelte/store";
     import {
+        Button,
         Card,
         CardBody,
         CardHeader,
@@ -13,9 +14,16 @@
         Row,
         Table,
     } from "sveltestrap";
+    import Icon from "../../components/Icon.svelte";
     import TablePaginate from "../../components/TablePaginate.svelte";
-    import { getPermissionGroups, showAlert } from "../../controller";
+    import {
+        createPermissionGroup,
+        deletePermissionGroup,
+        getPermissionGroups,
+        showAlert,
+    } from "../../controller";
     import { AlertType } from "../../models/AlertType";
+    import type PermissionGroup from "../../models/PermissionGroup";
     import { theme } from "../../stores";
 
     let paginationSize: number = 20;
@@ -24,19 +32,59 @@
     const groups = writable(null);
     const selectedGroup = writable(null);
 
-    function updateData() {
-        getPermissionGroups(
-            paginationSize,
-            (paginationPage - 1) * paginationSize
-        )
-            .then((data) => {
-                groups.set(data);
-                if (data.length > 0 && $selectedGroup === null) {
-                    selectedGroup.set(data[0]);
-                }
+    function updateData(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            getPermissionGroups(
+                paginationSize,
+                (paginationPage - 1) * paginationSize
+            )
+                .then((data: PermissionGroup[]) => {
+                    groups.set(data);
+                    if (data.length > 0 && $selectedGroup === null) {
+                        selectedGroup.set(data[0]);
+                    }
+                    resolve();
+                })
+                .catch((err) => {
+                    showAlert(AlertType.ERROR, "Failed fetching groups", err);
+                    reject();
+                });
+        });
+    }
+
+    function addGroup() {
+        createPermissionGroup("- Temporary Group Name - ")
+            .then((group) => {
+                updateData();
+                selectedGroup.set(group);
+                showAlert(AlertType.SUCCESS, "Create group", "Created group!");
             })
             .catch((err) => {
-                showAlert(AlertType.ERROR, "Failed fetching groups", err);
+                console.error(err);
+                showAlert(AlertType.ERROR, "Failed creating group", err);
+            });
+    }
+
+    function deleteSelectedGroup() {
+        let indexOfCurrentSelected = $groups.findIndex(
+            (group) => group.id === $selectedGroup.id
+        );
+        deletePermissionGroup($selectedGroup.id)
+            .then(() => {
+                updateData().then(() => {
+                    if ($groups.length > 0) {
+                        selectedGroup.set(
+                            $groups[Math.max(0, indexOfCurrentSelected - 1)]
+                        );
+                    } else {
+                        selectedGroup.set(null);
+                    }
+                });
+                showAlert(AlertType.SUCCESS, "Delete group", "Deleted group!");
+            })
+            .catch((err) => {
+                console.error(err);
+                showAlert(AlertType.ERROR, "Failed deleting group", err);
             });
     }
 
@@ -128,7 +176,16 @@
     <Col>
         <Card class={$theme.dark ? "bg-dark" : ""}>
             <CardHeader>
-                <span class="fw-bold">Edit Group</span>
+                <span class="fw-bold">Group Details</span>
+                <Button
+                    size="sm"
+                    color="success"
+                    class="float-end"
+                    style="margin-top: -4px;margin-bottom: -4px;"
+                    on:click={addGroup}
+                >
+                    <Icon name="plus" size="1" style="margin-top: -2px;" />
+                </Button>
             </CardHeader>
             <CardBody>
                 {#if $selectedGroup === null}
@@ -151,6 +208,8 @@
                                 <Input
                                     id="groupName"
                                     type="text"
+                                    disabled={$selectedGroup.name ===
+                                        "$superadmins"}
                                     bind:value={$selectedGroup.name}
                                 />
                                 <Label for="arguments">Group Name</Label>
@@ -161,11 +220,13 @@
                                 <Input
                                     id="groupLdapSync"
                                     type="text"
+                                    disabled={$selectedGroup.name ===
+                                        "$superadmins"}
                                     bind:value={$selectedGroup.ldapSync}
                                 />
-                                <Label for="arguments"
-                                    >LDAP Sync Group (optional)</Label
-                                >
+                                <Label for="arguments" class="text-muted">
+                                    LDAP Sync DN (optional)
+                                </Label>
                             </FormGroup>
                         </Col>
                         <Col class="form-check ps-3 mb-0" md="12">
@@ -180,6 +241,14 @@
                             </ul>
                         </Col>
                     </Row>
+                    <Button
+                        color="danger"
+                        class="float-end mt-3"
+                        disabled={$selectedGroup.name === "$superadmins"}
+                        on:click={deleteSelectedGroup}
+                    >
+                        Delete Group
+                    </Button>
                 {/if}
             </CardBody>
         </Card>
