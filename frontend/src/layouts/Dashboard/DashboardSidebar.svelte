@@ -23,7 +23,7 @@
 
 <div
     class="d-flex flex-column flex-shrink-0 bg-dark h-100 no-select"
-    style="min-height: 100vh; {$collapsed
+    style="min-height: 100vh; overflow-y: auto; {$collapsed
         ? 'width: 4.5rem;'
         : 'width: 17.5rem;'}"
 >
