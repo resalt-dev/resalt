@@ -82,7 +82,9 @@ export function closeEvents(): void {
     }
 }
 
-export async function connectEvents(timeout: number = 1000): Promise<EventSource> {
+export async function connectEvents(
+    timeout: number = 1000,
+): Promise<EventSource> {
     if (source && source.readyState === EventSource.OPEN) {
         console.log(
             'Tried connecting to SSE when already connected, returning same.',
@@ -157,9 +159,9 @@ export async function connectEvents(timeout: number = 1000): Promise<EventSource
             // Connection was closed.
             socketStore.set({ connected: false, last_ping: null });
             console.log(
-                `Retrying SSE connection in ${
-                    Math.round(timeout / 1000)
-                } seconds...`,
+                `Retrying SSE connection in ${Math.round(
+                    timeout / 1000,
+                )} seconds...`,
             );
             setTimeout(() => {
                 connectEvents(Math.min(timeout * 2, 5 * 60 * 1000));
@@ -204,7 +206,10 @@ export async function getCurrentUser(): Promise<User> {
 /// Users
 ///
 
-export async function getUsers(limit?: number, offset?: number): Promise<Array<User>> {
+export async function getUsers(
+    limit?: number,
+    offset?: number,
+): Promise<Array<User>> {
     const token = requireToken();
     return apiListUsers(token, limit, offset);
 }
@@ -257,7 +262,10 @@ export async function getMinionById(id: string): Promise<Minion> {
 /// Events
 ///
 
-export async function getEvents(limit?: number, offset?: number): Promise<Array<SaltEvent>> {
+export async function getEvents(
+    limit?: number,
+    offset?: number,
+): Promise<Array<SaltEvent>> {
     const token = requireToken();
     return apiListEvents(token, limit, offset);
 }
@@ -288,7 +296,17 @@ export async function runJob(
     timeout: number,
 ): Promise<any> {
     const token = requireToken();
-    return apiRunJob(token, client, tgtType, tgt, fun, arg, kwarg, batchSize, timeout);
+    return apiRunJob(
+        token,
+        client,
+        tgtType,
+        tgt,
+        fun,
+        arg,
+        kwarg,
+        batchSize,
+        timeout,
+    );
 }
 
 export async function getJobById(id: string): Promise<Job> {
@@ -333,7 +351,10 @@ export async function getMetricResults(): Promise<Array<MetricResult>> {
 /// Permission Groups
 ///
 
-export async function getPermissionGroups(limit: number, offset: number): Promise<Array<PermissionGroup>> {
+export async function getPermissionGroups(
+    limit: number,
+    offset: number,
+): Promise<Array<PermissionGroup>> {
     const token = requireToken();
     return apiListPermissionGroups(token, limit, offset);
 }
