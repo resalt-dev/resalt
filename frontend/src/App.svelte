@@ -33,7 +33,7 @@
     });
 </script>
 
-<main>
+<main class={$theme.dark ? "theme-dark" : ""}>
     {#if $config === null || $theme.color === null}
         <p>Loading...</p>
     {:else}

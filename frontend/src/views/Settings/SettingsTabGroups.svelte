@@ -20,6 +20,7 @@
         createPermissionGroup,
         deletePermissionGroup,
         getPermissionGroups,
+        removeUserFromPermissionGroup,
         showAlert,
     } from "../../controller";
     import { AlertType } from "../../models/AlertType";
@@ -87,6 +88,38 @@
                 showAlert(AlertType.ERROR, "Failed deleting group", err);
             });
     }
+
+    function addUserToSelectedGroup() {
+        if ($selectedGroup === null) {
+            return;
+        }
+        // TODO: Add user to group
+    }
+
+    function removeUserFromSelectedGroup(userId: string) {
+        if ($selectedGroup === null) {
+            return;
+        }
+        removeUserFromPermissionGroup(userId, $selectedGroup.id)
+            .then(() => {
+                updateData();
+                showAlert(
+                    AlertType.SUCCESS,
+                    "Remove user from group",
+                    "Removed user from group!"
+                );
+            })
+            .catch((err) => {
+                console.error(err);
+                showAlert(
+                    AlertType.ERROR,
+                    "Failed removing user from group",
+                    err
+                );
+            });
+    }
+
+    function updateSelectedGroup() {}
 
     onMount(() => {
         updateData();
@@ -198,7 +231,7 @@
                     <h1>Select a group to edit</h1>
                 {:else}
                     <Row>
-                        <Col class="form-check ps-3 mb-0" md="12">
+                        <Col class="ps-3 mb-0" md="12">
                             <FormGroup floating={true}>
                                 <Input
                                     id="groupID"
@@ -209,7 +242,7 @@
                                 <Label for="arguments">Group ID</Label>
                             </FormGroup>
                         </Col>
-                        <Col class="form-check ps-3 mb-0" md="12">
+                        <Col class="ps-3 mb-0" md="12">
                             <FormGroup floating={true}>
                                 <Input
                                     id="groupName"
@@ -221,7 +254,7 @@
                                 <Label for="arguments">Group Name</Label>
                             </FormGroup>
                         </Col>
-                        <Col class="form-check ps-3 mb-0" md="12">
+                        <Col class="ps-3 mb-0" md="12">
                             <FormGroup floating={true}>
                                 <Input
                                     id="groupLdapSync"
@@ -235,26 +268,128 @@
                                 </Label>
                             </FormGroup>
                         </Col>
-                        <Col class="form-check ps-3 mb-0" md="12">
+                        <Col class="ps-3 mb-0" md="12">
+                            <Button
+                                color="primary"
+                                class="float-end"
+                                disabled={$selectedGroup.name ===
+                                    "$superadmins"}
+                                on:click={deleteSelectedGroup}
+                            >
+                                Save changes
+                            </Button>
+                        </Col>
+                        <Col class="ps-3 mb-0" md="12">
                             <h3>Members</h3>
-                            <!-- simple list -->
-                            <ul class="list-group">
-                                {#each $selectedGroup.users as user}
-                                    <li class="list-group-item">
-                                        {user.username}
-                                    </li>
-                                {/each}
-                            </ul>
+                            <Table
+                                dark={$theme.dark}
+                                class="b-0 mb-3 {$theme.dark
+                                    ? 'text-light border-secondary'
+                                    : ''}"
+                            >
+                                <thead
+                                    class="bg-dark border-0 {$theme.dark
+                                        ? 'text-light'
+                                        : 'text-white'}"
+                                >
+                                    <tr>
+                                        <th
+                                            scope="col"
+                                            class="border-secondary"
+                                        >
+                                            <div class="row g-1">
+                                                <div
+                                                    class="col-auto align-self-center ps-2"
+                                                >
+                                                    User ID
+                                                </div>
+                                            </div>
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            class="border-secondary"
+                                        >
+                                            <div class="row g-1">
+                                                <div
+                                                    class="col-auto align-self-center"
+                                                >
+                                                    Username
+                                                </div>
+                                            </div>
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            class="border-secondary"
+                                        />
+                                    </tr>
+                                </thead>
+                                <tbody class="align-middle">
+                                    {#each $selectedGroup.users as user}
+                                        <tr>
+                                            <th scope="row">
+                                                {user.username}
+                                            </th>
+                                            <td>
+                                                <small>{user.id}</small>
+                                            </td>
+                                            <td>
+                                                <!-- <Button
+                                                    color="danger"
+                                                    size="sm"
+                                                    class="float-end"
+                                                    on:click={() => {
+                                                        removeUserFromSelectedGroup(
+                                                            user.id
+                                                        );
+                                                    }}
+                                                >
+                                                    Remove
+                                                </Button> -->
+                                            </td>
+                                        </tr>
+                                    {/each}
+                                </tbody>
+                            </Table>
+                        </Col>
+                        <Col class="ps-3 mb-0" md="12">
+                            <h3>Add user</h3>
+                            <div class="input-group flex-nowrap mb-3">
+                                <div class="form-floating w-100">
+                                    <Input
+                                        id="addUser"
+                                        type="text"
+                                        bsSize="sm"
+                                        style="height: 2.5rem;"
+                                    />
+                                    <!-- bind:value={$addUser} -->
+                                    <Label
+                                        for="arguments"
+                                        style="padding-top: 0.4rem;"
+                                        >User ID</Label
+                                    >
+                                </div>
+                                <Button
+                                    color="primary"
+                                    class="float-end text-nowrap px-4"
+                                    on:click={addUserToSelectedGroup}
+                                >
+                                    Add user
+                                </Button>
+                            </div>
+                        </Col>
+                        <Col class="ps-3 mb-0" md="12">
+                            <h3>Actions</h3>
+                            <Button
+                                color="danger"
+                                class="float-end"
+                                disabled={$selectedGroup.name ===
+                                    "$superadmins"}
+                                on:click={deleteSelectedGroup}
+                            >
+                                Delete Group
+                            </Button>
                         </Col>
                     </Row>
-                    <Button
-                        color="danger"
-                        class="float-end mt-3"
-                        disabled={$selectedGroup.name === "$superadmins"}
-                        on:click={deleteSelectedGroup}
-                    >
-                        Delete Group
-                    </Button>
                 {/if}
             </CardBody>
         </Card>

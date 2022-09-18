@@ -136,7 +136,7 @@
 </script>
 
 <Row>
-    <Col class="form-check ps-3 mb-0" md="2">
+    <Col class="ps-3 mb-0" md="2">
         <FormGroup floating={true}>
             <Input
                 id="clientType"
@@ -151,8 +151,8 @@
             <Label for="clientType">Client Type</Label>
         </FormGroup>
     </Col>
-    <Col class="form-check ps-3 mb-0" md="1" />
-    <Col class="form-check ps-3 mb-0" md="2">
+    <Col class="ps-3 mb-0" md="1" />
+    <Col class="ps-3 mb-0" md="2">
         {#if !runBatch}
             <div class="clearfix" />
             <Label for="async" class="ms-1 mb-0">Async</Label>
@@ -166,7 +166,7 @@
             </FormGroup>
         {/if}
     </Col>
-    <Col class="form-check ps-3 mb-0" md="1">
+    <Col class="ps-3 mb-0" md="1">
         {#if runClientType === "local"}
             <div class="clearfix" />
             <Label for="batch" class="ms-1 mb-0">Batch</Label>
@@ -180,7 +180,7 @@
             </FormGroup>
         {/if}
     </Col>
-    <Col class="form-check ps-3 mb-0" md="1">
+    <Col class="ps-3 mb-0" md="1">
         {#if runClientType === "local" && runBatch}
             <FormGroup floating={true}>
                 <Input id="batchSize" type="text" bind:value={runBatchSize} />
@@ -188,7 +188,7 @@
             </FormGroup>
         {/if}
     </Col>
-    <Col class="form-check ps-3 mb-0" md="1">
+    <Col class="ps-3 mb-0" md="1">
         {#if runClientType === "local" && (runBatch || (!runBatch && !runAsync))}
             <FormGroup floating={true}>
                 <Input id="timeout" type="number" bind:value={runTimeout} />
@@ -199,7 +199,7 @@
 </Row>
 
 <Row>
-    <Col class="form-check ps-3 mb-0" md="1">
+    <Col class="ps-3 mb-0" md="1">
         {#if runClientType === "local"}
             <FormGroup floating={true}>
                 <Input
@@ -224,7 +224,7 @@
             </FormGroup>
         {/if}
     </Col>
-    <Col class="form-check ps-3 mb-0" md="2">
+    <Col class="ps-3 mb-0" md="2">
         {#if runClientType === "local"}
             <FormGroup floating={true}>
                 <Input id="target" type="text" bind:value={runTarget} />
@@ -232,19 +232,19 @@
             </FormGroup>
         {/if}
     </Col>
-    <Col class="form-check ps-3 mb-0" md="2">
+    <Col class="ps-3 mb-0" md="2">
         <FormGroup floating={true}>
             <Input id="function" type="text" bind:value={runFunction} />
             <Label for="function">Function</Label>
         </FormGroup>
     </Col>
-    <Col class="form-check ps-3 mb-0" md="3">
+    <Col class="ps-3 mb-0" md="3">
         <FormGroup floating={true}>
             <Input id="arguments" type="text" bind:value={runArguments} />
             <Label for="arguments">Arguments</Label>
         </FormGroup>
     </Col>
-    <Col class="form-check ps-3 mb-0" md="4">
+    <Col class="ps-3 mb-0" md="4">
         <FormGroup floating={true}>
             <Input
                 id="keywordArguments"
