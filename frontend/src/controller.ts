@@ -28,6 +28,7 @@ import {
     apiListUsers,
     apiRefreshMinions,
     apiRejectKey,
+    apiRemoveUserFromPermissionGroup,
     apiRequestAuthToken,
     apiRunJob,
     apiUpdatePermissionGroup,
@@ -232,7 +233,7 @@ export async function removeUserFromPermissionGroup(
     permissionGroupId: string,
 ): Promise<void> {
     const token = requireToken();
-    return apiAddUserToPermissionGroup(token, userId, permissionGroupId);
+    return apiRemoveUserFromPermissionGroup(token, userId, permissionGroupId);
 }
 
 ///

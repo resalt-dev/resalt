@@ -178,10 +178,12 @@ pub async fn route_user_permission_delete(
     };
 
     match data.delete_permission_group_user(&user.id, &permission_group.id) {
-        Ok(_) => Ok(web::Json(())),
+        Ok(_) => (),
         Err(e) => {
             error!("{:?}", e);
-            Err(api_error_database())
+            return Err(api_error_database());
         }
     }
+
+    Ok(web::Json(()))
 }

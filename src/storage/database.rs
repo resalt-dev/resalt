@@ -851,7 +851,13 @@ impl Storage {
     ) -> Result<(), String> {
         let mut connection = self.create_connection()?;
         diesel::update(permission_groups::table)
-            .set(permission_group)
+            .filter(permission_groups::id.eq(&permission_group.id))
+            // set name, perms, ldap_sync
+            .set((
+                permission_groups::name.eq(&permission_group.name),
+                permission_groups::perms.eq(&permission_group.perms),
+                permission_groups::ldap_sync.eq(&permission_group.ldap_sync),
+            ))
             .execute(&mut connection)
             .map_err(|e| format!("{:?}", e))?;
         Ok(())

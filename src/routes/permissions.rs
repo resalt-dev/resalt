@@ -1,7 +1,7 @@
 use crate::prelude::*;
 use actix_web::{web, Responder, Result};
 use log::*;
-use serde::Deserialize;
+use serde::{Deserialize, Deserializer};
 use serde_json::Value;
 
 async fn get_group(data: &web::Data<Storage>, group_id: &String) -> Result<impl Responder> {
@@ -118,7 +118,8 @@ pub async fn route_permission_get(
 pub struct PermissionGroupUpdateRequest {
     pub name: String,
     pub perms: String, // JSON encoded array
-    #[serde(rename = "ldapSync")]
+    // allow ldapSync(string) to be null
+    #[serde(rename = "ldapSync", deserialize_with = "deserialize_null")]
     pub ldap_sync: Option<String>,
 }
 /// # Route: /permissions/{id} (PUT)
@@ -173,4 +174,11 @@ pub async fn route_permission_delete(
     };
 
     Ok(group)
+}
+
+fn deserialize_null<'de, D>(d: D) -> Result<Option<String>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    Deserialize::deserialize(d).map(|x: Option<_>| x.unwrap_or(None))
 }

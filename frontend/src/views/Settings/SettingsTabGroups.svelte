@@ -17,11 +17,13 @@
     import Icon from "../../components/Icon.svelte";
     import TablePaginate from "../../components/TablePaginate.svelte";
     import {
+        addUserToPermissionGroup,
         createPermissionGroup,
         deletePermissionGroup,
         getPermissionGroups,
         removeUserFromPermissionGroup,
         showAlert,
+        updatePermissionGroup,
     } from "../../controller";
     import { AlertType } from "../../models/AlertType";
     import type PermissionGroup from "../../models/PermissionGroup";
@@ -33,6 +35,13 @@
     const groups = writable(null);
     const selectedGroup = writable(null);
 
+    let groupNameFieldValue: string = "";
+    let groupNameFieldError: boolean = false;
+    let groupLdapSyncFieldValue: string = "";
+    let groupLdapSyncFieldError: boolean = false;
+    let addUserFieldValue: string = "";
+    let addUserFieldError: boolean = false;
+
     function updateData(): Promise<void> {
         return new Promise((resolve, reject) => {
             getPermissionGroups(
@@ -41,9 +50,20 @@
             )
                 .then((data: PermissionGroup[]) => {
                     groups.set(data);
-                    if (data.length > 0 && $selectedGroup === null) {
-                        selectedGroup.set(data[0]);
+
+                    if ($selectedGroup === null) {
+                        if (data.length > 0) {
+                            selectGroup(data[0]);
+                        }
+                    } else {
+                        for (let group of data) {
+                            if (group.id === $selectedGroup.id) {
+                                selectGroup(group);
+                                break;
+                            }
+                        }
                     }
+
                     resolve();
                 })
                 .catch((err) => {
@@ -53,7 +73,17 @@
         });
     }
 
-    function addGroup() {
+    function selectGroup(group: PermissionGroup): void {
+        selectedGroup.set(group);
+        groupNameFieldValue = group.name;
+        groupNameFieldError = false;
+        groupLdapSyncFieldValue = group.ldapSync ?? "";
+        groupLdapSyncFieldError = false;
+        addUserFieldValue = "";
+        addUserFieldError = false;
+    }
+
+    function addGroup(): void {
         createPermissionGroup("- Temporary Group Name - ")
             .then((group) => {
                 updateData();
@@ -66,7 +96,7 @@
             });
     }
 
-    function deleteSelectedGroup() {
+    function deleteSelectedGroup(): void {
         let indexOfCurrentSelected = $groups.findIndex(
             (group) => group.id === $selectedGroup.id
         );
@@ -89,14 +119,30 @@
             });
     }
 
-    function addUserToSelectedGroup() {
+    function addUserToSelectedGroup(): void {
         if ($selectedGroup === null) {
             return;
         }
-        // TODO: Add user to group
+        validateAddUserField();
+        if (addUserFieldError) {
+            return;
+        }
+        addUserToPermissionGroup(addUserFieldValue, $selectedGroup.id)
+            .then(() => {
+                updateData();
+                showAlert(
+                    AlertType.SUCCESS,
+                    "Add user to group",
+                    "Added user to group!"
+                );
+            })
+            .catch((err) => {
+                console.error(err);
+                showAlert(AlertType.ERROR, "Failed adding user to group", err);
+            });
     }
 
-    function removeUserFromSelectedGroup(userId: string) {
+    function removeUserFromSelectedGroup(userId: string): void {
         if ($selectedGroup === null) {
             return;
         }
@@ -119,7 +165,83 @@
             });
     }
 
-    function updateSelectedGroup() {}
+    function updateSelectedGroup(): void {
+        if ($selectedGroup === null) {
+            return;
+        }
+        validateGroupNameField();
+        validateGroupLdapSyncField();
+        if (groupNameFieldError || groupLdapSyncFieldError) {
+            return;
+        }
+        updatePermissionGroup(
+            $selectedGroup.id,
+            groupNameFieldValue,
+            $selectedGroup.perms,
+            groupLdapSyncFieldValue.length > 0 ? groupLdapSyncFieldValue : null
+        )
+            .then(() => {
+                updateData();
+                showAlert(
+                    AlertType.SUCCESS,
+                    "Update group",
+                    "Updated group name!"
+                );
+            })
+            .catch((err) => {
+                console.error(err);
+                showAlert(AlertType.ERROR, "Failed updating group", err);
+            });
+    }
+
+    /*
+    // VALIDATION
+    */
+
+    function validateGroupNameField(): void {
+        groupNameFieldError = false;
+        if (groupNameFieldValue.length === 0) {
+            groupNameFieldError = true;
+            return;
+        }
+        if (groupNameFieldValue === "$superadmins") {
+            groupNameFieldError = true;
+            return;
+        }
+    }
+
+    function validateGroupLdapSyncField(): void {
+        groupLdapSyncFieldError = false;
+        if (groupLdapSyncFieldValue.length === 0) {
+            // Allow empty
+            return;
+        }
+
+        if (!groupLdapSyncFieldValue.toLocaleLowerCase().startsWith("cn=")) {
+            groupLdapSyncFieldError = true;
+            return;
+        }
+        // https://stackoverflow.com/a/26492530/2479087
+        let regex =
+            /^(?:[A-Za-z][\w-]*|\d+(?:\.\d+)*)=(?:#(?:[\dA-Fa-f]{2})+|(?:[^,=\+<>#;\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*|"(?:[^\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*")(?:\+(?:[A-Za-z][\w-]*|\d+(?:\.\d+)*)=(?:#(?:[\dA-Fa-f]{2})+|(?:[^,=\+<>#;\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*|"(?:[^\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*"))*(?:,(?:[A-Za-z][\w-]*|\d+(?:\.\d+)*)=(?:#(?:[\dA-Fa-f]{2})+|(?:[^,=\+<>#;\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*|"(?:[^\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*")(?:\+(?:[A-Za-z][\w-]*|\d+(?:\.\d+)*)=(?:#(?:[\dA-Fa-f]{2})+|(?:[^,=\+<>#;\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*|"(?:[^\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*"))*)*$/;
+        if (!regex.test(groupLdapSyncFieldValue)) {
+            console.log("Invalid LDAP sync string", groupLdapSyncFieldValue);
+            groupLdapSyncFieldError = true;
+            return;
+        }
+    }
+
+    function validateAddUserField(): void {
+        addUserFieldError = false;
+        if (addUserFieldValue.length !== 40) {
+            addUserFieldError = true;
+            return;
+        }
+        if (!addUserFieldValue.startsWith("usr_")) {
+            addUserFieldError = true;
+            return;
+        }
+    }
 
     onMount(() => {
         updateData();
@@ -170,7 +292,7 @@
                                     ? 'text-white'
                                     : ''}"
                                 on:click={() => {
-                                    selectedGroup.set(group);
+                                    selectGroup(group);
                                 }}
                             >
                                 <th
@@ -234,7 +356,6 @@
                         <Col class="ps-3 mb-0" md="12">
                             <FormGroup floating={true}>
                                 <Input
-                                    id="groupID"
                                     type="text"
                                     bind:value={$selectedGroup.id}
                                     disabled
@@ -245,11 +366,13 @@
                         <Col class="ps-3 mb-0" md="12">
                             <FormGroup floating={true}>
                                 <Input
-                                    id="groupName"
                                     type="text"
                                     disabled={$selectedGroup.name ===
                                         "$superadmins"}
-                                    bind:value={$selectedGroup.name}
+                                    invalid={groupNameFieldError}
+                                    bind:value={groupNameFieldValue}
+                                    on:blur={validateGroupNameField}
+                                    required
                                 />
                                 <Label for="arguments">Group Name</Label>
                             </FormGroup>
@@ -257,11 +380,12 @@
                         <Col class="ps-3 mb-0" md="12">
                             <FormGroup floating={true}>
                                 <Input
-                                    id="groupLdapSync"
                                     type="text"
                                     disabled={$selectedGroup.name ===
                                         "$superadmins"}
-                                    bind:value={$selectedGroup.ldapSync}
+                                    invalid={groupLdapSyncFieldError}
+                                    bind:value={groupLdapSyncFieldValue}
+                                    on:blur={validateGroupLdapSyncField}
                                 />
                                 <Label for="arguments" class="text-muted">
                                     LDAP Sync DN (optional)
@@ -274,7 +398,7 @@
                                 class="float-end"
                                 disabled={$selectedGroup.name ===
                                     "$superadmins"}
-                                on:click={deleteSelectedGroup}
+                                on:click={updateSelectedGroup}
                             >
                                 Save changes
                             </Button>
@@ -333,10 +457,14 @@
                                                 <small>{user.id}</small>
                                             </td>
                                             <td>
-                                                <!-- <Button
+                                                <Button
                                                     color="danger"
                                                     size="sm"
                                                     class="float-end"
+                                                    disabled={$selectedGroup.name ===
+                                                        "$superadmins" &&
+                                                        user.username ===
+                                                            "admin"}
                                                     on:click={() => {
                                                         removeUserFromSelectedGroup(
                                                             user.id
@@ -344,7 +472,7 @@
                                                     }}
                                                 >
                                                     Remove
-                                                </Button> -->
+                                                </Button>
                                             </td>
                                         </tr>
                                     {/each}
@@ -352,20 +480,20 @@
                             </Table>
                         </Col>
                         <Col class="ps-3 mb-0" md="12">
-                            <h3>Add user</h3>
-                            <div class="input-group flex-nowrap mb-3">
+                            <div class="input-group flex-nowrap">
                                 <div class="form-floating w-100">
                                     <Input
-                                        id="addUser"
                                         type="text"
                                         bsSize="sm"
                                         style="height: 2.5rem;"
+                                        invalid={addUserFieldError}
+                                        bind:value={addUserFieldValue}
+                                        on:blur={validateAddUserField}
                                     />
-                                    <!-- bind:value={$addUser} -->
                                     <Label
                                         for="arguments"
                                         style="padding-top: 0.4rem;"
-                                        >User ID</Label
+                                        >Add by User ID</Label
                                     >
                                 </div>
                                 <Button
@@ -376,6 +504,13 @@
                                     Add user
                                 </Button>
                             </div>
+                            {#if addUserFieldError}
+                                <div class="invalid-feedback d-block">
+                                    Invalid User ID. Please see the User List
+                                    tab.
+                                </div>
+                            {/if}
+                            <div class="mb-3" />
                         </Col>
                         <Col class="ps-3 mb-0" md="12">
                             <h3>Actions</h3>
