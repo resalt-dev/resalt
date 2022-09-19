@@ -249,9 +249,9 @@
 </script>
 
 <Row>
-    <Col>
+    <Col xs="12" md="4">
         <Card
-            class="table-responsive border-bottom-0 {$theme.dark
+            class="table-responsive border-bottom-0 mb-3 {$theme.dark
                 ? 'bg-dark'
                 : ''}"
         >
@@ -334,7 +334,7 @@
             {/if}
         </Card>
     </Col>
-    <Col>
+    <Col xs="12" md="8">
         <Card class={$theme.dark ? "bg-dark" : ""}>
             <CardHeader>
                 <span class="fw-bold">Group Details</span>
@@ -353,7 +353,7 @@
                     <h1>Select a group to edit</h1>
                 {:else}
                     <Row>
-                        <Col class="ps-3 mb-0" md="12">
+                        <Col class="ps-3 mb-0" xs="12">
                             <FormGroup floating={true}>
                                 <Input
                                     type="text"
@@ -363,7 +363,7 @@
                                 <Label for="arguments">Group ID</Label>
                             </FormGroup>
                         </Col>
-                        <Col class="ps-3 mb-0" md="12">
+                        <Col class="ps-3 mb-0" xs="12" lg="6" xxl="5">
                             <FormGroup floating={true}>
                                 <Input
                                     type="text"
@@ -377,7 +377,7 @@
                                 <Label for="arguments">Group Name</Label>
                             </FormGroup>
                         </Col>
-                        <Col class="ps-3 mb-0" md="12">
+                        <Col class="ps-3 mb-0" xs="12" lg="6" xxl="7">
                             <FormGroup floating={true}>
                                 <Input
                                     type="text"
@@ -392,7 +392,7 @@
                                 </Label>
                             </FormGroup>
                         </Col>
-                        <Col class="ps-3 mb-0" md="12">
+                        <Col class="ps-3 mb-0" xs="12">
                             <Button
                                 color="primary"
                                 class="float-end"
@@ -403,7 +403,7 @@
                                 Save changes
                             </Button>
                         </Col>
-                        <Col class="ps-3 mb-0" md="12">
+                        <Col class="ps-3 mb-0" xs="12">
                             <h3>Members</h3>
                             <Table
                                 dark={$theme.dark}
@@ -479,7 +479,7 @@
                                 </tbody>
                             </Table>
                         </Col>
-                        <Col class="ps-3 mb-0" md="12">
+                        <Col class="ps-3 mb-0" xs="12">
                             <div class="input-group flex-nowrap">
                                 <div class="form-floating w-100">
                                     <Input
@@ -512,7 +512,68 @@
                             {/if}
                             <div class="mb-3" />
                         </Col>
-                        <Col class="ps-3 mb-0" md="12">
+                        <Col class="ps-3 mb-0" xs="12">
+                            <h3>Permissions</h3>
+                            <Table
+                                dark={$theme.dark}
+                                class="b-0 mb-3 {$theme.dark
+                                    ? 'text-light border-secondary'
+                                    : ''}"
+                            >
+                                <thead
+                                    class="bg-dark border-0 {$theme.dark
+                                        ? 'text-light'
+                                        : 'text-white'}"
+                                >
+                                    <tr>
+                                        <th
+                                            scope="col"
+                                            class="border-secondary"
+                                        >
+                                            <div class="row g-1">
+                                                <div
+                                                    class="col-auto align-self-center ps-2"
+                                                >
+                                                    Permission
+                                                </div>
+                                            </div>
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            class="border-secondary"
+                                        >
+                                            <div class="row g-1">
+                                                <div
+                                                    class="col-auto align-self-center"
+                                                >
+                                                    Description
+                                                </div>
+                                            </div>
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            class="border-secondary"
+                                        />
+                                    </tr>
+                                </thead>
+                                <tbody class="align-middle">
+                                    {#each $selectedGroup.perms as permission}
+                                        <tr>
+                                            <th scope="row">
+                                                {permission.name}
+                                            </th>
+                                            <td>
+                                                <small>
+                                                    {permission.description}
+                                                </small>
+                                            </td>
+                                            <td>a</td>
+                                        </tr>
+                                    {/each}
+                                </tbody>
+                            </Table>
+                        </Col>
+                        <Col class="ps-3 mb-0" xs="12">
                             <h3>Actions</h3>
                             <Button
                                 color="danger"
