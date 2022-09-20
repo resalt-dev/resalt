@@ -27,6 +27,7 @@
     } from "../../controller";
     import { AlertType } from "../../models/AlertType";
     import type PermissionGroup from "../../models/PermissionGroup";
+    import { resaltPermissions } from "../../perms";
     import { theme } from "../../stores";
 
     let paginationSize: number = 20;
@@ -529,6 +530,10 @@
                                         <th
                                             scope="col"
                                             class="border-secondary"
+                                        />
+                                        <th
+                                            scope="col"
+                                            class="border-secondary"
                                         >
                                             <div class="row g-1">
                                                 <div
@@ -550,24 +555,32 @@
                                                 </div>
                                             </div>
                                         </th>
-                                        <th
-                                            scope="col"
-                                            class="border-secondary"
-                                        />
                                     </tr>
                                 </thead>
                                 <tbody class="align-middle">
-                                    {#each $selectedGroup.perms as permission}
+                                    {#each resaltPermissions as resaltPermission}
                                         <tr>
+                                            <td>
+                                                <div class="clearfix" />
+                                                <FormGroup
+                                                    floating={true}
+                                                    class="form-switch ps-0"
+                                                    style="margin-bottom: 0 !important;"
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        class="form-check-input fs-3 ms-0 mt-0 mouse-pointer"
+                                                    />
+                                                </FormGroup>
+                                            </td>
                                             <th scope="row">
-                                                {permission.name}
+                                                {resaltPermission[1]}
                                             </th>
                                             <td>
                                                 <small>
-                                                    {permission.description}
+                                                    {resaltPermission[2]}
                                                 </small>
                                             </td>
-                                            <td>a</td>
                                         </tr>
                                     {/each}
                                 </tbody>

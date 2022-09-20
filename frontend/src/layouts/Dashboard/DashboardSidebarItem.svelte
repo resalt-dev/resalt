@@ -12,16 +12,17 @@
     $: isActiveOrSub = $location.pathname.startsWith(route.path);
 </script>
 
-<li class="nav-item">
+<li class="nav-item" style="height: 4.5rem;">
     <Link
         to={route.path}
         class="nav-link {$theme.color === 'yellow' && isActiveOrSub
             ? 'text-dark'
             : $theme.dark && !isActiveOrSub
             ? 'text-light'
-            : 'text-white'} py-3 fw-light d-flex align-items-center {isActiveOrSub
+            : 'text-white'} fw-light d-flex align-items-center {isActiveOrSub
             ? `bg-${$theme.color}`
             : ''}"
+        style="height: inherit;"
     >
         <Icon name={route.icon} class="ps-1 {collapsed ? '' : 'me-3'}" />
         {#if !collapsed}
