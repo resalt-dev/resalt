@@ -259,10 +259,6 @@ samp {
     font-weight: 400;
 }
 
-.vr {
-    width: 1px;
-}
-
 .rounded-none {
     border-radius: 0;
 }
@@ -581,6 +577,10 @@ hr {
     opacity: 1;
     color: var(--gray) !important;
 }
+/* vertical alternative to <hr> */
+.vr {
+    width: 1px;
+}
 
 .text-red {
     color: var(--red) !important;
@@ -644,6 +644,14 @@ hr {
 }
 .text-white {
     color: var(--white) !important;
+}
+.text-console {
+    font-weight: 700;
+    white-space: pre-wrap; /* css-3 */
+    white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
+    white-space: -pre-wrap; /* Opera 4-6 */
+    white-space: -o-pre-wrap; /* Opera 7 */
+    word-wrap: break-word; /* Internet Explorer 5.5+ */
 }
 
 .form-check-input:checked {
@@ -727,7 +735,68 @@ hr {
     border-color: var(--black) !important;
 }
 
-.mouse-pointer {
+.form-check-input:disabled {
+    background-color: var(--gray-5) !important;
+}
+.form-check-input-red:disabled:checked {
+    background-color: var(--light-red) !important;
+}
+.form-check-input-volcano:disabled:checked {
+    background-color: var(--light-volcano) !important;
+}
+.form-check-input-orange:disabled:checked {
+    background-color: var(--light-orange) !important;
+}
+.form-check-input-gold:disabled:checked {
+    background-color: var(--light-gold) !important;
+}
+.form-check-input-yellow:disabled:checked {
+    background-color: var(--light-yellow) !important;
+}
+.form-check-input-green:disabled:checked {
+    background-color: var(--light-green) !important;
+}
+.form-check-input-cyan:disabled:checked {
+    background-color: var(--light-cyan) !important;
+}
+.form-check-input-blue:disabled:checked {
+    background-color: var(--light-blue) !important;
+}
+.form-check-input-geekblue:disabled:checked {
+    background-color: var(--light-geekblue) !important;
+}
+.form-check-input-purple:disabled:checked {
+    background-color: var(--light-purple) !important;
+}
+.form-check-input-magenta:disabled:checked {
+    background-color: var(--light-magenta) !important;
+}
+.form-check-input-primary:disabled:checked {
+    background-color: var(--light-primary) !important;
+}
+.form-check-input-secondary:disabled:checked {
+    background-color: var(--light-secondary) !important;
+}
+.form-check-input-success:disabled:checked {
+    background-color: var(--light-success) !important;
+}
+.form-check-input-info:disabled:checked {
+    background-color: var(--light-info) !important;
+}
+.form-check-input-warning:disabled:checked {
+    background-color: var(--light-warning) !important;
+}
+.form-check-input-danger:disabled:checked {
+    background-color: var(--light-danger) !important;
+}
+.form-check-input-light:disabled:checked {
+    background-color: var(--gray-2) !important;
+}
+.form-check-input-dark:disabled:checked {
+    background-color: var(--light-dark) !important;
+}
+
+.mouse-pointer, .form-check-input {
     cursor: pointer;
 }
 
@@ -735,15 +804,6 @@ hr {
     -moz-user-select: none;
     -webkit-user-select: none;
     user-select: none;
-}
-
-.text-console {
-    font-weight: 700;
-    white-space: pre-wrap; /* css-3 */
-    white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
-    white-space: -pre-wrap; /* Opera 4-6 */
-    white-space: -o-pre-wrap; /* Opera 7 */
-    word-wrap: break-word; /* Internet Explorer 5.5+ */
 }
 
 /*
@@ -758,7 +818,7 @@ hr {
 }
 
 /*
- * directional-buttons override
+ * Directional-Buttons override (used in header)
  */
 .btn-arrow-right::before, .btn-arrow-left::after {
     background: none;

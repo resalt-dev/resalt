@@ -1,7 +1,8 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import { writable } from "svelte/store";
+    import { onMount } from 'svelte';
+    import { writable } from 'svelte/store';
     import {
+        Alert,
         Button,
         Card,
         CardBody,
@@ -13,9 +14,9 @@
         Progress,
         Row,
         Table,
-    } from "sveltestrap";
-    import Icon from "../../components/Icon.svelte";
-    import TablePaginate from "../../components/TablePaginate.svelte";
+    } from 'sveltestrap';
+    import Icon from '../../components/Icon.svelte';
+    import TablePaginate from '../../components/TablePaginate.svelte';
     import {
         addUserToPermissionGroup,
         createPermissionGroup,
@@ -24,30 +25,31 @@
         removeUserFromPermissionGroup,
         showAlert,
         updatePermissionGroup,
-    } from "../../controller";
-    import { AlertType } from "../../models/AlertType";
-    import type PermissionGroup from "../../models/PermissionGroup";
-    import { resaltPermissions } from "../../perms";
-    import { theme } from "../../stores";
+    } from '../../controller';
+    import { AlertType } from '../../models/AlertType';
+    import { resaltPermissions } from '../../perms';
+    import { theme } from '../../stores';
+    import type PermissionGroup from '../../models/PermissionGroup';
 
     let paginationSize: number = 20;
     let paginationPage: number = 1;
 
-    const groups = writable(null);
-    const selectedGroup = writable(null);
+    const groups = writable<PermissionGroup[]>(null);
+    const selectedGroup = writable<PermissionGroup | null>(null);
 
-    let groupNameFieldValue: string = "";
+    let groupNameFieldValue: string = '';
     let groupNameFieldError: boolean = false;
-    let groupLdapSyncFieldValue: string = "";
+    let groupLdapSyncFieldValue: string = '';
     let groupLdapSyncFieldError: boolean = false;
-    let addUserFieldValue: string = "";
+    let addUserFieldValue: string = '';
     let addUserFieldError: boolean = false;
+    let permissionWebFields: { [key: string]: boolean } = {};
 
     function updateData(): Promise<void> {
         return new Promise((resolve, reject) => {
             getPermissionGroups(
                 paginationSize,
-                (paginationPage - 1) * paginationSize
+                (paginationPage - 1) * paginationSize,
             )
                 .then((data: PermissionGroup[]) => {
                     groups.set(data);
@@ -68,7 +70,7 @@
                     resolve();
                 })
                 .catch((err) => {
-                    showAlert(AlertType.ERROR, "Failed fetching groups", err);
+                    showAlert(AlertType.ERROR, 'Failed fetching groups', err);
                     reject();
                 });
         });
@@ -78,45 +80,49 @@
         selectedGroup.set(group);
         groupNameFieldValue = group.name;
         groupNameFieldError = false;
-        groupLdapSyncFieldValue = group.ldapSync ?? "";
+        groupLdapSyncFieldValue = group.ldapSync ?? '';
         groupLdapSyncFieldError = false;
-        addUserFieldValue = "";
+        addUserFieldValue = '';
         addUserFieldError = false;
+        permissionWebFields = {};
+        for (let perm of resaltPermissions) {
+            permissionWebFields[perm[0]] = group.hasResaltPermission(perm[0]);
+        }
     }
 
     function addGroup(): void {
-        createPermissionGroup("- Temporary Group Name - ")
+        createPermissionGroup('- Temporary Group Name - ')
             .then((group) => {
                 updateData();
                 selectedGroup.set(group);
-                showAlert(AlertType.SUCCESS, "Create group", "Created group!");
+                showAlert(AlertType.SUCCESS, 'Create group', 'Created group!');
             })
             .catch((err) => {
                 console.error(err);
-                showAlert(AlertType.ERROR, "Failed creating group", err);
+                showAlert(AlertType.ERROR, 'Failed creating group', err);
             });
     }
 
     function deleteSelectedGroup(): void {
         let indexOfCurrentSelected = $groups.findIndex(
-            (group) => group.id === $selectedGroup.id
+            (group) => group.id === $selectedGroup.id,
         );
         deletePermissionGroup($selectedGroup.id)
             .then(() => {
                 updateData().then(() => {
                     if ($groups.length > 0) {
                         selectedGroup.set(
-                            $groups[Math.max(0, indexOfCurrentSelected - 1)]
+                            $groups[Math.max(0, indexOfCurrentSelected - 1)],
                         );
                     } else {
                         selectedGroup.set(null);
                     }
                 });
-                showAlert(AlertType.SUCCESS, "Delete group", "Deleted group!");
+                showAlert(AlertType.SUCCESS, 'Delete group', 'Deleted group!');
             })
             .catch((err) => {
                 console.error(err);
-                showAlert(AlertType.ERROR, "Failed deleting group", err);
+                showAlert(AlertType.ERROR, 'Failed deleting group', err);
             });
     }
 
@@ -133,13 +139,13 @@
                 updateData();
                 showAlert(
                     AlertType.SUCCESS,
-                    "Add user to group",
-                    "Added user to group!"
+                    'Add user to group',
+                    'Added user to group!',
                 );
             })
             .catch((err) => {
                 console.error(err);
-                showAlert(AlertType.ERROR, "Failed adding user to group", err);
+                showAlert(AlertType.ERROR, 'Failed adding user to group', err);
             });
     }
 
@@ -152,16 +158,16 @@
                 updateData();
                 showAlert(
                     AlertType.SUCCESS,
-                    "Remove user from group",
-                    "Removed user from group!"
+                    'Remove user from group',
+                    'Removed user from group!',
                 );
             })
             .catch((err) => {
                 console.error(err);
                 showAlert(
                     AlertType.ERROR,
-                    "Failed removing user from group",
-                    err
+                    'Failed removing user from group',
+                    err,
                 );
             });
     }
@@ -179,19 +185,19 @@
             $selectedGroup.id,
             groupNameFieldValue,
             $selectedGroup.perms,
-            groupLdapSyncFieldValue.length > 0 ? groupLdapSyncFieldValue : null
+            groupLdapSyncFieldValue.length > 0 ? groupLdapSyncFieldValue : null,
         )
             .then(() => {
                 updateData();
                 showAlert(
                     AlertType.SUCCESS,
-                    "Update group",
-                    "Updated group name!"
+                    'Update group',
+                    'Updated group name!',
                 );
             })
             .catch((err) => {
                 console.error(err);
-                showAlert(AlertType.ERROR, "Failed updating group", err);
+                showAlert(AlertType.ERROR, 'Failed updating group', err);
             });
     }
 
@@ -205,7 +211,7 @@
             groupNameFieldError = true;
             return;
         }
-        if (groupNameFieldValue === "$superadmins") {
+        if (groupNameFieldValue === '$superadmins') {
             groupNameFieldError = true;
             return;
         }
@@ -218,7 +224,7 @@
             return;
         }
 
-        if (!groupLdapSyncFieldValue.toLocaleLowerCase().startsWith("cn=")) {
+        if (!groupLdapSyncFieldValue.toLocaleLowerCase().startsWith('cn=')) {
             groupLdapSyncFieldError = true;
             return;
         }
@@ -226,7 +232,7 @@
         let regex =
             /^(?:[A-Za-z][\w-]*|\d+(?:\.\d+)*)=(?:#(?:[\dA-Fa-f]{2})+|(?:[^,=\+<>#;\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*|"(?:[^\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*")(?:\+(?:[A-Za-z][\w-]*|\d+(?:\.\d+)*)=(?:#(?:[\dA-Fa-f]{2})+|(?:[^,=\+<>#;\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*|"(?:[^\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*"))*(?:,(?:[A-Za-z][\w-]*|\d+(?:\.\d+)*)=(?:#(?:[\dA-Fa-f]{2})+|(?:[^,=\+<>#;\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*|"(?:[^\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*")(?:\+(?:[A-Za-z][\w-]*|\d+(?:\.\d+)*)=(?:#(?:[\dA-Fa-f]{2})+|(?:[^,=\+<>#;\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*|"(?:[^\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*"))*)*$/;
         if (!regex.test(groupLdapSyncFieldValue)) {
-            console.log("Invalid LDAP sync string", groupLdapSyncFieldValue);
+            console.log('Invalid LDAP sync string', groupLdapSyncFieldValue);
             groupLdapSyncFieldError = true;
             return;
         }
@@ -238,7 +244,7 @@
             addUserFieldError = true;
             return;
         }
-        if (!addUserFieldValue.startsWith("usr_")) {
+        if (!addUserFieldValue.startsWith('usr_')) {
             addUserFieldError = true;
             return;
         }
@@ -299,21 +305,21 @@
                                 <th
                                     scope="row"
                                     class={$selectedGroup?.id === group.id
-                                        ? "bg-" +
+                                        ? 'bg-' +
                                           $theme.color +
-                                          " border-" +
+                                          ' border-' +
                                           $theme.color
-                                        : ""}
+                                        : ''}
                                 >
                                     {group.name}
                                 </th>
                                 <td
                                     class={$selectedGroup?.id === group.id
-                                        ? "bg-" +
+                                        ? 'bg-' +
                                           $theme.color +
-                                          " border-" +
+                                          ' border-' +
                                           $theme.color
-                                        : ""}
+                                        : ''}
                                 >
                                     {group.users.length}
                                 </td>
@@ -336,7 +342,7 @@
         </Card>
     </Col>
     <Col xs="12" md="8">
-        <Card class={$theme.dark ? "bg-dark" : ""}>
+        <Card class={$theme.dark ? 'bg-dark' : ''}>
             <CardHeader>
                 <span class="fw-bold">Group Details</span>
                 <Button
@@ -355,6 +361,20 @@
                 {:else}
                     <Row>
                         <Col class="ps-3 mb-0" xs="12">
+                            {#if $selectedGroup.name === '$superadmins'}
+                                <Alert
+                                    color="warning"
+                                    dismissible={false}
+                                    fade={false}
+                                >
+                                    <strong>Warning!</strong> You have selected
+                                    the "<strong>$superadmins</strong>" group.
+                                    This is a special system-protected group
+                                    that cannot be edited or deleted.
+                                </Alert>
+                            {/if}
+                        </Col>
+                        <Col class="ps-3 mb-0" xs="12">
                             <FormGroup floating={true}>
                                 <Input
                                     type="text"
@@ -369,7 +389,7 @@
                                 <Input
                                     type="text"
                                     disabled={$selectedGroup.name ===
-                                        "$superadmins"}
+                                        '$superadmins'}
                                     invalid={groupNameFieldError}
                                     bind:value={groupNameFieldValue}
                                     on:blur={validateGroupNameField}
@@ -383,7 +403,7 @@
                                 <Input
                                     type="text"
                                     disabled={$selectedGroup.name ===
-                                        "$superadmins"}
+                                        '$superadmins'}
                                     invalid={groupLdapSyncFieldError}
                                     bind:value={groupLdapSyncFieldValue}
                                     on:blur={validateGroupLdapSyncField}
@@ -398,7 +418,7 @@
                                 color="primary"
                                 class="float-end"
                                 disabled={$selectedGroup.name ===
-                                    "$superadmins"}
+                                    '$superadmins'}
                                 on:click={updateSelectedGroup}
                             >
                                 Save changes
@@ -422,25 +442,13 @@
                                             scope="col"
                                             class="border-secondary"
                                         >
-                                            <div class="row g-1">
-                                                <div
-                                                    class="col-auto align-self-center ps-2"
-                                                >
-                                                    User ID
-                                                </div>
-                                            </div>
+                                            User ID
                                         </th>
                                         <th
                                             scope="col"
                                             class="border-secondary"
                                         >
-                                            <div class="row g-1">
-                                                <div
-                                                    class="col-auto align-self-center"
-                                                >
-                                                    Username
-                                                </div>
-                                            </div>
+                                            Username
                                         </th>
                                         <th
                                             scope="col"
@@ -463,12 +471,12 @@
                                                     size="sm"
                                                     class="float-end"
                                                     disabled={$selectedGroup.name ===
-                                                        "$superadmins" &&
+                                                        '$superadmins' &&
                                                         user.username ===
-                                                            "admin"}
+                                                            'admin'}
                                                     on:click={() => {
                                                         removeUserFromSelectedGroup(
-                                                            user.id
+                                                            user.id,
                                                         );
                                                     }}
                                                 >
@@ -488,6 +496,8 @@
                                         bsSize="sm"
                                         style="height: 2.5rem;"
                                         invalid={addUserFieldError}
+                                        disabled={$selectedGroup.name ===
+                                            '$superadmins'}
                                         bind:value={addUserFieldValue}
                                         on:blur={validateAddUserField}
                                     />
@@ -500,6 +510,8 @@
                                 <Button
                                     color="primary"
                                     class="float-end text-nowrap px-4"
+                                    disabled={$selectedGroup.name ===
+                                        '$superadmins'}
                                     on:click={addUserToSelectedGroup}
                                 >
                                     Add user
@@ -515,6 +527,7 @@
                         </Col>
                         <Col class="ps-3 mb-0" xs="12">
                             <h3>Permissions</h3>
+                            <h5>Web Dashboard</h5>
                             <Table
                                 dark={$theme.dark}
                                 class="b-0 mb-3 {$theme.dark
@@ -533,47 +546,33 @@
                                         />
                                         <th
                                             scope="col"
-                                            class="border-secondary"
+                                            class="border-secondary ps-0"
                                         >
-                                            <div class="row g-1">
-                                                <div
-                                                    class="col-auto align-self-center ps-2"
-                                                >
-                                                    Permission
-                                                </div>
-                                            </div>
+                                            Permission
                                         </th>
                                         <th
                                             scope="col"
                                             class="border-secondary"
                                         >
-                                            <div class="row g-1">
-                                                <div
-                                                    class="col-auto align-self-center"
-                                                >
-                                                    Description
-                                                </div>
-                                            </div>
+                                            Description
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody class="align-middle">
                                     {#each resaltPermissions as resaltPermission}
                                         <tr>
-                                            <td>
-                                                <div class="clearfix" />
-                                                <FormGroup
-                                                    floating={true}
-                                                    class="form-switch ps-0"
-                                                    style="margin-bottom: 0 !important;"
-                                                >
-                                                    <input
-                                                        type="checkbox"
-                                                        class="form-check-input fs-3 ms-0 mt-0 mouse-pointer"
-                                                    />
-                                                </FormGroup>
+                                            <td class="px-5" style="width: 0">
+                                                <input
+                                                    type="checkbox"
+                                                    class="form-check-input form-check-input-primary fs-3 ms-0 mt-0"
+                                                    disabled={$selectedGroup.name ===
+                                                        '$superadmins'}
+                                                    bind:checked={permissionWebFields[
+                                                        resaltPermission[0]
+                                                    ]}
+                                                />
                                             </td>
-                                            <th scope="row">
+                                            <th scope="row" class="ps-0">
                                                 {resaltPermission[1]}
                                             </th>
                                             <td>
@@ -585,6 +584,39 @@
                                     {/each}
                                 </tbody>
                             </Table>
+                            <h5>Minion Targets</h5>
+                            <Table
+                                dark={$theme.dark}
+                                class="b-0 mb-3 {$theme.dark
+                                    ? 'text-light border-secondary'
+                                    : ''}"
+                            >
+                                <thead
+                                    class="bg-dark border-0 {$theme.dark
+                                        ? 'text-light'
+                                        : 'text-white'}"
+                                >
+                                    <tr>
+                                        <th
+                                            scope="col"
+                                            class="border-secondary"
+                                        >
+                                            Target
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            class="border-secondary"
+                                        >
+                                            Permissions
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            class="border-secondary"
+                                        />
+                                    </tr>
+                                </thead>
+                                <tbody class="align-middle" />
+                            </Table>
                         </Col>
                         <Col class="ps-3 mb-0" xs="12">
                             <h3>Actions</h3>
@@ -592,7 +624,7 @@
                                 color="danger"
                                 class="float-end"
                                 disabled={$selectedGroup.name ===
-                                    "$superadmins"}
+                                    '$superadmins'}
                                 on:click={deleteSelectedGroup}
                             >
                                 Delete Group

@@ -1,4 +1,8 @@
 export default class Job {
+    static fromObject(data: any): any {
+        return new Job(data.id, data.timestamp, data.jid, data.user, data.minions);
+    }
+
     id: string;
 
     timestamp: string;

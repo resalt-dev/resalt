@@ -15,6 +15,25 @@
     "lastUpdatedConformity": null,
 } */
 export default class Minion {
+    static fromObject(data: any): any {
+        return new Minion(
+            data.id,
+            data.lastSeen,
+            data.grains,
+            data.pillars,
+            data.pkgs,
+            data.lastUpdatedGrains,
+            data.lastUpdatedPillars,
+            data.lastUpdatedPkgs,
+            data.conformity,
+            data.conformitySuccess,
+            data.conformityIncorrect,
+            data.conformityError,
+            data.lastUpdatedConformity,
+            data.osType,
+        );
+    }
+
     id: string;
 
     lastSeen: string;

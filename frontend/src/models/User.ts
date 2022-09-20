@@ -1,4 +1,15 @@
 export default class User {
+    static fromObject(data: any): any {
+        return new User(
+            data.id,
+            data.username,
+            data.isLocal,
+            data.perms,
+            data.lastLogin,
+            data.permissionGroups,
+        );
+    }
+
     id: string;
 
     username: string;
@@ -9,7 +20,7 @@ export default class User {
 
     lastLogin: string | null;
 
-    readonly permissionGroups: { readonly id: string, readonly name: string }[];
+    readonly permissionGroups: { readonly id: string; readonly name: string }[];
 
     constructor(
         id: string,
@@ -17,7 +28,7 @@ export default class User {
         isLocal: boolean,
         perms: any[],
         lastLogin: string | null,
-        permissionGroups: { id: string, name: string }[],
+        permissionGroups: { id: string; name: string }[],
     ) {
         this.id = id;
         this.username = username;

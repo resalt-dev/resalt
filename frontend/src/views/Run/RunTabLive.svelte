@@ -160,7 +160,7 @@
                 <input
                     id="async"
                     type="checkbox"
-                    class="form-check-input fs-3 ms-0 mt-0 mouse-pointer"
+                    class="form-check-input fs-3 ms-0 mt-0"
                     bind:checked={runAsync}
                 />
             </FormGroup>
@@ -174,7 +174,7 @@
                 <input
                     id="batch"
                     type="checkbox"
-                    class="form-check-input fs-3 ms-0 mt-0 mouse-pointer"
+                    class="form-check-input fs-3 ms-0 mt-0"
                     bind:checked={runBatch}
                 />
             </FormGroup>

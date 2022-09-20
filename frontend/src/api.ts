@@ -1,19 +1,21 @@
 import constants from './constants';
-import type Minion from './models/Minion';
-import type SaltEvent from './models/SaltEvent';
-import type Job from './models/Job';
-import type User from './models/User';
-import type Key from './models/Key';
-import type Config from './models/Config';
-import type MetricResult from './models/MetricResult';
-import type PermissionGroup from './models/PermissionGroup';
+import Minion from './models/Minion';
+import SaltEvent from './models/SaltEvent';
+import Job from './models/Job';
+import User from './models/User';
+import Key from './models/Key';
+import Config from './models/Config';
+import MetricResult from './models/MetricResult';
+import PermissionGroup from './models/PermissionGroup';
 
 // API class is independent, and is not allowed to import svelte/store's.
 
 export async function apiCreateEventConnection(
     token: string,
 ): Promise<EventSource> {
-    const stream = new EventSource(`${constants.apiUrl}/pipeline?token=${token}`);
+    const stream = new EventSource(
+        `${constants.apiUrl}/pipeline?token=${token}`,
+    );
     return stream;
 }
 
@@ -67,18 +69,22 @@ export async function apiRequestAuthToken(
     username: string,
     password: string,
 ): Promise<String> {
-    return (await sendUnauthenticatedRequest('POST', '/auth/login', {
-        username,
-        password,
-    })).token;
+    return (
+        await sendUnauthenticatedRequest('POST', '/auth/login', {
+            username,
+            password,
+        })
+    ).token;
 }
 
 export async function apiGetConfig(): Promise<Config> {
-    return sendUnauthenticatedRequest('GET', '/config');
+    return sendUnauthenticatedRequest('GET', '/config').then((data: any) => Config.fromObject(data));
 }
 
 export async function apiGetCurrentUser(token: string): Promise<User> {
-    return sendAuthenticatedRequest('GET', '/auth/user', token);
+    return sendAuthenticatedRequest('GET', '/auth/user', token).then((data) =>
+        User.fromObject(data),
+    );
 }
 
 ///
@@ -95,14 +101,17 @@ export async function apiListUsers(
     if (limit) args.append('limit', limit.toString());
     if (offset) args.append('offset', offset.toString());
 
-    return sendAuthenticatedRequest('GET', `/users?${args.toString()}`, token);
+    return sendAuthenticatedRequest(
+        'GET',
+        `/users?${args.toString()}`,
+        token,
+    ).then((data: any[]) => data.map((item) => User.fromObject(item)));
 }
 
-export async function apiGetUser(
-    token: string,
-    userId: string,
-): Promise<User> {
-    return sendAuthenticatedRequest('GET', `/users/${userId}`, token);
+export async function apiGetUser(token: string, userId: string): Promise<User> {
+    return sendAuthenticatedRequest('GET', `/users/${userId}`, token).then(
+        (data: any) => User.fromObject(data),
+    );
 }
 
 export async function apiAddUserToPermissionGroup(
@@ -145,7 +154,11 @@ export async function apiListMinions(
     if (limit) args.append('limit', limit.toString());
     if (offset) args.append('offset', offset.toString());
 
-    return sendAuthenticatedRequest('GET', `/minions?${args.toString()}`, token);
+    return sendAuthenticatedRequest(
+        'GET',
+        `/minions?${args.toString()}`,
+        token,
+    ).then((data: any[]) => data.map((item) => Minion.fromObject(item)));
 }
 
 export async function apiRefreshMinions(token: string): Promise<void> {
@@ -156,7 +169,9 @@ export async function apiGetMinionById(
     token: string,
     minionId: string,
 ): Promise<Minion> {
-    return sendAuthenticatedRequest('GET', `/minions/${minionId}`, token);
+    return sendAuthenticatedRequest('GET', `/minions/${minionId}`, token).then(
+        (data: any) => Minion.fromObject(data),
+    );
 }
 
 ///
@@ -173,7 +188,11 @@ export async function apiListEvents(
     if (limit) args.append('limit', limit.toString());
     if (offset) args.append('offset', offset.toString());
 
-    return sendAuthenticatedRequest('GET', `/events?${args.toString()}`, token);
+    return sendAuthenticatedRequest(
+        'GET',
+        `/events?${args.toString()}`,
+        token,
+    ).then((data: any[]) => data.map((item) => SaltEvent.fromObject(item)));
 }
 
 ///
@@ -196,7 +215,11 @@ export async function apiListJobs(
     if (limit) args.append('limit', limit.toString());
     if (offset) args.append('offset', offset.toString());
 
-    return sendAuthenticatedRequest('GET', `/jobs?${args.toString()}`, token);
+    return sendAuthenticatedRequest(
+        'GET',
+        `/jobs?${args.toString()}`,
+        token,
+    ).then((data: any[]) => data.map((item) => Job.fromObject(item)));
 }
 
 export async function apiRunJob(
@@ -226,38 +249,43 @@ export async function apiGetJobById(
     token: string,
     jobId: string,
 ): Promise<Job> {
-    return sendAuthenticatedRequest('GET', `/jobs/${jobId}`, token);
+    return sendAuthenticatedRequest('GET', `/jobs/${jobId}`, token).then(
+        (data: any) => Job.fromObject(data),
+    );
 }
 
 ///
 /// Keys
 ///
 
-export async function apiListKeys(
-    token: string,
-): Promise<Array<Key>> {
-    return sendAuthenticatedRequest('GET', '/keys', token);
+export async function apiListKeys(token: string): Promise<Array<Key>> {
+    return sendAuthenticatedRequest('GET', '/keys', token).then((data: any[]) =>
+        data.map((item) => Key.fromObject(item)),
+    );
 }
 
-export async function apiAcceptKey(
-    token: string,
-    key: Key,
-): Promise<void> {
-    await sendAuthenticatedRequest('PUT', `/keys/${key.state}/${key.id}/accept`, token);
+export async function apiAcceptKey(token: string, key: Key): Promise<void> {
+    await sendAuthenticatedRequest(
+        'PUT',
+        `/keys/${key.state}/${key.id}/accept`,
+        token,
+    );
 }
 
-export async function apiRejectKey(
-    token: string,
-    key: Key,
-): Promise<void> {
-    await sendAuthenticatedRequest('PUT', `/keys/${key.state}/${key.id}/reject`, token);
+export async function apiRejectKey(token: string, key: Key): Promise<void> {
+    await sendAuthenticatedRequest(
+        'PUT',
+        `/keys/${key.state}/${key.id}/reject`,
+        token,
+    );
 }
 
-export async function apiDeleteKey(
-    token: string,
-    key: Key,
-): Promise<void> {
-    await sendAuthenticatedRequest('DELETE', `/keys/${key.state}/${key.id}/delete`, token);
+export async function apiDeleteKey(token: string, key: Key): Promise<void> {
+    await sendAuthenticatedRequest(
+        'DELETE',
+        `/keys/${key.state}/${key.id}/delete`,
+        token,
+    );
 }
 
 ///
@@ -267,7 +295,9 @@ export async function apiDeleteKey(
 export async function apiListMetricResults(
     token: string,
 ): Promise<Array<MetricResult>> {
-    return sendAuthenticatedRequest('GET', '/metrics', token);
+    return sendAuthenticatedRequest('GET', '/metrics', token).then(
+        (data: any[]) => data.map((item) => MetricResult.fromObject(item)),
+    );
 }
 
 ///
@@ -284,14 +314,20 @@ export async function apiListPermissionGroups(
     if (limit) args.append('limit', limit.toString());
     if (offset) args.append('offset', offset.toString());
 
-    return sendAuthenticatedRequest('GET', `/permissions?${args.toString()}`, token);
+    return sendAuthenticatedRequest(
+        'GET',
+        `/permissions?${args.toString()}`,
+        token,
+    ).then((data: any[]) => data.map((item) => PermissionGroup.fromObject(item)));
 }
 
 export async function apiGetPermissionGroup(
     token: string,
     id: string,
 ): Promise<PermissionGroup> {
-    return sendAuthenticatedRequest('GET', `/permissions/${id}`, token);
+    return sendAuthenticatedRequest('GET', `/permissions/${id}`, token).then(
+        (data: any) => PermissionGroup.fromObject(data),
+    );
 }
 
 export async function apiCreatePermissionGroup(
@@ -300,7 +336,7 @@ export async function apiCreatePermissionGroup(
 ): Promise<PermissionGroup> {
     return sendAuthenticatedRequest('POST', '/permissions', token, {
         name,
-    });
+    }).then((data: any) => PermissionGroup.fromObject(data));
 }
 
 export async function apiDeletePermissionGroup(
