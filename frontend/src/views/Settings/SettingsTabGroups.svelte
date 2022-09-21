@@ -471,9 +471,9 @@
                                                     size="sm"
                                                     class="float-end"
                                                     disabled={$selectedGroup.name ===
-                                                        '$superadmins' &&
-                                                        user.username ===
-                                                            'admin'}
+                                                        '$superadmins' ||
+                                                        groupLdapSyncFieldValue.length >
+                                                            0}
                                                     on:click={() => {
                                                         removeUserFromSelectedGroup(
                                                             user.id,
@@ -497,21 +497,29 @@
                                         style="height: 2.5rem;"
                                         invalid={addUserFieldError}
                                         disabled={$selectedGroup.name ===
-                                            '$superadmins'}
+                                            '$superadmins' ||
+                                            groupLdapSyncFieldValue.length > 0}
                                         bind:value={addUserFieldValue}
                                         on:blur={validateAddUserField}
                                     />
                                     <Label
                                         for="arguments"
                                         style="padding-top: 0.4rem;"
-                                        >Add by User ID</Label
                                     >
+                                        {#if groupLdapSyncFieldValue.length > 0}
+                                            Manually managing users is disabled
+                                            because LDAP Sync is active.
+                                        {:else}
+                                            Add by User ID
+                                        {/if}
+                                    </Label>
                                 </div>
                                 <Button
                                     color="primary"
                                     class="float-end text-nowrap px-4"
                                     disabled={$selectedGroup.name ===
-                                        '$superadmins'}
+                                        '$superadmins' ||
+                                        groupLdapSyncFieldValue.length > 0}
                                     on:click={addUserToSelectedGroup}
                                 >
                                     Add user
