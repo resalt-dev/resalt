@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { Card, Table } from "sveltestrap";
-    import JsonViewer from "../../components/JsonViewer.svelte";
-    import { theme } from "../../stores";
+    import { Card, Table } from 'sveltestrap';
+    import JsonViewer from '../../components/JsonViewer.svelte';
+    import { theme } from '../../stores';
 
     export let minion;
     let rawData = false;
@@ -17,7 +17,7 @@
         style="margin-top: -0rem;z-index: 4;position: absolute;right: 0;"
         on:click={() => (rawData = !rawData)}
     >
-        {rawData ? "View List" : "View JSON"}
+        {rawData ? 'View List' : 'View JSON'}
     </button>
     {#if rawData}
         <JsonViewer data={JSON.parse($minion.pkgs)} />
@@ -41,13 +41,9 @@
                             : 'text-white'}"
                     >
                         <tr>
-                            <th scope="col" class="border-secondary">
-                                Package
-                            </th>
-                            <th scope="col" class="border-secondary">
-                                Version
-                            </th>
-                            <th scope="col" class="border-secondary" />
+                            <th class="border-secondary"> Package </th>
+                            <th class="border-secondary"> Version </th>
+                            <th class="border-secondary" />
                         </tr>
                     </thead>
                     <tbody>

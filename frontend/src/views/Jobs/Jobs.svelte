@@ -1,12 +1,12 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import { theme } from "../../stores";
-    import { getJobs, showAlert } from "../../controller";
-    import { Card, Table, Tooltip } from "sveltestrap";
-    import Icon from "../../components/Icon.svelte";
-    import { writable } from "svelte/store";
-    import TablePaginate from "../../components/TablePaginate.svelte";
-    import { AlertType } from "../../models/AlertType";
+    import { onMount } from 'svelte';
+    import { theme } from '../../stores';
+    import { getJobs, showAlert } from '../../controller';
+    import { Card, Table, Tooltip } from 'sveltestrap';
+    import Icon from '../../components/Icon.svelte';
+    import { writable } from 'svelte/store';
+    import TablePaginate from '../../components/TablePaginate.svelte';
+    import { AlertType } from '../../models/AlertType';
 
     let filterUser: string | null = null;
     let filterStartDate: Date | null = null;
@@ -22,13 +22,13 @@
             filterStartDate,
             filterEndDate,
             paginationSize,
-            (paginationPage - 1) * paginationSize
+            (paginationPage - 1) * paginationSize,
         )
             .then((data) => {
                 jobs.set(data);
             })
             .catch((err) => {
-                showAlert(AlertType.ERROR, "Failed fetching jobs", err);
+                showAlert(AlertType.ERROR, 'Failed fetching jobs', err);
             });
     }
 
@@ -51,7 +51,7 @@
             class="bg-dark border-0 {$theme.dark ? 'text-light' : 'text-white'}"
         >
             <tr>
-                <th scope="col" class="border-secondary">
+                <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center ps-2">
                             JID<Icon
@@ -81,7 +81,7 @@
                         </div>
                     </div>
                 </th>
-                <th scope="col" class="border-secondary">
+                <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">User</div>
                         <div class="col-auto align-self-center d-grid">
@@ -101,7 +101,7 @@
                         </div>
                     </div>
                 </th>
-                <th scope="col" class="border-secondary">
+                <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">Target</div>
                         <div class="col-auto align-self-center d-grid">
@@ -121,7 +121,7 @@
                         </div>
                     </div>
                 </th>
-                <th scope="col" class="border-secondary">
+                <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">Date</div>
                         <div class="col-auto align-self-center d-grid">
@@ -148,7 +148,7 @@
             {:else}
                 {#each $jobs as job}
                     <tr>
-                        <th scope="row">{job.jid}</th>
+                        <th>{job.jid}</th>
                         <td>{job.user}</td>
                         <td>-</td>
                         <td><small>{job.timestamp}</small></td>

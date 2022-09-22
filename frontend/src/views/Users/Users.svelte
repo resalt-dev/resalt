@@ -1,13 +1,13 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import { theme, currentUser } from "../../stores";
-    import { getUsers, showAlert } from "../../controller";
-    import { Badge, Card, Table } from "sveltestrap";
-    import { writable } from "svelte/store";
-    import TablePaginate from "../../components/TablePaginate.svelte";
-    import paths from "../../paths";
-    import { Link } from "svelte-navigator";
-    import { AlertType } from "../../models/AlertType";
+    import { onMount } from 'svelte';
+    import { theme, currentUser } from '../../stores';
+    import { getUsers, showAlert } from '../../controller';
+    import { Badge, Card, Table } from 'sveltestrap';
+    import { writable } from 'svelte/store';
+    import TablePaginate from '../../components/TablePaginate.svelte';
+    import paths from '../../paths';
+    import { Link } from 'svelte-navigator';
+    import { AlertType } from '../../models/AlertType';
 
     let paginationSize: number = 20;
     let paginationPage: number = 1;
@@ -20,7 +20,7 @@
                 users.set(data);
             })
             .catch((err) => {
-                showAlert(AlertType.ERROR, "Failed fetching users", err);
+                showAlert(AlertType.ERROR, 'Failed fetching users', err);
             });
     }
 
@@ -41,22 +41,22 @@
             class="bg-dark border-0 {$theme.dark ? 'text-light' : 'text-white'}"
         >
             <tr>
-                <th scope="col" class="border-secondary">
+                <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center ps-2">User</div>
                     </div>
                 </th>
-                <th scope="col" class="border-secondary">
+                <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">ID</div>
                     </div>
                 </th>
-                <th scope="col" class="border-secondary">
+                <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">Is Local</div>
                     </div>
                 </th>
-                <th scope="col" class="border-secondary" />
+                <th class="border-secondary" />
             </tr>
         </thead>
         <tbody class="align-middle">
@@ -67,7 +67,7 @@
             {:else}
                 {#each $users as user}
                     <tr>
-                        <th scope="row">
+                        <th>
                             <Link
                                 to={paths.user.getPath(user.id)}
                                 class="text-reset text-decoration-none"
@@ -84,7 +84,7 @@
                         <td>
                             {#if user.isLocal}
                                 <Badge
-                                    color={$theme.dark ? "secondary" : "dark"}
+                                    color={$theme.dark ? 'secondary' : 'dark'}
                                     >Yes</Badge
                                 >
                             {:else}

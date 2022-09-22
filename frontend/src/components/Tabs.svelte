@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { Card, CardBody } from "sveltestrap";
-    import { theme } from "../stores";
+    import { Card, CardBody } from 'sveltestrap';
+    import { theme } from '../stores';
 
     export let children: {
         label: string;
@@ -34,7 +34,7 @@
         ? 'bg-darker'
         : ''}"
 >
-    <CardBody class={children[selected].class || ""}>
+    <CardBody class={children[selected].class || ''}>
         <svelte:component
             this={children[selected].component}
             label={children[selected].label}

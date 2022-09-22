@@ -1,12 +1,12 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import { Card, Table } from "sveltestrap";
-    import Icon from "../components/Icon.svelte";
-    import { getEvents, showAlert } from "../controller";
-    import { theme } from "../stores";
-    import TablePaginate from "../components/TablePaginate.svelte";
-    import { AlertType } from "../models/AlertType";
-    import { writable } from "svelte/store";
+    import { onMount } from 'svelte';
+    import { Card, Table } from 'sveltestrap';
+    import Icon from '../components/Icon.svelte';
+    import { getEvents, showAlert } from '../controller';
+    import { theme } from '../stores';
+    import TablePaginate from '../components/TablePaginate.svelte';
+    import { AlertType } from '../models/AlertType';
+    import { writable } from 'svelte/store';
 
     let paginationSize: number = 20;
     let paginationPage: number = 1;
@@ -30,26 +30,26 @@
                 events.set(
                     data.map((event) => {
                         const data = JSON.parse(
-                            event.data ?? "{data: {}}"
+                            event.data ?? '{data: {}}',
                         ).data;
                         return {
                             ...event,
-                            jid: data.jid ?? "",
-                            target: data.id ?? "",
-                            fun: data.fun ?? "",
+                            jid: data.jid ?? '',
+                            target: data.id ?? '',
+                            fun: data.fun ?? '',
                             data_parsed: data,
                             data_formatted: JSON.stringify(data, null, 2),
                             unique_index: (
-                                (event.tag ?? "") +
-                                "_" +
-                                (event.timestamp ?? "")
-                            ).replace(/ /g, "_"),
+                                (event.tag ?? '') +
+                                '_' +
+                                (event.timestamp ?? '')
+                            ).replace(/ /g, '_'),
                         };
-                    })
+                    }),
                 );
             })
             .catch((err) => {
-                showAlert(AlertType.ERROR, "Failed fetching events", err);
+                showAlert(AlertType.ERROR, 'Failed fetching events', err);
             });
     }
 
@@ -71,7 +71,7 @@
             class="bg-dark border-0 {$theme.dark ? 'text-light' : 'text-white'}"
         >
             <tr>
-                <th scope="col" class="border-secondary">
+                <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center ps-2">Tag</div>
                         <div class="col-auto align-self-center d-grid">
@@ -91,7 +91,7 @@
                         </div>
                     </div>
                 </th>
-                <th scope="col" class="border-secondary">
+                <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">Function</div>
                         <div class="col-auto align-self-center d-grid">
@@ -111,7 +111,7 @@
                         </div>
                     </div>
                 </th>
-                <th scope="col" class="border-secondary">
+                <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">Target</div>
                         <div class="col-auto align-self-center d-grid">
@@ -131,7 +131,7 @@
                         </div>
                     </div>
                 </th>
-                <th scope="col" class="border-secondary">
+                <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">Job ID</div>
                         <div class="col-auto align-self-center d-grid">
@@ -151,7 +151,7 @@
                         </div>
                     </div>
                 </th>
-                <th scope="col" class="border-secondary">
+                <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">Date</div>
                         <div class="col-auto align-self-center d-grid">
@@ -178,7 +178,7 @@
             {:else}
                 {#each $events as event}
                     <tr>
-                        <!-- <th scope="row">{event.id}</th> -->
+                        <!-- <th>{event.id}</th> -->
                         <td
                             on:click={() =>
                                 toggleExpandEvent(event.unique_index)}
@@ -187,10 +187,10 @@
                             <Icon
                                 size="1.125"
                                 name={$expandedEvents.includes(
-                                    event.unique_index
+                                    event.unique_index,
                                 )
-                                    ? "chevron-up"
-                                    : "chevron-down"}
+                                    ? 'chevron-up'
+                                    : 'chevron-down'}
                             />
                             {event.tag}
                         </td>
@@ -203,8 +203,8 @@
                         <tr>
                             <td
                                 class={$theme.dark
-                                    ? "bg-secondary"
-                                    : "bg-light"}
+                                    ? 'bg-secondary'
+                                    : 'bg-light'}
                                 colspan="5"
                             >
                                 <pre

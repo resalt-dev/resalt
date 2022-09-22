@@ -1,17 +1,17 @@
 <script lang="ts">
-    import paths from "../../paths";
-    import { sidebarCollapsed as collapsed, theme, config } from "../../stores";
-    import Icon from "../../components/Icon.svelte";
-    import Logo from "../../components/Logo.svelte";
-    import SidebarItem from "./DashboardSidebarItem.svelte";
-    import constants from "../../constants";
+    import paths from '../../paths';
+    import { sidebarCollapsed as collapsed, theme, config } from '../../stores';
+    import Icon from '../../components/Icon.svelte';
+    import Logo from '../../components/Logo.svelte';
+    import SidebarItem from './DashboardSidebarItem.svelte';
+    import constants from '../../constants';
     import {
         Button,
         Modal,
         ModalBody,
         ModalFooter,
         ModalHeader,
-    } from "sveltestrap";
+    } from 'sveltestrap';
 
     function handleClickCollapse() {
         collapsed.update((n) => !n);
@@ -58,7 +58,7 @@
     >
         {#each paths as route}
             {#if route.showInNav}
-                {#if route.name === "users"}
+                {#if route.name === 'users'}
                     <li><hr /></li>
                 {/if}
                 <SidebarItem {route} collapsed={$collapsed} />
@@ -76,8 +76,8 @@
         aria-current="page"
     >
         <Icon
-            name={$collapsed ? "right-arrow-alt" : "left-arrow-alt"}
-            class={$collapsed ? "" : "me-3"}
+            name={$collapsed ? 'right-arrow-alt' : 'left-arrow-alt'}
+            class={$collapsed ? '' : 'me-3'}
             size="2.5"
             style="margin-bottom: -2px;"
         />
@@ -111,22 +111,22 @@
     <Modal
         isOpen={openUpdate}
         toggle={toggleUpdate}
-        contentClassName={$theme.dark ? "bg-darker text-white" : ""}
+        contentClassName={$theme.dark ? 'bg-darker text-white' : ''}
     >
         <ModalHeader
             toggle={toggleUpdate}
-            class={$config.latestVersion === "unknown"
-                ? "bg-danger"
-                : "bg-warning text-dark"}
+            class={$config.latestVersion === 'unknown'
+                ? 'bg-danger'
+                : 'bg-warning text-dark'}
         >
-            {#if $config.latestVersion === "unknown"}
+            {#if $config.latestVersion === 'unknown'}
                 Update Error!
             {:else}
                 Update Warning
             {/if}
         </ModalHeader>
         <ModalBody>
-            {#if $config.latestVersion === "unknown"}
+            {#if $config.latestVersion === 'unknown'}
                 Current version: <code>"{$config.currentVersion}"</code>
                 <br />
                 <br />

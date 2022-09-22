@@ -1,10 +1,10 @@
 <script lang="ts">
-    import { Table } from "sveltestrap";
-    import { theme } from "../../stores";
+    import { Table } from 'sveltestrap';
+    import { theme } from '../../stores';
 
     export let minion;
 
-    $: grains = JSON.parse($minion.grains ?? "{}");
+    $: grains = JSON.parse($minion.grains ?? '{}');
     $: console.log(grains);
 
     function formatAsSize(megabytes) {
@@ -40,7 +40,7 @@
                         : ''}"
                 >
                     <strong>F.Q.D.N</strong>
-                    <span class="float-end">{grains.fqdn ?? "Unknown"}</span>
+                    <span class="float-end">{grains.fqdn ?? 'Unknown'}</span>
                 </li>
                 <li
                     class="list-group-item {$theme.dark
@@ -48,7 +48,7 @@
                         : ''}"
                 >
                     <strong>OS</strong>
-                    <span class="float-end">{grains.os ?? "Unknown"}</span>
+                    <span class="float-end">{grains.os ?? 'Unknown'}</span>
                 </li>
                 <li
                     class="list-group-item {$theme.dark
@@ -57,8 +57,8 @@
                 >
                     <strong>OS Version</strong>
                     <span class="float-end"
-                        >{grains.osrelease ?? "Unknown"} ({grains.oscodename ??
-                            "Unknown"})</span
+                        >{grains.osrelease ?? 'Unknown'} ({grains.oscodename ??
+                            'Unknown'})</span
                     >
                 </li>
                 <li
@@ -68,7 +68,7 @@
                 >
                     <strong>Kernel</strong>
                     <span class="float-end"
-                        >{grains.kernelrelease ?? "Unknown"}</span
+                        >{grains.kernelrelease ?? 'Unknown'}</span
                     >
                 </li>
             </ul>
@@ -88,7 +88,7 @@
                 >
                     <strong>CPU</strong>
                     <span class="float-end"
-                        >{grains.cpu_model ?? "Unknown"}</span
+                        >{grains.cpu_model ?? 'Unknown'}</span
                     >
                 </li>
                 <li
@@ -97,7 +97,7 @@
                         : ''}"
                 >
                     <strong>Number of CPUs</strong>
-                    <span class="float-end">{grains.numCpus ?? "Unknown"}</span>
+                    <span class="float-end">{grains.numCpus ?? 'Unknown'}</span>
                 </li>
                 <li
                     class="list-group-item {$theme.dark
@@ -106,7 +106,7 @@
                 >
                     <strong>Memory</strong>
                     <span class="float-end"
-                        >{formatAsSize(grains.mem_total) ?? "Unknown"}</span
+                        >{formatAsSize(grains.mem_total) ?? 'Unknown'}</span
                     >
                 </li>
                 <li
@@ -116,7 +116,7 @@
                 >
                     <strong>Swap</strong>
                     <span class="float-end"
-                        >{formatAsSize(grains.swap_total) ?? "Unknown"}</span
+                        >{formatAsSize(grains.swap_total) ?? 'Unknown'}</span
                     >
                 </li>
                 <li
@@ -125,7 +125,7 @@
                         : ''}"
                 >
                     <strong>Virtual</strong>
-                    <span class="float-end">{grains.virtual ?? "Unknown"}</span>
+                    <span class="float-end">{grains.virtual ?? 'Unknown'}</span>
                 </li>
             </ul>
         </div>
@@ -193,8 +193,8 @@
                     <strong>Conformity check</strong>
                     <span class="float-end"
                         >{$minion.lastUpdatedConformity != null
-                            ? $minion.lastUpdatedConformity + " UTC"
-                            : "Never"}</span
+                            ? $minion.lastUpdatedConformity + ' UTC'
+                            : 'Never'}</span
                     >
                 </li>
                 <li
@@ -205,8 +205,8 @@
                     <strong>Grains fetched</strong>
                     <span class="float-end"
                         >{$minion.lastUpdatedGrains != null
-                            ? $minion.lastUpdatedGrains + " UTC"
-                            : "Never"}</span
+                            ? $minion.lastUpdatedGrains + ' UTC'
+                            : 'Never'}</span
                     >
                 </li>
                 <li
@@ -217,8 +217,8 @@
                     <strong>Pillars fetched</strong>
                     <span class="float-end"
                         >{$minion.lastUpdatedPillars != null
-                            ? $minion.lastUpdatedPillars + " UTC"
-                            : "Never"}</span
+                            ? $minion.lastUpdatedPillars + ' UTC'
+                            : 'Never'}</span
                     >
                 </li>
                 <li
@@ -229,8 +229,8 @@
                     <strong>Packages fetched</strong>
                     <span class="float-end"
                         >{$minion.lastUpdatedPkgs != null
-                            ? $minion.lastUpdatedPkgs + " UTC"
-                            : "Never"}</span
+                            ? $minion.lastUpdatedPkgs + ' UTC'
+                            : 'Never'}</span
                     >
                 </li>
             </ul>
@@ -246,19 +246,19 @@
                 <Table
                     dark={$theme.dark}
                     hover
-                    class={$theme.dark ? "text-light" : ""}
+                    class={$theme.dark ? 'text-light' : ''}
                 >
                     <thead>
                         <tr>
-                            <th scope="col">Interface</th>
-                            <th scope="col">Address</th>
-                            <th scope="col">MAC</th>
+                            <th>Interface</th>
+                            <th>Address</th>
+                            <th>MAC</th>
                         </tr>
                     </thead>
                     <tbody>
                         {#each Object.keys(grains.ip_interfaces ?? {}) as inter}
                             <tr>
-                                <th scope="row">{inter}</th>
+                                <th>{inter}</th>
                                 <td>
                                     {#each grains.ip_interfaces[inter] as addr}
                                         {addr}<br />

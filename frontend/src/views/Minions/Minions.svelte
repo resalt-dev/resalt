@@ -1,23 +1,23 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import { writable } from "svelte/store";
-    import { getMinions, showAlert } from "../../controller";
-    import { theme } from "../../stores";
-    import Icon from "../../components/Icon.svelte";
-    import paths from "../../paths";
-    import { Link } from "svelte-navigator";
-    import { Card, Table } from "sveltestrap";
-    import TablePaginate from "../../components/TablePaginate.svelte";
-    import Tabs from "../../components/Tabs.svelte";
-    import MinionsTabSearch from "./MinionsTabSearch.svelte";
-    import MinionsTabGroups from "./MinionsTabGroups.svelte";
-    import { AlertType } from "../../models/AlertType";
+    import { onMount } from 'svelte';
+    import { writable } from 'svelte/store';
+    import { getMinions, showAlert } from '../../controller';
+    import { theme } from '../../stores';
+    import Icon from '../../components/Icon.svelte';
+    import paths from '../../paths';
+    import { Link } from 'svelte-navigator';
+    import { Card, Table } from 'sveltestrap';
+    import TablePaginate from '../../components/TablePaginate.svelte';
+    import Tabs from '../../components/Tabs.svelte';
+    import MinionsTabSearch from './MinionsTabSearch.svelte';
+    import MinionsTabGroups from './MinionsTabGroups.svelte';
+    import { AlertType } from '../../models/AlertType';
 
     let sort: string = null;
     let paginationSize: number = 20;
     let paginationPage: number = 1;
 
-    const SORT_COLOR = "text-orange";
+    const SORT_COLOR = 'text-orange';
     const minions = writable(null);
 
     function updateData() {
@@ -26,27 +26,27 @@
                 minions.set(data);
             })
             .catch((err) => {
-                showAlert(AlertType.ERROR, "Failed fetching minions", err);
+                showAlert(AlertType.ERROR, 'Failed fetching minions', err);
             });
     }
 
     function toggleSort(field: string) {
         // field.order
-        let parts = (sort || "null.null").split(".");
+        let parts = (sort || 'null.null').split('.');
         if (parts[0] === field) {
             switch (parts[1]) {
-                case "asc":
-                    sort = field + ".desc";
+                case 'asc':
+                    sort = field + '.desc';
                     break;
-                case "desc":
+                case 'desc':
                     sort = null;
                     break;
                 default:
-                    sort = field + ".asc";
+                    sort = field + '.asc';
                     break;
             }
         } else {
-            sort = field + ".asc";
+            sort = field + '.asc';
         }
 
         updateData();
@@ -62,11 +62,11 @@
 <Tabs
     children={[
         {
-            label: "Search",
+            label: 'Search',
             component: MinionsTabSearch,
         },
         {
-            label: "Groups",
+            label: 'Groups',
             component: MinionsTabGroups,
         },
     ]}
@@ -83,7 +83,7 @@
             class="bg-dark border-0 {$theme.dark ? 'text-light' : 'text-white'}"
         >
             <tr>
-                <th scope="col" class="border-secondary">
+                <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center ps-2">ID</div>
                         <div class="col-auto align-self-center d-grid">
@@ -95,7 +95,7 @@
                                     ? SORT_COLOR
                                     : ''}"
                                 on:click={() => {
-                                    toggleSort("id");
+                                    toggleSort('id');
                                 }}
                             />
                             <Icon
@@ -106,13 +106,13 @@
                                     ? SORT_COLOR
                                     : ''}"
                                 on:click={() => {
-                                    toggleSort("id");
+                                    toggleSort('id');
                                 }}
                             />
                         </div>
                     </div>
                 </th>
-                <th scope="col" class="border-secondary">
+                <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">OS</div>
                         <div class="col-auto align-self-center d-grid">
@@ -124,7 +124,7 @@
                                     ? SORT_COLOR
                                     : ''}"
                                 on:click={() => {
-                                    toggleSort("osType");
+                                    toggleSort('osType');
                                 }}
                             />
                             <Icon
@@ -135,13 +135,13 @@
                                     ? SORT_COLOR
                                     : ''}"
                                 on:click={() => {
-                                    toggleSort("osType");
+                                    toggleSort('osType');
                                 }}
                             />
                         </div>
                     </div>
                 </th>
-                <th scope="col" class="border-secondary">
+                <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">Last seen</div>
                         <div class="col-auto align-self-center d-grid">
@@ -153,7 +153,7 @@
                                     ? SORT_COLOR
                                     : ''}"
                                 on:click={() => {
-                                    toggleSort("lastSeen");
+                                    toggleSort('lastSeen');
                                 }}
                             />
                             <Icon
@@ -164,13 +164,13 @@
                                     ? SORT_COLOR
                                     : ''}"
                                 on:click={() => {
-                                    toggleSort("lastSeen");
+                                    toggleSort('lastSeen');
                                 }}
                             />
                         </div>
                     </div>
                 </th>
-                <th scope="col" class="border-secondary">
+                <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">Conformity</div>
                         <div class="col-auto align-self-center d-grid">
@@ -182,7 +182,7 @@
                                     ? SORT_COLOR
                                     : 'text-success'}"
                                 on:click={() => {
-                                    toggleSort("conformitySuccess");
+                                    toggleSort('conformitySuccess');
                                 }}
                             />
                             <Icon
@@ -193,7 +193,7 @@
                                     ? SORT_COLOR
                                     : 'text-success'}"
                                 on:click={() => {
-                                    toggleSort("conformitySuccess");
+                                    toggleSort('conformitySuccess');
                                 }}
                             />
                         </div>
@@ -206,7 +206,7 @@
                                     ? SORT_COLOR
                                     : 'text-warning'}"
                                 on:click={() => {
-                                    toggleSort("conformityIncorrect");
+                                    toggleSort('conformityIncorrect');
                                 }}
                             />
                             <Icon
@@ -217,7 +217,7 @@
                                     ? SORT_COLOR
                                     : 'text-warning'}"
                                 on:click={() => {
-                                    toggleSort("conformityIncorrect");
+                                    toggleSort('conformityIncorrect');
                                 }}
                             />
                         </div>
@@ -230,7 +230,7 @@
                                     ? SORT_COLOR
                                     : 'text-danger'}"
                                 on:click={() => {
-                                    toggleSort("conformityError");
+                                    toggleSort('conformityError');
                                 }}
                             />
                             <Icon
@@ -241,13 +241,13 @@
                                     ? SORT_COLOR
                                     : 'text-danger'}"
                                 on:click={() => {
-                                    toggleSort("conformityError");
+                                    toggleSort('conformityError');
                                 }}
                             />
                         </div>
                     </div></th
                 >
-                <th scope="col" class="border-secondary">Actions</th>
+                <th class="border-secondary">Actions</th>
             </tr>
         </thead>
         <tbody class="align-middle">
@@ -258,29 +258,29 @@
             {:else}
                 {#each $minions as minion}
                     <tr>
-                        <th scope="row">
+                        <th>
                             <Link
                                 to={paths.minion.getPath(minion.id)}
                                 class="text-reset text-decoration-none"
                                 >{minion.id}</Link
                             >
                         </th>
-                        <td>{minion.osType ?? "Unknown"}</td>
+                        <td>{minion.osType ?? 'Unknown'}</td>
                         <td>{minion.lastSeen}</td>
                         <td>
                             {#if minion.lastUpdatedConformity === null}
                                 <span class="badge bg-purple"> Unknown </span>
                             {:else}
                                 <span class="badge bg-success">
-                                    {minion.conformitySuccess ?? "?"}
+                                    {minion.conformitySuccess ?? '?'}
                                 </span>
                                 /
                                 <span class="badge bg-warning">
-                                    {minion.conformityIncorrect ?? "?"}
+                                    {minion.conformityIncorrect ?? '?'}
                                 </span>
                                 /
                                 <span class="badge bg-danger">
-                                    {minion.conformityError ?? "?"}
+                                    {minion.conformityError ?? '?'}
                                 </span>
                             {/if}
                         </td>

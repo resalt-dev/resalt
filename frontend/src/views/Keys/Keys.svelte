@@ -1,20 +1,20 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import { theme } from "../../stores";
+    import { onMount } from 'svelte';
+    import { theme } from '../../stores';
     import {
         acceptKey,
         deleteKey,
         getKeys,
         rejectKey,
         showAlert,
-    } from "../../controller";
-    import { Badge, Button, Card, Table } from "sveltestrap";
-    import { writable } from "svelte/store";
-    import TablePaginate from "../../components/TablePaginate.svelte";
-    import paths from "../../paths";
-    import { Link } from "svelte-navigator";
-    import type Key from "../../models/Key";
-    import { AlertType } from "../../models/AlertType";
+    } from '../../controller';
+    import { Badge, Button, Card, Table } from 'sveltestrap';
+    import { writable } from 'svelte/store';
+    import TablePaginate from '../../components/TablePaginate.svelte';
+    import paths from '../../paths';
+    import { Link } from 'svelte-navigator';
+    import type Key from '../../models/Key';
+    import { AlertType } from '../../models/AlertType';
 
     let paginationSize: number = 20;
     let paginationPage: number = 1;
@@ -29,14 +29,14 @@
                 fakePaginate();
             })
             .catch((err) => {
-                showAlert(AlertType.ERROR, "Failed fetching keys", err);
+                showAlert(AlertType.ERROR, 'Failed fetching keys', err);
             });
     }
 
     function fakePaginate() {
         keysView = $keys.slice(
             paginationSize * (paginationPage - 1),
-            paginationSize * paginationPage
+            paginationSize * paginationPage,
         );
     }
 
@@ -46,12 +46,12 @@
                 updateData();
                 showAlert(
                     AlertType.SUCCESS,
-                    "Key accepted",
-                    `Key ${key.id} accepted`
+                    'Key accepted',
+                    `Key ${key.id} accepted`,
                 );
             })
             .catch((err) => {
-                showAlert(AlertType.ERROR, "Failed accepting key", err);
+                showAlert(AlertType.ERROR, 'Failed accepting key', err);
             });
     }
 
@@ -61,12 +61,12 @@
                 updateData();
                 showAlert(
                     AlertType.SUCCESS,
-                    "Key rejected",
-                    `Key ${key.id} rejected`
+                    'Key rejected',
+                    `Key ${key.id} rejected`,
                 );
             })
             .catch((err) => {
-                showAlert(AlertType.ERROR, "Failed rejecting key", err);
+                showAlert(AlertType.ERROR, 'Failed rejecting key', err);
             });
     }
 
@@ -76,12 +76,12 @@
                 updateData();
                 showAlert(
                     AlertType.SUCCESS,
-                    "Key deleted",
-                    `Key ${key.id} deleted`
+                    'Key deleted',
+                    `Key ${key.id} deleted`,
                 );
             })
             .catch((err) => {
-                showAlert(AlertType.ERROR, "Failed deleting key", err);
+                showAlert(AlertType.ERROR, 'Failed deleting key', err);
             });
     }
 
@@ -102,22 +102,22 @@
             class="bg-dark border-0 {$theme.dark ? 'text-light' : 'text-white'}"
         >
             <tr>
-                <th scope="col" class="border-secondary">
+                <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center ps-2">ID</div>
                     </div>
                 </th>
-                <th scope="col" class="border-secondary">
+                <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">Status</div>
                     </div>
                 </th>
-                <th scope="col" class="border-secondary">
+                <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">Public Key</div>
                     </div>
                 </th>
-                <th scope="col" class="border-secondary" />
+                <th class="border-secondary" />
             </tr>
         </thead>
         <tbody class="align-middle">
@@ -128,7 +128,7 @@
             {:else}
                 {#each keysView as key}
                     <tr>
-                        <th scope="row">
+                        <th>
                             <Link
                                 to={paths.minion.getPath(key.id)}
                                 class="text-reset text-decoration-none"
@@ -137,13 +137,13 @@
                             </Link>
                         </th>
                         <td>
-                            {#if key.state === "minions"}
+                            {#if key.state === 'minions'}
                                 <Badge color="success">Accepted</Badge>
-                            {:else if key.state === "minions_pre"}
+                            {:else if key.state === 'minions_pre'}
                                 <Badge color="danger">Unaccepted</Badge>
-                            {:else if key.state === "minions_rejected"}
+                            {:else if key.state === 'minions_rejected'}
                                 <Badge color="warning">Rejected</Badge>
-                            {:else if key.state === "minions_denied"}
+                            {:else if key.state === 'minions_denied'}
                                 <Badge color={null} class="bg-purple"
                                     >Denied</Badge
                                 >
@@ -155,7 +155,7 @@
                         </td>
                         <td>{key.finger}</td>
                         <td>
-                            {#if key.state === "minions"}
+                            {#if key.state === 'minions'}
                                 <Button
                                     color="warning"
                                     size="sm"
@@ -163,7 +163,7 @@
                                     on:click={() => {
                                         onClickReject(key);
                                     }}>Reject</Button
-                                >{:else if key.state === "minions_pre"}
+                                >{:else if key.state === 'minions_pre'}
                                 <Button
                                     color="success"
                                     size="sm"
@@ -171,7 +171,7 @@
                                     on:click={() => {
                                         onClickAccept(key);
                                     }}>Accept</Button
-                                >{:else if key.state === "minions_rejected"}
+                                >{:else if key.state === 'minions_rejected'}
                                 <Button
                                     color="success"
                                     size="sm"
@@ -179,7 +179,7 @@
                                     on:click={() => {
                                         onClickAccept(key);
                                     }}>Accept</Button
-                                >{:else if key.state === "minions_denied"}
+                                >{:else if key.state === 'minions_denied'}
                                 <Button
                                     color="success"
                                     size="sm"
