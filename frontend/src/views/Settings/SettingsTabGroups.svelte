@@ -813,7 +813,7 @@
                                                 {#each minionTarget.modules as module, mi}
                                                     {#if mi > 0}
                                                         <hr
-                                                            class="text-light"
+                                                            class="text-light my-2"
                                                         />
                                                     {/if}
                                                     <div
@@ -863,7 +863,7 @@
                                                 {#each minionTarget.modules as module, mi}
                                                     {#if mi > 0}
                                                         <hr
-                                                            class="text-light"
+                                                            class="text-light my-2"
                                                         />
                                                     {/if}
                                                     <div
@@ -891,7 +891,7 @@
                                                             <Icon
                                                                 name="x"
                                                                 size="1.5"
-                                                                class="mouse-pointer mt-2 ms-1 me-3 {$selectedGroup.name ===
+                                                                class="mouse-pointer my-2 ms-1 me-3 {$selectedGroup.name ===
                                                                 '$superadmins'
                                                                     ? 'text-muted'
                                                                     : 'text-danger'}"
@@ -912,7 +912,7 @@
                                                         <Icon
                                                             name="plus"
                                                             size="1.5"
-                                                            class="mouse-pointer mt-2 ms-3 {$selectedGroup.name ===
+                                                            class="mouse-pointer my-2 ms-3 {$selectedGroup.name ===
                                                             '$superadmins'
                                                                 ? 'text-muted'
                                                                 : 'text-success'}"
@@ -935,6 +935,7 @@
                                                 <Button
                                                     size="sm"
                                                     color="danger"
+                                                    style="height: 2rem;"
                                                     class="float-end mt-1"
                                                     disabled={$selectedGroup.name ===
                                                         '$superadmins'}
