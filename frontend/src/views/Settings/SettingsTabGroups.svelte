@@ -41,11 +41,13 @@
         moduleId: string;
         name: string;
         args: string[];
+        error: boolean;
     };
     type PermissionMinionTarget = {
         targetId: string;
         target: string;
         modules: PermissionMinionTargetModule[];
+        error: boolean;
     };
 
     let groupNameFieldValue: string = '';
@@ -57,6 +59,7 @@
     let permissionWebFields: { [key: string]: boolean } = {};
     const permissionMinionsFields: Writable<PermissionMinionTarget[]> =
         writable<PermissionMinionTarget[]>([]);
+    let permissionMinionsFieldsError: boolean = false;
 
     function updateData(): Promise<void> {
         return new Promise((resolve, reject) => {
@@ -108,7 +111,9 @@
         addUserFieldError = false;
         permissionWebFields = {};
         for (let perm of resaltWebPermissions) {
-            permissionWebFields[perm[0]] = group.hasResaltPermission(perm[0]);
+            permissionWebFields[perm.permission] = group.hasResaltPermission(
+                perm.permission,
+            );
         }
         let minionPerms: PermissionMinionTarget[] = [];
         for (let minionPermissionRaw of group.perms.filter(
@@ -142,6 +147,7 @@
                         moduleId: randomId(),
                         name: moduleName,
                         args: [...moduleArgs],
+                        error: false,
                     });
                 }
             }
@@ -149,6 +155,7 @@
                 targetId: randomId(),
                 target: targetName,
                 modules: targetModules,
+                error: false,
             });
         }
         permissionMinionsFields.set(minionPerms);
@@ -240,15 +247,24 @@
         if ($selectedGroup === null) {
             return;
         }
+
         validateGroupNameField();
         validateGroupLdapSyncField();
-        if (groupNameFieldError || groupLdapSyncFieldError) {
+        validatePermissionMinionTargetsFields();
+        if (
+            groupNameFieldError ||
+            groupLdapSyncFieldError ||
+            permissionMinionsFieldsError
+        ) {
             return;
         }
+
+        let perms: any[] = localCalculateSaltPermissions();
+        console.log('perms', perms);
         updatePermissionGroup(
             $selectedGroup.id,
             groupNameFieldValue,
-            $selectedGroup.perms,
+            perms,
             groupLdapSyncFieldValue.length > 0 ? groupLdapSyncFieldValue : null,
         )
             .then(() => {
@@ -265,12 +281,50 @@
             });
     }
 
+    function localCalculateSaltPermissions(): any[] {
+        let perms = [];
+
+        // Resalt web permissions
+        // { "@resalt": [ webPerms ] }
+        let webPerms = [];
+        for (let perm of Object.keys(permissionWebFields)) {
+            if (permissionWebFields[perm]) {
+                webPerms.push(perm);
+            }
+        }
+        if (webPerms.length > 0) {
+            perms.push({ '@resalt': webPerms });
+        }
+
+        // Resalt minion permissions
+        // Can be pushed as either a string or an object
+        for (let minion of $permissionMinionsFields) {
+            if (minion.modules.length === 0) {
+                perms.push(minion.target);
+            } else {
+                let minionModules = [];
+                for (let minionModule of minion.modules) {
+                    if (minionModule.args.length === 0) {
+                        minionModules.push(minionModule.name);
+                    } else {
+                        minionModules.push({
+                            [minionModule.name]: { args: minionModule.args },
+                        });
+                    }
+                }
+                perms.push({ [minion.target]: minionModules });
+            }
+        }
+        return perms;
+    }
+
     function localAddMinionTarget(): void {
         permissionMinionsFields.update((minions) => {
             minions.push({
                 targetId: randomId(),
                 target: '',
                 modules: [],
+                error: false,
             });
             return minions;
         });
@@ -286,6 +340,7 @@
                 moduleId: randomId(),
                 name: '',
                 args: [],
+                error: false,
             });
             return minions;
         });
@@ -300,13 +355,13 @@
             if (target === undefined) {
                 return minions;
             }
-            let module = target.modules.find(
-                (module) => module.moduleId === moduleId,
+            let minionModule = target.modules.find(
+                (minionModule) => minionModule.moduleId === moduleId,
             );
-            if (module === undefined) {
+            if (minionModule === undefined) {
                 return minions;
             }
-            module.args.push('');
+            minionModule.args.push('');
             return minions;
         });
     }
@@ -327,7 +382,7 @@
                 return minions;
             }
             target.modules = target.modules.filter(
-                (module) => module.moduleId !== moduleId,
+                (minionModule) => minionModule.moduleId !== moduleId,
             );
             return minions;
         });
@@ -343,13 +398,15 @@
             if (target === undefined) {
                 return minions;
             }
-            let module = target.modules.find(
-                (module) => module.moduleId === moduleId,
+            let minionModule = target.modules.find(
+                (minionModule) => minionModule.moduleId === moduleId,
             );
-            if (module === undefined) {
+            if (minionModule === undefined) {
                 return minions;
             }
-            module.args = module.args.filter((_arg, index) => index !== argNum);
+            minionModule.args = minionModule.args.filter(
+                (_arg, index) => index !== argNum,
+            );
             return minions;
         });
     }
@@ -400,6 +457,64 @@
         if (!addUserFieldValue.startsWith('usr_')) {
             addUserFieldError = true;
             return;
+        }
+    }
+
+    function validatePermissionMinionTargetsFields(): void {
+        let changed = false;
+        permissionMinionsFieldsError = false;
+
+        // Clear: Set all errors to false
+        for (let minion of $permissionMinionsFields) {
+            if (minion.error) {
+                minion.error = false;
+                changed = true;
+            }
+            for (let minionModule of minion.modules) {
+                if (minionModule.error) {
+                    minionModule.error = false;
+                    changed = true;
+                }
+            }
+        }
+
+        // Loop over all minion targets
+        for (let minion of $permissionMinionsFields) {
+            // Check if any target starts with @resalt ignorecase
+            if (minion.target.toLocaleLowerCase().startsWith('@resalt')) {
+                permissionMinionsFieldsError = true;
+                minion.error = true;
+                changed = true;
+            }
+            // Check if target is empty
+            if (minion.target.length === 0) {
+                permissionMinionsFieldsError = true;
+                minion.error = true;
+                changed = true;
+            }
+
+            // Loop over all modules
+            for (let minionModule of minion.modules) {
+                // Check if length is 0
+                if (minionModule.moduleId.length === 0) {
+                    permissionMinionsFieldsError = true;
+                    minionModule.error = true;
+                    changed = true;
+                }
+
+                // Check if any module arg starts with @resalt ignorecase
+                for (let arg of minionModule.args) {
+                    // No checks currently.
+                    // Args can actually be empty, to force empty argument, rather than emply which allow all arguments.
+                }
+            }
+        }
+
+        if (changed) {
+            // Force refresh the mutated state
+            permissionMinionsFields.update((minions) => {
+                return minions;
+            });
         }
     }
 
@@ -638,10 +753,10 @@
                                         type="text"
                                         bsSize="sm"
                                         style="height: 2.5rem;"
-                                        invalid={addUserFieldError}
                                         disabled={$selectedGroup.name ===
                                             '$superadmins' ||
                                             groupLdapSyncFieldValue.length > 0}
+                                        invalid={addUserFieldError}
                                         bind:value={addUserFieldValue}
                                         on:blur={validateAddUserField}
                                     />
@@ -781,7 +896,9 @@
                                                             style="height: 2.5rem;"
                                                             disabled={$selectedGroup.name ===
                                                                 '$superadmins'}
+                                                            invalid={minionTarget.error}
                                                             bind:value={minionTarget.target}
+                                                            on:blur={validatePermissionMinionTargetsFields}
                                                         />
                                                         <Label
                                                             for="arguments"
@@ -811,7 +928,7 @@
                                                 </div>
                                             </td>
                                             <td style="width: 12rem;">
-                                                {#each minionTarget.modules as module, mi}
+                                                {#each minionTarget.modules as minionModule, mi}
                                                     {#if mi > 0}
                                                         <hr
                                                             class="text-light my-2"
@@ -829,7 +946,7 @@
                                                                 style="height: 2.5rem;"
                                                                 disabled={$selectedGroup.name ===
                                                                     '$superadmins'}
-                                                                bind:value={module.name}
+                                                                bind:value={minionModule.name}
                                                             />
                                                             <Label
                                                                 for="arguments"
@@ -847,7 +964,7 @@
                                                             on:click={() => {
                                                                 localRemoveMinionTargetModule(
                                                                     minionTarget.targetId,
-                                                                    module.moduleId,
+                                                                    minionModule.moduleId,
                                                                 );
                                                             }}
                                                         >
@@ -861,7 +978,7 @@
                                                 {/each}
                                             </td>
                                             <td>
-                                                {#each minionTarget.modules as module, mi}
+                                                {#each minionTarget.modules as minionModule, mi}
                                                     {#if mi > 0}
                                                         <hr
                                                             class="text-light my-2"
@@ -870,7 +987,7 @@
                                                     <div
                                                         class="input-group flex-nowrap"
                                                     >
-                                                        {#each module.args as arg, ai}
+                                                        {#each minionModule.args as arg, ai}
                                                             <div
                                                                 class="form-floating"
                                                             >
@@ -904,7 +1021,7 @@
                                                                         return;
                                                                     localRemoveMinionTargetModuleArg(
                                                                         minionTarget.targetId,
-                                                                        module.moduleId,
+                                                                        minionModule.moduleId,
                                                                         ai,
                                                                     );
                                                                 }}
@@ -925,7 +1042,7 @@
                                                                     return;
                                                                 localAddMinionTargetModuleArg(
                                                                     minionTarget.targetId,
-                                                                    module.moduleId,
+                                                                    minionModule.moduleId,
                                                                 );
                                                             }}
                                                         />
