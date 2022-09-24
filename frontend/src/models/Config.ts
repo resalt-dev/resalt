@@ -1,6 +1,6 @@
-export default class Key {
-    static fromObject(data: any): any {
-        return new Key(
+export default class Config {
+    static fromObject(data: any): Config {
+        return new Config(
             data.currentVersion,
             data.latestVersion,
             data.themeColor,

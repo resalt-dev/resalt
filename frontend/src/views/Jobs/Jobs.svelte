@@ -4,9 +4,10 @@
     import { getJobs, showAlert } from '../../controller';
     import { Card, Table, Tooltip } from 'sveltestrap';
     import Icon from '../../components/Icon.svelte';
-    import { writable } from 'svelte/store';
+    import { writable, type Writable } from 'svelte/store';
     import TablePaginate from '../../components/TablePaginate.svelte';
     import { AlertType } from '../../models/AlertType';
+    import type Job from '../../models/Job';
 
     let filterUser: string | null = null;
     let filterStartDate: Date | null = null;
@@ -14,7 +15,7 @@
     let paginationSize: number = 20;
     let paginationPage: number = 1;
 
-    const jobs = writable(null);
+    const jobs: Writable<Job[] | null> = writable(null);
 
     function updateData() {
         getJobs(

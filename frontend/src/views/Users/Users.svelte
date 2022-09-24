@@ -3,16 +3,17 @@
     import { theme, currentUser } from '../../stores';
     import { getUsers, showAlert } from '../../controller';
     import { Badge, Card, Table } from 'sveltestrap';
-    import { writable } from 'svelte/store';
+    import { writable, type Writable } from 'svelte/store';
     import TablePaginate from '../../components/TablePaginate.svelte';
     import paths from '../../paths';
     import { Link } from 'svelte-navigator';
     import { AlertType } from '../../models/AlertType';
+    import type User from '../../models/User';
 
     let paginationSize: number = 20;
     let paginationPage: number = 1;
 
-    const users = writable(null);
+    const users: Writable<User[] | null> = writable(null);
 
     function updateData() {
         getUsers(paginationSize, (paginationPage - 1) * paginationSize)

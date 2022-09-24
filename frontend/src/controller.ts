@@ -67,7 +67,7 @@ export function showAlert(type: string, title: string, message: string): void {
  */
 
 export async function login(username: string, password: string): Promise<void> {
-    const token: String = await apiRequestAuthToken(username, password);
+    const token: string = await apiRequestAuthToken(username, password);
     authStore.set(token);
 }
 

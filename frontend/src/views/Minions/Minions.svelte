@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { writable } from 'svelte/store';
+    import { writable, type Writable } from 'svelte/store';
     import { getMinions, showAlert } from '../../controller';
     import { theme } from '../../stores';
     import Icon from '../../components/Icon.svelte';
@@ -12,13 +12,14 @@
     import MinionsTabSearch from './MinionsTabSearch.svelte';
     import MinionsTabGroups from './MinionsTabGroups.svelte';
     import { AlertType } from '../../models/AlertType';
+    import type Minion from '../../models/Minion';
 
     let sort: string = null;
     let paginationSize: number = 20;
     let paginationPage: number = 1;
 
-    const SORT_COLOR = 'text-orange';
-    const minions = writable(null);
+    const SORT_COLOR: string = 'text-orange';
+    const minions: Writable<Minion[] | null> = writable(null);
 
     function updateData() {
         getMinions(sort, paginationSize, (paginationPage - 1) * paginationSize)

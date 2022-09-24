@@ -13,7 +13,7 @@
         ModalHeader,
     } from 'sveltestrap';
 
-    function handleClickCollapse() {
+    function handleClickCollapse(): void {
         collapsed.update((n) => !n);
     }
 

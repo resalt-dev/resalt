@@ -20,7 +20,7 @@ export class Path {
         this.showInNav = showInNav;
     }
 
-    getPath(...args: string[]) {
+    getPath(...args: string[]): string {
         let { path } = this;
         if (this.hasParams) {
             // Substitute url arguments (.e.g ":id" or ":group") with args

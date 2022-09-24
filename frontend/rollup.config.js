@@ -26,10 +26,14 @@ function serve() {
             if (server) return;
             try {
                 // eslint-disable-next-line global-require
-                server = require('child_process').spawn('npm', ['run', 'start', '--', '--dev'], {
-                    stdio: ['ignore', 'inherit', 'inherit'],
-                    shell: true,
-                });
+                server = require('child_process').spawn(
+                    'npm',
+                    ['run', 'start', '--', '--dev'],
+                    {
+                        stdio: ['ignore', 'inherit', 'inherit'],
+                        shell: true,
+                    },
+                );
             } catch (e) {
                 console.log(e);
             }
@@ -60,15 +64,16 @@ export default {
                     dest: 'public/',
                     rename: 'index.html',
                     // eslint-disable-next-line no-unused-vars
-                    transform: (content, _path) => content
-                        .toString()
-                        .replace(
-                            /__buildEnv__/g,
-                            production ? 'production' : 'development',
-                        )
-                        .replace(/__buildDate__/g, new Date().toISOString())
-                        .replace(/__appName__/g, constants.appName)
-                        .replace(/__basePath__/g, constants.basePath),
+                    transform: (content, _path) =>
+                        content
+                            .toString()
+                            .replace(
+                                /__buildEnv__/g,
+                                production ? 'production' : 'development',
+                            )
+                            .replace(/__buildDate__/g, new Date().toISOString())
+                            .replace(/__appName__/g, constants.appName)
+                            .replace(/__basePath__/g, constants.basePath),
                 },
             ],
         }),
@@ -110,8 +115,8 @@ export default {
         // Watch the `public` directory and refresh the
         // browser on changes when not in production
         //! production && livereload('public'),
-        !production
-            && livereload({
+        !production &&
+            livereload({
                 watch: 'public',
                 delay: 500,
                 port: 35730,

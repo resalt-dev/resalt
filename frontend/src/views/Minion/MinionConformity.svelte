@@ -1,20 +1,21 @@
 <script lang="ts">
-    import JsonViewer from "../../components/JsonViewer.svelte";
-    import ResultBox from "../../components/ResultBox.svelte";
-    import { theme } from "../../stores";
-    import ConsoleChangeBranch from "./ConsoleChangeBranch.svelte";
+    import type { Writable } from 'svelte/store';
+    import JsonViewer from '../../components/JsonViewer.svelte';
+    import ResultBox from '../../components/ResultBox.svelte';
+    import type Minion from '../../models/Minion';
+    import { theme } from '../../stores';
 
     const SHIFT = 10;
 
-    export let minion;
+    export let minion: Writable<Minion>;
     let rawData = false;
 
     enum SortOrder {
-        Incremental = "Incremental order",
-        Decremental = "Decremental order",
-        LongestRuntime = "Longest runtime",
-        BestResult = "Success first",
-        WorstResult = "Errors first",
+        Incremental = 'Incremental order',
+        Decremental = 'Decremental order',
+        LongestRuntime = 'Longest runtime',
+        BestResult = 'Success first',
+        WorstResult = 'Errors first',
     }
     // Salt structure
     class ConformData {
@@ -45,25 +46,25 @@
         .map(([key, v]) => {
             let value: any = v;
 
-            let parts = key.split("_|-");
+            let parts = key.split('_|-');
             let conform: Conform = {
                 title: key,
-                fun: parts[0] + "." + parts[parts.length - 1],
+                fun: parts[0] + '.' + parts[parts.length - 1],
                 // color should be success/warning/danger based on true/null/false
                 color:
                     value.result === true
-                        ? "success"
+                        ? 'success'
                         : value.result === false
-                        ? "danger"
-                        : "warning",
+                        ? 'danger'
+                        : 'warning',
                 data: {
-                    __id__: value.__id__ ?? parts[1] ?? "UKNOWN ID",
+                    __id__: value.__id__ ?? parts[1] ?? 'UKNOWN ID',
                     __run_num__: value.__run_num__,
                     __sls__: value.__sls__,
                     changes: value.changes ?? {},
                     comment: value.comment,
                     duration: value.duration,
-                    name: value.name ?? parts[2] ?? "UKNOWN NAME",
+                    name: value.name ?? parts[2] ?? 'UKNOWN NAME',
                     result: value.result,
                     start_time: value.start_time,
                 } as ConformData,
@@ -118,7 +119,7 @@
         style="margin-top: -0rem;z-index: 4;position: absolute;right: 0;"
         on:click={() => (rawData = !rawData)}
     >
-        {rawData ? "View List" : "View JSON"}
+        {rawData ? 'View List' : 'View JSON'}
     </button>
 
     {#if rawData}
@@ -173,7 +174,7 @@
                             />
                             <label class="form-check-label" for="showRawData">
                                 Show Succeeded ({conformity.filter(
-                                    (c) => c.data.result === true
+                                    (c) => c.data.result === true,
                                 ).length})
                             </label>
                         </div>
@@ -189,7 +190,7 @@
                             />
                             <label class="form-check-label" for="showIncorrect">
                                 Show Incorrects ({conformity.filter(
-                                    (c) => c.data.result === null
+                                    (c) => c.data.result === null,
                                 ).length})
                             </label>
                         </div>
@@ -204,7 +205,7 @@
                             />
                             <label class="form-check-label" for="showError">
                                 Show Errors ({conformity.filter(
-                                    (c) => c.data.result === false
+                                    (c) => c.data.result === false,
                                 ).length})
                             </label>
                         </div>

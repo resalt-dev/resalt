@@ -1,7 +1,9 @@
 <script lang="ts">
-    import JsonViewer from "../../components/JsonViewer.svelte";
+    import type { Writable } from 'svelte/store';
+    import JsonViewer from '../../components/JsonViewer.svelte';
+    import type Minion from '../../models/Minion';
 
-    export let minion;
+    export let minion: Writable<Minion>;
 </script>
 
 {#if !$minion.grains}

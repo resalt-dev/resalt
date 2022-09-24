@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { onMount } from 'svelte';
 
-    import { writable } from "svelte/store";
+    import { writable, type Writable } from 'svelte/store';
     import {
         Card,
         CardBody,
@@ -10,12 +10,12 @@
         CardTitle,
         Col,
         Row,
-    } from "sveltestrap";
-    import { getMetricResults, showAlert } from "../../controller";
-    import { AlertType } from "../../models/AlertType";
-    import { theme } from "../../stores";
+    } from 'sveltestrap';
+    import { getMetricResults, showAlert } from '../../controller';
+    import { AlertType } from '../../models/AlertType';
+    import { theme } from '../../stores';
 
-    import { Pie, Line, Bar } from "svelte-chartjs";
+    import { Pie, Line, Bar } from 'svelte-chartjs';
     import {
         Chart as ChartJS,
         ArcElement,
@@ -27,8 +27,9 @@
         PointElement,
         Title,
         Tooltip,
-    } from "chart.js";
-    import Color from "../../models/Color";
+    } from 'chart.js';
+    import Color from '../../models/Color';
+    import type MetricResult from '../../models/MetricResult';
     ChartJS.register(
         ArcElement,
         BarElement,
@@ -38,10 +39,10 @@
         LineElement,
         PointElement,
         Title,
-        Tooltip
+        Tooltip,
     );
 
-    const metrics = writable(null);
+    const metrics: Writable<MetricResult[] | null> = writable(null);
 
     onMount(() => {
         getMetricResults()
@@ -51,19 +52,19 @@
             .catch((err) => {
                 showAlert(
                     AlertType.ERROR,
-                    "Failed fetching dashboard metrics",
-                    err
+                    'Failed fetching dashboard metrics',
+                    err,
                 );
             });
     });
 
-    const backgroundColorConfirmity: String[] = [
+    const backgroundColorConfirmity: string[] = [
         Color.green6,
         Color.yellow6,
         Color.red6,
         Color.gray6,
     ];
-    const backgroundColorConfirmityHover: String[] = [
+    const backgroundColorConfirmityHover: string[] = [
         Color.green5,
         Color.yellow5,
         Color.red5,
@@ -84,7 +85,7 @@
                         <CardTitle class="mb-0">{metric.title}</CardTitle>
                     </CardHeader>
                     <CardBody>
-                        {#if metric.chart === "pie"}
+                        {#if metric.chart === 'pie'}
                             <Pie
                                 data={{
                                     labels: metric.labels,

@@ -1,31 +1,31 @@
 <script lang="ts">
-    import { theme } from "../stores";
-    import Icon from "./Icon.svelte";
+    import { theme } from '../stores';
+    import Icon from './Icon.svelte';
 
     export let size: number;
     export let page: number;
     export let last: boolean;
     export let updateData: Function;
 
-    function paginateIncrement() {
+    function paginateIncrement(): void {
         if (last) {
             return;
         }
         page++;
         updateData();
     }
-    function paginateDecrement() {
+    function paginateDecrement(): void {
         if (page === 1) {
             return;
         }
         page--;
         updateData();
     }
-    function paginateFirst() {
+    function paginateFirst(): void {
         page = 1;
         updateData();
     }
-    function setSize(newSize: number) {
+    function setSize(newSize: number): void {
         size = newSize;
         updateData();
     }

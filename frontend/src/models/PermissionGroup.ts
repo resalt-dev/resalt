@@ -1,5 +1,5 @@
 export default class PermissionGroup {
-    static fromObject(group: any): any {
+    static fromObject(group: any): PermissionGroup {
         return new PermissionGroup(
             group.id,
             group.name,

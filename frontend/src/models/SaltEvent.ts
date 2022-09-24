@@ -1,5 +1,5 @@
 export default class SaltEvent {
-    static fromObject(item: any): any {
+    static fromObject(item: any): SaltEvent {
         return new SaltEvent(item.id, item.timestamp, item.tag, item.data);
     }
 

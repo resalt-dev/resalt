@@ -15,7 +15,7 @@
     "lastUpdatedConformity": null,
 } */
 export default class Minion {
-    static fromObject(data: any): any {
+    static fromObject(data: any): Minion {
         return new Minion(
             data.id,
             data.lastSeen,

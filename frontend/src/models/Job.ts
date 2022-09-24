@@ -1,5 +1,5 @@
 export default class Job {
-    static fromObject(data: any): any {
+    static fromObject(data: any): Job {
         return new Job(data.id, data.timestamp, data.jid, data.user, data.minions);
     }
 

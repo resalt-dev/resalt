@@ -1,21 +1,21 @@
 <script lang="ts">
-    import { useLocation, Link } from "svelte-navigator";
-    import { currentUser, socket, theme } from "../../stores";
-    import paths from "../../paths";
-    import { Col } from "sveltestrap";
-    import Icon from "../../components/Icon.svelte";
+    import { useLocation, Link } from 'svelte-navigator';
+    import { currentUser, socket, theme } from '../../stores';
+    import paths from '../../paths';
+    import { Col } from 'sveltestrap';
+    import Icon from '../../components/Icon.svelte';
 
     const location = useLocation();
 
     $: navbar = $location.pathname
-        .split("/")
+        .split('/')
         .filter(Boolean)
-        .filter((path) => path !== "home")
+        .filter((path) => path !== 'home')
         .map((str) => {
             return {
                 title: str.charAt(0).toUpperCase() + str.slice(1),
                 path: paths[
-                    str === "dashboard" ? "home" : str.toLowerCase()
+                    str === 'dashboard' ? 'home' : str.toLowerCase()
                 ]?.getPath(),
             };
         });
@@ -48,12 +48,12 @@
             <!-- display last_ping as hh:mm:ss -->
             <span class="font-monospace pt-1"
                 >Connected: {new Date($socket.last_ping)
-                    .toLocaleTimeString("en-US", {
-                        timeZone: "UTC",
-                        timeZoneName: "short",
+                    .toLocaleTimeString('en-US', {
+                        timeZone: 'UTC',
+                        timeZoneName: 'short',
                         hour12: false,
                     })
-                    .replace(/\./g, ":")}</span
+                    .replace(/\./g, ':')}</span
             >
         {:else}
             <span class="font-monospace pt-1 text-danger">Disconnected</span>
@@ -99,9 +99,3 @@
         Logout
     </Link>
 </div>
-
-<style>
-    * {
-        /* outline: 1px solid red; */
-    }
-</style>

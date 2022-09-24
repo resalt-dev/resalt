@@ -1,10 +1,10 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import { useNavigate } from "svelte-navigator";
+    import { onMount } from 'svelte';
+    import { useNavigate } from 'svelte-navigator';
 
     const navigate = useNavigate();
 
-    export let to;
+    export let to: string;
 
     onMount(() => {
         navigate(to);

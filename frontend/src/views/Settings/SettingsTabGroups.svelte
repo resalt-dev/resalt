@@ -34,8 +34,8 @@
     let paginationSize: number = 20;
     let paginationPage: number = 1;
 
-    const groups = writable<PermissionGroup[]>(null);
-    const selectedGroup = writable<PermissionGroup | null>(null);
+    const groups: Writable<PermissionGroup[] | null> = writable(null);
+    const selectedGroup: Writable<PermissionGroup | null> = writable(null);
 
     type PermissionMinionTargetModule = {
         moduleId: string;
@@ -58,7 +58,7 @@
     let addUserFieldError: boolean = false;
     let permissionWebFields: { [key: string]: boolean } = {};
     const permissionMinionsFields: Writable<PermissionMinionTarget[]> =
-        writable<PermissionMinionTarget[]>([]);
+        writable([]);
     let permissionMinionsFieldsError: boolean = false;
 
     function updateData(): Promise<void> {

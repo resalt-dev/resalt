@@ -1,5 +1,5 @@
 export default class Key {
-    static fromObject(item: any): any {
+    static fromObject(item: any): Key {
         return new Key(item.id, item.finger, item.state);
     }
 

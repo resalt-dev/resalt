@@ -1,8 +1,10 @@
 <script lang="ts">
+    import type { Writable } from 'svelte/store';
     import { Table } from 'sveltestrap';
+    import type Minion from '../../models/Minion';
     import { theme } from '../../stores';
 
-    export let minion;
+    export let minion: Writable<Minion>;
 
     $: grains = JSON.parse($minion.grains ?? '{}');
     $: console.log(grains);

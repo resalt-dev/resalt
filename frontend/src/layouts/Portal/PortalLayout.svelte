@@ -1,13 +1,14 @@
 <script lang="ts">
-    import { Router, Route } from "svelte-navigator";
-    import { Card, CardBody, CardText, CardTitle } from "sveltestrap";
-    import Logo from "../../components/Logo.svelte";
-    import constants from "../../constants";
-    import { alerts, theme } from "../../stores";
-    import AuthLogin from "../../views/AuthLogin.svelte";
-    import AuthLogout from "../../views/AuthLogout.svelte";
+    import { Router, Route } from 'svelte-navigator';
+    import { Card, CardBody, CardText, CardTitle } from 'sveltestrap';
+    import Logo from '../../components/Logo.svelte';
+    import constants from '../../constants';
+    import type Alert from '../../models/Alert';
+    import { alerts, theme } from '../../stores';
+    import AuthLogin from '../../views/AuthLogin.svelte';
+    import AuthLogout from '../../views/AuthLogout.svelte';
 
-    let localAlerts = [];
+    let localAlerts: Alert[] = [];
 
     // Clone "alerts" to "localAlerts" then empty it on every Svelte update
     $: {
@@ -75,8 +76,5 @@
         background-position: center;
         background-repeat: no-repeat;
         background-attachment: fixed;
-    }
-    .background2 {
-        /* background: rgba(255, 255, 255, 0.25); */
     }
 </style>

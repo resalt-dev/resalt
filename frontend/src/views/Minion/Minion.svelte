@@ -1,24 +1,25 @@
 <script lang="ts">
-    import { Link } from "svelte-navigator";
-    import { showAlert, getMinionById } from "../../controller";
-    import { theme } from "../../stores";
-    import { writable } from "svelte/store";
-    import paths from "../../paths";
-    import Redirect from "../../components/Redirect.svelte";
+    import { Link } from 'svelte-navigator';
+    import { showAlert, getMinionById } from '../../controller';
+    import { theme } from '../../stores';
+    import { writable, type Writable } from 'svelte/store';
+    import paths from '../../paths';
+    import Redirect from '../../components/Redirect.svelte';
 
-    import MinionInfo from "./MinionInfo.svelte";
-    import MinionGrains from "./MinionGrains.svelte";
-    import MinionPillars from "./MinionPillars.svelte";
-    import MinionPackages from "./MinionPackages.svelte";
-    import MinionConformity from "./MinionConformity.svelte";
-    import { onMount } from "svelte";
-    import { AlertType } from "../../models/AlertType";
+    import MinionInfo from './MinionInfo.svelte';
+    import MinionGrains from './MinionGrains.svelte';
+    import MinionPillars from './MinionPillars.svelte';
+    import MinionPackages from './MinionPackages.svelte';
+    import MinionConformity from './MinionConformity.svelte';
+    import { onMount } from 'svelte';
+    import { AlertType } from '../../models/AlertType';
+    import type Minion from '../../models/Minion';
 
     // export let navigate;
-    export let location;
-    export let minionId;
+    export let location: { pathname: string };
+    export let minionId: string;
 
-    const minion = writable(null);
+    const minion: Writable<Minion | null> = writable(null);
 
     onMount(() => {
         getMinionById(minionId)
@@ -28,34 +29,34 @@
             .catch((err) => {
                 showAlert(
                     AlertType.ERROR,
-                    "Failed fetching minion: " + minionId,
-                    err
+                    'Failed fetching minion: ' + minionId,
+                    err,
                 );
             });
     });
 
-    $: subPage = location.pathname.split("/")[4];
+    $: subPage = location.pathname.split('/')[4];
     //$: console.log("location", location, subPage);
     $: subPagesNav = [
         {
-            name: "General",
+            name: 'General',
             path: paths.minion.getPath(minionId),
         },
         {
-            name: "Conformity",
-            path: paths.minion.getPath(minionId, "conformity"),
+            name: 'Conformity',
+            path: paths.minion.getPath(minionId, 'conformity'),
         },
         {
-            name: "Grains",
-            path: paths.minion.getPath(minionId, "grains"),
+            name: 'Grains',
+            path: paths.minion.getPath(minionId, 'grains'),
         },
         {
-            name: "Pillars",
-            path: paths.minion.getPath(minionId, "pillars"),
+            name: 'Pillars',
+            path: paths.minion.getPath(minionId, 'pillars'),
         },
         {
-            name: "Packages",
-            path: paths.minion.getPath(minionId, "packages"),
+            name: 'Packages',
+            path: paths.minion.getPath(minionId, 'packages'),
         },
     ];
 </script>
@@ -90,13 +91,13 @@
         <div class="card-body p-0">
             {#if subPage === undefined}
                 <MinionInfo {minion} />
-            {:else if subPage === "grains"}
+            {:else if subPage === 'grains'}
                 <MinionGrains {minion} />
-            {:else if subPage === "pillars"}
+            {:else if subPage === 'pillars'}
                 <MinionPillars {minion} />
-            {:else if subPage === "packages"}
+            {:else if subPage === 'packages'}
                 <MinionPackages {minion} />
-            {:else if subPage === "conformity"}
+            {:else if subPage === 'conformity'}
                 <MinionConformity {minion} />
             {:else}
                 <Redirect to={paths.minion.getPath(minionId)} />

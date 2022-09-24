@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { writable } from "svelte/store";
-    import { theme } from "../../stores";
-    import Tabs from "../../components/Tabs.svelte";
-    import ConsoleChangeBranch from "../Minion/ConsoleChangeBranch.svelte";
-    import RunTabLive from "./RunTabLive.svelte";
+    import { writable } from 'svelte/store';
+    import { theme } from '../../stores';
+    import Tabs from '../../components/Tabs.svelte';
+    import ConsoleChangeBranch from '../../components/ConsoleChangeBranch.svelte';
+    import RunTabLive from './RunTabLive.svelte';
 
     const SHIFT = 0;
 
@@ -15,7 +15,7 @@
 <Tabs
     children={[
         {
-            label: "Live Run",
+            label: 'Live Run',
             component: RunTabLive,
             data: { returns },
         },

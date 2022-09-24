@@ -1,5 +1,5 @@
 export default class User {
-    static fromObject(data: any): any {
+    static fromObject(data: any): User {
         return new User(
             data.id,
             data.username,

@@ -9,7 +9,7 @@
         showAlert,
     } from '../../controller';
     import { Badge, Button, Card, Table } from 'sveltestrap';
-    import { writable } from 'svelte/store';
+    import { writable, type Writable } from 'svelte/store';
     import TablePaginate from '../../components/TablePaginate.svelte';
     import paths from '../../paths';
     import { Link } from 'svelte-navigator';
@@ -18,9 +18,9 @@
 
     let paginationSize: number = 20;
     let paginationPage: number = 1;
-    let keysView = [];
+    let keysView: Key[] = [];
 
-    const keys = writable(null);
+    const keys: Writable<Key[] | null> = writable(null);
 
     function updateData() {
         getKeys()

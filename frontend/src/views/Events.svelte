@@ -6,13 +6,30 @@
     import { theme } from '../stores';
     import TablePaginate from '../components/TablePaginate.svelte';
     import { AlertType } from '../models/AlertType';
-    import { writable } from 'svelte/store';
+    import { writable, type Writable } from 'svelte/store';
 
     let paginationSize: number = 20;
     let paginationPage: number = 1;
 
-    const events = writable(null);
-    const expandedEvents = writable<string[]>([]);
+    const events: Writable<
+        | {
+              // SaltEvent
+              id: string;
+              timestamp: string;
+              tag: string;
+              data: string;
+
+              // Added by loop
+              jid: string;
+              target: string;
+              fun: string;
+              data_parsed: any;
+              data_formatted: string;
+              unique_index: string;
+          }[]
+        | null
+    > = writable(null);
+    const expandedEvents: Writable<string[]> = writable([]);
 
     function toggleExpandEvent(index: string) {
         console.log(index);
@@ -29,7 +46,7 @@
             .then((data) => {
                 events.set(
                     data.map((event) => {
-                        const data = JSON.parse(
+                        const data: any = JSON.parse(
                             event.data ?? '{data: {}}',
                         ).data;
                         return {

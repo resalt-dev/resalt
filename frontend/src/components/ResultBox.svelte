@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { theme } from "../stores";
-    import ConsoleChangeBranch from "../views/Minion/ConsoleChangeBranch.svelte";
+    import { theme } from '../stores';
+    import ConsoleChangeBranch from './ConsoleChangeBranch.svelte';
 
     const SHIFT = 10;
 
@@ -20,19 +20,19 @@
     function leftPadToTotalLength(
         str: string,
         maxLength: number,
-        char: string = " "
+        char: string = ' ',
     ) {
         return char.repeat(maxLength - str.length) + str;
     }
     function rightShiftLinesExceptFirst(
         str: string,
         paddingLength: number,
-        char: string = " "
+        char: string = ' ',
     ) {
         // Append paddingLength of spaces to each line except the first
-        let lines = str.split("\n");
-        let firstLine = lines.shift() ?? "";
-        let padding = "";
+        let lines = str.split('\n');
+        let firstLine = lines.shift() ?? '';
+        let padding = '';
         for (let i = 0; i < paddingLength; i++) {
             padding += char;
         }
@@ -40,7 +40,7 @@
         for (let line of lines) {
             paddedLines.push(padding + line);
         }
-        return paddedLines.join("\n");
+        return paddedLines.join('\n');
     }
 </script>
 
@@ -63,45 +63,45 @@
             <div class="card-text">
                 <pre
                     class="text-console m-0 text-{color}">{leftPadToTotalLength(
-                        "ID",
-                        SHIFT
+                        'ID',
+                        SHIFT,
                     )}: {stateName}</pre>
                 <pre
                     class="text-console m-0 text-{color}">{leftPadToTotalLength(
-                        "Function",
-                        SHIFT
+                        'Function',
+                        SHIFT,
                     )}: {fun}</pre>
                 <pre
                     class="text-console m-0 text-{color}">{leftPadToTotalLength(
-                        "Name",
-                        SHIFT
+                        'Name',
+                        SHIFT,
                     )}: {name}</pre>
                 <pre
                     class="text-console m-0 text-{color}">{leftPadToTotalLength(
-                        "Result",
-                        SHIFT
+                        'Result',
+                        SHIFT,
                     )}: <span style="text-transform:capitalize;"
-                        >{result === null ? "None" : result}</span
+                        >{result === null ? 'None' : result}</span
                     ></pre>
                 <pre
                     class="text-console m-0 text-{color}">{leftPadToTotalLength(
-                        "Comment",
-                        SHIFT
+                        'Comment',
+                        SHIFT,
                     )}: {rightShiftLinesExceptFirst(comment, SHIFT + 2)}</pre>
                 <pre
                     class="text-console m-0 text-{color}">{leftPadToTotalLength(
-                        "Started",
-                        SHIFT
+                        'Started',
+                        SHIFT,
                     )}: {startTime}</pre>
                 <pre
                     class="text-console m-0 text-{color}">{leftPadToTotalLength(
-                        "Duration",
-                        SHIFT
+                        'Duration',
+                        SHIFT,
                     )}: {duration}</pre>
                 <pre
                     class="text-console m-0 text-{color}">{leftPadToTotalLength(
-                        "Changes",
-                        SHIFT
+                        'Changes',
+                        SHIFT,
                     )}:</pre>
                 {#if Object.keys(changes).length != 0}
                     <ConsoleChangeBranch data={changes} shift={SHIFT + 2} />

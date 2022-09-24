@@ -1,16 +1,7 @@
 <script lang="ts">
-    import {
-        Card,
-        CardHeader,
-        CardTitle,
-        CardSubtitle,
-        CardBody,
-        Row,
-        Col,
-    } from "sveltestrap";
-    import { theme } from "../../stores";
-    import ThemeColorPicker from "./ThemeColorPicker.svelte";
-    import ThemeDarkToggle from "./ThemeDarkToggle.svelte";
+    import { Row, Col } from 'sveltestrap';
+    import ThemeColorPicker from './ThemeColorPicker.svelte';
+    import ThemeDarkToggle from './ThemeDarkToggle.svelte';
 </script>
 
 <Row>

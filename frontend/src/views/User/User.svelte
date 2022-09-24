@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { showAlert, getUserById } from "../../controller";
-    import { theme, currentUser, config } from "../../stores";
-    import { writable } from "svelte/store";
+    import { showAlert, getUserById } from '../../controller';
+    import { theme, currentUser, config } from '../../stores';
+    import { writable, type Writable } from 'svelte/store';
 
-    import { onMount } from "svelte";
+    import { onMount } from 'svelte';
     import {
         Badge,
         Card,
@@ -14,25 +14,26 @@
         Col,
         Input,
         Row,
-    } from "sveltestrap";
-    import { AlertType } from "../../models/AlertType";
-    import JsonViewer from "../../components/JsonViewer.svelte";
+    } from 'sveltestrap';
+    import { AlertType } from '../../models/AlertType';
+    import JsonViewer from '../../components/JsonViewer.svelte';
+    import type User from '../../models/User';
 
     // export let navigate;
     // export let location;
-    export let userId;
+    export let userId: string;
 
-    let password = "";
-    let passwordRepeat = "";
+    let password: string = '';
+    let passwordRepeat: string = '';
 
-    const user = writable(null);
+    const user: Writable<User | null> = writable(null);
 
     function handleUpdatePassword() {
         if (password !== passwordRepeat) {
             showAlert(
                 AlertType.ERROR,
-                "Password mismatch",
-                "Passwords do not match, please verify and try again."
+                'Password mismatch',
+                'Passwords do not match, please verify and try again.',
             );
             return;
         }
@@ -48,8 +49,8 @@
             .catch((err) => {
                 showAlert(
                     AlertType.ERROR,
-                    "Failed fetching user: " + userId,
-                    err
+                    'Failed fetching user: ' + userId,
+                    err,
                 );
             });
     });
@@ -97,7 +98,7 @@
                         <span class="float-end">
                             {#if $user.isLocal}
                                 <Badge
-                                    color={$theme.dark ? "secondary" : "dark"}
+                                    color={$theme.dark ? 'secondary' : 'dark'}
                                     >Yes</Badge
                                 >
                             {:else}

@@ -1,7 +1,7 @@
 import MetricResultData from './MetricResultData';
 
 export default class MetricResult {
-    static fromObject(item: any): any {
+    static fromObject(item: any): MetricResult {
         return new MetricResult(
             item.title,
             item.chart,

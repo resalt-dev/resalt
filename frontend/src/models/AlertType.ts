@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/prefer-default-export, no-shadow
 export enum AlertType {
     // eslint-disable-next-line no-unused-vars
     INFO = 'info',

@@ -1,9 +1,11 @@
 <script lang="ts">
+    import type { Writable } from 'svelte/store';
     import { Card, Table } from 'sveltestrap';
     import JsonViewer from '../../components/JsonViewer.svelte';
+    import type Minion from '../../models/Minion';
     import { theme } from '../../stores';
 
-    export let minion;
+    export let minion: Writable<Minion>;
     let rawData = false;
 
     $: pkgs = JSON.parse($minion.pkgs);

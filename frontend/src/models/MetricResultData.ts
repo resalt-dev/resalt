@@ -1,5 +1,5 @@
 export default class MetricResultData {
-    static fromObject(data: any) {
+    static fromObject(data: any): MetricResultData {
         return new MetricResultData(data.label, data.data);
     }
 

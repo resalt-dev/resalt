@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { theme } from "../../stores";
+    import { theme } from '../../stores';
 
-    function toggleDarkMode() {
-        console.log("toggleDarkMode");
+    function toggleDarkMode(): void {
+        console.log('toggleDarkMode');
         theme.update((t) => ({ ...t, dark: !t.dark }));
     }
 </script>

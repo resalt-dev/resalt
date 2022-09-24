@@ -68,7 +68,7 @@ async function sendUnauthenticatedRequest(
 export async function apiRequestAuthToken(
     username: string,
     password: string,
-): Promise<String> {
+): Promise<string> {
     return (
         await sendUnauthenticatedRequest('POST', '/auth/login', {
             username,
