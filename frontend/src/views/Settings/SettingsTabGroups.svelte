@@ -27,7 +27,7 @@
         updatePermissionGroup,
     } from '../../controller';
     import { AlertType } from '../../models/AlertType';
-    import { resaltPermissions } from '../../perms';
+    import { resaltWebPermissions } from '../../perms';
     import { theme } from '../../stores';
     import type PermissionGroup from '../../models/PermissionGroup';
 
@@ -107,7 +107,7 @@
         addUserFieldValue = '';
         addUserFieldError = false;
         permissionWebFields = {};
-        for (let perm of resaltPermissions) {
+        for (let perm of resaltWebPermissions) {
             permissionWebFields[perm[0]] = group.hasResaltPermission(perm[0]);
         }
         let minionPerms: PermissionMinionTarget[] = [];
@@ -701,7 +701,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="align-middle">
-                                    {#each resaltPermissions as resaltPermission}
+                                    {#each resaltWebPermissions as resaltPermission}
                                         <tr>
                                             <td class="px-5" style="width: 0">
                                                 <input
@@ -710,16 +710,17 @@
                                                     disabled={$selectedGroup.name ===
                                                         '$superadmins'}
                                                     bind:checked={permissionWebFields[
-                                                        resaltPermission[0]
+                                                        resaltPermission
+                                                            .permission
                                                     ]}
                                                 />
                                             </td>
                                             <th class="ps-0">
-                                                {resaltPermission[1]}
+                                                {resaltPermission.title}
                                             </th>
                                             <td>
                                                 <small>
-                                                    {resaltPermission[2]}
+                                                    {resaltPermission.description}
                                                 </small>
                                             </td>
                                         </tr>
