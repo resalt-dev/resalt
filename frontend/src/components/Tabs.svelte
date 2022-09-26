@@ -1,13 +1,9 @@
 <script lang="ts">
     import { Card, CardBody } from 'sveltestrap';
     import { theme } from '../stores';
+    import type { NavSubPage } from '../utils';
 
-    export let children: {
-        label: string;
-        component: any;
-        data?: any;
-        class?: string;
-    }[] = [];
+    export let children: NavSubPage[] = [];
     export let selected: number = 0;
     export let onSelect: (index: number) => void = () => {};
 </script>
@@ -29,16 +25,18 @@
         </div>
     {/each}
 </div>
-<Card
-    class="mb-3 border-4 border-{$theme.color} rounded-none {$theme.dark
-        ? 'bg-darker'
-        : ''}"
->
-    <CardBody class={children[selected].class || ''}>
-        <svelte:component
-            this={children[selected].component}
-            label={children[selected].label}
-            tabData={children[selected].data || undefined}
-        />
-    </CardBody>
-</Card>
+{#if selected < children.length}
+    <Card
+        class="mb-3 border-4 border-{$theme.color} rounded-none {$theme.dark
+            ? 'bg-darker'
+            : ''}"
+    >
+        <CardBody class={children[selected].class || ''}>
+            <svelte:component
+                this={children[selected].component}
+                label={children[selected].label}
+                tabData={children[selected].data || undefined}
+            />
+        </CardBody>
+    </Card>
+{/if}

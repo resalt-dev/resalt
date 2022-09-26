@@ -1,33 +1,46 @@
 <script lang="ts">
-    import { useNavigate } from "svelte-navigator";
-    import { Label } from "sveltestrap";
+    import { useNavigate } from 'svelte-navigator';
     const navigate = useNavigate();
 
-    import Tabs from "../../components/Tabs.svelte";
-    import paths from "../../paths";
-    import SettingsTabConfig from "./SettingsTabConfig.svelte";
-    import SettingsTabGroups from "./SettingsTabGroups.svelte";
-    import { theme } from "../../stores";
+    import { currentUser, theme } from '../../stores';
+    import { hasResaltPermission, P_ADMIN_GROUP } from '../../perms';
+    import paths from '../../paths';
+    import SettingsTabConfig from './SettingsTabConfig.svelte';
+    import SettingsTabGroups from './SettingsTabGroups.svelte';
+    import Tabs from '../../components/Tabs.svelte';
+    import type { NavSubPage } from '../../utils';
+    import type User from '../../models/User';
 
-    $: subPagesNav = [
-        {
-            label: "Config",
-            component: SettingsTabConfig,
-            class: $theme.dark ? "bg-dark" : "",
-        },
-        {
-            label: "Groups",
-            component: SettingsTabGroups,
-        },
-    ];
+    function calcSubPagesNav(user: User | null): NavSubPage[] {
+        if (!user) return [];
 
-    $: subPage = location.pathname.split("/")[4];
-    // $: console.log("location", location, subPage);
+        let navs: NavSubPage[] = [
+            {
+                label: 'Config',
+                component: SettingsTabConfig,
+                class: $theme.dark ? 'bg-dark' : '',
+            },
+        ];
+
+        if (hasResaltPermission(user.perms, P_ADMIN_GROUP)) {
+            navs.push({
+                label: 'Groups',
+                component: SettingsTabGroups,
+            });
+        }
+
+        return navs;
+    }
+
+    $: subPagesNav = calcSubPagesNav($currentUser);
 
     // Find index of subPage in subPagesNav, or 0 otherwise.
     $: currentSubPage = Math.max(
-        subPagesNav.findIndex((page) => page.label.toLowerCase() === subPage),
-        0
+        subPagesNav.findIndex(
+            (page) =>
+                page.label.toLowerCase() === location.pathname.split('/')[4],
+        ),
+        0,
     );
 </script>
 
@@ -38,7 +51,7 @@
     selected={currentSubPage}
     onSelect={(index) => {
         let pageLabel = subPagesNav[index].label.toLowerCase();
-        if (pageLabel === "config") {
+        if (pageLabel === 'config') {
             navigate(paths.settings.path);
         } else {
             navigate(paths.settings_page.getPath(pageLabel));

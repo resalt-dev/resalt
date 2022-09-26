@@ -1,5 +1,5 @@
 use crate::prelude::*;
-use actix_web::{web, Responder, Result};
+use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 use serde::{Deserialize, Deserializer};
 use serde_json::Value;
@@ -37,7 +37,16 @@ pub struct PermissionGroupsListGetQuery {
 pub async fn route_permissions_get(
     data: web::Data<Storage>,
     query: web::Query<PermissionGroupsListGetQuery>,
+    req: HttpRequest,
 ) -> Result<impl Responder> {
+    let ext = req.extensions_mut();
+    let auth = ext.get::<AuthStatus>().unwrap();
+
+    // Validate permission
+    if !has_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
+        return Err(api_error_forbidden());
+    }
+
     // Pagination
     let limit = query.limit;
     let offset = query.offset;
@@ -73,7 +82,16 @@ pub struct PermissionGroupCreateRequest {
 pub async fn route_permissions_post(
     data: web::Data<Storage>,
     input: web::Json<PermissionGroupCreateRequest>,
+    req: HttpRequest,
 ) -> Result<impl Responder> {
+    let ext = req.extensions_mut();
+    let auth = ext.get::<AuthStatus>().unwrap();
+
+    // Validate permission
+    if !has_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
+        return Err(api_error_forbidden());
+    }
+
     let permission_group_id = match data.create_permission_group(&input.name) {
         Ok(id) => id,
         Err(e) => {
@@ -110,7 +128,16 @@ pub struct PermissionInfo {
 pub async fn route_permission_get(
     data: web::Data<Storage>,
     info: web::Path<PermissionInfo>,
+    req: HttpRequest,
 ) -> Result<impl Responder> {
+    let ext = req.extensions_mut();
+    let auth = ext.get::<AuthStatus>().unwrap();
+
+    // Validate permission
+    if !has_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
+        return Err(api_error_forbidden());
+    }
+
     get_group(&data, &info.id).await
 }
 
@@ -127,7 +154,17 @@ pub async fn route_permission_update(
     data: web::Data<Storage>,
     info: web::Path<PermissionInfo>,
     input: web::Json<PermissionGroupUpdateRequest>,
+    req: HttpRequest,
 ) -> Result<impl Responder> {
+    let ext = req.extensions_mut();
+    let auth = ext.get::<AuthStatus>().unwrap();
+
+    // Validate permission
+    if !has_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
+        return Err(api_error_forbidden());
+    }
+
+    // Get permission group
     let permission_group = match data.get_permission_group_by_id(&info.id) {
         Ok(permission_group) => permission_group,
         Err(e) => {
@@ -135,7 +172,6 @@ pub async fn route_permission_update(
             return Err(api_error_database());
         }
     };
-
     let mut permission_group = match permission_group {
         Some(permission_group) => permission_group,
         None => {
@@ -143,12 +179,26 @@ pub async fn route_permission_update(
         }
     };
 
+    // Update permission group
     permission_group.name = input.name.clone();
     permission_group.perms = input.perms.clone(); // TODO: Validate JSON
     permission_group.ldap_sync = input.ldap_sync.clone(); // TODO: Validate LDAP
 
     match data.update_permission_group(&permission_group) {
         Ok(()) => (),
+        Err(e) => {
+            error!("{:?}", e);
+            return Err(api_error_database());
+        }
+    };
+
+    // Update members
+    match data.list_users_by_permission_group_id(&info.id) {
+        Ok(users) => {
+            for user in users {
+                update_user_permissions_from_groups(&data, &user)?;
+            }
+        }
         Err(e) => {
             error!("{:?}", e);
             return Err(api_error_database());
@@ -162,9 +212,29 @@ pub async fn route_permission_update(
 pub async fn route_permission_delete(
     data: web::Data<Storage>,
     info: web::Path<PermissionInfo>,
+    req: HttpRequest,
 ) -> Result<impl Responder> {
+    let ext = req.extensions_mut();
+    let auth = ext.get::<AuthStatus>().unwrap();
+
+    // Validate permission
+    if !has_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
+        return Err(api_error_forbidden());
+    }
+
+    // Get the group so we can return it as result
     let group = get_group(&data, &info.id).await?;
 
+    // Get list of all users, so we can update them after deleting the group
+    let users = match data.list_users_by_permission_group_id(&info.id) {
+        Ok(users) => users,
+        Err(e) => {
+            error!("{:?}", e);
+            return Err(api_error_database());
+        }
+    };
+
+    // Delete group
     match &data.delete_permission_group(&info.id) {
         Ok(()) => (),
         Err(e) => {
@@ -172,6 +242,11 @@ pub async fn route_permission_delete(
             return Err(api_error_database());
         }
     };
+
+    // Update ex-members
+    for user in users {
+        update_user_permissions_from_groups(&data, &user)?;
+    }
 
     Ok(group)
 }

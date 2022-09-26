@@ -28,6 +28,7 @@
 	<!-- Sub path: __basePath__ -->
 	<link rel='icon' type='image/png' href='__basePath__/favicon.png'>
 	<link rel='stylesheet' href='__basePath__/global.css'>
+	<link rel='stylesheet' href='__basePath__/resalt.css'>
 	<link rel='stylesheet' href='__basePath__/build/bundle.css'>
 	<script defer src='__basePath__/build/bundle.js'></script>
 

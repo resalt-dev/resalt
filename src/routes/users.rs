@@ -137,6 +137,9 @@ pub async fn route_user_permission_post(
                 return Err(api_error_database());
             }
         }
+
+        // Update user-cached permissions
+        update_user_permissions_from_groups(&data, &user)?;
     }
 
     return Ok(web::Json(()));
@@ -184,6 +187,9 @@ pub async fn route_user_permission_delete(
             return Err(api_error_database());
         }
     }
+
+    // Update user-cached permissions
+    update_user_permissions_from_groups(&data, &user)?;
 
     Ok(web::Json(()))
 }

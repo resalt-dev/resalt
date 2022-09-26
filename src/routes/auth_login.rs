@@ -45,6 +45,9 @@ pub async fn route_auth_login_post(
 
     debug!("User {} found, generating token", &user.username);
 
+    // Refresh their user-cached permissions before doing anything else
+    update_user_permissions_from_groups(&data, &user)?;
+
     // Create token
     let authtoken = match data.create_authtoken(user.id.clone()) {
         Ok(authtoken) => authtoken,

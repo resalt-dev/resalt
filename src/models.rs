@@ -8,7 +8,9 @@ use serde_json::{json, Value};
 =========================
 */
 
-#[derive(Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset, Associations)]
+#[derive(
+    Clone, Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset, Associations,
+)]
 #[diesel(belongs_to(User, foreign_key = user_id))]
 #[diesel(table_name = authtokens)]
 pub struct AuthToken {
@@ -18,7 +20,7 @@ pub struct AuthToken {
     pub salt_token: Option<String>,
 }
 
-#[derive(Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset)]
+#[derive(Clone, Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset)]
 #[diesel(table_name = events)]
 pub struct Event {
     pub id: String,
@@ -42,7 +44,9 @@ impl Serialize for Event {
     }
 }
 
-#[derive(Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset, Associations)]
+#[derive(
+    Clone, Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset, Associations,
+)]
 #[diesel(belongs_to(Event, foreign_key = event_id))]
 #[diesel(table_name = jobs)]
 pub struct Job {
@@ -69,7 +73,9 @@ impl Serialize for Job {
     }
 }
 
-#[derive(Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset, Associations)]
+#[derive(
+    Clone, Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset, Associations,
+)]
 #[diesel(belongs_to(Job, foreign_key = job_id))]
 #[diesel(belongs_to(Event, foreign_key = event_id))]
 #[diesel(belongs_to(Minion, foreign_key = minion_id))]
@@ -83,7 +89,7 @@ pub struct JobReturn {
     pub minion_id: String,
 }
 
-#[derive(Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset)]
+#[derive(Clone, Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset)]
 #[diesel(table_name = minions)]
 pub struct Minion {
     pub id: String,
@@ -161,7 +167,7 @@ impl Serialize for Minion {
     }
 }
 
-#[derive(Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset)]
+#[derive(Clone, Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset)]
 #[diesel(table_name = users)]
 pub struct User {
     pub id: String,
@@ -201,7 +207,7 @@ impl User {
     }
 }
 
-#[derive(Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset)]
+#[derive(Clone, Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset)]
 #[diesel(table_name = permission_groups)]
 pub struct PermissionGroup {
     pub id: String,
@@ -229,7 +235,9 @@ impl PermissionGroup {
     }
 }
 
-#[derive(Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset, Associations)]
+#[derive(
+    Clone, Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset, Associations,
+)]
 #[diesel(belongs_to(User, foreign_key = user_id))]
 #[diesel(belongs_to(PermissionGroup, foreign_key = group_id))]
 #[diesel(table_name = permission_group_users)]
@@ -244,7 +252,7 @@ pub struct PermissionGroupUser {
 =   NON-DATABASE MODELS   =
 ===========================
 */
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct SaltToken {
     pub token: String,
     pub start: f64,
@@ -260,20 +268,20 @@ impl SaltToken {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct AuthStatus {
     pub user_id: String,
     pub salt_token: Option<SaltToken>,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct SaltMinionKey {
     pub id: String,
     pub state: String,
     pub finger: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct MetricResult {
     pub title: String,
     pub chart: String,
@@ -281,7 +289,7 @@ pub struct MetricResult {
     pub data: Vec<MetricResultData>,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct MetricResultData {
     pub label: String,
     pub data: Vec<i32>,

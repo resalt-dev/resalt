@@ -449,6 +449,7 @@
     }
 
     function validateAddUserField(): void {
+        addUserFieldValue = addUserFieldValue.trim();
         addUserFieldError = false;
         if (addUserFieldValue.length !== 40) {
             addUserFieldError = true;
