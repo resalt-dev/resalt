@@ -660,8 +660,10 @@ impl Storage {
         //
         // Gather data
         //
-        let mut custom_grains_metrics: Vec<(&str, &str)> =
-            vec![("osfinger", "Operating System"), ("ipv4", "IPv4")];
+        let mut custom_grains_metrics: Vec<(&str, &str)> = vec![
+            ("osfinger", "Operating System"),
+            ("efi-secure-boot", "EFI Secure Boot"),
+        ];
         let minions = minions::table
             .load::<Minion>(&mut connection)
             .map_err(|e| format!("{:?}", e))?;
