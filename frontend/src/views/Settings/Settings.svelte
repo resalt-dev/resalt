@@ -11,8 +11,8 @@
     import type { NavSubPage } from '../../utils';
     import type User from '../../models/User';
 
-    function calcSubPagesNav(user: User | null): NavSubPage[] {
-        if (!user) return [];
+    function calcSubPagesNav(currentUser: User | null): NavSubPage[] {
+        if (!currentUser) return [];
 
         let navs: NavSubPage[] = [
             {
@@ -22,7 +22,7 @@
             },
         ];
 
-        if (hasResaltPermission(user.perms, P_ADMIN_GROUP)) {
+        if (hasResaltPermission(currentUser.perms, P_ADMIN_GROUP)) {
             navs.push({
                 label: 'Groups',
                 component: SettingsTabGroups,

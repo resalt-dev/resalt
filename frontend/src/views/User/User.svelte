@@ -13,7 +13,6 @@
         Card,
         CardBody,
         CardHeader,
-        CardSubtitle,
         CardTitle,
         Col,
         FormGroup,
@@ -24,6 +23,11 @@
     import { AlertType } from '../../models/AlertType';
     import JsonViewer from '../../components/JsonViewer.svelte';
     import type User from '../../models/User';
+    import {
+        hasResaltPermission,
+        P_ADMIN_USER,
+        P_USER_PASSWORD,
+    } from '../../perms';
 
     const PASSWORD_MIN_LENGTH: number = 8;
 
@@ -207,60 +211,64 @@
                 </ul>
             </Card>
         </Col>
-        <Col xs="12" xxl="4" class="pb-3">
-            <Card class="h-100 {$theme.dark ? 'bg-dark' : ''}">
-                <CardHeader>
-                    <CardTitle class="mb-0">Password</CardTitle>
-                </CardHeader>
-                <CardBody>
-                    <FormGroup floating={true}>
-                        <Input
-                            type="text"
+        {#if hasResaltPermission($currentUser.perms, P_ADMIN_USER) || ($currentUser.id === $user.id && hasResaltPermission($currentUser.perms, P_USER_PASSWORD))}
+            <Col xs="12" xxl="4" class="pb-3">
+                <Card class="h-100 {$theme.dark ? 'bg-dark' : ''}">
+                    <CardHeader>
+                        <CardTitle class="mb-0">Password</CardTitle>
+                    </CardHeader>
+                    <CardBody>
+                        <FormGroup floating={true}>
+                            <Input
+                                type="text"
+                                disabled={$user.ldapSync !== null}
+                                invalid={passwordFieldError}
+                                bind:value={passwordFieldValue}
+                                on:blur={validatePasswordField}
+                            />
+                            <Label for="arguments" class="text-muted">
+                                New password
+                            </Label>
+                        </FormGroup>
+                        <FormGroup floating={true}>
+                            <Input
+                                type="text"
+                                disabled={$user.ldapSync !== null}
+                                invalid={repeatPasswordFieldError &&
+                                    repeatPasswordFieldValue.length > 0}
+                                bind:value={repeatPasswordFieldValue}
+                                on:blur={validateRepeatPasswordField}
+                            />
+                            <Label for="arguments" class="text-muted">
+                                Confirm password
+                            </Label>
+                        </FormGroup>
+                        {#if $user.ldapSync !== null}
+                            <p class="text-muted mt-3">
+                                This user is synced with LDAP. Passwords can
+                                only be changed in LDAP.
+                            </p>
+                        {/if}
+                        {#if passwordFieldError}
+                            <p class="text-danger mt-3">
+                                Password must be at least {PASSWORD_MIN_LENGTH} characters
+                                long.
+                            </p>
+                        {/if}
+                        {#if repeatPasswordFieldError && repeatPasswordFieldValue.length > 0}
+                            <p class="text-danger mt-3">
+                                Passwords do not match.
+                            </p>
+                        {/if}
+                        <button
                             disabled={$user.ldapSync !== null}
-                            invalid={passwordFieldError}
-                            bind:value={passwordFieldValue}
-                            on:blur={validatePasswordField}
-                        />
-                        <Label for="arguments" class="text-muted">
-                            New password
-                        </Label>
-                    </FormGroup>
-                    <FormGroup floating={true}>
-                        <Input
-                            type="text"
-                            disabled={$user.ldapSync !== null}
-                            invalid={repeatPasswordFieldError &&
-                                repeatPasswordFieldValue.length > 0}
-                            bind:value={repeatPasswordFieldValue}
-                            on:blur={validateRepeatPasswordField}
-                        />
-                        <Label for="arguments" class="text-muted">
-                            Confirm password
-                        </Label>
-                    </FormGroup>
-                    {#if $user.ldapSync !== null}
-                        <p class="text-muted mt-3">
-                            This user is synced with LDAP. Passwords can only be
-                            changed in LDAP.
-                        </p>
-                    {/if}
-                    {#if passwordFieldError}
-                        <p class="text-danger mt-3">
-                            Password must be at least {PASSWORD_MIN_LENGTH} characters
-                            long.
-                        </p>
-                    {/if}
-                    {#if repeatPasswordFieldError && repeatPasswordFieldValue.length > 0}
-                        <p class="text-danger mt-3">Passwords do not match.</p>
-                    {/if}
-                    <button
-                        disabled={$user.ldapSync !== null}
-                        class="btn btn-{$theme.color}"
-                        on:click={updatePassword}>Update</button
-                    >
-                </CardBody>
-            </Card>
-        </Col>
+                            class="btn btn-{$theme.color}"
+                            on:click={updatePassword}>Update</button
+                        >
+                    </CardBody>
+                </Card>
+            </Col>
+        {/if}
         <Col xs="12" xxl="4" class="pb-3">
             <Card class="h-100 {$theme.dark ? 'bg-dark' : ''}">
                 <CardHeader>

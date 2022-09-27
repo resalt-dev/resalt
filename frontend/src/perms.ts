@@ -3,7 +3,6 @@ export const P_ADMIN_SUPERADMIN: string = 'admin.superadmin';
 export const P_ADMIN_GROUP: string = 'admin.group';
 export const P_ADMIN_USER: string = 'admin.user';
 export const P_USER_PASSWORD: string = 'user.password';
-export const P_USER_THEME: string = 'user.theme';
 
 export const resaltWebPermissions: {
     permission: string;
@@ -73,6 +72,9 @@ export function hasResaltPermission(
         }
     }
     testPerms.push('admin.superadmin');
+
+    console.log('testPerms', testPerms);
+    console.log('resaltPermissions', resaltPermissions);
 
     for (const userPermission of resaltPermissions) {
         for (const testPerm of testPerms) {
