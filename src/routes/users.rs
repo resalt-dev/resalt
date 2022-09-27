@@ -1,5 +1,5 @@
 use crate::prelude::*;
-use actix_web::{web, Responder, Result};
+use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 use serde::Deserialize;
 use serde_json::Value;
@@ -78,6 +78,63 @@ pub async fn route_user_get(
 }
 
 #[derive(Deserialize)]
+pub struct UserPostPasswordData {
+    password: String,
+}
+
+pub async fn route_user_password_post(
+    data: web::Data<Storage>,
+    info: web::Path<UserGetInfo>,
+    req: HttpRequest,
+    body: web::Json<UserPostPasswordData>,
+) -> Result<impl Responder> {
+    let ext = req.extensions_mut();
+    let auth = ext.get::<AuthStatus>().unwrap();
+
+    // Validate permission
+    let permission_ok = has_permission(&data, &auth.user_id, P_ADMIN_USER)?
+        || (auth.user_id.eq(&info.user_id)
+            && has_permission(&data, &auth.user_id, P_USER_PASSWORD)?);
+    if !permission_ok {
+        return Err(api_error_forbidden());
+    }
+
+    // Minimum password check
+    if &body.password.len() < &8 {
+        return Err(api_error_invalid_request());
+    }
+
+    // Check if user exists
+    let user = match data.get_user_by_id(&info.user_id) {
+        Ok(user) => user,
+        Err(e) => {
+            error!("{:?}", e);
+            return Err(api_error_database());
+        }
+    };
+
+    let mut user = match user {
+        Some(user) => user,
+        None => {
+            return Err(api_error_not_found());
+        }
+    };
+
+    // Update password
+    user.password = Some(hash_password(&body.password));
+
+    match data.update_user(&user) {
+        Ok(_) => {}
+        Err(e) => {
+            error!("{:?}", e);
+            return Err(api_error_database());
+        }
+    }
+
+    return Ok(web::Json(()));
+}
+
+#[derive(Deserialize)]
 pub struct UserPermissionInfo {
     user_id: String,
     group_id: String,
@@ -87,7 +144,16 @@ pub struct UserPermissionInfo {
 pub async fn route_user_permission_post(
     data: web::Data<Storage>,
     info: web::Path<UserPermissionInfo>,
+    req: HttpRequest,
 ) -> Result<impl Responder> {
+    let ext = req.extensions_mut();
+    let auth = ext.get::<AuthStatus>().unwrap();
+
+    // Validate permission
+    if !has_permission(&data, &auth.user_id, P_ADMIN_USER)? {
+        return Err(api_error_forbidden());
+    }
+
     // Check if user exists
     let user = match data.get_user_by_id(&info.user_id) {
         Ok(user) => user,
@@ -149,7 +215,17 @@ pub async fn route_user_permission_post(
 pub async fn route_user_permission_delete(
     data: web::Data<Storage>,
     info: web::Path<UserPermissionInfo>,
+    req: HttpRequest,
 ) -> Result<impl Responder> {
+    let ext = req.extensions_mut();
+    let auth = ext.get::<AuthStatus>().unwrap();
+
+    // Validate permission
+    if !has_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
+        return Err(api_error_forbidden());
+    }
+
+    // Check if user exists
     let user = match data.get_user_by_id(&info.user_id) {
         Ok(user) => user,
         Err(e) => {

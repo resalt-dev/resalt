@@ -78,7 +78,9 @@ export async function apiRequestAuthToken(
 }
 
 export async function apiGetConfig(): Promise<Config> {
-    return sendUnauthenticatedRequest('GET', '/config').then((data: any) => Config.fromObject(data));
+    return sendUnauthenticatedRequest('GET', '/config').then((data: any) =>
+        Config.fromObject(data),
+    );
 }
 
 export async function apiGetCurrentUser(token: string): Promise<User> {
@@ -111,6 +113,19 @@ export async function apiListUsers(
 export async function apiGetUser(token: string, userId: string): Promise<User> {
     return sendAuthenticatedRequest('GET', `/users/${userId}`, token).then(
         (data: any) => User.fromObject(data),
+    );
+}
+
+export async function apiUpdateUserPassword(
+    token: string,
+    userId: string,
+    password: string,
+): Promise<void> {
+    return sendAuthenticatedRequest(
+        'POST',
+        `/users/${userId}/password`,
+        token,
+        { password },
     );
 }
 
@@ -318,7 +333,9 @@ export async function apiListPermissionGroups(
         'GET',
         `/permissions?${args.toString()}`,
         token,
-    ).then((data: any[]) => data.map((item) => PermissionGroup.fromObject(item)));
+    ).then((data: any[]) =>
+        data.map((item) => PermissionGroup.fromObject(item)),
+    );
 }
 
 export async function apiGetPermissionGroup(

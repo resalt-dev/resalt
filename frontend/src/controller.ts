@@ -32,6 +32,7 @@ import {
     apiRequestAuthToken,
     apiRunJob,
     apiUpdatePermissionGroup,
+    apiUpdateUserPassword,
 } from './api';
 import Alert from './models/Alert';
 import type Minion from './models/Minion';
@@ -215,9 +216,14 @@ export async function getUsers(
     return apiListUsers(token, limit, offset);
 }
 
-export async function getUserById(id: string): Promise<User> {
+export async function getUserById(userId: string): Promise<User> {
     const token = requireToken();
-    return apiGetUser(token, id);
+    return apiGetUser(token, userId);
+}
+
+export async function updateUserPassword(userId: string, password: string): Promise<void> {
+    const token = requireToken();
+    return apiUpdateUserPassword(token, userId, password);
 }
 
 export async function addUserToPermissionGroup(

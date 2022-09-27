@@ -42,12 +42,7 @@ export const resaltWebPermissions: {
     {
         permission: P_USER_PASSWORD,
         title: '[User] Manage Password',
-        description: 'Allows the user to change their password in Resalt.',
-    },
-    {
-        permission: P_USER_THEME,
-        title: '[User] Manage Theme',
-        description: 'Allows the user to change their theme in Resalt.',
+        description: 'Allows the user to change their own password in Resalt. LDAP users cannot set or log in with local password.',
     },
 ];
 

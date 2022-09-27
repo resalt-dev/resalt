@@ -131,7 +131,10 @@ async fn main() -> std::io::Result<()> {
                             .wrap(auth::RequireAuth::new())
                             .route("", web::get().to(route_users_get))
                             .route("/{user_id}", web::get().to(route_user_get))
-                            //.route("/{id}/password", web::post().to(route_user_password_post))
+                            .route(
+                                "/{user_id}/password",
+                                web::post().to(route_user_password_post),
+                            )
                             .route(
                                 "/{user_id}/permissions/{group_id}",
                                 web::post().to(route_user_permission_post),

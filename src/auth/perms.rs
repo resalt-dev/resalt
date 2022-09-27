@@ -10,7 +10,6 @@ pub const P_ADMIN_SUPERADMIN: &str = "admin.superadmin";
 pub const P_ADMIN_GROUP: &str = "admin.group";
 pub const P_ADMIN_USER: &str = "admin.user";
 pub const P_USER_PASSWORD: &str = "user.password";
-// pub const P_USER_THEME: &str = "user.theme";
 
 pub fn has_permission(
     data: &web::Data<Storage>,

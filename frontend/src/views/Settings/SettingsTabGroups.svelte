@@ -649,7 +649,7 @@
                                     bind:value={$selectedGroup.id}
                                     disabled
                                 />
-                                <Label for="arguments">Group ID</Label>
+                                <Label>Group ID</Label>
                             </FormGroup>
                         </Col>
                         <Col class="ps-3 mb-0" xs="12" lg="6" xxl="5">
@@ -663,7 +663,7 @@
                                     on:blur={validateGroupNameField}
                                     required
                                 />
-                                <Label for="arguments">Group Name</Label>
+                                <Label>Group Name</Label>
                             </FormGroup>
                         </Col>
                         <Col class="ps-3 mb-0" xs="12" lg="6" xxl="7">
@@ -676,7 +676,7 @@
                                     bind:value={groupLdapSyncFieldValue}
                                     on:blur={validateGroupLdapSyncField}
                                 />
-                                <Label for="arguments" class="text-muted">
+                                <Label class="text-muted">
                                     LDAP Sync DN (optional)
                                 </Label>
                             </FormGroup>
@@ -761,10 +761,7 @@
                                         bind:value={addUserFieldValue}
                                         on:blur={validateAddUserField}
                                     />
-                                    <Label
-                                        for="arguments"
-                                        style="padding-top: 0.4rem;"
-                                    >
+                                    <Label style="padding-top: 0.4rem;">
                                         {#if groupLdapSyncFieldValue.length > 0}
                                             Manually managing users is disabled
                                             because LDAP Sync is active.
@@ -902,7 +899,6 @@
                                                             on:blur={validatePermissionMinionTargetsFields}
                                                         />
                                                         <Label
-                                                            for="arguments"
                                                             style="padding-top: 0.4rem;"
                                                         >
                                                             Target
@@ -950,7 +946,6 @@
                                                                 bind:value={minionModule.name}
                                                             />
                                                             <Label
-                                                                for="arguments"
                                                                 style="padding-top: 0.4rem;"
                                                             >
                                                                 Module
@@ -1001,7 +996,6 @@
                                                                     bind:value={arg}
                                                                 />
                                                                 <Label
-                                                                    for="arguments"
                                                                     style="padding-top: 0.4rem;"
                                                                 >
                                                                     Arg {ai}

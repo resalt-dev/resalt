@@ -1,5 +1,9 @@
 <script lang="ts">
-    import { showAlert, getUserById } from '../../controller';
+    import {
+        showAlert,
+        getUserById,
+        updateUserPassword,
+    } from '../../controller';
     import { theme, currentUser, config } from '../../stores';
     import { writable, type Writable } from 'svelte/store';
 
@@ -12,36 +16,29 @@
         CardSubtitle,
         CardTitle,
         Col,
+        FormGroup,
         Input,
+        Label,
         Row,
     } from 'sveltestrap';
     import { AlertType } from '../../models/AlertType';
     import JsonViewer from '../../components/JsonViewer.svelte';
     import type User from '../../models/User';
 
+    const PASSWORD_MIN_LENGTH: number = 8;
+
     // export let navigate;
     // export let location;
     export let userId: string;
 
-    let password: string = '';
-    let passwordRepeat: string = '';
-
     const user: Writable<User | null> = writable(null);
 
-    function handleUpdatePassword() {
-        if (password !== passwordRepeat) {
-            showAlert(
-                AlertType.ERROR,
-                'Password mismatch',
-                'Passwords do not match, please verify and try again.',
-            );
-            return;
-        }
+    let passwordFieldValue: string = '';
+    let passwordFieldError: boolean = false;
+    let repeatPasswordFieldValue: string = '';
+    let repeatPasswordFieldError: boolean = false;
 
-        // TODO: Update password
-    }
-
-    onMount(() => {
+    function updateData(): void {
         getUserById(userId)
             .then((data) => {
                 user.set(data);
@@ -53,6 +50,63 @@
                     err,
                 );
             });
+    }
+
+    function updatePassword() {
+        validatePasswordField();
+        validateRepeatPasswordField();
+        if (passwordFieldError || repeatPasswordFieldError) {
+            return;
+        }
+
+        updateUserPassword($user.id, passwordFieldValue)
+            .then(() => {
+                // OK!
+                passwordFieldValue = '';
+                passwordFieldError = false;
+                repeatPasswordFieldValue = '';
+                repeatPasswordFieldError = false;
+                updateData();
+            })
+            .catch((err) => {
+                showAlert(
+                    AlertType.ERROR,
+                    'Failed updating password for user: ' + userId,
+                    err,
+                );
+            });
+    }
+
+    /*
+    // VALIDATION
+    */
+
+    function validatePasswordField(): void {
+        validateRepeatPasswordField();
+
+        passwordFieldError = false;
+
+        if (passwordFieldValue.length < PASSWORD_MIN_LENGTH) {
+            passwordFieldError = true;
+            return;
+        }
+    }
+
+    function validateRepeatPasswordField(): void {
+        repeatPasswordFieldError = false;
+
+        if (repeatPasswordFieldValue.length < PASSWORD_MIN_LENGTH) {
+            repeatPasswordFieldError = true;
+            return;
+        }
+        if (passwordFieldValue !== repeatPasswordFieldValue) {
+            repeatPasswordFieldError = true;
+            return;
+        }
+    }
+
+    onMount(() => {
+        updateData();
     });
 </script>
 
@@ -94,7 +148,7 @@
                             ? 'bg-dark text-light'
                             : ''}"
                     >
-                        <strong>Has Password</strong>
+                        <strong>Has Local Password</strong>
                         <span class="float-end">
                             {#if $user.hasPassword}
                                 <Badge
@@ -159,32 +213,51 @@
                     <CardTitle class="mb-0">Password</CardTitle>
                 </CardHeader>
                 <CardBody>
-                    <CardSubtitle class="mb-3">New password:</CardSubtitle>
-                    <Input
-                        bind:value={password}
-                        id="userNewPassword"
-                        type="password"
-                        placeholder="New password"
-                        class="form-control mb-3 d-inline"
-                        style="width: 20rem;"
-                        disabled
-                    />
-                    <CardSubtitle class="mb-3">Confirm password:</CardSubtitle>
-                    <Input
-                        bind:value={passwordRepeat}
-                        id="userNewPasswordConfirm"
-                        type="password"
-                        placeholder="Confirm password"
-                        class="form-control mb-3 d-inline"
-                        style="width: 20rem;"
-                        disabled
-                    />
-                    <br />
+                    <FormGroup floating={true}>
+                        <Input
+                            type="text"
+                            disabled={$user.ldapSync !== null}
+                            invalid={passwordFieldError}
+                            bind:value={passwordFieldValue}
+                            on:blur={validatePasswordField}
+                        />
+                        <Label for="arguments" class="text-muted">
+                            New password
+                        </Label>
+                    </FormGroup>
+                    <FormGroup floating={true}>
+                        <Input
+                            type="text"
+                            disabled={$user.ldapSync !== null}
+                            invalid={repeatPasswordFieldError &&
+                                repeatPasswordFieldValue.length > 0}
+                            bind:value={repeatPasswordFieldValue}
+                            on:blur={validateRepeatPasswordField}
+                        />
+                        <Label for="arguments" class="text-muted">
+                            Confirm password
+                        </Label>
+                    </FormGroup>
+                    {#if $user.ldapSync !== null}
+                        <p class="text-muted mt-3">
+                            This user is synced with LDAP. Passwords can only be
+                            changed in LDAP.
+                        </p>
+                    {/if}
+                    {#if passwordFieldError}
+                        <p class="text-danger mt-3">
+                            Password must be at least {PASSWORD_MIN_LENGTH} characters
+                            long.
+                        </p>
+                    {/if}
+                    {#if repeatPasswordFieldError && repeatPasswordFieldValue.length > 0}
+                        <p class="text-danger mt-3">Passwords do not match.</p>
+                    {/if}
                     <button
-                        disabled
+                        disabled={$user.ldapSync !== null}
                         class="btn btn-{$theme.color}"
-                        on:click={handleUpdatePassword}>Update</button
-                    > Not yet implemented.
+                        on:click={updatePassword}>Update</button
+                    >
                 </CardBody>
             </Card>
         </Col>
