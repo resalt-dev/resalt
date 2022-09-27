@@ -1,6 +1,6 @@
 <script lang="ts">
     import {
-        showAlert,
+        showToast,
         getUserById,
         updateUserPassword,
     } from '../../controller';
@@ -48,7 +48,7 @@
                 user.set(data);
             })
             .catch((err) => {
-                showAlert(
+                showToast(
                     AlertType.ERROR,
                     'Failed fetching user: ' + userId,
                     err,
@@ -73,7 +73,7 @@
                 updateData();
             })
             .catch((err) => {
-                showAlert(
+                showToast(
                     AlertType.ERROR,
                     'Failed updating password for user: ' + userId,
                     err,
@@ -220,28 +220,24 @@
                     <CardBody>
                         <FormGroup floating={true}>
                             <Input
-                                type="text"
+                                type="password"
                                 disabled={$user.ldapSync !== null}
                                 invalid={passwordFieldError}
                                 bind:value={passwordFieldValue}
                                 on:blur={validatePasswordField}
                             />
-                            <Label for="arguments" class="text-muted">
-                                New password
-                            </Label>
+                            <Label class="text-muted">New password</Label>
                         </FormGroup>
                         <FormGroup floating={true}>
                             <Input
-                                type="text"
+                                type="password"
                                 disabled={$user.ldapSync !== null}
                                 invalid={repeatPasswordFieldError &&
                                     repeatPasswordFieldValue.length > 0}
                                 bind:value={repeatPasswordFieldValue}
                                 on:blur={validateRepeatPasswordField}
                             />
-                            <Label for="arguments" class="text-muted">
-                                Confirm password
-                            </Label>
+                            <Label class="text-muted">Confirm password</Label>
                         </FormGroup>
                         {#if $user.ldapSync !== null}
                             <p class="text-muted mt-3">

@@ -6,7 +6,7 @@
         deleteKey,
         getKeys,
         rejectKey,
-        showAlert,
+        showToast,
     } from '../../controller';
     import { Badge, Button, Card, Table } from 'sveltestrap';
     import { writable, type Writable } from 'svelte/store';
@@ -29,7 +29,7 @@
                 fakePaginate();
             })
             .catch((err) => {
-                showAlert(AlertType.ERROR, 'Failed fetching keys', err);
+                showToast(AlertType.ERROR, 'Failed fetching keys', err);
             });
     }
 
@@ -44,14 +44,14 @@
         acceptKey(key)
             .then(() => {
                 updateData();
-                showAlert(
+                showToast(
                     AlertType.SUCCESS,
                     'Key accepted',
                     `Key ${key.id} accepted`,
                 );
             })
             .catch((err) => {
-                showAlert(AlertType.ERROR, 'Failed accepting key', err);
+                showToast(AlertType.ERROR, 'Failed accepting key', err);
             });
     }
 
@@ -59,14 +59,14 @@
         rejectKey(key)
             .then(() => {
                 updateData();
-                showAlert(
+                showToast(
                     AlertType.SUCCESS,
                     'Key rejected',
                     `Key ${key.id} rejected`,
                 );
             })
             .catch((err) => {
-                showAlert(AlertType.ERROR, 'Failed rejecting key', err);
+                showToast(AlertType.ERROR, 'Failed rejecting key', err);
             });
     }
 
@@ -74,14 +74,14 @@
         deleteKey(key)
             .then(() => {
                 updateData();
-                showAlert(
+                showToast(
                     AlertType.SUCCESS,
                     'Key deleted',
                     `Key ${key.id} deleted`,
                 );
             })
             .catch((err) => {
-                showAlert(AlertType.ERROR, 'Failed deleting key', err);
+                showToast(AlertType.ERROR, 'Failed deleting key', err);
             });
     }
 

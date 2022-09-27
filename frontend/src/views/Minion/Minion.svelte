@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Link } from 'svelte-navigator';
-    import { showAlert, getMinionById } from '../../controller';
+    import { showToast, getMinionById } from '../../controller';
     import { theme } from '../../stores';
     import { writable, type Writable } from 'svelte/store';
     import paths from '../../paths';
@@ -27,7 +27,7 @@
                 minion.set(data);
             })
             .catch((err) => {
-                showAlert(
+                showToast(
                     AlertType.ERROR,
                     'Failed fetching minion: ' + minionId,
                     err,

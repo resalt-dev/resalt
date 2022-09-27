@@ -4,7 +4,7 @@ import {
     config as configStore,
     currentUser as currentUserStore,
     socket as socketStore,
-    alerts,
+    toasts,
 } from './stores';
 import {
     apiAcceptKey,
@@ -59,8 +59,8 @@ function requireToken(): string {
 /*
  * UTIL
  */
-export function showAlert(type: string, title: string, message: string): void {
-    alerts.update((mAlerts) => [...mAlerts, new Alert(type, title, message)]);
+export function showToast(type: string, title: string, message: string): void {
+    toasts.update((mAlerts) => [...mAlerts, new Alert(type, title, message)]);
 }
 
 /*

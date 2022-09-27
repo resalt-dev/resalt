@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { writable, type Writable } from 'svelte/store';
-    import { getMinions, showAlert } from '../../controller';
+    import { getMinions, showToast } from '../../controller';
     import { theme } from '../../stores';
     import Icon from '../../components/Icon.svelte';
     import paths from '../../paths';
@@ -27,7 +27,7 @@
                 minions.set(data);
             })
             .catch((err) => {
-                showAlert(AlertType.ERROR, 'Failed fetching minions', err);
+                showToast(AlertType.ERROR, 'Failed fetching minions', err);
             });
     }
 

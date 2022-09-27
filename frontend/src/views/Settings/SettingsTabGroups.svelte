@@ -23,7 +23,7 @@
         deletePermissionGroup,
         getPermissionGroups,
         removeUserFromPermissionGroup,
-        showAlert,
+        showToast,
         updatePermissionGroup,
     } from '../../controller';
     import { AlertType } from '../../models/AlertType';
@@ -86,7 +86,7 @@
                     resolve();
                 })
                 .catch((err) => {
-                    showAlert(AlertType.ERROR, 'Failed fetching groups', err);
+                    showToast(AlertType.ERROR, 'Failed fetching groups', err);
                     reject();
                 });
         });
@@ -166,11 +166,11 @@
             .then((group) => {
                 updateData();
                 selectedGroup.set(group);
-                showAlert(AlertType.SUCCESS, 'Create group', 'Created group!');
+                showToast(AlertType.SUCCESS, 'Create group', 'Created group!');
             })
             .catch((err) => {
                 console.error(err);
-                showAlert(AlertType.ERROR, 'Failed creating group', err);
+                showToast(AlertType.ERROR, 'Failed creating group', err);
             });
     }
 
@@ -189,11 +189,11 @@
                         selectedGroup.set(null);
                     }
                 });
-                showAlert(AlertType.SUCCESS, 'Delete group', 'Deleted group!');
+                showToast(AlertType.SUCCESS, 'Delete group', 'Deleted group!');
             })
             .catch((err) => {
                 console.error(err);
-                showAlert(AlertType.ERROR, 'Failed deleting group', err);
+                showToast(AlertType.ERROR, 'Failed deleting group', err);
             });
     }
 
@@ -208,7 +208,7 @@
         addUserToPermissionGroup(addUserFieldValue, $selectedGroup.id)
             .then(() => {
                 updateData();
-                showAlert(
+                showToast(
                     AlertType.SUCCESS,
                     'Add user to group',
                     'Added user to group!',
@@ -216,7 +216,7 @@
             })
             .catch((err) => {
                 console.error(err);
-                showAlert(AlertType.ERROR, 'Failed adding user to group', err);
+                showToast(AlertType.ERROR, 'Failed adding user to group', err);
             });
     }
 
@@ -227,7 +227,7 @@
         removeUserFromPermissionGroup(userId, $selectedGroup.id)
             .then(() => {
                 updateData();
-                showAlert(
+                showToast(
                     AlertType.SUCCESS,
                     'Remove user from group',
                     'Removed user from group!',
@@ -235,7 +235,7 @@
             })
             .catch((err) => {
                 console.error(err);
-                showAlert(
+                showToast(
                     AlertType.ERROR,
                     'Failed removing user from group',
                     err,
@@ -269,7 +269,7 @@
         )
             .then(() => {
                 updateData();
-                showAlert(
+                showToast(
                     AlertType.SUCCESS,
                     'Update group',
                     'Updated group name!',
@@ -277,7 +277,7 @@
             })
             .catch((err) => {
                 console.error(err);
-                showAlert(AlertType.ERROR, 'Failed updating group', err);
+                showToast(AlertType.ERROR, 'Failed updating group', err);
             });
     }
 

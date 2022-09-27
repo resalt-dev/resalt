@@ -342,7 +342,7 @@ samp {
 .btn-info:hover, .btn-info.active {background-color: var(--dark-info) !important;}
 .btn-warning:hover, .btn-warning.active {background-color: var(--dark-warning) !important;}
 .btn-danger:hover, .btn-danger.active {background-color: var(--dark-danger) !important;}
-.btn-light:hover, .btn-light.active {background-color: var(--gray) !important;}
+.btn-light:hover, .btn-light.active {background-color: var(--gray-8) !important;}
 .btn-dark:hover, .btn-dark.active {background-color: var(--black) !important;}
 
 /* .btn-yellow, .btn-yellow:hover,

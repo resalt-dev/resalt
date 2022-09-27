@@ -1,19 +1,20 @@
 <script lang="ts">
     import { Router, Route } from 'svelte-navigator';
+    import { writable, type Writable } from 'svelte/store';
     import { Card, CardBody, CardText, CardTitle } from 'sveltestrap';
-    import Logo from '../../components/Logo.svelte';
-    import constants from '../../constants';
-    import type Alert from '../../models/Alert';
-    import { alerts, theme } from '../../stores';
+    import { toasts, theme } from '../../stores';
     import AuthLogin from '../../views/AuthLogin.svelte';
     import AuthLogout from '../../views/AuthLogout.svelte';
+    import constants from '../../constants';
+    import Logo from '../../components/Logo.svelte';
+    import type Alert from '../../models/Alert';
 
-    let localAlerts: Alert[] = [];
+    let localAlerts: Writable<Alert[]> = writable([]);
 
     // Clone "alerts" to "localAlerts" then empty it on every Svelte update
     $: {
-        localAlerts = $alerts.slice();
-        alerts.update(() => []);
+        localAlerts.set($toasts);
+        toasts.set([]);
     }
 </script>
 
@@ -53,7 +54,7 @@
 
                             <div class="clearfix" />
 
-                            {#each localAlerts as alert}
+                            {#each $localAlerts as alert}
                                 <Card class="text-white bg-{alert.type} mb-3">
                                     <CardBody>
                                         <CardTitle>{alert.title}</CardTitle>

@@ -11,7 +11,7 @@
         Col,
         Row,
     } from 'sveltestrap';
-    import { getMetricResults, showAlert } from '../../controller';
+    import { getMetricResults, showToast } from '../../controller';
     import { AlertType } from '../../models/AlertType';
     import { theme } from '../../stores';
 
@@ -50,7 +50,7 @@
                 metrics.set(data);
             })
             .catch((err) => {
-                showAlert(
+                showToast(
                     AlertType.ERROR,
                     'Failed fetching dashboard metrics',
                     err,

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { theme } from '../../stores';
-    import { getJobs, showAlert } from '../../controller';
+    import { getJobs, showToast } from '../../controller';
     import { Card, Table, Tooltip } from 'sveltestrap';
     import Icon from '../../components/Icon.svelte';
     import { writable, type Writable } from 'svelte/store';
@@ -29,7 +29,7 @@
                 jobs.set(data);
             })
             .catch((err) => {
-                showAlert(AlertType.ERROR, 'Failed fetching jobs', err);
+                showToast(AlertType.ERROR, 'Failed fetching jobs', err);
             });
     }
 

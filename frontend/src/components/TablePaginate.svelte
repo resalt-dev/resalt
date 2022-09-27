@@ -73,7 +73,7 @@
                 : 'bg-darker'}"
             aria-labelledby="dropdownPaginatePageSize"
         >
-            {#each [10, 20, 50, 100, 250] as s}
+            {#each [20, 50, 100, 250] as s}
                 <li>
                     <span
                         class="dropdown-item mouse-pointer {$theme.dark

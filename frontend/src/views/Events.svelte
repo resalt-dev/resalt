@@ -2,7 +2,7 @@
     import { onMount } from 'svelte';
     import { Card, Table } from 'sveltestrap';
     import Icon from '../components/Icon.svelte';
-    import { getEvents, showAlert } from '../controller';
+    import { getEvents, showToast } from '../controller';
     import { theme } from '../stores';
     import TablePaginate from '../components/TablePaginate.svelte';
     import { AlertType } from '../models/AlertType';
@@ -66,7 +66,7 @@
                 );
             })
             .catch((err) => {
-                showAlert(AlertType.ERROR, 'Failed fetching events', err);
+                showToast(AlertType.ERROR, 'Failed fetching events', err);
             });
     }
 
