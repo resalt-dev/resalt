@@ -3,7 +3,8 @@ export default class Config {
         return new Config(
             data.currentVersion,
             data.latestVersion,
-            data.themeColor,
+            data.defaultThemeColor,
+            data.enableThemeSwitching,
         );
     }
 
@@ -11,11 +12,19 @@ export default class Config {
 
     latestVersion: string;
 
-    themeColor: string;
+    defaultThemeColor: string;
 
-    constructor(currentVersion: string, latestVersion: string, themeColor: string) {
+    enableThemeSwitching: boolean;
+
+    constructor(
+        currentVersion: string,
+        latestVersion: string,
+        defaultThemeColor: string,
+        enableThemeSwitching: boolean,
+    ) {
         this.currentVersion = currentVersion;
         this.latestVersion = latestVersion;
-        this.themeColor = themeColor;
+        this.defaultThemeColor = defaultThemeColor;
+        this.enableThemeSwitching = enableThemeSwitching;
     }
 }

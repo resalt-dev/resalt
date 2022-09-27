@@ -9,7 +9,8 @@ use crate::{prelude::SConfig, update};
 struct ApiConfig {
     currentVersion: String,
     latestVersion: String,
-    themeColor: String,
+    defaultThemeColor: String,
+    enableThemeSwitching: bool,
 }
 
 pub async fn route_config_get() -> Result<impl Responder> {
@@ -22,7 +23,8 @@ pub async fn route_config_get() -> Result<impl Responder> {
                 "unknown".to_string()
             }
         },
-        themeColor: SConfig::http_frontend_theme_color(),
+        defaultThemeColor: SConfig::http_frontend_theme_color(),
+        enableThemeSwitching: SConfig::http_frontend_theme_enabled(),
     };
     Ok(web::Json(config))
 }

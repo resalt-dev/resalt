@@ -244,6 +244,14 @@ impl SConfig {
             .unwrap()
     }
 
+    pub fn http_frontend_theme_enabled() -> bool {
+        SETTINGS
+            .read()
+            .unwrap()
+            .get_bool("http.frontend.theme.enabled")
+            .unwrap()
+    }
+
     pub fn http_frontend_theme_color() -> String {
         strip_quotes!(SETTINGS
             .read()

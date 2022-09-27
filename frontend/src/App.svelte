@@ -1,15 +1,15 @@
 <script lang="ts">
-    import { Router, Route } from "svelte-navigator";
-    import constants from "./constants";
-    import paths from "./paths";
-    import DashboardLayout from "./layouts/Dashboard/DashboardLayout.svelte";
-    import PortalLayout from "./layouts/Portal/PortalLayout.svelte";
-    import Redirect from "./components/Redirect.svelte";
-    import SSEConnector from "./components/SSEConnector.svelte";
-    import { loadConfig } from "./controller";
-    import { onMount } from "svelte";
-    import { config, theme } from "./stores";
-    import type Config from "./models/Config";
+    import { Router, Route } from 'svelte-navigator';
+    import constants from './constants';
+    import paths from './paths';
+    import DashboardLayout from './layouts/Dashboard/DashboardLayout.svelte';
+    import PortalLayout from './layouts/Portal/PortalLayout.svelte';
+    import Redirect from './components/Redirect.svelte';
+    import SSEConnector from './components/SSEConnector.svelte';
+    import { loadConfig } from './controller';
+    import { onMount } from 'svelte';
+    import { config, theme } from './stores';
+    import type Config from './models/Config';
 
     // check if URL starts with basePath, if not then redirect
     const basePath = constants.basePath;
@@ -23,17 +23,21 @@
             .then((data: Config) => {
                 // set default color if theme.color is null
                 if (!$theme.color) {
-                    $theme.color = data.themeColor;
+                    $theme.color = data.defaultThemeColor;
+                }
+                // reset theme is switching is disabled
+                if (!data.enableThemeSwitching) {
+                    $theme.color = data.defaultThemeColor;
                 }
             })
             .catch((err) => {
                 console.error(err);
-                alert("Critical API error");
+                alert('Critical API error');
             });
     });
 </script>
 
-<main class={$theme.dark ? "theme-dark" : ""}>
+<main class={$theme.dark ? 'theme-dark' : ''}>
     {#if $config === null || $theme.color === null}
         <p>Loading...</p>
     {:else}

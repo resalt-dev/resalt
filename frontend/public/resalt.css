@@ -1,3 +1,9 @@
+hr {
+    color: var(--light-gray);
+}
+
+
+
 /*
  * Startside (used for e.g. displaying conformity)
  */

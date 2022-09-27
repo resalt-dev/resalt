@@ -45,6 +45,7 @@ skipverify = true
 [http]
 port = 8000
 [http.frontend.theme]
+enabled = true
 color = "primary"
 [http.frontend.proxy]
 enabled = true
