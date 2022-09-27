@@ -15,7 +15,6 @@ impl LdapHandler {
         let ldap_skip_tls_verify = SConfig::auth_ldap_skip_tls_verify();
 
         let settings: LdapConnSettings = LdapConnSettings::new()
-            // .set_conn_timeout(None)
             .set_starttls(ldap_start_tls)
             .set_no_tls_verify(ldap_skip_tls_verify);
 
@@ -56,13 +55,17 @@ impl LdapHandler {
         Ok(ldap)
     }
 
-    async fn find_dn(username: &str) -> Result<Option<(String, String)>, LdapError> {
+    /**
+     * Find the DN of a user in LDAP.
+     * Returns None if the user does not exist.
+     */
+    async fn find_dn(username: &str) -> Result<Option<(String, String, String)>, LdapError> {
         let mut service_ldap = LdapHandler::create_system_connection().await?;
 
         let base_dn = SConfig::auth_ldap_base_dn();
-        let user_filter = SConfig::auth_ldap_user_filter();
-        let user_filter = user_filter.replace("%s", username);
+        let user_filter = SConfig::auth_ldap_user_filter().replace("%s", username);
         let user_attribute = SConfig::auth_ldap_user_attribute();
+        let email_attribute = String::from("mail"); // Same in both OpenLDAP and Active Directory
 
         debug!("Searching LDAP for user with filter {}", &user_filter);
         let (rs, _res) = service_ldap
@@ -70,7 +73,7 @@ impl LdapHandler {
                 &base_dn,
                 Scope::Subtree,
                 &user_filter,
-                vec![&user_attribute],
+                vec![&user_attribute, &email_attribute],
             )
             .await?
             .success()?;
@@ -81,14 +84,21 @@ impl LdapHandler {
         let entry = rs.get(0).unwrap().clone();
         let entry = SearchEntry::construct(entry);
         let dn = (&entry.dn).to_string();
-        let user_id = entry
+        let user_username = entry
             .attrs
             .get(&user_attribute)
             .unwrap()
             .get(0)
             .unwrap()
             .clone();
-        Ok(Some((dn, user_id)))
+        let user_email = entry
+            .attrs
+            .get(&email_attribute)
+            .unwrap()
+            .get(0)
+            .unwrap()
+            .clone();
+        Ok(Some((dn, user_username, user_email)))
     }
 
     /**
@@ -96,35 +106,36 @@ impl LdapHandler {
      *
      * @param username The username of the user.
      * @param password The password of the user.
-     * @returns The user's unique identifier if authenticated, None otherwise.
+     * @returns A tuple of the user DN, username and email if the user was successfully authenticated.
      */
-    pub async fn authenticate(username: &str, password: &str) -> Result<Option<String>, LdapError> {
+    pub async fn authenticate(
+        username: &str,
+        password: &str,
+    ) -> Result<Option<(String, String, String)>, LdapError> {
         if !LdapHandler::is_enabled() {
             return Ok(None);
         }
 
         // Find user full DN
-        let (dn, user_id) = match LdapHandler::find_dn(username).await? {
+        let (dn, user_username, user_email) = match LdapHandler::find_dn(username).await? {
             Some(dn) => dn,
             None => return Ok(None),
         };
 
         // Bind with user credentials
         let mut user_ldap = LdapHandler::create_connection().await?;
-        let user_id = match user_ldap.simple_bind(&dn, password).await?.success() {
-            Ok(_) => {
-                debug!("Successfully authenticated user with DN {}", dn);
-                Some(user_id)
-            }
+        match user_ldap.simple_bind(&dn, password).await?.success() {
+            Ok(_) => {}
             Err(e) => {
                 error!("Failed to authenticate user with DN {}: {:?}", dn, e);
-                None
+                return Ok(None);
             }
         };
+        debug!("Successfully authenticated user with DN {}", dn);
 
         // Close User connection
         user_ldap.unbind().await?;
 
-        Ok(user_id)
+        Ok(Some((dn, user_username, user_email)))
     }
 }

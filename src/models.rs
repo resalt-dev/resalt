@@ -175,6 +175,8 @@ pub struct User {
     pub password: Option<String>,
     pub perms: String,
     pub last_login: Option<chrono::NaiveDateTime>,
+    pub email: Option<String>,
+    pub ldap_sync: Option<String>,
 }
 
 impl User {
@@ -186,9 +188,11 @@ impl User {
         serde_json::json!({
             "id": self.id,
             "username": self.username,
-            "isLocal": self.password.is_some(),
+            "hasPassword": self.password.is_some(),
             "perms": perms,
             "lastLogin": self.last_login.map(|d| d.format("%Y-%m-%d %H:%M:%S").to_string()),
+            "email": self.email,
+            "ldapSync": self.ldap_sync,
             "permissionGroups": permission_groups.iter().map(|g| json!({
                 "id": g.id,
                 "name": g.name,

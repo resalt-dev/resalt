@@ -62,7 +62,12 @@ impl Storage {
 
             // Create initial admin user
             let mut user = self
-                .create_user("admin".to_string(), Some(random_password.to_string()))
+                .create_user(
+                    "admin".to_string(),
+                    Some(random_password.to_string()),
+                    None,
+                    None,
+                )
                 .unwrap();
 
             // Give permissions to admmin
@@ -139,7 +144,13 @@ impl Storage {
     /// Users ///
     /////////////
 
-    pub fn create_user(&self, username: String, password: Option<String>) -> Result<User, String> {
+    pub fn create_user(
+        &self,
+        username: String,
+        password: Option<String>,
+        email: Option<String>,
+        ldap_sync: Option<String>,
+    ) -> Result<User, String> {
         let mut connection = self.create_connection()?;
         let id = format!("usr_{}", uuid::Uuid::new_v4());
         let user = User {
@@ -148,6 +159,8 @@ impl Storage {
             password: password.map(|v| hash_password(&v)),
             perms: "[]".to_string(),
             last_login: None,
+            email,
+            ldap_sync,
         };
 
         diesel::insert_into(users::table)

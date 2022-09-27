@@ -100,6 +100,11 @@ pub fn auth_login_classic(
         }
     };
 
+    // Check if they are local user
+    if user.ldap_sync.is_some() {
+        return Ok(None);
+    }
+
     // Check password
     let user_pass = match &user.password {
         Some(user_pass) => user_pass,
@@ -117,7 +122,7 @@ pub async fn auth_login_ldap(
     username: &str,
     password: &str,
 ) -> Result<Option<User>, actix_web::Error> {
-    let uid = match LdapHandler::authenticate(username, password).await {
+    let (uid, email, user_ldap_dn) = match LdapHandler::authenticate(username, password).await {
         Ok(Some(uid)) => uid,
         Ok(None) => return Ok(None),
         Err(e) => {
@@ -126,6 +131,7 @@ pub async fn auth_login_ldap(
         }
     };
 
+    // Fetch user
     let mut user = match data.get_user_by_username(&uid) {
         Ok(user) => user,
         Err(e) => {
@@ -136,7 +142,7 @@ pub async fn auth_login_ldap(
 
     // Create user if doesn't exist, as LDAP passed.
     if user.is_none() {
-        user = match data.create_user(uid, None) {
+        user = match data.create_user(uid, None, Some(email), Some(user_ldap_dn)) {
             Ok(user) => Some(user),
             Err(e) => {
                 error!("{:?}", e);

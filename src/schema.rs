@@ -82,6 +82,8 @@ diesel::table! {
         password -> Nullable<Varchar>,
         perms -> Text,
         last_login -> Nullable<Timestamp>,
+        email -> Nullable<Varchar>,
+        ldap_sync -> Nullable<Varchar>,
     }
 }
 

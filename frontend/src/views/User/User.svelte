@@ -94,9 +94,9 @@
                             ? 'bg-dark text-light'
                             : ''}"
                     >
-                        <strong>Is Local</strong>
+                        <strong>Has Password</strong>
                         <span class="float-end">
-                            {#if $user.isLocal}
+                            {#if $user.hasPassword}
                                 <Badge
                                     color={$theme.dark ? 'secondary' : 'dark'}
                                     >Yes</Badge
@@ -119,6 +119,34 @@
                                 {$user.lastLogin}
                             {:else}
                                 <em>Never</em>
+                            {/if}
+                        </span>
+                    </li>
+                    <li
+                        class="list-group-item {$theme.dark
+                            ? 'bg-dark text-light'
+                            : ''}"
+                    >
+                        <strong>Email</strong>
+                        <span class="float-end">
+                            {#if $user.email}
+                                {$user.email}
+                            {:else}
+                                <em>Not set</em>
+                            {/if}
+                        </span>
+                    </li>
+                    <li
+                        class="list-group-item {$theme.dark
+                            ? 'bg-dark text-light'
+                            : ''}"
+                    >
+                        <strong>LDAP Sync DN</strong>
+                        <span class="float-end">
+                            {#if $user.ldapSync}
+                                {$user.ldapSync}
+                            {:else}
+                                <em>Not set</em>
                             {/if}
                         </span>
                     </li>
@@ -166,14 +194,6 @@
                     <CardTitle class="mb-0">Permissions</CardTitle>
                 </CardHeader>
                 <JsonViewer data={$user.perms} />
-                <CardSubtitle class="m-3">
-                    {#if $user.isLocal}
-                        <em>
-                            Permissions can only be modified from Salt's master
-                            config.
-                        </em>
-                    {/if}
-                </CardSubtitle>
             </Card>
         </Col>
     </Row>

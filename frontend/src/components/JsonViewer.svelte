@@ -1,12 +1,12 @@
 <script lang="ts">
-    import { EditorView, basicSetup } from "codemirror";
-    import { ensureSyntaxTree, foldAll } from "@codemirror/language";
-    import { EditorState } from "@codemirror/state";
-    import { json } from "@codemirror/lang-json";
-    import { onDestroy, onMount } from "svelte";
-    import { theme } from "../stores";
-    import { resaltDark } from "./codemirror-resalt-theme-dark";
-    import { resaltLight } from "./codemirror-resalt-theme-light";
+    import { EditorView, basicSetup } from 'codemirror';
+    import { ensureSyntaxTree, foldAll } from '@codemirror/language';
+    import { EditorState } from '@codemirror/state';
+    import { json } from '@codemirror/lang-json';
+    import { onDestroy, onMount } from 'svelte';
+    import { theme } from '../stores';
+    import { resaltDark } from './codemirror-resalt-theme-dark';
+    import { resaltLight } from './codemirror-resalt-theme-light';
 
     export let data: any;
     export let collapse: boolean = true;
@@ -16,7 +16,7 @@
 
     $: {
         if (cm) {
-            createJSONView("$ update");
+            createJSONView('$ update');
 
             if (!(data instanceof Array) && collapse) {
                 foldAll(cm);
@@ -25,7 +25,7 @@
     }
 
     function createJSONView(caller: string) {
-        console.log("createJSONView caller: " + caller);
+        console.log('createJSONView caller: ' + caller);
         let state = EditorState.create({
             doc: JSON.stringify(data, null, 2),
             extensions: [
@@ -41,7 +41,7 @@
         if (tree !== null) {
             console.log(tree);
         } else {
-            console.error("Syntax tree parsing timed out.");
+            console.error('Syntax tree parsing timed out.');
         }
 
         //cm.dispatch({});
@@ -54,7 +54,7 @@
             unsub = null;
         }
         unsub = theme.subscribe((newTheme) => {
-            createJSONView("theme.subscribe");
+            createJSONView('theme.subscribe');
         });
     });
 
