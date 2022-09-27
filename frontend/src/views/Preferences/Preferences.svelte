@@ -2,7 +2,6 @@
     import { useNavigate } from 'svelte-navigator';
     const navigate = useNavigate();
 
-    import { config } from '../../stores';
     import paths from '../../paths';
     import PreferencesTabTheme from './PreferencesTabTheme.svelte';
     import Tabs from '../../components/Tabs.svelte';
@@ -11,12 +10,10 @@
     function calcSubPagesNav(): NavSubPage[] {
         let navs: NavSubPage[] = [];
 
-        if ($config.enableThemeSwitching) {
-            navs.push({
-                label: 'Theming',
-                component: PreferencesTabTheme,
-            });
-        }
+        navs.push({
+            label: 'Theming',
+            component: PreferencesTabTheme,
+        });
 
         return navs;
     }

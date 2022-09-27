@@ -24,25 +24,28 @@
 
 <Row>
     <Col xs="12">
-        <h5 class="mb-3">Color:</h5>
+        {#if $config.enableThemeSwitching}
+            <h5 class="mb-3">Color:</h5>
 
-        {#each constants.themeColors as color}
-            <Icon
-                type={color === $theme.color ? 'solid' : 'regular'}
+            {#each constants.themeColors as color}
+                <Icon
+                    type={color === $theme.color ? 'solid' : 'regular'}
+                    size="2"
+                    name="check-circle"
+                    class="mouse-pointer text-{color}"
+                    on:click={selectColor}
+                />
+            {/each}<Icon
+                type="regular"
                 size="2"
-                name="check-circle"
-                class="mouse-pointer text-{color}"
+                name="reset"
+                class="mouse-pointer text-reset"
                 on:click={selectColor}
             />
-        {/each}<Icon
-            type="regular"
-            size="2"
-            name="reset"
-            class="mouse-pointer text-reset"
-            on:click={selectColor}
-        />
 
-        <hr />
+            <hr />
+        {/if}
+
         <h5 class="mb-3">Dark mode:</h5>
         <FormGroup floating={true} class="form-switch ps-2">
             <input
