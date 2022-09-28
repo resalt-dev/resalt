@@ -1,15 +1,12 @@
 import { terser } from 'rollup-plugin-terser';
 import commonjs from '@rollup/plugin-commonjs';
-import copy from 'rollup-plugin-copy';
+import css from 'rollup-plugin-css-only';
 import livereload from 'rollup-plugin-livereload';
 import polyfills from 'rollup-plugin-node-polyfills';
 import resolve from '@rollup/plugin-node-resolve';
-import sass from 'rollup-plugin-sass';
 import svelte from 'rollup-plugin-svelte';
 import sveltePreprocess from 'svelte-preprocess';
 import typescript from '@rollup/plugin-typescript';
-
-import constants from './src/constants';
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -22,7 +19,6 @@ function serve() {
 
     return {
         writeBundle() {
-            console.log(`server: ${server}`);
             if (server) return;
             try {
                 // eslint-disable-next-line global-require
@@ -55,41 +51,23 @@ export default {
     },
     plugins: [
         polyfills(),
-        copy({
-            copyOnce: true,
-            hook: 'closeBundle',
-            targets: [
-                {
-                    src: 'public/index.html.template',
-                    dest: 'public/',
-                    rename: 'index.html',
-                    // eslint-disable-next-line no-unused-vars
-                    transform: (content, _path) =>
-                        content
-                            .toString()
-                            .replace(
-                                /__buildEnv__/g,
-                                production ? 'production' : 'development',
-                            )
-                            .replace(/__buildDate__/g, new Date().toISOString())
-                            .replace(/__appName__/g, constants.appName)
-                            .replace(/__basePath__/g, constants.basePath),
-                },
-            ],
-        }),
 
         svelte({
             preprocess: sveltePreprocess({
                 sourceMap: !production,
+                scss: {
+                    prependData: '@use \'src/styles/_imports.scss\';',
+                },
             }),
             compilerOptions: {
                 // enable run-time checks when not in production
                 dev: !production,
             },
+            emitCss: true,
         }),
         // we'll extract any component CSS out into
         // a separate file - better for performance
-        sass({
+        css({
             output: 'bundle.css',
         }),
 
