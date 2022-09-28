@@ -448,10 +448,10 @@ samp {
 .bg-light {
     background-color: var(--light-gray) !important;
 }
-.bg-darker {
+.bg-dark {
     background-color: var(--dark-gray) !important;
 }
-.bg-dark {
+.bg-black {
     background-color: var(--black) !important;
 }
 .bg-muted {
@@ -750,7 +750,7 @@ hr {
 .text-dark {
     color: var(--black) !important;
 }
-.text-muted {
+.text-muted, .form-label {
     color: var(--muted) !important;
 }
 .text-white {

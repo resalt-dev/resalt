@@ -70,7 +70,7 @@
             on:blur={validateUsernameField}
             bind:inner={usernameField}
         />
-        <Label class="text-muted">Username</Label>
+        <Label>Username</Label>
     </FormGroup>
     <FormGroup floating={true}>
         <Input
@@ -79,7 +79,7 @@
             bind:value={passwordFieldValue}
             on:blur={validatePasswordField}
         />
-        <Label class="text-muted">Password</Label>
+        <Label>Password</Label>
     </FormGroup>
 
     <br />

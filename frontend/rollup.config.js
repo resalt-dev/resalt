@@ -1,14 +1,14 @@
-import svelte from 'rollup-plugin-svelte';
-import commonjs from '@rollup/plugin-commonjs';
-import resolve from '@rollup/plugin-node-resolve';
-import livereload from 'rollup-plugin-livereload';
 import { terser } from 'rollup-plugin-terser';
+import commonjs from '@rollup/plugin-commonjs';
+import copy from 'rollup-plugin-copy';
+import livereload from 'rollup-plugin-livereload';
+import polyfills from 'rollup-plugin-node-polyfills';
+import resolve from '@rollup/plugin-node-resolve';
+import sass from 'rollup-plugin-sass';
+import svelte from 'rollup-plugin-svelte';
 import sveltePreprocess from 'svelte-preprocess';
 import typescript from '@rollup/plugin-typescript';
-import css from 'rollup-plugin-css-only';
-import polyfills from 'rollup-plugin-node-polyfills';
 
-import copy from 'rollup-plugin-copy';
 import constants from './src/constants';
 
 const production = !process.env.ROLLUP_WATCH;
@@ -89,7 +89,7 @@ export default {
         }),
         // we'll extract any component CSS out into
         // a separate file - better for performance
-        css({
+        sass({
             output: 'bundle.css',
         }),
 

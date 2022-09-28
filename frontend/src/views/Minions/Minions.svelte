@@ -73,7 +73,7 @@
     ]}
 />
 
-<Card class="table-responsive border-bottom-0 {$theme.dark ? 'bg-dark' : ''}">
+<Card class="table-responsive border-bottom-0 {$theme.dark ? 'bg-black' : ''}">
     <Table
         dark={$theme.dark}
         hover
@@ -81,7 +81,9 @@
         class="b-0 mb-0 {$theme.dark ? 'text-light border-secondary' : ''}"
     >
         <thead
-            class="bg-dark border-0 {$theme.dark ? 'text-light' : 'text-white'}"
+            class="bg-black border-0 {$theme.dark
+                ? 'text-light'
+                : 'text-white'}"
         >
             <tr>
                 <th class="border-secondary">

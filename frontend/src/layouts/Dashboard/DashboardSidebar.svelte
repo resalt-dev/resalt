@@ -22,7 +22,7 @@
 </script>
 
 <div
-    class="d-flex flex-column flex-shrink-0 bg-dark h-100 no-select"
+    class="d-flex flex-column flex-shrink-0 bg-black h-100 no-select"
     style="min-height: 100vh; overflow-y: auto; {$collapsed
         ? 'width: 4.5rem;'
         : 'width: 17.5rem;'}"
@@ -72,7 +72,7 @@
         on:click={handleClickCollapse}
         class="{$theme.dark
             ? 'text-light'
-            : 'text-white'} btn-dark bg-dark border-0 pt-3 pb-3 px-3 fw-light mouse-pointer d-flex align-items-center"
+            : 'text-white'} btn-dark bg-black border-0 pt-3 pb-3 px-3 fw-light mouse-pointer d-flex align-items-center"
         aria-current="page"
     >
         <Icon
@@ -111,7 +111,7 @@
     <Modal
         isOpen={openUpdate}
         toggle={toggleUpdate}
-        contentClassName={$theme.dark ? 'bg-darker text-white' : ''}
+        contentClassName={$theme.dark ? 'bg-dark text-white' : ''}
     >
         <ModalHeader
             toggle={toggleUpdate}

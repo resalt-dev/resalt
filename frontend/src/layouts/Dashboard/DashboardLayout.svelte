@@ -25,8 +25,11 @@
 
     onMount(() => {
         loadCurrentUser()
-            .then((data) => {})
+            .then((data) => {
+                currentUser.set(data);
+            })
             .catch((err) => {
+                console.error(err);
                 logout();
                 navigate(paths.logout.path);
             });
@@ -40,11 +43,7 @@
         <div class="">
             <Sidebar />
         </div>
-        <div
-            class="w-100 overflow-auto {$theme.dark
-                ? 'bg-darker text-light'
-                : ''}"
-        >
+        <div class="w-100 overflow-auto bg-white">
             <DashboardTopbar />
             <div class="px-4 py-3">
                 <Router primary={false}>

@@ -528,7 +528,7 @@
     <Col xs="12" md="4">
         <Card
             class="table-responsive border-bottom-0 mb-3 {$theme.dark
-                ? 'bg-dark'
+                ? 'bg-black'
                 : ''}"
         >
             <Table
@@ -538,7 +538,7 @@
                     : ''}"
             >
                 <thead
-                    class="bg-dark border-0 {$theme.dark
+                    class="bg-black border-0 {$theme.dark
                         ? 'text-light'
                         : 'text-white'}"
                 >
@@ -610,7 +610,7 @@
         </Card>
     </Col>
     <Col xs="12" md="8">
-        <Card class={$theme.dark ? 'bg-dark' : ''}>
+        <Card class={$theme.dark ? 'bg-black' : ''}>
             <CardHeader>
                 <span class="fw-bold">Group Details</span>
                 <Button
@@ -676,9 +676,7 @@
                                     bind:value={groupLdapSyncFieldValue}
                                     on:blur={validateGroupLdapSyncField}
                                 />
-                                <Label class="text-muted">
-                                    LDAP Sync DN (optional)
-                                </Label>
+                                <Label>LDAP Sync DN (optional)</Label>
                             </FormGroup>
                         </Col>
                         <Col class="ps-3 mb-0" xs="12">
@@ -701,7 +699,7 @@
                                     : ''}"
                             >
                                 <thead
-                                    class="bg-dark border-0 {$theme.dark
+                                    class="bg-black border-0 {$theme.dark
                                         ? 'text-light'
                                         : 'text-white'}"
                                 >
@@ -799,7 +797,7 @@
                                     : ''}"
                             >
                                 <thead
-                                    class="bg-dark border-0 {$theme.dark
+                                    class="bg-black border-0 {$theme.dark
                                         ? 'text-light'
                                         : 'text-white'}"
                                 >
@@ -848,7 +846,7 @@
                                     : ''}"
                             >
                                 <thead
-                                    class="bg-dark border-0 {$theme.dark
+                                    class="bg-black border-0 {$theme.dark
                                         ? 'text-light'
                                         : 'text-white'}"
                                 >

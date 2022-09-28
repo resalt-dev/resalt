@@ -22,22 +22,14 @@
     class="background1 h-100"
     style="background-image: url('{constants.basePath}/assets/images/0da7530ac9cd4c88850c62138da12e66.jpg');"
 >
-    <div class="background2 h-100 w-100">
+    <div class="h-100 w-100">
         <div class="row g-0 h-100">
             <!-- Right side -->
-            <div
-                class="offset-8 col-4 h-100 {$theme.dark
-                    ? 'bg-dark'
-                    : 'bg-white'}"
-            >
+            <div class="offset-8 col-4 h-100 bg-white">
                 <div
                     class="row h-100 g-0 justify-content-center align-items-center"
                 >
-                    <div
-                        class="col-12 {$theme.dark
-                            ? 'bg-dark text-light'
-                            : 'bg-white'}"
-                    >
+                    <div class="col-12">
                         <!-- Title -->
                         <div class="m-3 px-5 py-3">
                             <Logo color={$theme.color} />

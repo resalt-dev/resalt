@@ -10,26 +10,26 @@
         ModalFooter,
         ModalHeader,
         Row,
-    } from "sveltestrap";
-    import { quoteSplit } from "../../utils";
-    import { theme } from "../../stores";
-    import { runJob } from "../../controller";
-    import RunResult from "../../models/RunResult";
-    import RunCommand from "../../models/RunCommand";
+    } from 'sveltestrap';
+    import { quoteSplit } from '../../utils';
+    import { theme } from '../../stores';
+    import { runJob } from '../../controller';
+    import RunResult from '../../models/RunResult';
+    import RunCommand from '../../models/RunCommand';
 
     export let tabData: any;
 
     let runConfirmDialog = false;
 
-    let runClientType = "local";
-    let runTargetType = "glob";
-    let runTarget = "";
-    let runFunction = "";
-    let runArguments = "";
-    let runKeywordArguments = "";
+    let runClientType = 'local';
+    let runTargetType = 'glob';
+    let runTarget = '';
+    let runFunction = '';
+    let runArguments = '';
+    let runKeywordArguments = '';
     let runAsync = false;
     let runBatch = false;
-    let runBatchSize = "";
+    let runBatchSize = '';
     let runTimeout = null;
 
     // Pre-comupted before showing the confirmation modal.
@@ -55,27 +55,27 @@
         // client
         let client = null;
         switch (runClientType) {
-            case "local":
+            case 'local':
                 if (runBatch) {
-                    client = "local_batch";
+                    client = 'local_batch';
                 } else if (runAsync) {
-                    client = "local_async";
+                    client = 'local_async';
                 } else {
-                    client = "local";
+                    client = 'local';
                 }
                 break;
-            case "runner":
+            case 'runner':
                 if (runAsync) {
-                    client = "runner_async";
+                    client = 'runner_async';
                 } else {
-                    client = "runner";
+                    client = 'runner';
                 }
                 break;
-            case "wheel":
+            case 'wheel':
                 if (runAsync) {
-                    client = "wheel_async";
+                    client = 'wheel_async';
                 } else {
-                    client = "wheel";
+                    client = 'wheel';
                 }
                 break;
         }
@@ -84,7 +84,7 @@
         // kwarg
         let kwarg = new Map<string, string>();
         quoteSplit(runKeywordArguments).forEach((item) => {
-            let [key, value] = item.split("=");
+            let [key, value] = item.split('=');
             kwarg.set(key, value);
         });
 
@@ -99,7 +99,7 @@
             arg,
             kwarg,
             runBatchSize,
-            runTimeout
+            runTimeout,
         );
 
         // Show confirm dialog
@@ -119,7 +119,7 @@
             command.arg,
             command.kwarg,
             command.batchSize,
-            command.timeout
+            command.timeout,
         )
             .then((result) => {
                 console.log(result);
@@ -167,7 +167,7 @@
         {/if}
     </Col>
     <Col class="ps-3 mb-0" md="1">
-        {#if runClientType === "local"}
+        {#if runClientType === 'local'}
             <div class="clearfix" />
             <Label for="batch" class="ms-1 mb-0">Batch</Label>
             <FormGroup floating={true} class="form-switch ps-0">
@@ -181,7 +181,7 @@
         {/if}
     </Col>
     <Col class="ps-3 mb-0" md="1">
-        {#if runClientType === "local" && runBatch}
+        {#if runClientType === 'local' && runBatch}
             <FormGroup floating={true}>
                 <Input id="batchSize" type="text" bind:value={runBatchSize} />
                 <Label for="batchSize">Batch Size</Label>
@@ -189,7 +189,7 @@
         {/if}
     </Col>
     <Col class="ps-3 mb-0" md="1">
-        {#if runClientType === "local" && (runBatch || (!runBatch && !runAsync))}
+        {#if runClientType === 'local' && (runBatch || (!runBatch && !runAsync))}
             <FormGroup floating={true}>
                 <Input id="timeout" type="number" bind:value={runTimeout} />
                 <Label for="timeout">Timeout</Label>
@@ -200,7 +200,7 @@
 
 <Row>
     <Col class="ps-3 mb-0" md="1">
-        {#if runClientType === "local"}
+        {#if runClientType === 'local'}
             <FormGroup floating={true}>
                 <Input
                     id="targetType"
@@ -225,7 +225,7 @@
         {/if}
     </Col>
     <Col class="ps-3 mb-0" md="2">
-        {#if runClientType === "local"}
+        {#if runClientType === 'local'}
             <FormGroup floating={true}>
                 <Input id="target" type="text" bind:value={runTarget} />
                 <Label for="target">Target</Label>
@@ -282,7 +282,7 @@
         toggle={() => {
             runConfirmDialog = false;
         }}
-        contentClassName={$theme.dark ? "bg-darker text-white" : ""}
+        contentClassName={$theme.dark ? 'bg-dark text-white' : ''}
     >
         <ModalHeader
             toggle={() => {
@@ -311,12 +311,12 @@
                     >{JSON.stringify(
                         Object.fromEntries(command.kwarg),
                         null,
-                        2
+                        2,
                     )}</b
                 ></pre>
             <br />
-            Timeout:{" "}<b
-                >{command.timeout == null ? "none" : command.timeout}</b
+            Timeout:{' '}<b
+                >{command.timeout == null ? 'none' : command.timeout}</b
             >
             <br />
         </ModalBody>

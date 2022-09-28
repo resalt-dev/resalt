@@ -80,7 +80,7 @@
     <Row>
         {#each $metrics as metric}
             <Col xs="12" md="6" lg="4">
-                <Card class="mb-3 {$theme.dark ? 'bg-dark' : ''}">
+                <Card class="mb-3 {$theme.dark ? 'bg-black' : ''}">
                     <CardHeader>
                         <CardTitle class="mb-0">{metric.title}</CardTitle>
                     </CardHeader>

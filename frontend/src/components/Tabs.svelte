@@ -8,7 +8,7 @@
     export let onSelect: (index: number) => void = () => {};
 </script>
 
-<div class="nav bg-dark w-100 no-select">
+<div class="nav bg-black w-100 no-select">
     {#each children as tab, i}
         <div
             class="nav-link px-4 py-3 fw-bold mouse-pointer {i === selected
@@ -28,7 +28,7 @@
 {#if selected < children.length}
     <Card
         class="mb-3 border-4 border-{$theme.color} rounded-none {$theme.dark
-            ? 'bg-darker'
+            ? 'bg-dark'
             : ''}"
     >
         <CardBody class={children[selected].class || ''}>

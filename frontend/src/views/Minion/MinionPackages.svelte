@@ -27,7 +27,7 @@
         <div class="p-3">
             <Card
                 class="table-responsive border-bottom-0 {$theme.dark
-                    ? 'bg-dark'
+                    ? 'bg-black'
                     : ''}"
             >
                 <Table
@@ -38,7 +38,7 @@
                         : ''}"
                 >
                     <thead
-                        class="bg-dark border-0 {$theme.dark
+                        class="bg-black border-0 {$theme.dark
                             ? 'text-light'
                             : 'text-white'}"
                     >

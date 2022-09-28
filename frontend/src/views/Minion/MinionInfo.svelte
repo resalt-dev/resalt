@@ -23,14 +23,14 @@
 
 <div class="row p-3">
     <div class="col-6 col-xxl-3">
-        <div class="card mb-3 {$theme.dark ? 'bg-dark' : ''}">
+        <div class="card mb-3 {$theme.dark ? 'bg-black' : ''}">
             <div class="card-header">
                 <span class="fw-bold">Common</span>
             </div>
             <ul class="list-group list-group-flush">
                 <li
                     class="list-group-item {$theme.dark
-                        ? 'bg-dark text-light'
+                        ? 'bg-black text-light'
                         : ''}"
                 >
                     <strong>ID</strong>
@@ -38,7 +38,7 @@
                 </li>
                 <li
                     class="list-group-item {$theme.dark
-                        ? 'bg-dark text-light'
+                        ? 'bg-black text-light'
                         : ''}"
                 >
                     <strong>F.Q.D.N</strong>
@@ -46,7 +46,7 @@
                 </li>
                 <li
                     class="list-group-item {$theme.dark
-                        ? 'bg-dark text-light'
+                        ? 'bg-black text-light'
                         : ''}"
                 >
                     <strong>OS</strong>
@@ -54,7 +54,7 @@
                 </li>
                 <li
                     class="list-group-item {$theme.dark
-                        ? 'bg-dark text-light'
+                        ? 'bg-black text-light'
                         : ''}"
                 >
                     <strong>OS Version</strong>
@@ -65,7 +65,7 @@
                 </li>
                 <li
                     class="list-group-item {$theme.dark
-                        ? 'bg-dark text-light'
+                        ? 'bg-black text-light'
                         : ''}"
                 >
                     <strong>Kernel</strong>
@@ -78,14 +78,14 @@
     </div>
 
     <div class="col-6 col-xxl-3">
-        <div class="card mb-3 {$theme.dark ? 'bg-dark' : ''}">
+        <div class="card mb-3 {$theme.dark ? 'bg-black' : ''}">
             <div class="card-header">
                 <span class="fw-bold">Hardware</span>
             </div>
             <ul class="list-group list-group-flush">
                 <li
                     class="list-group-item {$theme.dark
-                        ? 'bg-dark text-light'
+                        ? 'bg-black text-light'
                         : ''}"
                 >
                     <strong>CPU</strong>
@@ -95,7 +95,7 @@
                 </li>
                 <li
                     class="list-group-item {$theme.dark
-                        ? 'bg-dark text-light'
+                        ? 'bg-black text-light'
                         : ''}"
                 >
                     <strong>Number of CPUs</strong>
@@ -103,7 +103,7 @@
                 </li>
                 <li
                     class="list-group-item {$theme.dark
-                        ? 'bg-dark text-light'
+                        ? 'bg-black text-light'
                         : ''}"
                 >
                     <strong>Memory</strong>
@@ -113,7 +113,7 @@
                 </li>
                 <li
                     class="list-group-item {$theme.dark
-                        ? 'bg-dark text-light'
+                        ? 'bg-black text-light'
                         : ''}"
                 >
                     <strong>Swap</strong>
@@ -123,7 +123,7 @@
                 </li>
                 <li
                     class="list-group-item {$theme.dark
-                        ? 'bg-dark text-light'
+                        ? 'bg-black text-light'
                         : ''}"
                 >
                     <strong>Virtual</strong>
@@ -134,14 +134,14 @@
     </div>
 
     <div class="col-6 col-xxl-3">
-        <div class="card mb-3 {$theme.dark ? 'bg-dark' : ''}">
+        <div class="card mb-3 {$theme.dark ? 'bg-black' : ''}">
             <div class="card-header">
                 <span class="fw-bold">DNS</span>
             </div>
             <ul class="list-group list-group-flush">
                 <li
                     class="list-group-item {$theme.dark
-                        ? 'bg-dark text-light'
+                        ? 'bg-black text-light'
                         : ''}"
                 >
                     <strong>IPv4 DNS</strong>
@@ -151,7 +151,7 @@
                 </li>
                 <li
                     class="list-group-item {$theme.dark
-                        ? 'bg-dark text-light'
+                        ? 'bg-black text-light'
                         : ''}"
                 >
                     <strong>IPv6 DNS</strong>
@@ -161,7 +161,7 @@
                 </li>
                 <li
                     class="list-group-item {$theme.dark
-                        ? 'bg-dark text-light'
+                        ? 'bg-black text-light'
                         : ''}"
                 >
                     <strong>Search Domains</strong>
@@ -174,14 +174,14 @@
     </div>
 
     <div class="col-6 col-xxl-3">
-        <div class="card mb-3 {$theme.dark ? 'bg-dark' : ''}">
+        <div class="card mb-3 {$theme.dark ? 'bg-black' : ''}">
             <div class="card-header">
                 <span class="fw-bold">Timings</span>
             </div>
             <ul class="list-group list-group-flush">
                 <li
                     class="list-group-item {$theme.dark
-                        ? 'bg-dark text-light'
+                        ? 'bg-black text-light'
                         : ''}"
                 >
                     <strong>Last seen</strong>
@@ -189,7 +189,7 @@
                 </li>
                 <li
                     class="list-group-item {$theme.dark
-                        ? 'bg-dark text-light'
+                        ? 'bg-black text-light'
                         : ''}"
                 >
                     <strong>Conformity check</strong>
@@ -201,7 +201,7 @@
                 </li>
                 <li
                     class="list-group-item {$theme.dark
-                        ? 'bg-dark text-light'
+                        ? 'bg-black text-light'
                         : ''}"
                 >
                     <strong>Grains fetched</strong>
@@ -213,7 +213,7 @@
                 </li>
                 <li
                     class="list-group-item {$theme.dark
-                        ? 'bg-dark text-light'
+                        ? 'bg-black text-light'
                         : ''}"
                 >
                     <strong>Pillars fetched</strong>
@@ -225,7 +225,7 @@
                 </li>
                 <li
                     class="list-group-item {$theme.dark
-                        ? 'bg-dark text-light'
+                        ? 'bg-black text-light'
                         : ''}"
                 >
                     <strong>Packages fetched</strong>
@@ -240,7 +240,7 @@
     </div>
 
     <div class="col-12">
-        <div class="card mb-3 {$theme.dark ? 'bg-dark' : ''}">
+        <div class="card mb-3 {$theme.dark ? 'bg-black' : ''}">
             <div class="card-header">
                 <span class="fw-bold">Network</span>
             </div>

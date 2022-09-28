@@ -31,7 +31,7 @@
     }
 </script>
 
-<div class="nav bg-dark w-100 justify-content-start no-select">
+<div class="nav bg-black w-100 justify-content-start no-select">
     <div
         class="nav-link fw-bold mouse-pointer {page === 1
             ? 'text-secondary'
@@ -70,7 +70,7 @@
         <ul
             class="dropdown-menu dropdown-menu-dark ms-5 {$theme.dark
                 ? 'bg-secondary'
-                : 'bg-darker'}"
+                : 'bg-dark'}"
             aria-labelledby="dropdownPaginatePageSize"
         >
             {#each [20, 50, 100, 250] as s}

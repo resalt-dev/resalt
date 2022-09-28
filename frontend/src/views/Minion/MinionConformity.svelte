@@ -127,7 +127,7 @@
     {:else}
         <div class="row p-3">
             <div class="col-3">
-                <div class="card mb-3 {$theme.dark ? 'bg-dark' : ''}">
+                <div class="card mb-3 {$theme.dark ? 'bg-black' : ''}">
                     <div class="card-header">
                         <span class="fw-bold">Options</span>
                     </div>
@@ -229,7 +229,7 @@
                     </div>
                 </div>
 
-                <div class="card mb-3 {$theme.dark ? 'bg-dark' : ''}">
+                <div class="card mb-3 {$theme.dark ? 'bg-black' : ''}">
                     <div class="card-header">
                         <span class="fw-bold">Tree view</span>
                     </div>
