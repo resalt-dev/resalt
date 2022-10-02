@@ -526,22 +526,9 @@
 
 <Row>
     <Col xs="12" md="4">
-        <Card
-            class="table-responsive border-bottom-0 mb-3 {$theme.dark
-                ? 'bg-dark'
-                : ''}"
-        >
-            <Table
-                dark={$theme.dark}
-                class="b-0 mb-0 {$theme.dark
-                    ? 'text-light border-secondary'
-                    : ''}"
-            >
-                <thead
-                    class="bg-dark border-0 {$theme.dark
-                        ? 'text-light'
-                        : 'text-white'}"
-                >
+        <div class="table-responsive border-bottom-0 mb-3">
+            <Table class="b-0 mb-0">
+                <thead class="bg-dark border-0 text-white">
                     <tr>
                         <th class="border-secondary">
                             <div class="row g-1">
@@ -607,10 +594,10 @@
                     Loading...
                 </Progress>
             {/if}
-        </Card>
+        </div>
     </Col>
     <Col xs="12" md="8">
-        <Card class={$theme.dark ? 'bg-dark' : ''}>
+        <Card>
             <CardHeader>
                 <span class="fw-bold">Group Details</span>
                 <Button
@@ -692,17 +679,8 @@
                         </Col>
                         <Col class="ps-3 mb-0" xs="12">
                             <h3>Members</h3>
-                            <Table
-                                dark={$theme.dark}
-                                class="b-0 mb-3 {$theme.dark
-                                    ? 'text-light border-secondary'
-                                    : ''}"
-                            >
-                                <thead
-                                    class="bg-dark border-0 {$theme.dark
-                                        ? 'text-light'
-                                        : 'text-white'}"
-                                >
+                            <Table class="b-0 mb-3">
+                                <thead class="bg-dark border-0 text-white">
                                     <tr>
                                         <th class="border-secondary">
                                             User ID
@@ -790,17 +768,8 @@
                         <Col class="ps-3 mb-0" xs="12">
                             <h3>Permissions</h3>
                             <h5>Web Dashboard</h5>
-                            <Table
-                                dark={$theme.dark}
-                                class="b-0 mb-3 {$theme.dark
-                                    ? 'text-light border-secondary'
-                                    : ''}"
-                            >
-                                <thead
-                                    class="bg-dark border-0 {$theme.dark
-                                        ? 'text-light'
-                                        : 'text-white'}"
-                                >
+                            <Table class="b-0 mb-3">
+                                <thead class="bg-dark border-0 text-white">
                                     <tr>
                                         <th class="border-secondary" />
                                         <th class="border-secondary ps-0">
@@ -839,17 +808,8 @@
                                 </tbody>
                             </Table>
                             <h5>Minion Targets</h5>
-                            <Table
-                                dark={$theme.dark}
-                                class="b-0 mb-3 {$theme.dark
-                                    ? 'text-light border-secondary'
-                                    : ''}"
-                            >
-                                <thead
-                                    class="bg-dark border-0 {$theme.dark
-                                        ? 'text-light'
-                                        : 'text-white'}"
-                                >
+                            <Table class="b-0 mb-3">
+                                <thead class="bg-dark border-0 text-white">
                                     <tr>
                                         <th class="border-secondary ps-3">
                                             Target

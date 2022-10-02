@@ -40,7 +40,10 @@
             <div class="px-5 py-3 {$collapsed ? 'd-none' : 'w-100'}">
                 <Logo color={$theme.color} />
             </div>
-            <Icon name="menu" class="mb-0 h3 {!$collapsed && 'd-none'}" />
+            <Icon
+                name="menu"
+                class="mb-0 h3 text-white {!$collapsed && 'd-none'}"
+            />
         </div>
     </div>
 

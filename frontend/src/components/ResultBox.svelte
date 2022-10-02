@@ -44,7 +44,7 @@
     }
 </script>
 
-<div class="card mb-3 {$theme.dark ? 'bg-secondary' : ''} startside-{color}">
+<div class="card result-box mb-3 startside-{color}">
     <div
         type="button"
         class="card-header"

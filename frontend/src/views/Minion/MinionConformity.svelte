@@ -5,8 +5,6 @@
     import type Minion from '../../models/Minion';
     import { theme } from '../../stores';
 
-    const SHIFT = 10;
-
     export let minion: Writable<Minion>;
     let rawData = false;
 
@@ -127,7 +125,7 @@
     {:else}
         <div class="row p-3">
             <div class="col-3">
-                <div class="card mb-3 {$theme.dark ? 'bg-dark' : ''}">
+                <div class="card mb-3">
                     <div class="card-header">
                         <span class="fw-bold">Options</span>
                     </div>
@@ -142,9 +140,7 @@
                                     (sortOrder = SortOrder[sortKey])}
                             >
                                 <input
-                                    class="form-check-input form-check-input-{$theme.dark
-                                        ? $theme.color
-                                        : 'dark'}"
+                                    class="form-check-input form-check-input-{$theme.color}"
                                     type="radio"
                                     name="sortMethod"
                                     id={`sortMethod-${sortKey}`}
@@ -213,9 +209,7 @@
                         <!-- showCollapsed -->
                         <div class="form-check">
                             <input
-                                class="form-check-input form-check-input-{$theme.dark
-                                    ? $theme.color
-                                    : 'dark'}"
+                                class="form-check-input form-check-input-{$theme.color}"
                                 type="checkbox"
                                 id="showCollapsed"
                                 on:click={() =>
@@ -229,7 +223,7 @@
                     </div>
                 </div>
 
-                <div class="card mb-3 {$theme.dark ? 'bg-dark' : ''}">
+                <div class="card mb-3">
                     <div class="card-header">
                         <span class="fw-bold">Tree view</span>
                     </div>

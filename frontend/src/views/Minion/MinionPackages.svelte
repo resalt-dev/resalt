@@ -3,7 +3,6 @@
     import { Card, Table } from 'sveltestrap';
     import JsonViewer from '../../components/JsonViewer.svelte';
     import type Minion from '../../models/Minion';
-    import { theme } from '../../stores';
 
     export let minion: Writable<Minion>;
     let rawData = false;
@@ -22,43 +21,27 @@
         {rawData ? 'View List' : 'View JSON'}
     </button>
     {#if rawData}
-        <JsonViewer data={JSON.parse($minion.pkgs)} />
+        <JsonViewer data={JSON.parse($minion.pkgs)} collapse={false} />
     {:else}
-        <div class="p-3">
-            <Card
-                class="table-responsive border-bottom-0 {$theme.dark
-                    ? 'bg-dark'
-                    : ''}"
-            >
-                <Table
-                    dark={$theme.dark}
-                    hover
-                    class="b-0 mb-0 {$theme.dark
-                        ? 'text-light border-secondary'
-                        : ''}"
-                >
-                    <thead
-                        class="bg-dark border-0 {$theme.dark
-                            ? 'text-light'
-                            : 'text-white'}"
-                    >
+        <Card class="table-responsive border-bottom-0">
+            <Table hover class="b-0 mb-0">
+                <thead class="bg-dark border-0 text-white">
+                    <tr>
+                        <th class="border-secondary"> Package </th>
+                        <th class="border-secondary"> Version </th>
+                        <th class="border-secondary" />
+                    </tr>
+                </thead>
+                <tbody>
+                    {#each Object.entries(pkgs) as pkg}
                         <tr>
-                            <th class="border-secondary"> Package </th>
-                            <th class="border-secondary"> Version </th>
-                            <th class="border-secondary" />
+                            <td>{pkg[0]}</td>
+                            <td>{pkg[1]}</td>
+                            <td />
                         </tr>
-                    </thead>
-                    <tbody>
-                        {#each Object.entries(pkgs) as pkg}
-                            <tr>
-                                <td>{pkg[0]}</td>
-                                <td>{pkg[1]}</td>
-                                <td />
-                            </tr>
-                        {/each}
-                    </tbody>
-                </Table>
-            </Card>
-        </div>
+                    {/each}
+                </tbody>
+            </Table>
+        </Card>
     {/if}
 {/if}

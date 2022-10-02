@@ -376,6 +376,83 @@ samp {
     background-color: rgba(0, 0, 0, 0.1) !important;
 }
 
+.alert {
+    color: var(--black);
+}
+.alert-red {
+    background-color: var(--red);
+    border-color: var(--red);
+}
+.alert-volcano {
+    background-color: var(--volcano);
+    border-color: var(--volcano);
+}
+.alert-orange {
+    background-color: var(--orange);
+    border-color: var(--orange);
+}
+.alert-gold {
+    background-color: var(--gold);
+    border-color: var(--gold);
+}
+.alert-yellow {
+    background-color: var(--yellow);
+    border-color: var(--yellow);
+}
+.alert-green {
+    background-color: var(--green);
+    border-color: var(--green);
+}
+.alert-cyan {
+    background-color: var(--cyan);
+    border-color: var(--cyan);
+}
+.alert-blue {
+    background-color: var(--blue);
+    border-color: var(--blue);
+}
+.alert-purple {
+    background-color: var(--purple);
+    border-color: var(--purple);
+}
+.alert-magenta {
+    background-color: var(--magenta);
+    border-color: var(--magenta);
+}
+.alert-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+.alert-secondary {
+    background-color: var(--secondary);
+    border-color: var(--secondary);
+}
+.alert-success {
+    background-color: var(--success);
+    border-color: var(--success);
+}
+.alert-info {
+    background-color: var(--info);
+    border-color: var(--info);
+}
+.alert-warning {
+    background-color: var(--warning);
+    border-color: var(--warning);
+}
+.alert-danger {
+    background-color: var(--danger);
+    border-color: var(--danger);
+}
+.alert-light {
+    background-color: var(--gray);
+    border-color: var(--gray);
+}
+.alert-dark {
+    background-color: var(--black);
+    border-color: var(--black);
+    color: var(--white);
+}
+
 .bg-red {
     background-color: var(--red) !important;
 }
@@ -656,6 +733,9 @@ hr {
 /* When both table-responsive and card */
 .table-responsive.card {
     border-radius: 0;
+}
+.table-responsive {
+    background-color: transparent !important;
 }
 
 

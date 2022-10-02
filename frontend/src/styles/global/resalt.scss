@@ -1,7 +1,3 @@
-.table-responsive {
-    background-color: transparent !important;
-}
-
 /*
  * Theme-dark
  */
@@ -32,11 +28,18 @@
     
     .form-control {
         background-color: var(--bluegray-8) !important;
-        border-color: var(--gray);
+        border-color: var(--bluegray-6);
         color: var(--light-gray);
     }
     .form-control:focus {
         border-color: var(--primary);
+    }
+    .form-switch > input {
+        background-color: var(--bluegray-8) !important;
+        border-color: var(--bluegray-6);
+    }
+    .form-switch > input:checked {
+        background-color: var(--primary) !important;
     }
     
     #dashboard-header {
@@ -61,11 +64,28 @@
     .btn-secondary:not(.btn-arrow-left):not(.btn-arrow-right).active {
         background-color: var(--dark-bluegray) !important;
     }
+
+    .btn-dark.btn-arrow-left,
+    .btn-dark.btn-arrow-right {
+        background-color: var(--bluegray-9) !important;
+        border-bottom-color: var(--bluegray-10) !important;
+    }
+    .btn-dark.btn-arrow-left::before,
+    .btn-dark.btn-arrow-right::after {
+        background-color: var(--bluegray-9);
+        border-top-color: var(--bluegray-10) !important;
+        border-right-color: var(--bluegray-10) !important;
+    }
     
     .table {
         background-color: var(--bluegray-8) !important;
         color: var(--light-gray) !important;
     }
+    // Table nested in Card
+    .card-body .table {
+        background-color: var(--bluegray-7) !important;
+    }
+
     .table-hover > tbody > tr:hover {
         background-color: var(--bluegray-5) !important;
         color: var(--light-gray) !important;
@@ -84,7 +104,26 @@
 
     .table > :not(caption) > * > *,
     .border-secondary {
-        border-color: var(--bluegray-6) !important;
+        border-color: var(--bluegray-5) !important;
+    }
+
+    .card:not(.bg-none) {
+        background-color: var(--bluegray-9) !important;
+    }
+    .card .card-header {
+        background-color: var(--black) !important;
+        color: var(--light-gray) !important;
+    }
+    .card:not(.bg-none) .card-body:not(.bg-dark) {
+        background-color: var(--bluegray-8) !important;
+    }
+    // Second-level nested Card
+    .card-body .card:not(.bg-none) .card-body:not(.bg-dark) {
+        background-color: var(--bluegray-7) !important;
+    }
+
+    .result-box .card-header {
+        border-bottom: 2px solid var(--bluegray-7) !important;
     }
 }
 

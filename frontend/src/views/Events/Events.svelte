@@ -77,7 +77,7 @@
 <h1>Events</h1>
 
 <Card class="table-responsive border-bottom-0">
-    <Table hover id="eventListTable" class="b-0 mb-0">
+    <Table hover class="b-0 mb-0">
         <thead class="bg-dark border-0 text-white">
             <tr>
                 <th class="border-secondary">

@@ -1,6 +1,5 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { theme } from '../../stores';
     import { getJobs, showToast } from '../../controller';
     import { Card, Table, Tooltip } from 'sveltestrap';
     import Icon from '../../components/Icon.svelte';
@@ -42,15 +41,9 @@
 
 <h1>Jobs</h1>
 
-<Card class="table-responsive border-bottom-0 {$theme.dark ? 'bg-dark' : ''}">
-    <Table
-        dark={$theme.dark}
-        hover
-        class="b-0 mb-0 {$theme.dark ? 'text-light border-secondary' : ''}"
-    >
-        <thead
-            class="bg-dark border-0 {$theme.dark ? 'text-light' : 'text-white'}"
-        >
+<Card class="table-responsive border-bottom-0">
+    <Table hover class="b-0 mb-0">
+        <thead class="bg-dark border-0 text-white">
             <tr>
                 <th class="border-secondary">
                     <div class="row g-1">
