@@ -926,7 +926,7 @@
                                                 {#each minionTarget.modules as minionModule, mi}
                                                     {#if mi > 0}
                                                         <hr
-                                                            class="text-light my-2"
+                                                            class="bg-light my-2"
                                                         />
                                                     {/if}
                                                     <div
@@ -975,7 +975,7 @@
                                                 {#each minionTarget.modules as minionModule, mi}
                                                     {#if mi > 0}
                                                         <hr
-                                                            class="text-light my-2"
+                                                            class="bg-light my-2"
                                                         />
                                                     {/if}
                                                     <div

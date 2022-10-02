@@ -256,7 +256,7 @@
     </Col>
 </Row>
 
-<hr class="text-light" />
+<hr class="bg-light" />
 
 <Row>
     <Col />
@@ -282,6 +282,7 @@
         toggle={() => {
             runConfirmDialog = false;
         }}
+        class={$theme.dark ? 'theme-dark' : ''}
         contentClassName={$theme.dark ? 'bg-secondary text-white' : ''}
     >
         <ModalHeader

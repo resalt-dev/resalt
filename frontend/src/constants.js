@@ -9,7 +9,6 @@ const themeColors = [
     'green',
     'cyan',
     'blue',
-    // "geekblue", // Disabled due to too similar to primary color (navy/dark blue)
     'primary',
     'purple',
     'magenta',

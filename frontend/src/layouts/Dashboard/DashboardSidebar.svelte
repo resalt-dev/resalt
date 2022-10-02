@@ -40,12 +40,7 @@
             <div class="px-5 py-3 {$collapsed ? 'd-none' : 'w-100'}">
                 <Logo color={$theme.color} />
             </div>
-            <Icon
-                name="menu"
-                class="mb-0 h3 {$theme.dark
-                    ? 'text-light'
-                    : 'text-white'} {!$collapsed && 'd-none'}"
-            />
+            <Icon name="menu" class="mb-0 h3 {!$collapsed && 'd-none'}" />
         </div>
     </div>
 
@@ -70,9 +65,7 @@
 
     <div
         on:click={handleClickCollapse}
-        class="{$theme.dark
-            ? 'text-light'
-            : 'text-white'} btn-dark bg-dark border-0 pt-3 pb-3 px-3 fw-light mouse-pointer d-flex align-items-center"
+        class="btn-dark bg-dark border-0 pt-3 pb-3 px-3 fw-light mouse-pointer d-flex align-items-center"
         aria-current="page"
     >
         <Icon
@@ -102,7 +95,9 @@
         {#if $collapsed}
             {$config.currentVersion}
         {:else}
+            <Icon name="chevrons-up" />
             {constants.appName} - {$config.currentVersion}
+            <Icon name="chevrons-up" />
         {/if}
     </span>
 </div>
@@ -111,7 +106,7 @@
     <Modal
         isOpen={openUpdate}
         toggle={toggleUpdate}
-        contentClassName={$theme.dark ? 'bg-secondary text-white' : ''}
+        class={$theme.dark ? 'theme-dark' : ''}
     >
         <ModalHeader
             toggle={toggleUpdate}
@@ -127,8 +122,12 @@
         </ModalHeader>
         <ModalBody>
             {#if $config.latestVersion === 'unknown'}
-                Current version: <code>"{$config.currentVersion}"</code>
-                <br />
+                <h1>
+                    <span class="update-label">Current: </span>
+                    <span class="badge bg-{$theme.color}"
+                        >{$config.currentVersion}</span
+                    >
+                </h1>
                 <br />
                 There was a critical error while trying to check for updates. Especially
                 in a software that interracts with SaltStack, it is
@@ -140,28 +139,32 @@
                 contact your administrator or the Resalt development team if this
                 issue persists.
             {:else}
-                Current version: <code>"{$config.currentVersion}"</code>
+                <h1>
+                    <span class="update-label">Current: </span>
+                    <span class="badge bg-{$theme.color}"
+                        >{$config.currentVersion}</span
+                    >
+                </h1>
+                <h1>
+                    <span class="update-label">Latest: </span>
+                    <span class="badge bg-{$theme.color}"
+                        >{$config.latestVersion}</span
+                    >
+                </h1>
                 <br />
-                Latest version: <code>"{$config.latestVersion}"</code>
-                <br />
-                <br />
-                Upgrading to the latest version is
-                <b>CRITICAL FOR SECURITY</b>.
-                <br />
-                <br />
-                By not updating, you risk compromising the security and integrity
+                By not upgrading, you risk compromising the security and integrity
                 of your infrastructure by not taking use of the latest bug fixes
                 and security patches.
                 <br />
                 <hr class="bg-light" />
                 You can upgrade by increasing the version number of the Docker image
                 in your compose/stack file to the latest version. If you have any
-                questions, please reach out on GitHub (<a
+                questions, please reach out on GitHub:<a
                     target="_blank"
                     href={constants.githubUrl}
                 >
                     {constants.githubUrl}</a
-                >).
+                >
             {/if}
         </ModalBody>
         <ModalFooter>
@@ -169,3 +172,10 @@
         </ModalFooter>
     </Modal>
 </div>
+
+<style lang="scss">
+    .update-label {
+        width: 150px;
+        display: inline-block;
+    }
+</style>

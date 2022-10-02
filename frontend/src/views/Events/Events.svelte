@@ -1,11 +1,10 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { Card, Table } from 'sveltestrap';
-    import Icon from '../components/Icon.svelte';
-    import { getEvents, showToast } from '../controller';
-    import { theme } from '../stores';
-    import TablePaginate from '../components/TablePaginate.svelte';
-    import { AlertType } from '../models/AlertType';
+    import Icon from '../../components/Icon.svelte';
+    import { getEvents, showToast } from '../../controller';
+    import TablePaginate from '../../components/TablePaginate.svelte';
+    import { AlertType } from '../../models/AlertType';
     import { writable, type Writable } from 'svelte/store';
 
     let paginationSize: number = 20;
@@ -77,16 +76,9 @@
 
 <h1>Events</h1>
 
-<Card class="table-responsive border-bottom-0 {$theme.dark ? 'bg-dark' : ''}">
-    <Table
-        dark={$theme.dark}
-        hover
-        id="eventListTable"
-        class="b-0 mb-0 {$theme.dark ? 'text-light border-secondary' : ''}"
-    >
-        <thead
-            class="bg-dark border-0 {$theme.dark ? 'text-light' : 'text-white'}"
-        >
+<Card class="table-responsive border-bottom-0">
+    <Table hover id="eventListTable" class="b-0 mb-0">
+        <thead class="bg-dark border-0 text-white">
             <tr>
                 <th class="border-secondary">
                     <div class="row g-1">
@@ -218,12 +210,7 @@
                     </tr>
                     {#if $expandedEvents.includes(event.unique_index)}
                         <tr>
-                            <td
-                                class={$theme.dark
-                                    ? 'bg-secondary'
-                                    : 'bg-light'}
-                                colspan="5"
-                            >
+                            <td class="bg-light" colspan="5">
                                 <pre
                                     class="text-left">{event.data_formatted}</pre>
                             </td>

@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { Link, useLocation } from "svelte-navigator";
-    import { theme } from "../../stores";
-    import Icon from "../../components/Icon.svelte";
-    import type { Path } from "../../paths";
+    import { Link, useLocation } from 'svelte-navigator';
+    import { theme } from '../../stores';
+    import Icon from '../../components/Icon.svelte';
+    import type { Path } from '../../paths';
 
     export let route: Path;
     export let collapsed: boolean;
@@ -17,9 +17,9 @@
         to={route.path}
         class="nav-link {$theme.color === 'yellow' && isActiveOrSub
             ? 'text-dark'
-            : $theme.dark && !isActiveOrSub
-            ? 'text-light'
-            : 'text-white'} fw-light d-flex align-items-center {isActiveOrSub
+            : 'text-white'} {isActiveOrSub
+            ? ''
+            : 'fw-light'} d-flex align-items-center {isActiveOrSub
             ? `bg-${$theme.color}`
             : ''}"
         style="height: inherit;"

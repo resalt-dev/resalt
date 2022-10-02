@@ -100,17 +100,6 @@
     --blue-9: #003a8c;
     --blue-10: #002766;
 
-    --geekblue-1: #f0f5ff;
-    --geekblue-2: #d6e4ff;
-    --geekblue-3: #adc6ff;
-    --geekblue-4: #85a5ff;
-    --geekblue-5: #597ef7;
-    --geekblue-6: #2f54eb;
-    --geekblue-7: #1d39c4;
-    --geekblue-8: #10239e;
-    --geekblue-9: #061178;
-    --geekblue-10: #030852;
-
     --purple-1: #f9f0ff;
     --purple-2: #efdbff;
     --purple-3: #d3adf7;
@@ -156,7 +145,6 @@
     --green: var(--green-6);
     --cyan: var(--cyan-6);
     --blue: var(--blue-6);
-    --geekblue: var(--geekblue-6);
     --purple: var(--purple-6);
     --magenta: var(--magenta-6);
 
@@ -169,7 +157,6 @@
     --light-green: var(--green-2);
     --light-cyan: var(--cyan-2);
     --light-blue: var(--blue-2);
-    --light-geekblue: var(--geekblue-2);
     --light-purple: var(--purple-2);
     --light-magenta: var(--magenta-2);
     --light-gray: var(--gray-5);
@@ -183,7 +170,6 @@
     --dark-green: var(--green-8);
     --dark-cyan: var(--cyan-8);
     --dark-blue: var(--blue-8);
-    --dark-geekblue: var(--geekblue-8);
     --dark-purple: var(--purple-8);
     --dark-magenta: var(--magenta-8);
     --dark-gray: var(--gray-11);
@@ -293,7 +279,6 @@ samp {
 .btn-green {background-color: var(--green);}
 .btn-cyan {background-color: var(--cyan);}
 .btn-blue {background-color: var(--blue);}
-.btn-geekblue {background-color: var(--geekblue);}
 .btn-purple {background-color: var(--purple);}
 .btn-magenta {background-color: var(--magenta);}
 .btn-primary {background-color: var(--primary) !important;}
@@ -313,7 +298,6 @@ samp {
 .btn-green {border-color: var(--dark-green);}
 .btn-cyan {border-color: var(--dark-cyan);}
 .btn-blue {border-color: var(--dark-blue);}
-.btn-geekblue {border-color: var(--dark-geekblue);}
 .btn-purple {border-color: var(--dark-purple);}
 .btn-magenta {border-color: var(--dark-magenta);}
 .btn-primary {border-color: var(--dark-primary) !important;}
@@ -333,7 +317,6 @@ samp {
 .btn-green:hover, .btn-green.active {background-color: var(--dark-green);}
 .btn-cyan:hover, .btn-cyan.active {background-color: var(--dark-cyan);}
 .btn-blue:hover, .btn-blue.active {background-color: var(--dark-blue);}
-.btn-geekblue:hover, .btn-geekblue.active {background-color: var(--dark-geekblue);}
 .btn-purple:hover, .btn-purple.active {background-color: var(--dark-purple);}
 .btn-magenta:hover, .btn-magenta.active {background-color: var(--dark-magenta);}
 .btn-primary:hover, .btn-primary.active {background-color: var(--dark-primary) !important;}
@@ -363,7 +346,6 @@ samp {
 .btn-green, .btn-green:hover,
 .btn-cyan, .btn-cyan:hover,
 .btn-blue, .btn-blue:hover,
-.btn-geekblue, .btn-geekblue:hover,
 .btn-purple, .btn-purple:hover,
 .btn-magenta, .btn-magenta:hover,
 .btn-dark, .btn-dark:hover,
@@ -418,9 +400,6 @@ samp {
 .bg-blue {
     background-color: var(--blue) !important;
 }
-.bg-geekblue {
-    background-color: var(--geekblue) !important;
-}
 .bg-purple {
     background-color: var(--purple) !important;
 }
@@ -454,6 +433,9 @@ samp {
 .bg-muted {
     background-color: var(--muted) !important;
 }
+.bg-none {
+    background-color: transparent !important;
+}
 
 .border-red {
     border-color: var(--red) !important;
@@ -478,9 +460,6 @@ samp {
 }
 .border-blue {
     border-color: var(--blue) !important;
-}
-.border-geekblue {
-    border-color: var(--geekblue) !important;
 }
 .border-purple {
     border-color: var(--purple) !important;
@@ -565,10 +544,6 @@ hr {
     background-color: var(--blue) !important;
     border-color: var(--blue) !important;
 }
-.form-check-input-geekblue:checked {
-    background-color: var(--geekblue) !important;
-    border-color: var(--geekblue) !important;
-}
 .form-check-input-purple:checked {
     background-color: var(--purple) !important;
     border-color: var(--purple) !important;
@@ -637,9 +612,6 @@ hr {
 }
 .form-check-input-blue:disabled:checked {
     background-color: var(--light-blue) !important;
-}
-.form-check-input-geekblue:disabled:checked {
-    background-color: var(--light-geekblue) !important;
 }
 .form-check-input-purple:disabled:checked {
     background-color: var(--light-purple) !important;
@@ -713,9 +685,6 @@ hr {
 }
 .text-blue {
     color: var(--blue) !important;
-}
-.text-geekblue {
-    color: var(--geekblue) !important;
 }
 .text-purple {
     color: var(--purple) !important;

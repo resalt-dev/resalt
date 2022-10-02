@@ -15,7 +15,7 @@
     import Job from '../../views/Job/Job.svelte';
     import Jobs from '../../views/Jobs/Jobs.svelte';
     import Keys from '../../views/Keys/Keys.svelte';
-    import Events from '../../views/Events.svelte';
+    import Events from '../../views/Events/Events.svelte';
     import User from '../../views/User/User.svelte';
     import Users from '../../views/Users/Users.svelte';
     import Settings from '../../views/Settings/Settings.svelte';

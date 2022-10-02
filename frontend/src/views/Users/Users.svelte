@@ -54,7 +54,7 @@
                 </th>
                 <th class="border-secondary">
                     <div class="row g-1">
-                        <div class="col-auto align-self-center">Is LDAP</div>
+                        <div class="col-auto align-self-center">LDAP</div>
                     </div>
                 </th>
                 <th class="border-secondary" />
@@ -84,12 +84,12 @@
                         <td>{user.id}</td>
                         <td>
                             {#if user.ldapSync !== null}
-                                <Badge
-                                    color={$theme.dark ? 'secondary' : 'dark'}
+                                <Badge color={null} class="bg-{$theme.color}"
                                     >Yes</Badge
                                 >
                             {:else}
-                                <Badge color={null} class="bg-{$theme.color}"
+                                <Badge
+                                    color={$theme.dark ? 'secondary' : 'dark'}
                                     >No</Badge
                                 >
                             {/if}

@@ -43,7 +43,7 @@
                 on:click={selectColor}
             />
 
-            <hr />
+            <hr class="bg-light" />
         {/if}
 
         <h5 class="mb-3">Dark mode:</h5>

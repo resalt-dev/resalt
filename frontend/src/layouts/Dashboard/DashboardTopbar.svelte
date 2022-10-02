@@ -21,11 +21,7 @@
         });
 </script>
 
-<div
-    class="row g-0 d-flex align-items-center {$theme.dark
-        ? 'bg-secondary'
-        : 'bg-light'}"
->
+<div id="dashboard-header" class="row g-0 d-flex align-items-center bg-light">
     <div class="col">
         <div class="btn-group me-3" role="group">
             {#each navbar as item}

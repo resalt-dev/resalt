@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { theme } from '../stores';
     import Icon from './Icon.svelte';
 
     export let size: number;
@@ -74,9 +73,9 @@
             {#each [20, 50, 100, 250] as s}
                 <li>
                     <span
-                        class="dropdown-item mouse-pointer {$theme.dark
-                            ? 'text-light'
-                            : 'text-white'} {size === s ? 'fw-bold' : ''}"
+                        class="dropdown-item mouse-pointer {size === s
+                            ? 'fw-bold'
+                            : ''}"
                         on:click={() => setSize(s)}>{s}</span
                     >
                 </li>
