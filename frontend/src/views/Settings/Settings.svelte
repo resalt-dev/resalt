@@ -18,7 +18,7 @@
             {
                 label: 'Config',
                 component: SettingsTabConfig,
-                class: $theme.dark ? 'bg-black' : '',
+                class: $theme.dark ? 'bg-dark' : '',
             },
         ];
 

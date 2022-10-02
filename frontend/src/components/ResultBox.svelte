@@ -59,7 +59,7 @@
         </small>
     </div>
     <div class="collapse {show ? 'show' : ''}" id="conformityCollapse{num}">
-        <div class="card-body bg-black text-light">
+        <div class="card-body bg-dark text-light">
             <div class="card-text">
                 <pre
                     class="text-console m-0 text-{color}">{leftPadToTotalLength(

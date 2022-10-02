@@ -1,6 +1,7 @@
 import { terser } from 'rollup-plugin-terser';
+import autoprefixer from 'autoprefixer';
 import commonjs from '@rollup/plugin-commonjs';
-import css from 'rollup-plugin-css-only';
+import scss from 'rollup-plugin-scss';
 import livereload from 'rollup-plugin-livereload';
 import polyfills from 'rollup-plugin-node-polyfills';
 import resolve from '@rollup/plugin-node-resolve';
@@ -56,7 +57,13 @@ export default {
             preprocess: sveltePreprocess({
                 sourceMap: !production,
                 scss: {
-                    prependData: '@use \'src/styles/_imports.scss\';',
+                    includePaths: ['src/layout/include'],
+                    prependData: '@use \'src/styles/include/_include.scss\';',
+                },
+                postcss: {
+                    plugins: [
+                        autoprefixer(),
+                    ],
                 },
             }),
             compilerOptions: {
@@ -67,8 +74,8 @@ export default {
         }),
         // we'll extract any component CSS out into
         // a separate file - better for performance
-        css({
-            output: 'bundle.css',
+        scss({
+            output: 'public/build/bundle.css',
         }),
 
         // If you have external dependencies installed from

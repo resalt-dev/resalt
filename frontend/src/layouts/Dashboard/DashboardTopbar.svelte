@@ -66,7 +66,7 @@
         <Icon name="user" size="1.5" type="solid" class="pe-1" />
         {$currentUser.username}
         <!-- <ul
-            class="dropdown-menu dropdown-menu-dark bg-dark ms-5"
+            class="dropdown-menu dropdown-menu-dark bg-secondary ms-5"
             aria-labelledby="dropdownUser1"
         >
             <li>

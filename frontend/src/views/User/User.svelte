@@ -126,14 +126,14 @@
 
     <Row>
         <Col xs="12" xxl="4" class="pb-3">
-            <Card class="h-100 {$theme.dark ? 'bg-black' : ''}">
+            <Card class="h-100 {$theme.dark ? 'bg-dark' : ''}">
                 <CardHeader>
                     <CardTitle class="mb-0">General</CardTitle>
                 </CardHeader>
                 <ul class="list-group list-group-flush">
                     <li
                         class="list-group-item {$theme.dark
-                            ? 'bg-black text-light'
+                            ? 'bg-dark text-light'
                             : ''}"
                     >
                         <strong>ID</strong>
@@ -141,7 +141,7 @@
                     </li>
                     <li
                         class="list-group-item {$theme.dark
-                            ? 'bg-black text-light'
+                            ? 'bg-dark text-light'
                             : ''}"
                     >
                         <strong>Username</strong>
@@ -149,7 +149,7 @@
                     </li>
                     <li
                         class="list-group-item {$theme.dark
-                            ? 'bg-black text-light'
+                            ? 'bg-dark text-light'
                             : ''}"
                     >
                         <strong>Has Local Password</strong>
@@ -168,7 +168,7 @@
                     </li>
                     <li
                         class="list-group-item {$theme.dark
-                            ? 'bg-black text-light'
+                            ? 'bg-dark text-light'
                             : ''}"
                     >
                         <strong>Last Login</strong>
@@ -182,7 +182,7 @@
                     </li>
                     <li
                         class="list-group-item {$theme.dark
-                            ? 'bg-black text-light'
+                            ? 'bg-dark text-light'
                             : ''}"
                     >
                         <strong>Email</strong>
@@ -196,7 +196,7 @@
                     </li>
                     <li
                         class="list-group-item {$theme.dark
-                            ? 'bg-black text-light'
+                            ? 'bg-dark text-light'
                             : ''}"
                     >
                         <strong>LDAP Sync DN</strong>
@@ -213,7 +213,7 @@
         </Col>
         {#if hasResaltPermission($currentUser.perms, P_ADMIN_USER) || ($currentUser.id === $user.id && hasResaltPermission($currentUser.perms, P_USER_PASSWORD))}
             <Col xs="12" xxl="4" class="pb-3">
-                <Card class="h-100 {$theme.dark ? 'bg-black' : ''}">
+                <Card class="h-100 {$theme.dark ? 'bg-dark' : ''}">
                     <CardHeader>
                         <CardTitle class="mb-0">Password</CardTitle>
                     </CardHeader>
@@ -266,7 +266,7 @@
             </Col>
         {/if}
         <Col xs="12" xxl="4" class="pb-3">
-            <Card class="h-100 {$theme.dark ? 'bg-black' : ''}">
+            <Card class="h-100 {$theme.dark ? 'bg-dark' : ''}">
                 <CardHeader>
                     <CardTitle class="mb-0">Permissions</CardTitle>
                 </CardHeader>

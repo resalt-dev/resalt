@@ -66,7 +66,7 @@
 {:else}
     <h1>Minion {$minion.id}</h1>
 
-    <div class="nav bg-black w-100">
+    <div class="nav bg-dark w-100">
         {#each subPagesNav as item}
             <Link
                 to={item.path}
@@ -85,7 +85,7 @@
 
     <div
         class="card border-4 border-{$theme.color} rounded-none {$theme.dark
-            ? 'bg-dark'
+            ? 'bg-secondary'
             : ''}"
     >
         <div class="card-body p-0">

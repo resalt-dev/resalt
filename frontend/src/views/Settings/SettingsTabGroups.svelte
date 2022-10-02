@@ -528,7 +528,7 @@
     <Col xs="12" md="4">
         <Card
             class="table-responsive border-bottom-0 mb-3 {$theme.dark
-                ? 'bg-black'
+                ? 'bg-dark'
                 : ''}"
         >
             <Table
@@ -538,7 +538,7 @@
                     : ''}"
             >
                 <thead
-                    class="bg-black border-0 {$theme.dark
+                    class="bg-dark border-0 {$theme.dark
                         ? 'text-light'
                         : 'text-white'}"
                 >
@@ -610,7 +610,7 @@
         </Card>
     </Col>
     <Col xs="12" md="8">
-        <Card class={$theme.dark ? 'bg-black' : ''}>
+        <Card class={$theme.dark ? 'bg-dark' : ''}>
             <CardHeader>
                 <span class="fw-bold">Group Details</span>
                 <Button
@@ -699,7 +699,7 @@
                                     : ''}"
                             >
                                 <thead
-                                    class="bg-black border-0 {$theme.dark
+                                    class="bg-dark border-0 {$theme.dark
                                         ? 'text-light'
                                         : 'text-white'}"
                                 >
@@ -797,7 +797,7 @@
                                     : ''}"
                             >
                                 <thead
-                                    class="bg-black border-0 {$theme.dark
+                                    class="bg-dark border-0 {$theme.dark
                                         ? 'text-light'
                                         : 'text-white'}"
                                 >
@@ -846,7 +846,7 @@
                                     : ''}"
                             >
                                 <thead
-                                    class="bg-black border-0 {$theme.dark
+                                    class="bg-dark border-0 {$theme.dark
                                         ? 'text-light'
                                         : 'text-white'}"
                                 >

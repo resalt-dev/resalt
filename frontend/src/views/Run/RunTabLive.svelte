@@ -282,7 +282,7 @@
         toggle={() => {
             runConfirmDialog = false;
         }}
-        contentClassName={$theme.dark ? 'bg-dark text-white' : ''}
+        contentClassName={$theme.dark ? 'bg-secondary text-white' : ''}
     >
         <ModalHeader
             toggle={() => {

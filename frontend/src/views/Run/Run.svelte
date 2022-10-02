@@ -38,7 +38,7 @@
             </small>
         </div>
         <div class="collapse show" id="conformityCollapse{ret.num}">
-            <div class="card-body bg-black text-light">
+            <div class="card-body bg-dark text-light">
                 <div class="card-text">
                     {#if Object.keys(ret.data).length != 0}
                         <ConsoleChangeBranch data={ret.data} shift={SHIFT} />
