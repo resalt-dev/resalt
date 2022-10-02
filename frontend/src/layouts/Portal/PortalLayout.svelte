@@ -3,8 +3,8 @@
     import { writable, type Writable } from 'svelte/store';
     import { Card, CardBody, CardText, CardTitle } from 'sveltestrap';
     import { toasts, theme } from '../../stores';
-    import AuthLogin from '../../views/AuthLogin.svelte';
-    import AuthLogout from '../../views/AuthLogout.svelte';
+    import AuthLogin from '../../views/Auth/AuthLogin.svelte';
+    import AuthLogout from '../../views/Auth/AuthLogout.svelte';
     import constants from '../../constants';
     import Logo from '../../components/Logo.svelte';
     import type Alert from '../../models/Alert';
