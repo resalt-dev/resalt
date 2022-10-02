@@ -1,21 +1,16 @@
 /*
  * Theme-dark
  */
-:root {
-    --bluegray-5: #314757;
-    --bluegray-6: #2a3d4a;
-    --bluegray-7: #23333e;
-    --bluegray-8: #1c2831;
-    --bluegray-9: #151e25;
-    --bluegray-10: #0e1418;
-
-    --bluegray: var(--bluegray-5);
-    --dark-bluegray: var(--bluegray-9);
-}
+$bluegray-5: #314757;
+$bluegray-6: #2a3d4a;
+$bluegray-7: #23333e;
+$bluegray-8: #1c2831;
+$bluegray-9: #151e25;
+$bluegray-10: #0e1418;
 
 .theme-dark {
     .bg-white {
-        background-color: var(--bluegray-9) !important;
+        background-color: $bluegray-9 !important;
         color: var(--light-gray) !important;
     }
     .text-white {
@@ -23,71 +18,71 @@
     }
     
     hr.bg-light {
-        background-color: var(--bluegray-5) !important;
+        background-color: $bluegray-5 !important;
     }
     
     .form-control {
-        background-color: var(--bluegray-8) !important;
-        border-color: var(--bluegray-6);
+        background-color: $bluegray-8 !important;
+        border-color: $bluegray-6;
         color: var(--light-gray);
     }
     .form-control:focus {
         border-color: var(--primary);
     }
     .form-switch > input {
-        background-color: var(--bluegray-8) !important;
-        border-color: var(--bluegray-6);
+        background-color: $bluegray-8 !important;
+        border-color: $bluegray-6;
     }
     .form-switch > input:checked {
         background-color: var(--primary) !important;
     }
     
     #dashboard-header {
-        background-color: var(--bluegray-6) !important;
+        background-color: $bluegray-6 !important;
     }
     
     .modal-body {
-        background-color: var(--bluegray-8) !important;
+        background-color: $bluegray-8 !important;
         color: var(--light-gray) !important;
     }
     .modal-footer {
-        background-color: var(--bluegray-8) !important;
+        background-color: $bluegray-8 !important;
         color: var(--light-gray) !important;
-        border-top-color: var(--bluegray-5) !important;
+        border-top-color: $bluegray-5 !important;
     }
     
     .btn-secondary:not(.btn-arrow-left):not(.btn-arrow-right) {
-        background-color: var(--bluegray) !important;
-        border-color: var(--dark-bluegray) !important;
+        background-color: $bluegray-5 !important;
+        border-color: $bluegray-9 !important;
     }
     .btn-secondary:hover:not(.btn-arrow-left):not(.btn-arrow-right),
     .btn-secondary:not(.btn-arrow-left):not(.btn-arrow-right).active {
-        background-color: var(--dark-bluegray) !important;
+        background-color: $bluegray-9 !important;
     }
 
     .btn-dark.btn-arrow-left,
     .btn-dark.btn-arrow-right {
-        background-color: var(--bluegray-9) !important;
+        background-color: $bluegray-9 !important;
         border-bottom-color: var(--bluegray-10) !important;
     }
     .btn-dark.btn-arrow-left::before,
     .btn-dark.btn-arrow-right::after {
-        background-color: var(--bluegray-9);
+        background-color: $bluegray-9;
         border-top-color: var(--bluegray-10) !important;
         border-right-color: var(--bluegray-10) !important;
     }
     
     .table {
-        background-color: var(--bluegray-8) !important;
+        background-color: $bluegray-8 !important;
         color: var(--light-gray) !important;
     }
     // Table nested in Card
     .card-body .table {
-        background-color: var(--bluegray-7) !important;
+        background-color: $bluegray-7 !important;
     }
 
     .table-hover > tbody > tr:hover {
-        background-color: var(--bluegray-5) !important;
+        background-color: $bluegray-5 !important;
         color: var(--light-gray) !important;
     }
     .table .bg-light {
@@ -104,30 +99,30 @@
 
     .table > :not(caption) > * > *,
     .border-secondary {
-        border-color: var(--bluegray-5) !important;
+        border-color: $bluegray-5 !important;
     }
 
     .card:not(.bg-none) {
-        background-color: var(--bluegray-9) !important;
+        background-color: $bluegray-9 !important;
     }
     .card .card-header {
         background-color: var(--black) !important;
         color: var(--light-gray) !important;
     }
     .card:not(.bg-none) .card-body:not(.bg-dark) {
-        background-color: var(--bluegray-8) !important;
+        background-color: $bluegray-8 !important;
     }
     // Second-level nested Card
     .card-body .card:not(.bg-none) .card-body:not(.bg-dark) {
-        background-color: var(--bluegray-7) !important;
+        background-color: $bluegray-7 !important;
     }
 
     .result-box .card-header {
-        border-bottom: 2px solid var(--bluegray-7) !important;
+        border-bottom: 2px solid $bluegray-7 !important;
     }
 
     .list-group-item {
-        background-color: var(--bluegray-7) !important;
+        background-color: $bluegray-7 !important;
         color: var(--light-gray) !important;
     }
 }
