@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import { Link } from "svelte-navigator";
-    import paths from "../paths";
-    import { theme } from "../stores";
-    import { logout } from "../controller";
+    import { onMount } from 'svelte';
+    import { Link } from 'svelte-navigator';
+    import paths from '../../paths';
+    import { theme } from '../../stores';
+    import { logout } from '../../controller';
 
     onMount(async () => {
         logout();
