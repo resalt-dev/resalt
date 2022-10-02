@@ -85,24 +85,41 @@
     <hr class="mt-0 mb-0" />
 
     <!-- svelte-ignore a11y-invalid-attribute -->
-    <span
-        class="text-center {$config.latestVersion === 'unknown'
-            ? 'link-danger text-decoration-underline mouse-pointer'
-            : $config.currentVersion !== $config.latestVersion
-            ? 'link-warning text-decoration-underline mouse-pointer'
-            : 'text-secondary'}"
-        on:click={$config.currentVersion !== $config.latestVersion
-            ? toggleUpdate
-            : null}
-    >
-        {#if $collapsed}
-            {$config.currentVersion}
-        {:else}
-            <Icon name="chevrons-up" />
-            {constants.appName} - {$config.currentVersion}
-            <Icon name="chevrons-up" />
-        {/if}
-    </span>
+    {#if $config.latestVersion === 'unknown'}
+        <span
+            class="text-center link-danger text-decoration-underline mouse-pointer"
+            on:click={toggleUpdate}
+        >
+            {#if $collapsed}
+                {$config.currentVersion}
+            {:else}
+                <Icon name="chevrons-up" />
+                {constants.appName} - {$config.currentVersion}
+                <Icon name="chevrons-up" />
+            {/if}
+        </span>
+    {:else if $config.currentVersion !== $config.latestVersion}
+        <span
+            class="text-center link-warning text-decoration-underline mouse-pointer"
+            on:click={toggleUpdate}
+        >
+            {#if $collapsed}
+                {$config.currentVersion}
+            {:else}
+                <Icon name="chevrons-up" />
+                {constants.appName} - {$config.currentVersion}
+                <Icon name="chevrons-up" />
+            {/if}
+        </span>
+    {:else}
+        <span class="text-center text-secondary">
+            {#if $collapsed}
+                {$config.currentVersion}
+            {:else}
+                {constants.appName} - {$config.currentVersion}
+            {/if}
+        </span>
+    {/if}
 </div>
 
 <div>
