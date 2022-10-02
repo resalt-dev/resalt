@@ -1,5 +1,6 @@
 <script lang="ts">
     import type { Writable } from 'svelte/store';
+    import { Card, CardBody, CardHeader, Col, Row } from 'sveltestrap';
     import JsonViewer from '../../components/JsonViewer.svelte';
     import ResultBox from '../../components/ResultBox.svelte';
     import type Minion from '../../models/Minion';
@@ -123,13 +124,11 @@
     {#if rawData}
         <JsonViewer data={JSON.parse($minion.conformity)} />
     {:else}
-        <div class="row p-3">
-            <div class="col-3">
-                <div class="card mb-3">
-                    <div class="card-header">
-                        <span class="fw-bold">Options</span>
-                    </div>
-                    <div class="card-body">
+        <Row class="p-3">
+            <Col xs="3">
+                <Card class="mb-3">
+                    <CardHeader>Options</CardHeader>
+                    <CardBody>
                         <h5 class="card-title">Sort method</h5>
 
                         <!-- loop through sort orders-->
@@ -220,20 +219,18 @@
                                 Show Collapsed
                             </label>
                         </div>
-                    </div>
-                </div>
+                    </CardBody>
+                </Card>
 
-                <div class="card mb-3">
-                    <div class="card-header">
-                        <span class="fw-bold">Tree view</span>
-                    </div>
-                    <div class="card-body">
+                <Card class="mb-3">
+                    <CardHeader>Tree view</CardHeader>
+                    <CardBody>
                         <h5 class="card-title">Title</h5>
                         <p class="card-text">Text</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col">
+                    </CardBody>
+                </Card>
+            </Col>
+            <Col>
                 <div class="d-grid">
                     {#each conformity as conform}
                         <div
@@ -268,7 +265,7 @@
                         </div>
                     {/each}
                 </div>
-            </div>
-        </div>
+            </Col>
+        </Row>
     {/if}
 {/if}

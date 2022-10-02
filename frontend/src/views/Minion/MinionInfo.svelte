@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { Writable } from 'svelte/store';
-    import { Card, CardBody, CardHeader, Table } from 'sveltestrap';
+    import { Card, CardBody, CardHeader, Col, Row, Table } from 'sveltestrap';
     import type Minion from '../../models/Minion';
     import { theme } from '../../stores';
 
@@ -21,12 +21,10 @@
     }
 </script>
 
-<div class="row p-3">
-    <div class="col-6 col-xxl-3">
-        <div class="card mb-3">
-            <div class="card-header">
-                <span class="fw-bold">Common</span>
-            </div>
+<Row class="p-3">
+    <Col xs="6" xxl="3">
+        <Card class="mb-3">
+            <CardHeader>Common</CardHeader>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
                     <strong>ID</strong>
@@ -54,14 +52,12 @@
                     >
                 </li>
             </ul>
-        </div>
-    </div>
+        </Card>
+    </Col>
 
-    <div class="col-6 col-xxl-3">
-        <div class="card mb-3">
-            <div class="card-header">
-                <span class="fw-bold">Hardware</span>
-            </div>
+    <Col xs="6" xxl="3">
+        <Card class="mb-3">
+            <CardHeader>Hardware</CardHeader>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
                     <strong>CPU</strong>
@@ -90,14 +86,12 @@
                     <span class="float-end">{grains.virtual ?? 'Unknown'}</span>
                 </li>
             </ul>
-        </div>
-    </div>
+        </Card>
+    </Col>
 
-    <div class="col-6 col-xxl-3">
-        <div class="card mb-3">
-            <div class="card-header">
-                <span class="fw-bold">DNS</span>
-            </div>
+    <Col xs="6" xxl="3">
+        <Card class="mb-3">
+            <CardHeader>DNS</CardHeader>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
                     <strong>IPv4 DNS</strong>
@@ -118,14 +112,12 @@
                     {/each}
                 </li>
             </ul>
-        </div>
-    </div>
+        </Card>
+    </Col>
 
-    <div class="col-6 col-xxl-3">
-        <div class="card mb-3">
-            <div class="card-header">
-                <span class="fw-bold">Timings</span>
-            </div>
+    <Col xs="6" xxl="3">
+        <Card class="mb-3">
+            <CardHeader>Timings</CardHeader>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
                     <strong>Last seen</strong>
@@ -164,14 +156,12 @@
                     >
                 </li>
             </ul>
-        </div>
-    </div>
+        </Card>
+    </Col>
 
-    <div class="col-12">
-        <Card class="card mb-3">
-            <CardHeader>
-                <span class="fw-bold">Network</span>
-            </CardHeader>
+    <Col xs="12">
+        <Card class="mb-3">
+            <CardHeader>Network</CardHeader>
             <CardBody class="p-0">
                 <Table hover class="mb-0">
                     <thead>
@@ -197,5 +187,5 @@
                 </Table>
             </CardBody>
         </Card>
-    </div>
-</div>
+    </Col>
+</Row>

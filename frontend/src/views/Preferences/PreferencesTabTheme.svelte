@@ -1,13 +1,18 @@
 <script lang="ts">
-    import { Row, Col, FormGroup } from 'sveltestrap';
+    import {
+        Row,
+        Col,
+        FormGroup,
+        Button,
+        Card,
+        CardHeader,
+        CardBody,
+    } from 'sveltestrap';
     import Icon from '../../components/Icon.svelte';
     import constants from '../../constants';
     import { config, theme } from '../../stores';
 
-    function selectColor(event: any): void {
-        let color = [...event.target.classList]
-            .filter((i) => i.startsWith('text'))[0]
-            .split('-')[1];
+    function selectColor(color: string): void {
         console.log('selectColor', color);
         if (color === 'reset') {
             $theme.color = $config.defaultThemeColor;
@@ -16,44 +21,101 @@
         }
     }
 
-    function toggleDarkMode(_event: any): void {
+    function setDarkMode(dark: boolean): void {
         console.log('toggleDarkMode');
-        theme.update((t) => ({ ...t, dark: !t.dark }));
+        theme.update((t) => ({ ...t, dark: dark }));
     }
 </script>
 
-<Row>
-    <Col xs="12">
-        {#if $config.enableThemeSwitching}
-            <h5 class="mb-3">Color:</h5>
+{#if $config.enableThemeSwitching}
+    <Card class="mb-3">
+        <CardHeader>Color</CardHeader>
+        <CardBody>
+            <Row>
+                {#each constants.themeColors as color}
+                    <Col xs="auto">
+                        <div
+                            class="theme-box mouse-pointer bg-{color} mb-4 border-{$theme.dark
+                                ? 'secondary'
+                                : 'light'}"
+                            on:click={() => selectColor(color)}
+                        >
+                            {#if $theme.color === color}
+                                <Icon
+                                    name="check"
+                                    style="color: {color === 'yellow'
+                                        ? 'black'
+                                        : 'white'} !important;"
+                                    size="3"
+                                />
+                            {/if}
+                        </div>
+                    </Col>
+                {/each}
+            </Row>
 
-            {#each constants.themeColors as color}
-                <Icon
-                    type={color === $theme.color ? 'solid' : 'regular'}
-                    size="2"
-                    name="check-circle"
-                    class="mouse-pointer text-{color}"
-                    on:click={selectColor}
-                />
-            {/each}<Icon
-                type="regular"
-                size="2"
-                name="reset"
-                class="mouse-pointer text-reset"
-                on:click={selectColor}
-            />
+            <Button
+                color={null}
+                class="btn-{$theme.color}"
+                on:click={() => selectColor('reset')}
+            >
+                Reset
+            </Button>
+        </CardBody>
+    </Card>
+{/if}
 
-            <hr class="bg-light" />
-        {/if}
+<Card class="mb-3">
+    <CardHeader>Dark mode</CardHeader>
+    <CardBody>
+        <Row>
+            <Col xs="auto">
+                <div
+                    class="theme-box mouse-pointer mb-4 border-{$theme.dark
+                        ? 'secondary'
+                        : 'light'}"
+                    style="background-color: #fff;"
+                    on:click={() => setDarkMode(false)}
+                >
+                    {#if $theme.dark === false}
+                        <Icon name="check" class="text-black" size="3" />
+                    {/if}
+                </div>
+            </Col>
+            <Col xs="auto">
+                <div
+                    class="theme-box mouse-pointer bg-dark mb-4 border-{$theme.dark
+                        ? 'secondary'
+                        : 'light'}"
+                    on:click={() => setDarkMode(true)}
+                >
+                    {#if $theme.dark === true}
+                        <Icon name="check" class="text-white" size="3" />
+                    {/if}
+                </div>
+            </Col>
+        </Row>
 
-        <h5 class="mb-3">Dark mode:</h5>
-        <FormGroup floating={true} class="form-switch ps-2">
-            <input
-                type="checkbox"
-                class="form-check-input fs-3 ms-0 mt-0"
-                checked={$theme.dark}
-                on:click={toggleDarkMode}
-            />
-        </FormGroup>
-    </Col>
-</Row>
+        <Button
+            color={null}
+            class="btn-{$theme.color}"
+            on:click={() => setDarkMode(false)}
+        >
+            Reset
+        </Button>
+    </CardBody>
+</Card>
+
+<style lang="scss">
+    $theme-box-size: 75px;
+    .theme-box {
+        width: $theme-box-size;
+        height: $theme-box-size;
+        border-radius: 10px;
+        border: 6px solid;
+
+        display: flex;
+        justify-content: center; /* align horizontal */
+        align-items: center; /* align vertical */
+    }
+</style>

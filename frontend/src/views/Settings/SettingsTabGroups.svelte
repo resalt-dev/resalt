@@ -599,7 +599,7 @@
     <Col xs="12" md="8">
         <Card>
             <CardHeader>
-                <span class="fw-bold">Group Details</span>
+                Group Details
                 <Button
                     size="sm"
                     color="success"

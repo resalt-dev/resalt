@@ -11,7 +11,7 @@
         let navs: NavSubPage[] = [];
 
         navs.push({
-            label: 'Theming',
+            label: 'Color theme',
             component: PreferencesTabTheme,
         });
 

@@ -4,6 +4,7 @@
     import Tabs from '../../components/Tabs.svelte';
     import ConsoleChangeBranch from '../../components/ConsoleChangeBranch.svelte';
     import RunTabLive from './RunTabLive.svelte';
+    import { Card } from 'sveltestrap';
 
     const SHIFT = 0;
 
@@ -23,14 +24,14 @@
 />
 
 {#each $returns as ret}
-    <div class="card mb-3 {$theme.dark ? 'bg-secondary' : ''}">
+    <Card class="result-box mb-3">
         <div
             type="button"
             class="card-header"
             data-bs-toggle="collapse"
             data-bs-target="#conformityCollapse{ret.num}"
         >
-            <span class="fw-bold">Result : </span>
+            <span>Result : </span>
             ({ret.command.targetType}) {ret.command.target}
             <small class="text-muted">({ret.command.fun})</small>
             <small class="float-end text-muted pt-1">
@@ -46,5 +47,5 @@
                 </div>
             </div>
         </div>
-    </div>
+    </Card>
 {/each}
