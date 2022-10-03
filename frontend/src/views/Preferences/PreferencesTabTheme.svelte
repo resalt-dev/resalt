@@ -10,6 +10,8 @@
     } from 'sveltestrap';
     import Icon from '../../components/Icon.svelte';
     import constants from '../../constants';
+    import { showToast } from '../../controller';
+    import { AlertType } from '../../models/AlertType';
     import { config, theme } from '../../stores';
 
     function selectColor(color: string): void {
@@ -102,6 +104,19 @@
             on:click={() => setDarkMode(false)}
         >
             Reset
+        </Button>
+
+        <Button
+            color="warning"
+            on:click={() => {
+                showToast(
+                    AlertType.INFO,
+                    'Testing toast!',
+                    "This is a test toast message. It's a bit longer than the others, but that's okay.",
+                );
+            }}
+        >
+            Show toast
         </Button>
     </CardBody>
 </Card>
