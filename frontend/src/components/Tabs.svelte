@@ -26,7 +26,9 @@
     {/each}
 </div>
 {#if selected < children.length}
-    <Card class="mb-3 border-4 border-{$theme.color} rounded-none bg-none">
+    <Card
+        class="mb-3 border border-4 border-{$theme.color} rounded-none bg-none"
+    >
         <CardBody class={children[selected].class || ''}>
             <svelte:component
                 this={children[selected].component}
