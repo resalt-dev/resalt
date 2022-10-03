@@ -2,7 +2,7 @@
     import { useLocation, Link } from 'svelte-navigator';
     import { currentUser, socket, theme } from '../../stores';
     import paths from '../../paths';
-    import { Col } from 'sveltestrap';
+    import { Col, Row } from 'sveltestrap';
     import Icon from '../../components/Icon.svelte';
 
     const location = useLocation();
@@ -21,8 +21,8 @@
         });
 </script>
 
-<div id="dashboard-header" class="row g-0 d-flex align-items-center bg-light">
-    <div class="col">
+<Row id="dashboard-header" class="g-0 d-flex align-items-center bg-light">
+    <Col>
         <div class="btn-group me-3" role="group">
             {#each navbar as item}
                 {#if item.path}
@@ -38,11 +38,11 @@
                 {/if}
             {/each}
         </div>
-    </div>
-    <div class="col-auto pe-3 d-flex align-items-center">
+    </Col>
+    <Col xs="auto" class="pe-3 d-flex align-items-center">
         {#if $socket.connected}
             <!-- display last_ping as hh:mm:ss -->
-            <span class="font-monospace pt-1"
+            <span class="font-monospace pt-1 ps-3"
                 >Connected: {new Date($socket.last_ping)
                     .toLocaleTimeString('en-US', {
                         timeZone: 'UTC',
@@ -54,9 +54,9 @@
         {:else}
             <span class="font-monospace pt-1 text-danger">Disconnected</span>
         {/if}
-    </div>
+    </Col>
     <Col xs="auto">
-        <div class="vr" style="height: 1.5rem;background: rgba(0, 0, 0, 0.2)" />
+        <div class="vr sep" />
     </Col>
     <Col xs="auto" class="px-3 text-reset text-decoration-none">
         <Icon name="user" size="1.5" type="solid" class="pe-1" />
@@ -79,13 +79,13 @@
         </ul> -->
     </Col>
     <Col xs="auto">
-        <div class="vr" style="height: 1.5rem;background: rgba(0, 0, 0, 0.2)" />
+        <div class="vr sep" />
     </Col>
     <Col xs="auto" class="px-3 text-reset text-decoration-none">
         <Icon name="bell" size="1.5" />
     </Col>
     <Col xs="auto">
-        <div class="vr" style="height: 1.5rem;background: rgba(0, 0, 0, 0.2)" />
+        <div class="vr sep" />
     </Col>
     <Link
         to={paths.logout.path}
@@ -94,4 +94,11 @@
         <Icon name="log-out" size="1.5" class="pe-1" />
         Logout
     </Link>
-</div>
+</Row>
+
+<style lang="scss">
+    .sep {
+        margin-top: 0.4rem;
+        height: 1.5rem;
+    }
+</style>
