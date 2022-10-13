@@ -3,7 +3,6 @@ export default class User {
         return new User(
             data.id,
             data.username,
-            data.isLocal,
             data.perms,
             data.lastLogin,
             data.permissionGroups,
@@ -15,8 +14,6 @@ export default class User {
     id: string;
 
     username: string;
-
-    hasPassword: boolean;
 
     perms: any[]; // the array contains both objects and strings
 
@@ -31,7 +28,6 @@ export default class User {
     constructor(
         id: string,
         username: string,
-        hasPassword: boolean,
         perms: any[],
         lastLogin: string | null,
         permissionGroups: { id: string; name: string }[],
@@ -40,7 +36,6 @@ export default class User {
     ) {
         this.id = id;
         this.username = username;
-        this.hasPassword = hasPassword;
         this.perms = perms;
         this.lastLogin = lastLogin;
         this.permissionGroups = permissionGroups;

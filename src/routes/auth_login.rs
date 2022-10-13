@@ -20,15 +20,12 @@ pub async fn route_auth_login_post(
     input: web::Json<LoginRequest>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
-    log::warn!("hello {}", SConfig::auth_forward_enabled());
     let user: User = if SConfig::auth_forward_enabled() {
         // Use X-Forwarded-User header as username
-        log::warn!("headers {:?}", req.headers());
         let username = match req.headers().get("X-Forwarded-User") {
             Some(forwarded_user) => forwarded_user.to_str().unwrap().to_string(),
             None => return Err(api_error_unauthorized()),
         };
-        log::warn!("username: {}", username);
 
         // Fetch user to see if they exist
         let user = match data.get_user_by_username(&username) {

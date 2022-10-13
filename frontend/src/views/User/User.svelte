@@ -152,25 +152,6 @@
                             ? 'bg-dark text-light'
                             : ''}"
                     >
-                        <strong>Has Local Password</strong>
-                        <span class="float-end">
-                            {#if $user.hasPassword}
-                                <Badge
-                                    color={$theme.dark ? 'secondary' : 'dark'}
-                                    >Yes</Badge
-                                >
-                            {:else}
-                                <Badge color={null} class="bg-{$theme.color}"
-                                    >No</Badge
-                                >
-                            {/if}
-                        </span>
-                    </li>
-                    <li
-                        class="list-group-item {$theme.dark
-                            ? 'bg-dark text-light'
-                            : ''}"
-                    >
                         <strong>Last Login</strong>
                         <span class="float-end">
                             {#if $user.lastLogin}

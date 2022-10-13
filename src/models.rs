@@ -188,7 +188,6 @@ impl User {
         serde_json::json!({
             "id": self.id,
             "username": self.username,
-            "hasPassword": self.password.is_some(),
             "perms": perms,
             "lastLogin": self.last_login.map(|d| d.format("%Y-%m-%d %H:%M:%S").to_string()),
             "email": self.email,
