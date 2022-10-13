@@ -1,5 +1,12 @@
-# Only if you use active OAuth2 Proxy where authentication happens before requests reach Resalt
+#
+# RESALT
+#
+
 [auth.forward]
+# Only if you use active OAuth2 Proxy where authentication happens before requests reach Resalt
+#
+# If you enable this, please remember to also change auth.ldap.user.filter and
+# auth.ldap.user.attribute if LDAP sync is enabled.
 enabled = false
 
 # If you have LDAP authentication enabled
@@ -27,6 +34,7 @@ passwordfile = ""
 filter = "(&(objectClass=inetOrgPerson)(uid=%s))"
 # OpenLDAP: uid
 # Active Directory: sAMAccountName
+# OAuth2 Proxy: userPrincipalName
 attribute = "uid"
 
 [auth.session]
