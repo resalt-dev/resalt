@@ -7,6 +7,7 @@ use crate::{prelude::SConfig, update};
 #[allow(non_snake_case)]
 #[derive(Debug, Serialize)]
 struct ApiConfig {
+    authForwardEnabled: bool,
     currentVersion: String,
     latestVersion: String,
     defaultThemeColor: String,
@@ -15,6 +16,7 @@ struct ApiConfig {
 
 pub async fn route_config_get() -> Result<impl Responder> {
     let config = ApiConfig {
+        authForwardEnabled: SConfig::auth_forward_enabled(),
         currentVersion: update::CURRENT_VERSION.to_string(),
         latestVersion: match update::get_remote_version().await {
             Ok(version) => version,

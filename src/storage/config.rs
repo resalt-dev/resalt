@@ -39,6 +39,14 @@ macro_rules! strip_quotes {
 
 #[allow(dead_code)]
 impl SConfig {
+    pub fn auth_forward_enabled() -> bool {
+        SETTINGS
+            .read()
+            .unwrap()
+            .get_bool("auth.forward.enabled")
+            .unwrap()
+    }
+
     pub fn auth_ldap_enabled() -> bool {
         SETTINGS
             .read()

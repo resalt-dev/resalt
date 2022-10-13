@@ -1,3 +1,8 @@
+# Only if you use active OAuth2 Proxy where authentication happens before requests reach Resalt
+[auth.forward]
+enabled = false
+
+# If you have LDAP authentication enabled
 [auth.ldap]
 enabled = false
 host = "ldap.example.com"
@@ -18,6 +23,7 @@ passwordfile = ""
 # OpenLDAP: (&(objectClass=inetOrgPerson)(uid=%s))
 # Active Directory: (&(objectClass=user)(sAMAccountName=%s))
 # AD with username or email: (&(objectClass=user)(|(sAMAccountName=%s)(mail=%s)))
+# OAuth2 Proxy: (userPrincipalName=%s)
 filter = "(&(objectClass=inetOrgPerson)(uid=%s))"
 # OpenLDAP: uid
 # Active Directory: sAMAccountName

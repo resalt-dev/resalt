@@ -1,5 +1,5 @@
 use crate::prelude::*;
-use actix_web::{web, Responder, Result};
+use actix_web::{web, HttpRequest, Responder, Result};
 use log::*;
 use serde::{Deserialize, Serialize};
 
@@ -18,28 +18,79 @@ pub async fn route_auth_login_post(
     data: web::Data<Storage>,
     salt: web::Data<SaltAPI>,
     input: web::Json<LoginRequest>,
+    req: HttpRequest,
 ) -> Result<impl Responder> {
-    let username = input.username.to_lowercase();
-    let password = input.password.clone();
+    log::warn!("hello {}", SConfig::auth_forward_enabled());
+    let user: User = if SConfig::auth_forward_enabled() {
+        // Use X-Forwarded-User header as username
+        log::warn!("headers {:?}", req.headers());
+        let username = match req.headers().get("X-Forwarded-User") {
+            Some(forwarded_user) => forwarded_user.to_str().unwrap().to_string(),
+            None => return Err(api_error_unauthorized()),
+        };
+        log::warn!("username: {}", username);
 
-    info!("Attempting login for {:?}", username);
+        // Fetch user to see if they exist
+        let user = match data.get_user_by_username(&username) {
+            Ok(user) => user,
+            Err(e) => {
+                error!("{:?}", e);
+                return Err(api_error_database());
+            }
+        };
+        match user {
+            Some(user) => user,
+            None => {
+                // Create User
+                let (ldap_sync, username, email) = match SConfig::auth_ldap_enabled() {
+                    true => {
+                        // Create user
+                        match LdapHandler::find_dn(&username).await {
+                            // User was found in LDAP, lets link
+                            Ok(Some((ldap_sync, username, email))) => {
+                                (Some(ldap_sync), username, Some(email))
+                            }
+                            // User was not found in LDAP,
+                            Ok(None) => return Err(api_error_unauthorized()),
+                            Err(e) => {
+                                error!("route_auth_login_post {:?}", e);
+                                return Err(api_error_ldap());
+                            }
+                        }
+                    }
+                    false => (None, username, None),
+                };
 
-    let mut user = match auth_login_classic(&data, &username, &password) {
-        Ok(user) => user,
-        Err(e) => return Err(e),
-    };
-    if user.is_none() {
-        debug!("User not found, testing LDAP");
-        user = match auth_login_ldap(&data, &username, &password).await {
+                match data.create_user(username, None, email, ldap_sync) {
+                    Ok(user) => user,
+                    Err(e) => {
+                        error!("Failed creating user {:?}", e);
+                        return Err(api_error_database());
+                    }
+                }
+            }
+        }
+    } else {
+        let username = input.username.to_lowercase();
+        let password = input.password.clone();
+
+        info!("Attempting login for {:?}", username);
+        let user = match auth_login_classic(&data, &username, &password) {
             Ok(user) => user,
             Err(e) => return Err(e),
         };
-    }
-
-    let user = match user {
-        Some(user) => user,
-        None => {
-            return Err(api_error_unauthorized());
+        match user {
+            Some(user) => user,
+            None => {
+                debug!("User not found, testing LDAP");
+                match auth_login_ldap(&data, &username, &password).await {
+                    Ok(user) => match user {
+                        Some(user) => user,
+                        None => return Err(api_error_unauthorized()),
+                    },
+                    Err(e) => return Err(e),
+                }
+            }
         }
     };
 

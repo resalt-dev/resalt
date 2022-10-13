@@ -58,8 +58,10 @@ impl LdapHandler {
     /**
      * Find the DN of a user in LDAP.
      * Returns None if the user does not exist.
+     *
+     * Returns tuple of (dn, username, email)
      */
-    async fn find_dn(username: &str) -> Result<Option<(String, String, String)>, LdapError> {
+    pub async fn find_dn(username: &str) -> Result<Option<(String, String, String)>, LdapError> {
         let mut service_ldap = LdapHandler::create_system_connection().await?;
 
         let base_dn = SConfig::auth_ldap_base_dn();
