@@ -29,7 +29,7 @@
     <Card
         class="mb-3 border border-4 border-{$theme.color} rounded-none bg-none"
     >
-        <CardBody class={children[selected].class || ''}>
+        <CardBody>
             <svelte:component
                 this={children[selected].component}
                 label={children[selected].label}

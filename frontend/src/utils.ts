@@ -27,5 +27,4 @@ export type NavSubPage = {
     label: string;
     component: any;
     data?: any;
-    class?: string;
 };

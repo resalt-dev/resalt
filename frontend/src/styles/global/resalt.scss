@@ -23,6 +23,7 @@ $bluegray-10: #0e1418;
     
     hr.bg-light, .vr.bg-light {
         background-color: $bluegray-5 !important;
+        border-color: $bluegray-5 !important;
     }
     
     .form-control {
@@ -121,17 +122,16 @@ $bluegray-10: #0e1418;
     .card:not(.bg-none) .card-body:not(.bg-dark) {
         background-color: $bluegray-8 !important;
     }
-    // Second-level nested Card
-    .card-body .card:not(.bg-none) .card-body:not(.bg-dark) {
-        background-color: $bluegray-7 !important;
-    }
 
     .result-box .card-header {
         border-bottom: 2px solid $bluegray-7 !important;
     }
 
+    .list-group {
+        --bs-list-group-border-color: #{$bluegray-5};
+    }
     .list-group-item {
-        background-color: $bluegray-7 !important;
+        background-color: $bluegray-8 !important;
         color: var(--light-gray) !important;
     }
 

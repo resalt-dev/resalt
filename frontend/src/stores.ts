@@ -66,7 +66,7 @@ function createToastStore(): ToastStore {
                     messages.shift();
                     return messages;
                 });
-            }, 7500);
+            }, 5000);
         },
         clear: () => set([]),
     };

@@ -3,11 +3,11 @@
     import JsonViewer from '../../components/JsonViewer.svelte';
     import type Minion from '../../models/Minion';
 
-    export let minion: Writable<Minion>;
+    export let tabData: Writable<Minion>;
 </script>
 
-{#if !$minion.pillars}
+{#if !$tabData.pillars}
     <div class="p-3">No pillars data. Please refresh minion.</div>
 {:else}
-    <JsonViewer data={JSON.parse($minion.pillars)} collapse={false} />
+    <JsonViewer data={JSON.parse($tabData.pillars)} collapse={false} />
 {/if}
