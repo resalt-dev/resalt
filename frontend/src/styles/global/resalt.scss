@@ -40,6 +40,11 @@ $bluegray-10: #0e1418;
     .form-switch > input:checked {
         background-color: var(--primary) !important;
     }
+    .form-select {
+        background-color: $bluegray-8 !important;
+        border-color: $bluegray-6;
+        color: var(--light-gray);
+    }
     
     #dashboard-header {
         background-color: $bluegray-6 !important;
