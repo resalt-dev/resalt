@@ -5,7 +5,7 @@
     import { loadCurrentUser, logout } from '../../controller';
     import paths from '../../paths';
     import Sidebar from './DashboardSidebar.svelte';
-    import DashboardTopbar from './DashboardTopbar.svelte';
+    import DashboardHeader from './DashboardHeader.svelte';
     import Redirect from '../../components/Redirect.svelte';
 
     import Home from '../../views/Home/Home.svelte';
@@ -45,7 +45,7 @@
             <Sidebar />
         </div>
         <div class="w-100 overflow-auto bg-white">
-            <DashboardTopbar />
+            <DashboardHeader />
             <div class="px-4 py-3">
                 <Router primary={false}>
                     <Route path="home" component={Home} />

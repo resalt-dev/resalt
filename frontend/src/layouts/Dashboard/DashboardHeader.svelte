@@ -28,11 +28,14 @@
                 {#if item.path}
                     <Link
                         to={item.path}
-                        class={`btn btn-${$theme.color} btn-arrow-right fw-bold`}
-                        >{item.title}</Link
+                        class={`btn btn-${$theme.color} ${
+                            $theme.color === 'yellow' ? '' : 'text-white'
+                        } btn-arrow-right fw-bold`}>{item.title}</Link
                     >
                 {:else}
-                    <div class="btn btn-dark btn-arrow-right fw-bold">
+                    <div
+                        class="btn btn-dark text-white btn-arrow-right fw-bold"
+                    >
                         {item.title}
                     </div>
                 {/if}
