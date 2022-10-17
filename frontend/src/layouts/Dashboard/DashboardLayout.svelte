@@ -69,10 +69,10 @@
     </div>
 {/if}
 
-<!-- Toast area, top right -->
-<div class="position-absolute top-0 end-0 p-3" style="z-index: 11">
+<!-- Toast / Alerts -->
+<div class="position-fixed top-0 end-0 pt-5 pe-5" style="z-index: 11">
     {#each $toasts as toast}
-        <Toast class={'toast-' + toast.type}>
+        <Toast class="{'toast-' + toast.type} mb-2">
             <ToastHeader>{toast.title}</ToastHeader>
             <ToastBody>{toast.message}</ToastBody>
         </Toast>
