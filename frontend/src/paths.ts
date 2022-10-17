@@ -54,10 +54,10 @@ const dashboardPaths = [
 
     new Path('user', '/dashboard/users/:userId', 'User', '', false, true),
     new Path('users', '/dashboard/users', 'Users', 'user-circle', true),
-    new Path('preferences_page', '/dashboard/preferences/:preferencesPage', 'Preferences', 'wrench', false, true),
-    new Path('preferences', '/dashboard/preferences', 'Preferences', 'wrench', true),
     new Path('settings_page', '/dashboard/settings/:settingsPage', 'Settings', '', false, true),
     new Path('settings', '/dashboard/settings', 'Settings', 'cog', true),
+    new Path('preferences_page', '/dashboard/preferences/:preferencesPage', 'Preferences', '', false, true),
+    new Path('preferences', '/dashboard/preferences', 'Preferences', 'wrench', true),
 ];
 
 const paths: any = new Proxy([
