@@ -674,7 +674,7 @@
                                     '$superadmins'}
                                 on:click={updateSelectedGroup}
                             >
-                                Save changes
+                                Save
                             </Button>
                         </Col>
                         <Col class="ps-3 mb-0" xs="12">
@@ -1036,7 +1036,7 @@
                                     '$superadmins'}
                                 on:click={updateSelectedGroup}
                             >
-                                Save changes
+                                Save
                             </Button>
                             <Button
                                 color="danger"
