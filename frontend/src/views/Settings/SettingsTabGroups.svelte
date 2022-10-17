@@ -26,7 +26,7 @@
         showToast,
         updatePermissionGroup,
     } from '../../controller';
-    import { AlertType } from '../../models/AlertType';
+    import { AlertType } from '../../models/MessageType';
     import { resaltWebPermissions } from '../../perms';
     import { theme } from '../../stores';
     import type PermissionGroup from '../../models/PermissionGroup';

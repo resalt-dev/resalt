@@ -12,7 +12,7 @@
     import MinionPackages from './MinionPackages.svelte';
     import MinionConformity from './MinionConformity.svelte';
     import { onMount } from 'svelte';
-    import { AlertType } from '../../models/AlertType';
+    import { AlertType } from '../../models/MessageType';
     import type Minion from '../../models/Minion';
 
     // export let navigate;

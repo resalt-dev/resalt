@@ -11,8 +11,8 @@
     import Icon from '../../components/Icon.svelte';
     import constants from '../../constants';
     import { showToast } from '../../controller';
-    import { AlertType } from '../../models/AlertType';
-    import { config, theme } from '../../stores';
+    import { AlertType } from '../../models/MessageType';
+    import { config, theme, toasts } from '../../stores';
 
     function selectColor(color: string): void {
         console.log('selectColor', color);
@@ -110,7 +110,11 @@
             color="warning"
             on:click={() => {
                 showToast(
-                    AlertType.INFO,
+                    AlertType[
+                        Object.keys(AlertType).filter((k) => isNaN(Number(k)))[
+                            $toasts.length
+                        ]
+                    ],
                     'Testing toast!',
                     "This is a test toast message. It's a bit longer than the others, but that's okay.",
                 );

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { Router, Route, useNavigate } from 'svelte-navigator';
-    import { currentUser, theme } from '../../stores';
+    import { currentUser, toasts } from '../../stores';
     import { loadCurrentUser, logout } from '../../controller';
     import paths from '../../paths';
     import Sidebar from './DashboardSidebar.svelte';
@@ -20,6 +20,7 @@
     import Users from '../../views/Users/Users.svelte';
     import Settings from '../../views/Settings/Settings.svelte';
     import Preferences from '../../views/Preferences/Preferences.svelte';
+    import { Toast, ToastBody, ToastHeader } from 'sveltestrap';
 
     const navigate = useNavigate();
 
@@ -67,3 +68,13 @@
         </div>
     </div>
 {/if}
+
+<!-- Toast area, top right -->
+<div class="position-absolute top-0 end-0 p-3" style="z-index: 11">
+    {#each $toasts as toast}
+        <Toast class={'toast-' + toast.type}>
+            <ToastHeader>{toast.title}</ToastHeader>
+            <ToastBody>{toast.message}</ToastBody>
+        </Toast>
+    {/each}
+</div>

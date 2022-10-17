@@ -34,7 +34,7 @@ import {
     apiUpdatePermissionGroup,
     apiUpdateUserPassword,
 } from './api';
-import Alert from './models/Alert';
+import Alert from './models/Message';
 import type Minion from './models/Minion';
 import type User from './models/User';
 import type SaltEvent from './models/SaltEvent';
@@ -60,7 +60,7 @@ function requireToken(): string {
  * UTIL
  */
 export function showToast(type: string, title: string, message: string): void {
-    toasts.update((mAlerts) => [...mAlerts, new Alert(type, title, message)]);
+    toasts.add(new Alert(type, title, message));
 }
 
 /*

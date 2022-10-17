@@ -9,7 +9,7 @@
     import { config, theme } from '../../stores';
     import paths from '../../paths';
     import { useNavigate } from 'svelte-navigator';
-    import { AlertType } from '../../models/AlertType';
+    import { AlertType } from '../../models/MessageType';
     import { FormGroup, Input, Label, Progress } from 'sveltestrap';
     const navigate = useNavigate();
 

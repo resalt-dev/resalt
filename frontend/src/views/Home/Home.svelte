@@ -12,7 +12,7 @@
         Row,
     } from 'sveltestrap';
     import { getMetricResults, showToast } from '../../controller';
-    import { AlertType } from '../../models/AlertType';
+    import { AlertType } from '../../models/MessageType';
     import { theme } from '../../stores';
 
     import { Pie, Line, Bar } from 'svelte-chartjs';

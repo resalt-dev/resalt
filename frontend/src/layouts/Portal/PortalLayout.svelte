@@ -7,7 +7,7 @@
     import AuthLogout from '../../views/Auth/AuthLogout.svelte';
     import constants from '../../constants';
     import Logo from '../../components/Logo.svelte';
-    import type Alert from '../../models/Alert';
+    import type Alert from '../../models/Message';
 
     let localAlerts: Writable<Alert[]> = writable([]);
 

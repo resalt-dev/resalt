@@ -11,7 +11,7 @@
     import Tabs from '../../components/Tabs.svelte';
     import MinionsTabSearch from './MinionsTabSearch.svelte';
     import MinionsTabGroups from './MinionsTabGroups.svelte';
-    import { AlertType } from '../../models/AlertType';
+    import { AlertType } from '../../models/MessageType';
     import type Minion from '../../models/Minion';
 
     let sort: string = null;

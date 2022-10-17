@@ -7,7 +7,7 @@
     import TablePaginate from '../../components/TablePaginate.svelte';
     import paths from '../../paths';
     import { Link } from 'svelte-navigator';
-    import { AlertType } from '../../models/AlertType';
+    import { AlertType } from '../../models/MessageType';
     import type User from '../../models/User';
 
     let paginationSize: number = 20;

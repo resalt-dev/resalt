@@ -812,6 +812,48 @@ hr {
 }
 
 /*
+ * Toasts
+ */
+.toast {
+    --bs-toast-font-size: 1rem;
+}
+.toast.toast-primary, .toast.toast-primary .toast-header {
+    --bs-toast-bg: var(--light-primary);
+    --bs-toast-header-bg: var(--primary);
+    --bs-toast-header-color: var(--white);
+}
+.toast.toast-info, .toast.toast-info .toast-header {
+    --bs-toast-bg: var(--light-info);
+    --bs-toast-header-bg: var(--info);
+    --bs-toast-header-color: var(--white);
+}
+.toast.toast-success, .toast.toast-success .toast-header {
+    --bs-toast-bg: var(--light-success);
+    --bs-toast-header-bg: var(--success);
+    --bs-toast-header-color: var(--white);
+}
+.toast.toast-warning, .toast.toast-warning .toast-header {
+    --bs-toast-bg: var(--light-warning);
+    --bs-toast-header-bg: var(--warning);
+    --bs-toast-header-color: var(--black); // special for yellow
+}
+.toast.toast-danger, .toast.toast-danger .toast-header {
+    --bs-toast-bg: var(--light-danger);
+    --bs-toast-header-bg: var(--danger);
+    --bs-toast-header-color: var(--white);
+}
+.toast.toast-light, .toast.toast-light .toast-header {
+    --bs-toast-bg: var(--light);
+    --bs-toast-header-bg: var(--gray-2);
+}
+.toast.toast-dark, .toast.toast-dark .toast-header {
+    --bs-toast-bg: var(--dark);
+    --bs-toast-header-bg: var(--light-dark);
+    --bs-toast-header-color: var(--white);
+    --bs-toast-color: var(--white);
+}
+
+/*
  * Progress bars
  */
 .progress {

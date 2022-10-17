@@ -20,7 +20,7 @@
         Label,
         Row,
     } from 'sveltestrap';
-    import { AlertType } from '../../models/AlertType';
+    import { AlertType } from '../../models/MessageType';
     import JsonViewer from '../../components/JsonViewer.svelte';
     import type User from '../../models/User';
     import {
@@ -86,7 +86,6 @@
     */
 
     function validatePasswordField(): void {
-        console.log('validatePasswordField');
         validateRepeatPasswordField();
 
         passwordFieldError = false;
@@ -98,7 +97,6 @@
     }
 
     function validateRepeatPasswordField(): void {
-        console.log('validateRepeatPasswordField');
         repeatPasswordFieldError = false;
 
         if (repeatPasswordFieldValue.length < PASSWORD_MIN_LENGTH) {

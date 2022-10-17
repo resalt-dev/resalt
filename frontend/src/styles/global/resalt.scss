@@ -134,6 +134,17 @@ $bluegray-10: #0e1418;
         background-color: $bluegray-7 !important;
         color: var(--light-gray) !important;
     }
+
+    .toast.toast-light, .toast.toast-light .toast-header {
+        --bs-toast-bg: #{$bluegray-5};
+        --bs-toast-header-bg: #{$bluegray-9};
+        --bs-toast-header-color: var(--light-gray);
+        --bs-toast-color: var(--light-gray);
+    }
+    .toast.toast-dark, .toast.toast-dark .toast-header {
+        --bs-toast-header-color: var(--light-gray);
+        --bs-toast-color: var(--light-gray);
+    }
 }
 
 

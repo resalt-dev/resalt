@@ -13,7 +13,7 @@
     import paths from '../../paths';
     import { Link } from 'svelte-navigator';
     import type Key from '../../models/Key';
-    import { AlertType } from '../../models/AlertType';
+    import { AlertType } from '../../models/MessageType';
 
     let paginationSize: number = 20;
     let paginationPage: number = 1;
