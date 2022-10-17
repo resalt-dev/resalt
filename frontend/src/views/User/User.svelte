@@ -86,6 +86,7 @@
     */
 
     function validatePasswordField(): void {
+        console.log('validatePasswordField');
         validateRepeatPasswordField();
 
         passwordFieldError = false;
@@ -97,6 +98,7 @@
     }
 
     function validateRepeatPasswordField(): void {
+        console.log('validateRepeatPasswordField');
         repeatPasswordFieldError = false;
 
         if (repeatPasswordFieldValue.length < PASSWORD_MIN_LENGTH) {
@@ -216,7 +218,7 @@
                                 invalid={repeatPasswordFieldError &&
                                     repeatPasswordFieldValue.length > 0}
                                 bind:value={repeatPasswordFieldValue}
-                                on:blur={validateRepeatPasswordField}
+                                on:keyup={validateRepeatPasswordField}
                             />
                             <Label>Confirm password</Label>
                         </FormGroup>
@@ -232,7 +234,7 @@
                                 long.
                             </p>
                         {/if}
-                        {#if repeatPasswordFieldError && repeatPasswordFieldValue.length > 0}
+                        {#if repeatPasswordFieldError}
                             <p class="text-danger mt-3">
                                 Passwords do not match.
                             </p>
