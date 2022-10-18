@@ -54,12 +54,12 @@
             ? 'nav-flush text-center'
             : 'mx-2'}"
     >
-        {#each paths as route}
-            {#if route.showInNav}
-                {#if route.name === 'users'}
+        {#each Object.values(paths) as path}
+            {#if path.showInNav}
+                {#if path.name === 'users'}
                     <li><hr /></li>
                 {/if}
-                <SidebarItem {route} collapsed={$collapsed} />
+                <SidebarItem {path} collapsed={$collapsed} />
             {/if}
         {/each}
     </ul>

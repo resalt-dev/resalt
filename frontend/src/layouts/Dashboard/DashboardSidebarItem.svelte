@@ -4,17 +4,17 @@
     import Icon from '../../components/Icon.svelte';
     import type { Path } from '../../paths';
 
-    export let route: Path;
+    export let path: Path;
     export let collapsed: boolean;
 
     const location = useLocation();
     // $: isActive = $location.pathname === route.path;
-    $: isActiveOrSub = $location.pathname.startsWith(route.path);
+    $: isActiveOrSub = $location.pathname.startsWith(path.path);
 </script>
 
 <li class="nav-item" style="height: 4.5rem;">
     <Link
-        to={route.path}
+        to={path.path}
         class="nav-link {$theme.color === 'yellow' && isActiveOrSub
             ? 'text-dark'
             : 'text-white'} {isActiveOrSub
@@ -24,9 +24,9 @@
             : ''}"
         style="height: inherit;"
     >
-        <Icon name={route.icon} class="ps-1 {collapsed ? '' : 'me-3'}" />
+        <Icon name={path.icon} class="ps-1 {collapsed ? '' : 'me-3'}" />
         {#if !collapsed}
-            <span>{route.label}</span>
+            <span>{path.label}</span>
         {/if}
     </Link>
 </li>
