@@ -3,16 +3,32 @@
     import { Link } from 'svelte-navigator';
     import paths from '../../paths';
     import { theme } from '../../stores';
-    import { logout } from '../../controller';
+    import { logout, showToast } from '../../controller';
+    import { MessageType } from '../../models/MessageType';
 
-    onMount(async () => {
-        logout();
+    let loggingOut: boolean = true;
+
+    onMount(() => {
+        logout()
+            .then(() => {
+                loggingOut = false;
+                showToast(
+                    MessageType.SUCCESS,
+                    'Logout Success',
+                    'You have now been logged out.',
+                );
+            })
+            .catch((err) => {
+                showToast(MessageType.ERROR, 'Logout Error', err);
+            });
     });
+
+    $: console.log('p3: ' + paths.login.path);
 </script>
 
-{#await logout()}
+{#if loggingOut}
     <p class="fw-bold">Hang on a moment while we sign you out.</p>
-{:then}
+{:else}
     <p class="fw-bold">You have been successfully signed out.</p>
     <br />
     <Link
@@ -22,6 +38,4 @@
         Go back
     </Link>
     <br />
-{:catch error}
-    An error occurred.
-{/await}
+{/if}

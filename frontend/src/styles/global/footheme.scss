@@ -816,6 +816,7 @@ hr {
  */
 .toast {
     --bs-toast-font-size: 1rem;
+    --bs-toast-color: var(--dark);
 }
 .toast.toast-primary, .toast.toast-primary .toast-header {
     --bs-toast-bg: var(--light-primary);

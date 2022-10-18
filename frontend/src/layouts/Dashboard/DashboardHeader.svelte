@@ -7,18 +7,21 @@
 
     const location = useLocation();
 
-    $: navbar = $location.pathname
-        .split('/')
-        .filter(Boolean)
-        .filter((path) => path !== 'home')
-        .map((str) => {
-            return {
-                title: str.charAt(0).toUpperCase() + str.slice(1),
-                path: paths[
-                    str === 'dashboard' ? 'home' : str.toLowerCase()
-                ]?.getPath(),
-            };
-        });
+    $: navbar =
+        $location.pathname.indexOf('/auth/') !== -1
+            ? []
+            : $location.pathname
+                  .split('/')
+                  .filter(Boolean)
+                  .filter((path) => path !== 'home')
+                  .map((str) => {
+                      return {
+                          title: str.charAt(0).toUpperCase() + str.slice(1),
+                          path: paths[
+                              str === 'dashboard' ? 'home' : str.toLowerCase()
+                          ]?.getPath(),
+                      };
+                  });
 </script>
 
 <Row id="dashboard-header" class="g-0 d-flex align-items-center bg-light">

@@ -11,7 +11,7 @@
     import Tabs from '../../components/Tabs.svelte';
     import MinionsTabSearch from './MinionsTabSearch.svelte';
     import MinionsTabGroups from './MinionsTabGroups.svelte';
-    import { AlertType } from '../../models/MessageType';
+    import { MessageType } from '../../models/MessageType';
     import type Minion from '../../models/Minion';
 
     let sort: string = null;
@@ -27,7 +27,7 @@
                 minions.set(data);
             })
             .catch((err) => {
-                showToast(AlertType.ERROR, 'Failed fetching minions', err);
+                showToast(MessageType.ERROR, 'Failed fetching minions', err);
             });
     }
 

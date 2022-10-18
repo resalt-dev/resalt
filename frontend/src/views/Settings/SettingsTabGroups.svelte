@@ -26,7 +26,7 @@
         showToast,
         updatePermissionGroup,
     } from '../../controller';
-    import { AlertType } from '../../models/MessageType';
+    import { MessageType } from '../../models/MessageType';
     import { resaltWebPermissions } from '../../perms';
     import { theme } from '../../stores';
     import type PermissionGroup from '../../models/PermissionGroup';
@@ -86,7 +86,7 @@
                     resolve();
                 })
                 .catch((err) => {
-                    showToast(AlertType.ERROR, 'Failed fetching groups', err);
+                    showToast(MessageType.ERROR, 'Failed fetching groups', err);
                     reject();
                 });
         });
@@ -166,11 +166,15 @@
             .then((group) => {
                 updateData();
                 selectedGroup.set(group);
-                showToast(AlertType.SUCCESS, 'Create group', 'Created group!');
+                showToast(
+                    MessageType.SUCCESS,
+                    'Create group',
+                    'Created group!',
+                );
             })
             .catch((err) => {
                 console.error(err);
-                showToast(AlertType.ERROR, 'Failed creating group', err);
+                showToast(MessageType.ERROR, 'Failed creating group', err);
             });
     }
 
@@ -189,11 +193,15 @@
                         selectedGroup.set(null);
                     }
                 });
-                showToast(AlertType.SUCCESS, 'Delete group', 'Deleted group!');
+                showToast(
+                    MessageType.SUCCESS,
+                    'Delete group',
+                    'Deleted group!',
+                );
             })
             .catch((err) => {
                 console.error(err);
-                showToast(AlertType.ERROR, 'Failed deleting group', err);
+                showToast(MessageType.ERROR, 'Failed deleting group', err);
             });
     }
 
@@ -209,14 +217,18 @@
             .then(() => {
                 updateData();
                 showToast(
-                    AlertType.SUCCESS,
+                    MessageType.SUCCESS,
                     'Add user to group',
                     'Added user to group!',
                 );
             })
             .catch((err) => {
                 console.error(err);
-                showToast(AlertType.ERROR, 'Failed adding user to group', err);
+                showToast(
+                    MessageType.ERROR,
+                    'Failed adding user to group',
+                    err,
+                );
             });
     }
 
@@ -228,7 +240,7 @@
             .then(() => {
                 updateData();
                 showToast(
-                    AlertType.SUCCESS,
+                    MessageType.SUCCESS,
                     'Remove user from group',
                     'Removed user from group!',
                 );
@@ -236,7 +248,7 @@
             .catch((err) => {
                 console.error(err);
                 showToast(
-                    AlertType.ERROR,
+                    MessageType.ERROR,
                     'Failed removing user from group',
                     err,
                 );
@@ -270,14 +282,14 @@
             .then(() => {
                 updateData();
                 showToast(
-                    AlertType.SUCCESS,
+                    MessageType.SUCCESS,
                     'Update group',
                     'Updated group name!',
                 );
             })
             .catch((err) => {
                 console.error(err);
-                showToast(AlertType.ERROR, 'Failed updating group', err);
+                showToast(MessageType.ERROR, 'Failed updating group', err);
             });
     }
 

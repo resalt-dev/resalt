@@ -5,7 +5,7 @@
     import Icon from '../../components/Icon.svelte';
     import { writable, type Writable } from 'svelte/store';
     import TablePaginate from '../../components/TablePaginate.svelte';
-    import { AlertType } from '../../models/MessageType';
+    import { MessageType } from '../../models/MessageType';
     import type Job from '../../models/Job';
 
     let filterUser: string | null = null;
@@ -28,7 +28,7 @@
                 jobs.set(data);
             })
             .catch((err) => {
-                showToast(AlertType.ERROR, 'Failed fetching jobs', err);
+                showToast(MessageType.ERROR, 'Failed fetching jobs', err);
             });
     }
 

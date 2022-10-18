@@ -7,7 +7,7 @@
     import TablePaginate from '../../components/TablePaginate.svelte';
     import paths from '../../paths';
     import { Link } from 'svelte-navigator';
-    import { AlertType } from '../../models/MessageType';
+    import { MessageType } from '../../models/MessageType';
     import type User from '../../models/User';
 
     let paginationSize: number = 20;
@@ -21,7 +21,7 @@
                 users.set(data);
             })
             .catch((err) => {
-                showToast(AlertType.ERROR, 'Failed fetching users', err);
+                showToast(MessageType.ERROR, 'Failed fetching users', err);
             });
     }
 

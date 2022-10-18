@@ -13,7 +13,7 @@
     import paths from '../../paths';
     import { Link } from 'svelte-navigator';
     import type Key from '../../models/Key';
-    import { AlertType } from '../../models/MessageType';
+    import { MessageType } from '../../models/MessageType';
 
     let paginationSize: number = 20;
     let paginationPage: number = 1;
@@ -28,7 +28,7 @@
                 fakePaginate();
             })
             .catch((err) => {
-                showToast(AlertType.ERROR, 'Failed fetching keys', err);
+                showToast(MessageType.ERROR, 'Failed fetching keys', err);
             });
     }
 
@@ -44,13 +44,13 @@
             .then(() => {
                 updateData();
                 showToast(
-                    AlertType.SUCCESS,
+                    MessageType.SUCCESS,
                     'Key accepted',
                     `Key ${key.id} accepted`,
                 );
             })
             .catch((err) => {
-                showToast(AlertType.ERROR, 'Failed accepting key', err);
+                showToast(MessageType.ERROR, 'Failed accepting key', err);
             });
     }
 
@@ -59,13 +59,13 @@
             .then(() => {
                 updateData();
                 showToast(
-                    AlertType.SUCCESS,
+                    MessageType.SUCCESS,
                     'Key rejected',
                     `Key ${key.id} rejected`,
                 );
             })
             .catch((err) => {
-                showToast(AlertType.ERROR, 'Failed rejecting key', err);
+                showToast(MessageType.ERROR, 'Failed rejecting key', err);
             });
     }
 
@@ -74,13 +74,13 @@
             .then(() => {
                 updateData();
                 showToast(
-                    AlertType.SUCCESS,
+                    MessageType.SUCCESS,
                     'Key deleted',
                     `Key ${key.id} deleted`,
                 );
             })
             .catch((err) => {
-                showToast(AlertType.ERROR, 'Failed deleting key', err);
+                showToast(MessageType.ERROR, 'Failed deleting key', err);
             });
     }
 

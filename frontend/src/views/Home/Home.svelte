@@ -12,7 +12,7 @@
         Row,
     } from 'sveltestrap';
     import { getMetricResults, showToast } from '../../controller';
-    import { AlertType } from '../../models/MessageType';
+    import { MessageType } from '../../models/MessageType';
     import { theme } from '../../stores';
 
     import { Pie, Line, Bar } from 'svelte-chartjs';
@@ -51,7 +51,7 @@
             })
             .catch((err) => {
                 showToast(
-                    AlertType.ERROR,
+                    MessageType.ERROR,
                     'Failed fetching dashboard metrics',
                     err,
                 );

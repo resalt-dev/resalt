@@ -2,7 +2,7 @@
     import { useNavigate } from 'svelte-navigator';
     const navigate = useNavigate();
 
-    import { currentUser, theme } from '../../stores';
+    import { currentUser } from '../../stores';
     import { hasResaltPermission, P_ADMIN_GROUP } from '../../perms';
     import paths from '../../paths';
     import SettingsTabConfig from './SettingsTabConfig.svelte';
@@ -10,6 +10,8 @@
     import Tabs from '../../components/Tabs.svelte';
     import type { NavSubPage } from '../../utils';
     import type User from '../../models/User';
+
+    export let subPage: string = 'theme';
 
     function calcSubPagesNav(currentUser: User | null): NavSubPage[] {
         if (!currentUser) return [];
@@ -35,10 +37,7 @@
 
     // Find index of subPage in subPagesNav, or 0 otherwise.
     $: currentSubPage = Math.max(
-        subPagesNav.findIndex(
-            (page) =>
-                page.label.toLowerCase() === location.pathname.split('/')[4],
-        ),
+        subPagesNav.findIndex((page) => page.label.toLowerCase() === subPage),
         0,
     );
 </script>
@@ -50,10 +49,6 @@
     selected={currentSubPage}
     onSelect={(index) => {
         let pageLabel = subPagesNav[index].label.toLowerCase();
-        if (pageLabel === 'config') {
-            navigate(paths.settings.path);
-        } else {
-            navigate(paths.settings_page.getPath(pageLabel));
-        }
+        navigate(paths.settings_page.getPath(pageLabel));
     }}
 />

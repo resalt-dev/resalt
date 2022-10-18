@@ -7,11 +7,13 @@
     import Tabs from '../../components/Tabs.svelte';
     import type { NavSubPage } from '../../utils';
 
+    export let subPage: string = 'theme';
+
     function calcSubPagesNav(): NavSubPage[] {
         let navs: NavSubPage[] = [];
 
         navs.push({
-            label: 'Color theme',
+            label: 'Theme',
             component: PreferencesTabTheme,
         });
 
@@ -22,10 +24,7 @@
 
     // Find index of subPage in subPagesNav, or 0 otherwise.
     $: currentSubPage = Math.max(
-        subPagesNav.findIndex(
-            (page) =>
-                page.label.toLowerCase() === location.pathname.split('/')[4],
-        ),
+        subPagesNav.findIndex((page) => page.label.toLowerCase() === subPage),
         0,
     );
 </script>
@@ -37,10 +36,6 @@
     selected={currentSubPage}
     onSelect={(index) => {
         let pageLabel = subPagesNav[index].label.toLowerCase();
-        if (pageLabel === 'config') {
-            navigate(paths.preferences.path);
-        } else {
-            navigate(paths.preferences_page.getPath(pageLabel));
-        }
+        navigate(paths.preferences_page.getPath(pageLabel));
     }}
 />

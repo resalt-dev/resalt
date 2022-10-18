@@ -58,8 +58,13 @@
                     <Route path="events" component={Events} />
                     <Route path="users/:userId" component={User} />
                     <Route path="users" component={Users} />
-                    <Route path="preferences/*" component={Preferences} />
-                    <Route path="settings/*" component={Settings} />
+                    <Route
+                        path="preferences/:subPage"
+                        component={Preferences}
+                    />
+                    <Route path="preferences" component={Preferences} />
+                    <Route path="settings/:subPage" component={Settings} />
+                    <Route path="settings" component={Settings} />
                     <Route path="*">
                         <Redirect to={paths.home.path} />
                     </Route>
@@ -70,7 +75,7 @@
 {/if}
 
 <!-- Toast / Alerts -->
-<div class="position-fixed top-0 end-0 pt-5 pe-5" style="z-index: 11">
+<div class="position-fixed top-0 end-0 mt-5 me-5" style="z-index: 11">
     {#each $toasts as toast}
         <Toast class="{'toast-' + toast.type} mb-2">
             <ToastHeader>{toast.title}</ToastHeader>

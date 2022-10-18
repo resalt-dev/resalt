@@ -4,7 +4,7 @@
     import Icon from '../../components/Icon.svelte';
     import { getEvents, showToast } from '../../controller';
     import TablePaginate from '../../components/TablePaginate.svelte';
-    import { AlertType } from '../../models/MessageType';
+    import { MessageType } from '../../models/MessageType';
     import { writable, type Writable } from 'svelte/store';
 
     let paginationSize: number = 20;
@@ -65,7 +65,7 @@
                 );
             })
             .catch((err) => {
-                showToast(AlertType.ERROR, 'Failed fetching events', err);
+                showToast(MessageType.ERROR, 'Failed fetching events', err);
             });
     }
 

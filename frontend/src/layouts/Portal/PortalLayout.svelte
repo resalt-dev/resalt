@@ -1,21 +1,11 @@
 <script lang="ts">
     import { Router, Route } from 'svelte-navigator';
-    import { writable, type Writable } from 'svelte/store';
-    import { Card, CardBody, CardText, CardTitle } from 'sveltestrap';
+    import { Toast, ToastBody, ToastHeader } from 'sveltestrap';
     import { toasts, theme } from '../../stores';
     import AuthLogin from '../../views/Auth/AuthLogin.svelte';
     import AuthLogout from '../../views/Auth/AuthLogout.svelte';
     import constants from '../../constants';
     import Logo from '../../components/Logo.svelte';
-    import type Alert from '../../models/Message';
-
-    let localAlerts: Writable<Alert[]> = writable([]);
-
-    // Clone "alerts" to "localAlerts" then empty it on every Svelte update
-    $: {
-        localAlerts.set($toasts);
-        toasts.set([]);
-    }
 </script>
 
 <div
@@ -46,13 +36,11 @@
 
                             <div class="clearfix" />
 
-                            {#each $localAlerts as alert}
-                                <Card class="text-white bg-{alert.type} mb-3">
-                                    <CardBody>
-                                        <CardTitle>{alert.title}</CardTitle>
-                                        <CardText>{alert.message}</CardText>
-                                    </CardBody>
-                                </Card>
+                            {#each $toasts as toast}
+                                <Toast class="{'toast-' + toast.type} mb-2">
+                                    <ToastHeader>{toast.title}</ToastHeader>
+                                    <ToastBody>{toast.message}</ToastBody>
+                                </Toast>
                             {/each}
                         </div>
                     </div>

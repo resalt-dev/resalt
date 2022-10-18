@@ -9,7 +9,7 @@
     import { config, theme } from '../../stores';
     import paths from '../../paths';
     import { useNavigate } from 'svelte-navigator';
-    import { AlertType } from '../../models/MessageType';
+    import { MessageType } from '../../models/MessageType';
     import { FormGroup, Input, Label, Progress } from 'sveltestrap';
     const navigate = useNavigate();
 
@@ -48,12 +48,16 @@
                         navigate(paths.home.path);
                     })
                     .catch((err) => {
-                        showToast(AlertType.ERROR, 'Failed fetching user', err);
+                        showToast(
+                            MessageType.ERROR,
+                            'Failed fetching user',
+                            err,
+                        );
                         logout();
                     });
             })
             .catch((err) => {
-                showToast(AlertType.ERROR, 'Login Error', err);
+                showToast(MessageType.ERROR, 'Login Error', err);
             });
     }
 

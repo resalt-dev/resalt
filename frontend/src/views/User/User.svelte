@@ -20,7 +20,7 @@
         Label,
         Row,
     } from 'sveltestrap';
-    import { AlertType } from '../../models/MessageType';
+    import { MessageType } from '../../models/MessageType';
     import JsonViewer from '../../components/JsonViewer.svelte';
     import type User from '../../models/User';
     import {
@@ -49,7 +49,7 @@
             })
             .catch((err) => {
                 showToast(
-                    AlertType.ERROR,
+                    MessageType.ERROR,
                     'Failed fetching user: ' + userId,
                     err,
                 );
@@ -74,7 +74,7 @@
             })
             .catch((err) => {
                 showToast(
-                    AlertType.ERROR,
+                    MessageType.ERROR,
                     'Failed updating password for user: ' + userId,
                     err,
                 );

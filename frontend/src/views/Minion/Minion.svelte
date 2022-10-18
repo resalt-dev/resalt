@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { AlertType } from '../../models/MessageType';
+    import { MessageType } from '../../models/MessageType';
     import { currentUser } from '../../stores';
     import { hasResaltPermission, P_ADMIN_GROUP } from '../../perms';
     import { onMount } from 'svelte';
@@ -30,7 +30,7 @@
             })
             .catch((err) => {
                 showToast(
-                    AlertType.ERROR,
+                    MessageType.ERROR,
                     'Failed fetching minion: ' + minionId,
                     err,
                 );

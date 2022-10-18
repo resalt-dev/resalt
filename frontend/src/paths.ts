@@ -22,11 +22,14 @@ export class Path {
 
     getPath(...args: string[]): string {
         let { path } = this;
+        console.log(`a1: ${path}`);
         if (this.hasParams) {
+            console.log(`a2: ${path}`);
             // Substitute url arguments (.e.g ":id" or ":group") with args
             // eslint-disable-next-line no-unused-vars
             path = path.replace(/:([^/]+)/g, (_match, _p1) => args.shift() || '');
         }
+        console.log(`a3: ${path}`);
         return path;
     }
 }
@@ -64,9 +67,18 @@ const paths: any = new Proxy([
     ...authPaths,
     ...dashboardPaths,
 ], {
-    get: (target, prop: any, receiver) => target.find(
-        (path: Path) => path.name === prop || path.path === prop,
-    ) || Reflect.get(target, prop, receiver),
+    get: (target: Path[], prop: any, receiver) => {
+        let result = target.find(
+            (path: Path) => path.name === prop || path.path === prop,
+        );
+        console.log(`_0: ${result} with ${prop.toString()}`);
+        result = result || Reflect.get(target, prop, receiver);
+        console.log(`_1: ${result} with ${prop.toString()}`);
+        if (!result) {
+            throw new Error(`Path not found: ${prop}`);
+        }
+        return result;
+    },
 });
 
 export default paths;
