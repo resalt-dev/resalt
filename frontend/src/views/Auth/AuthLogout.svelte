@@ -22,8 +22,6 @@
                 showToast(MessageType.ERROR, 'Logout Error', err);
             });
     });
-
-    $: console.log('p3: ' + paths.login.path);
 </script>
 
 {#if loggingOut}

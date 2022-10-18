@@ -25,14 +25,11 @@ export class Path {
 
     getPath(...args: string[]): string {
         let { path } = this;
-        console.log(`a1: ${path}`);
         if (this.hasParams) {
-            console.log(`a2: ${path}`);
             // Substitute url arguments (.e.g ":id" or ":group") with args
             // eslint-disable-next-line no-unused-vars
             path = path.replace(/:([^/]+)/g, (_match, _p1) => args.shift() || '');
         }
-        console.log(`a3: ${path}`);
         return path;
     }
 }
