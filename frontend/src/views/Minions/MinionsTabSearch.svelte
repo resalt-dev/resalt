@@ -1,21 +1,8 @@
 <script lang="ts">
-    import { Button, Col, Input, Row } from "sveltestrap";
-    import { refreshMinions } from "../../controller";
+    import type Filter from '../../models/Filter';
+    import MinionsFiltersBox from './MinionsFiltersBox.svelte';
+
+    export let tabData: { update: (filters: Filter[]) => void };
 </script>
 
-<Row>
-    <Col class="mb-4">
-        <label for="minionsSearch" class="form-label d-inline">ABC</label>
-        <Input
-            id="minionsSearch"
-            type="text"
-            placeholder="Search minions"
-            class="form-control ms-2 d-inline"
-            style="width: 15rem;"
-        />
-    </Col>
-</Row>
-
-<Button color="secondary" size="sm" on:click={() => refreshMinions()}>
-    Force reload minions
-</Button>
+<MinionsFiltersBox update={tabData.update} />

@@ -159,12 +159,14 @@ export async function apiRemoveUserFromPermissionGroup(
 
 export async function apiListMinions(
     token: string,
+    filter?: string,
     sort?: string,
     limit?: number,
     offset?: number,
 ): Promise<Array<Minion>> {
     const args = new URLSearchParams();
 
+    if (filter) args.append('filter', filter);
     if (sort) args.append('sort', sort);
     if (limit) args.append('limit', limit.toString());
     if (offset) args.append('offset', offset.toString());

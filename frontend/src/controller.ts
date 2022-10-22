@@ -43,6 +43,7 @@ import type Key from './models/Key';
 import type Config from './models/Config';
 import type MetricResult from './models/MetricResult';
 import type PermissionGroup from './models/PermissionGroup';
+import type Filter from './models/Filter';
 
 /*
  * INTERNAL UTILS
@@ -247,12 +248,14 @@ export async function removeUserFromPermissionGroup(
 ///
 
 export async function getMinions(
+    filters?: Filter[],
     sort?: string,
     limit?: number,
     offset?: number,
 ): Promise<Array<Minion>> {
     const token = requireToken();
-    return apiListMinions(token, sort, limit, offset);
+    const filter = filters && filters.length > 0 ? JSON.stringify(filters) : undefined;
+    return apiListMinions(token, filter, sort, limit, offset);
 }
 
 export async function refreshMinions(): Promise<void> {

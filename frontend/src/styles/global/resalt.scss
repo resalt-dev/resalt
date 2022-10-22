@@ -61,13 +61,16 @@ $bluegray-10: #0e1418;
         border-top-color: $bluegray-5 !important;
     }
     
+    .btn.disabled, .btn:disabled, fieldset:disabled .btn {
+        --bs-btn-disabled-opacity: 0.4;
+    }
     .btn-secondary:not(.btn-arrow-left):not(.btn-arrow-right) {
         background-color: $bluegray-5 !important;
         border-color: $bluegray-9 !important;
     }
     .btn-secondary:hover:not(.btn-arrow-left):not(.btn-arrow-right),
     .btn-secondary:not(.btn-arrow-left):not(.btn-arrow-right).active {
-        background-color: $bluegray-9 !important;
+        background-color: $bluegray-8 !important;
     }
 
     .btn-dark.btn-arrow-left,

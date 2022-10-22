@@ -32,6 +32,7 @@
 
 <div class="nav bg-dark w-100 justify-content-start no-select">
     <div
+        aria-hidden="true"
         class="nav-link fw-bold mouse-pointer {page === 1
             ? 'text-secondary'
             : 'text-white'}"
@@ -40,6 +41,7 @@
         &lt;&lt;
     </div>
     <div
+        aria-hidden="true"
         class="nav-link fw-bold mouse-pointer {page === 1
             ? 'text-secondary'
             : 'text-white'}"
@@ -48,6 +50,7 @@
         &lt;
     </div>
     <div
+        aria-hidden="true"
         class="nav-link fw-bold mouse-pointer {last
             ? 'text-secondary'
             : 'text-white'}"
@@ -73,6 +76,7 @@
             {#each [20, 50, 100, 250] as s}
                 <li>
                     <span
+                        aria-hidden="true"
                         class="dropdown-item mouse-pointer {size === s
                             ? 'fw-bold'
                             : ''}"

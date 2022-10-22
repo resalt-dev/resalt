@@ -1,19 +1,22 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
-    import { writable, type Writable } from 'svelte/store';
+    import { Button, Card, Table } from 'sveltestrap';
     import { getMinions, showToast } from '../../controller';
-    import { theme } from '../../stores';
-    import Icon from '../../components/Icon.svelte';
-    import paths from '../../paths';
     import { Link } from 'svelte-navigator';
-    import { Card, Table } from 'sveltestrap';
+    import { MessageType } from '../../models/MessageType';
+    import { onMount } from 'svelte';
+    import { refreshMinions } from '../../controller';
+    import { theme } from '../../stores';
+    import { writable, type Writable } from 'svelte/store';
+    import Icon from '../../components/Icon.svelte';
+    import MinionsTabGroups from './MinionsTabGroups.svelte';
+    import MinionsTabSearch from './MinionsTabSearch.svelte';
+    import paths from '../../paths';
     import TablePaginate from '../../components/TablePaginate.svelte';
     import Tabs from '../../components/Tabs.svelte';
-    import MinionsTabSearch from './MinionsTabSearch.svelte';
-    import MinionsTabGroups from './MinionsTabGroups.svelte';
-    import { MessageType } from '../../models/MessageType';
+    import type Filter from '../../models/Filter';
     import type Minion from '../../models/Minion';
 
+    let filters: Filter[] = [];
     let sort: string = null;
     let paginationSize: number = 20;
     let paginationPage: number = 1;
@@ -21,8 +24,13 @@
     const SORT_COLOR: string = 'text-orange';
     const minions: Writable<Minion[] | null> = writable(null);
 
-    function updateData() {
-        getMinions(sort, paginationSize, (paginationPage - 1) * paginationSize)
+    function updateData(): void {
+        getMinions(
+            filters,
+            sort,
+            paginationSize,
+            (paginationPage - 1) * paginationSize,
+        )
             .then((data) => {
                 minions.set(data);
             })
@@ -31,7 +39,12 @@
             });
     }
 
-    function toggleSort(field: string) {
+    function setFilters(newFilters: Filter[]): void {
+        filters = newFilters;
+        updateData();
+    }
+
+    function toggleSort(field: string): void {
         // field.order
         let parts = (sort || 'null.null').split('.');
         if (parts[0] === field) {
@@ -65,6 +78,7 @@
         {
             label: 'Search',
             component: MinionsTabSearch,
+            data: { update: setFilters },
         },
         {
             label: 'Groups',
@@ -298,3 +312,9 @@
     last={$minions === null || $minions.length < paginationSize}
     {updateData}
 />
+
+<br />
+
+<Button color="secondary" size="sm" on:click={() => refreshMinions()}>
+    Force reload minions
+</Button>

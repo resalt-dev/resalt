@@ -261,7 +261,7 @@
     </Col>
 </Row>
 
-<hr class="bg-light" />
+<hr class="bg-light mt-1" />
 
 <Row>
     <Col />

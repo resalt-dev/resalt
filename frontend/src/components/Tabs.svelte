@@ -11,6 +11,7 @@
 <div class="nav bg-dark w-100 no-select">
     {#each children as tab, i}
         <div
+            aria-hidden="true"
             class="nav-link px-4 py-3 fw-bold mouse-pointer {i === selected
                 ? 'bg-' + $theme.color
                 : ''} {$theme.color === 'yellow' && i === selected
