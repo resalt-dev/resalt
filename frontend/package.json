@@ -14,6 +14,7 @@
     "@codemirror/language": "^6.2.1",
     "@codemirror/state": "^6.1.1",
     "@codemirror/view": "^6.2.3",
+    "@eonasdan/tempus-dominus": "^6.2.4",
     "@lezer/highlight": "^1.0.0",
     "@rollup/plugin-commonjs": "^22.0.2",
     "@rollup/plugin-node-resolve": "^14.1.0",

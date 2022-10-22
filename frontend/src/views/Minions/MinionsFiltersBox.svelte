@@ -1,6 +1,7 @@
 <script lang="ts">
     import { writable } from 'svelte/store';
-    import { Button, Col, FormGroup, Input, Label, Row } from 'sveltestrap';
+    import { TempusDominus } from '@eonasdan/tempus-dominus';
+    import { Button, Col, Input, Label, Row } from 'sveltestrap';
     import Icon from '../../components/Icon.svelte';
     import type Filter from '../../models/Filter';
     import { FilterFieldType } from '../../models/FilterFieldType';
@@ -176,23 +177,53 @@
                 </div>
             </Col>
             <Col xs="12" lg="8" xl="3">
-                <div
-                    class="form-floating {i + 1 === $filters.length
-                        ? 'mb-0'
-                        : 'mb-3'}"
-                >
-                    <Input
-                        type="text"
-                        name="text"
-                        bind:value={filter.value}
-                        on:blur={onBlur}
-                    />
-                    {#if filter.fieldType === FilterFieldType.PACKAGE}
-                        <Label>Version</Label>
-                    {:else}
-                        <Label>Value</Label>
-                    {/if}
-                </div>
+                {#if filter.fieldType === FilterFieldType.OBJECT && filter.field === 'last_seen'}
+                    <div
+                        class="input-group"
+                        id="datetimepicker{i}"
+                        data-td-target-input="nearest"
+                        data-td-target-toggle="nearest"
+                    >
+                        <div
+                            class="form-floating {i + 1 === $filters.length
+                                ? 'mb-0'
+                                : 'mb-3'}"
+                        >
+                            <input
+                                id="datetimepicker{i}Input"
+                                type="text"
+                                class="form-control"
+                                data-td-target="#datetimepicker{i}"
+                            />
+                            <Label>Date</Label>
+                        </div>
+                        <span
+                            class="input-group-text mb-3"
+                            data-td-target="#datetimepicker{i}"
+                            data-td-toggle="datetimepicker"
+                        >
+                            <Icon name="calendar" size="1" />
+                        </span>
+                    </div>
+                {:else}
+                    <div
+                        class="form-floating {i + 1 === $filters.length
+                            ? 'mb-0'
+                            : 'mb-3'}"
+                    >
+                        <Input
+                            type="text"
+                            name="text"
+                            bind:value={filter.value}
+                            on:blur={onBlur}
+                        />
+                        {#if filter.fieldType === FilterFieldType.PACKAGE}
+                            <Label>Version</Label>
+                        {:else}
+                            <Label>Value</Label>
+                        {/if}
+                    </div>
+                {/if}
             </Col>
         {/if}
         <Col>
