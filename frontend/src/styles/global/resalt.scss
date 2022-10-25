@@ -94,7 +94,9 @@ $bluegray-10: #0e1418;
         background-color: $bluegray-7 !important;
     }
 
-    .table-hover > tbody > tr:hover {
+    .table-hover > tbody > tr:hover,
+    .table-hover > tbody > tr:hover > td,
+    .table-hover > tbody > tr:hover > th {
         background-color: $bluegray-5 !important;
         color: var(--light-gray) !important;
     }
