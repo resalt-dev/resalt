@@ -286,14 +286,12 @@ export async function getEvents(
 ///
 
 export async function getJobs(
-    user?: string,
-    startDate?: Date,
-    endDate?: Date,
+    sort?: string,
     limit?: number,
     offset?: number,
 ): Promise<Array<Job>> {
     const token = requireToken();
-    return apiListJobs(token, user, startDate, endDate, limit, offset);
+    return apiListJobs(token, sort, limit, offset);
 }
 
 export async function runJob(

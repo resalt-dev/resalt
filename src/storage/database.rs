@@ -497,7 +497,7 @@ impl Storage {
             "conformityError.desc" => query = query.order(minions::conformity_error.desc()),
             "osType.asc" => query = query.order(minions::os_type.asc()),
             "osType.desc" => query = query.order(minions::os_type.desc()),
-            _ => {}
+            _ => return Err(String::from("Invalid sort parameter")),
         }
 
         // Pagination
@@ -1039,9 +1039,7 @@ impl Storage {
 
     pub fn list_jobs(
         &self,
-        user: Option<String>,
-        start_date: Option<NaiveDateTime>,
-        end_date: Option<NaiveDateTime>,
+        sort: Option<String>,
         limit: Option<i64>,
         offset: Option<i64>,
     ) -> Result<Vec<Job>, String> {
@@ -1050,14 +1048,18 @@ impl Storage {
         query = query.order(jobs::timestamp.desc());
 
         // Filtering
-        if let Some(user) = user {
-            query = query.filter(jobs::user.eq(user));
-        }
-        if let Some(start_date) = start_date {
-            query = query.filter(jobs::timestamp.ge(start_date));
-        }
-        if let Some(end_date) = end_date {
-            query = query.filter(jobs::timestamp.le(end_date));
+
+        // Sorting
+        match sort.unwrap_or(String::from("id.asc")).as_str() {
+            "id.asc" => query = query.order(jobs::id.asc()),
+            "id.desc" => query = query.order(jobs::id.desc()),
+            "timestamp.asc" => query = query.order(jobs::timestamp.asc()),
+            "timestamp.desc" => query = query.order(jobs::timestamp.desc()),
+            "jid.asc" => query = query.order(jobs::jid.asc()),
+            "jid.desc" => query = query.order(jobs::jid.desc()),
+            "user.asc" => query = query.order(jobs::user.asc()),
+            "user.desc" => query = query.order(jobs::user.desc()),
+            _ => return Err(String::from("Invalid sort parameter")),
         }
 
         // Pagination

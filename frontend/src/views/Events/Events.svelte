@@ -10,24 +10,23 @@
     let paginationSize: number = 20;
     let paginationPage: number = 1;
 
-    const events: Writable<
-        | {
-              // SaltEvent
-              id: string;
-              timestamp: string;
-              tag: string;
-              data: string;
+    class EventsWriteableData {
+        // SaltEvent
+        id: string;
+        timestamp: string;
+        tag: string;
+        data: string;
 
-              // Added by loop
-              jid: string;
-              target: string;
-              fun: string;
-              data_parsed: any;
-              data_formatted: string;
-              unique_index: string;
-          }[]
-        | null
-    > = writable(null);
+        // Added by loop
+        jid: string;
+        target: string;
+        fun: string;
+        data_parsed: any;
+        data_formatted: string;
+        unique_index: string;
+    }
+
+    const events: Writable<EventsWriteableData[] | null> = writable(null);
     const expandedEvents: Writable<string[]> = writable([]);
 
     function toggleExpandEvent(index: string) {
@@ -83,98 +82,26 @@
                 <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center ps-2">Tag</div>
-                        <div class="col-auto">
-                            <Icon
-                                size="1.25"
-                                name="chevron-up"
-                                class="sort-icon-up"
-                            />
-                            <Icon
-                                size="1.25"
-                                name="chevron-down"
-                                class="sort-icon-down"
-                            />
-                        </div>
-                        <div class="col-auto align-self-center">
-                            <input type="text" class="ms-1 lh-1" size="15" />
-                        </div>
                     </div>
                 </th>
                 <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">Function</div>
-                        <div class="col-auto">
-                            <Icon
-                                size="1.25"
-                                name="chevron-up"
-                                class="sort-icon-up"
-                            />
-                            <Icon
-                                size="1.25"
-                                name="chevron-down"
-                                class="sort-icon-down"
-                            />
-                        </div>
-                        <div class="col-auto align-self-center">
-                            <input type="text" class="ms-1 lh-1" size="12" />
-                        </div>
                     </div>
                 </th>
                 <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">Target</div>
-                        <div class="col-auto">
-                            <Icon
-                                size="1.25"
-                                name="chevron-up"
-                                class="sort-icon-up"
-                            />
-                            <Icon
-                                size="1.25"
-                                name="chevron-down"
-                                class="sort-icon-down"
-                            />
-                        </div>
-                        <div class="col-auto align-self-center">
-                            <input type="text" class="ms-1 lh-1" size="12" />
-                        </div>
                     </div>
                 </th>
                 <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">Job ID</div>
-                        <div class="col-auto">
-                            <Icon
-                                size="1.25"
-                                name="chevron-up"
-                                class="sort-icon-up"
-                            />
-                            <Icon
-                                size="1.25"
-                                name="chevron-down"
-                                class="sort-icon-down"
-                            />
-                        </div>
-                        <div class="col-auto align-self-center">
-                            <input type="text" class="ms-1 lh-1" size="15" />
-                        </div>
                     </div>
                 </th>
                 <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">Date</div>
-                        <div class="col-auto">
-                            <Icon
-                                size="1.25"
-                                name="chevron-up"
-                                class="sort-icon-up"
-                            />
-                            <Icon
-                                size="1.25"
-                                name="chevron-down"
-                                class="sort-icon-down"
-                            />
-                        </div>
                     </div>
                 </th>
             </tr>

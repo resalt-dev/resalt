@@ -218,17 +218,13 @@ export async function apiListEvents(
 
 export async function apiListJobs(
     token: string,
-    user?: string,
-    startDate?: Date,
-    endDate?: Date,
+    sort?: string,
     limit?: number,
     offset?: number,
 ): Promise<Array<Job>> {
     const args = new URLSearchParams();
 
-    if (user) args.append('user', user);
-    if (startDate) args.append('start_date', startDate.toISOString());
-    if (endDate) args.append('end_date', endDate.toISOString());
+    if (sort) args.append('sort', sort);
     if (limit) args.append('limit', limit.toString());
     if (offset) args.append('offset', offset.toString());
 

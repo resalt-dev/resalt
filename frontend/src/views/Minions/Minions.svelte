@@ -31,7 +31,7 @@
     function updateData(): void {
         getMinions(
             filters,
-            sortField + '.' + sortOrder,
+            sortField === null ? null : sortField + '.' + sortOrder,
             paginationSize,
             (paginationPage - 1) * paginationSize,
         )

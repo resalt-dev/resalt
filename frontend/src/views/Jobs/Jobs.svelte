@@ -7,10 +7,10 @@
     import TablePaginate from '../../components/TablePaginate.svelte';
     import { MessageType } from '../../models/MessageType';
     import type Job from '../../models/Job';
+    import { SortOrder } from '../../models/SortOrder';
 
-    let filterUser: string | null = null;
-    let filterStartDate: Date | null = null;
-    let filterEndDate: Date | null = null;
+    let sortField: string | null = null;
+    let sortOrder: SortOrder = SortOrder.Up;
     let paginationSize: number = 20;
     let paginationPage: number = 1;
 
@@ -18,9 +18,7 @@
 
     function updateData() {
         getJobs(
-            filterUser,
-            filterStartDate,
-            filterEndDate,
+            sortField === null ? null : sortField + '.' + sortOrder,
             paginationSize,
             (paginationPage - 1) * paginationSize,
         )
@@ -58,78 +56,21 @@
                                 >Job ID</Tooltip
                             >
                         </div>
-                        <div class="col-auto">
-                            <Icon
-                                size="1.25"
-                                name="chevron-up"
-                                class="sort-icon-up"
-                            />
-                            <Icon
-                                size="1.25"
-                                name="chevron-down"
-                                class="sort-icon-down"
-                            />
-                        </div>
-                        <div class="col-auto align-self-center">
-                            <input type="text" class="ms-1 lh-1" size="15" />
-                        </div>
                     </div>
                 </th>
                 <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">User</div>
-                        <div class="col-auto">
-                            <Icon
-                                size="1.25"
-                                name="chevron-up"
-                                class="sort-icon-up"
-                            />
-                            <Icon
-                                size="1.25"
-                                name="chevron-down"
-                                class="sort-icon-down"
-                            />
-                        </div>
-                        <div class="col-auto align-self-center">
-                            <input type="text" class="ms-1 lh-1" size="12" />
-                        </div>
                     </div>
                 </th>
                 <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">Target</div>
-                        <div class="col-auto">
-                            <Icon
-                                size="1.25"
-                                name="chevron-up"
-                                class="sort-icon-up"
-                            />
-                            <Icon
-                                size="1.25"
-                                name="chevron-down"
-                                class="sort-icon-down"
-                            />
-                        </div>
-                        <div class="col-auto align-self-center">
-                            <input type="text" class="ms-1 lh-1" size="12" />
-                        </div>
                     </div>
                 </th>
                 <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">Date</div>
-                        <div class="col-auto">
-                            <Icon
-                                size="1.25"
-                                name="chevron-up"
-                                class="sort-icon-up"
-                            />
-                            <Icon
-                                size="1.25"
-                                name="chevron-down"
-                                class="sort-icon-down"
-                            />
-                        </div>
                     </div>
                 </th>
             </tr>
@@ -138,7 +79,7 @@
             {#if $jobs === null}
                 <p>Loading</p>
             {:else if $jobs.length === 0 && paginationPage === 1}
-                <div class="p-3">No jobs exist. Very unusal.</div>
+                <div class="p-3">No jobs exist.</div>
             {:else}
                 {#each $jobs as job}
                     <tr>
