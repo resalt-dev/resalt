@@ -289,6 +289,8 @@ impl Storage {
         let mut connection = self.create_connection()?;
         let mut query = minions::table.into_boxed();
         query = query.order(minions::id.asc());
+        let limit = limit.unwrap_or(100);
+        let offset = offset.unwrap_or(0);
 
         // Filtering
         let mut has_grain_filters = false;
@@ -500,8 +502,8 @@ impl Storage {
 
         // Pagination
         if !has_grain_filters && !has_package_filters {
-            query = query.limit(limit.unwrap_or(100));
-            query = query.offset(offset.unwrap_or(0));
+            query = query.limit(limit);
+            query = query.offset(offset);
         }
 
         let mut minions: Vec<Minion> = query
@@ -753,6 +755,18 @@ impl Storage {
                 }
                 return true;
             });
+        }
+
+        // 2nd Limit if the first limit didn't kick in
+        if has_grain_filters || has_package_filters {
+            let offset = offset as usize;
+            let limit = limit as usize;
+            if offset > 0 {
+                minions = minions[offset..].to_vec();
+            }
+            if limit > 0 {
+                minions = minions[..limit].to_vec();
+            }
         }
 
         return Ok(minions);

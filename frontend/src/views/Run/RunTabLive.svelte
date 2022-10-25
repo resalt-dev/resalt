@@ -13,9 +13,10 @@
     } from 'sveltestrap';
     import { quoteSplit } from '../../utils';
     import { theme } from '../../stores';
-    import { runJob } from '../../controller';
+    import { runJob, showToast } from '../../controller';
     import RunResult from '../../models/RunResult';
     import RunCommand from '../../models/RunCommand';
+    import { MessageType } from '../../models/MessageType';
 
     export let tabData: any;
 
@@ -129,7 +130,8 @@
                 ]);
             })
             .catch((error) => {
-                console.log(error);
+                console.error(error);
+                showToast(MessageType.ERROR, 'Failed executing job', error);
             });
         closeRunNowDialog();
     }

@@ -84,7 +84,6 @@
 
     <hr class="mt-0 mb-0" />
 
-    <!-- svelte-ignore a11y-invalid-attribute -->
     {#if $config.latestVersion === 'unknown'}
         <span
             class="text-center link-danger text-decoration-underline mouse-pointer"
@@ -182,6 +181,7 @@
                 questions, please reach out on GitHub:<a
                     target="_blank"
                     href={constants.githubUrl}
+                    rel="noreferrer"
                 >
                     {constants.githubUrl}</a
                 >

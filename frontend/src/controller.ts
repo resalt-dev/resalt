@@ -182,7 +182,7 @@ export async function loadConfig(): Promise<Config> {
         configStore.set(config);
         return config;
     } catch (e) {
-        console.log(e);
+        console.error(e);
         throw e;
     }
 }
@@ -195,7 +195,7 @@ export async function loadCurrentUser(): Promise<User> {
         currentUserStore.set(currentUser);
         return currentUser;
     } catch (e) {
-        console.log(e);
+        console.error(e);
         throw e;
     }
 }
@@ -256,7 +256,6 @@ export async function getMinions(
     const token = requireToken();
     const filter: string | undefined =
         filters && filters.length > 0 ? encodeURIComponent(JSON.stringify(filters)) : undefined;
-    console.log(decodeURIComponent(filter));
     return apiListMinions(token, filter, sort, limit, offset);
 }
 

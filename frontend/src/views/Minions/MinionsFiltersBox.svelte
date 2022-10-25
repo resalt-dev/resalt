@@ -149,8 +149,6 @@
 
     onMount(() => {
         filters.subscribe((filters) => {
-            console.log(filters);
-
             // Fetch new data from API
             setFilters(
                 filters
