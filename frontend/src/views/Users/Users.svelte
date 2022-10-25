@@ -6,9 +6,11 @@
     import { writable, type Writable } from 'svelte/store';
     import TablePaginate from '../../components/TablePaginate.svelte';
     import paths from '../../paths';
-    import { Link } from 'svelte-navigator';
+    import { Link, type NavigateFn } from 'svelte-navigator';
     import { MessageType } from '../../models/MessageType';
     import type User from '../../models/User';
+
+    export let navigate: NavigateFn;
 
     let paginationSize: number = 20;
     let paginationPage: number = 1;
@@ -62,18 +64,15 @@
             {:else}
                 {#each $users as user}
                     <tr>
-                        <th>
-                            <Link
-                                to={paths.user.getPath(user.id)}
-                                class="text-reset text-decoration-none"
-                            >
-                                {user.username}
-                                {#if user.id === $currentUser.id}
-                                    <span class="text-{$theme.color}">
-                                        (You)</span
-                                    >
-                                {/if}
-                            </Link>
+                        <th
+                            class="mouse-pointer"
+                            on:click={() =>
+                                navigate(paths.user.getPath(user.id))}
+                        >
+                            {user.username}
+                            {#if user.id === $currentUser.id}
+                                <span class="text-{$theme.color}"> (You)</span>
+                            {/if}
                         </th>
                         <td>{user.id}</td>
                         <td>

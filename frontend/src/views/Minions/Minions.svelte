@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Button, Card, Table } from 'sveltestrap';
     import { getMinions, showToast } from '../../controller';
-    import { Link } from 'svelte-navigator';
+    import { Link, type NavigateFn } from 'svelte-navigator';
     import { MessageType } from '../../models/MessageType';
     import { onMount } from 'svelte';
     import { refreshMinions } from '../../controller';
@@ -15,6 +15,8 @@
     import Tabs from '../../components/Tabs.svelte';
     import type Filter from '../../models/Filter';
     import type Minion from '../../models/Minion';
+
+    export let navigate: NavigateFn;
 
     let filters: Filter[] = [];
     let sort: string = null;
@@ -266,12 +268,12 @@
             {:else}
                 {#each $minions as minion}
                     <tr>
-                        <th>
-                            <Link
-                                to={paths.minion.getPath(minion.id)}
-                                class="text-reset text-decoration-none"
-                                >{minion.id}</Link
-                            >
+                        <th
+                            class="mouse-pointer"
+                            on:click={() =>
+                                navigate(paths.minion.getPath(minion.id))}
+                        >
+                            {minion.id}
                         </th>
                         <td>{minion.osType ?? 'Unknown'}</td>
                         <td>{minion.lastSeen}</td>

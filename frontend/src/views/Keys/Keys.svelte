@@ -11,9 +11,11 @@
     import { writable, type Writable } from 'svelte/store';
     import TablePaginate from '../../components/TablePaginate.svelte';
     import paths from '../../paths';
-    import { Link } from 'svelte-navigator';
     import type Key from '../../models/Key';
     import { MessageType } from '../../models/MessageType';
+    import type { NavigateFn } from 'svelte-navigator';
+
+    export let navigate: NavigateFn;
 
     let paginationSize: number = 20;
     let paginationPage: number = 1;
@@ -121,13 +123,12 @@
             {:else}
                 {#each keysView as key}
                     <tr>
-                        <th>
-                            <Link
-                                to={paths.minion.getPath(key.id)}
-                                class="text-reset text-decoration-none"
-                            >
-                                {key.id}
-                            </Link>
+                        <th
+                            class="mouse-pointer"
+                            on:click={() =>
+                                navigate(paths.minion.getPath(key.id))}
+                        >
+                            {key.id}
                         </th>
                         <td>
                             {#if key.state === 'minions'}
