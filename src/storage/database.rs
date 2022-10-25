@@ -11,6 +11,7 @@ use diesel_migrations::EmbeddedMigrations;
 use log::{error, info, warn};
 use rand::Rng;
 use serde_json::{json, Value};
+use version_compare::Cmp;
 
 type DbPooledConnection = PooledConnection<ConnectionManager<MysqlConnection>>;
 
@@ -280,6 +281,7 @@ impl Storage {
 
     pub fn list_minions(
         &self,
+        filters: Vec<Filter>,
         sort: Option<String>,
         limit: Option<i64>,
         offset: Option<i64>,
@@ -289,6 +291,195 @@ impl Storage {
         query = query.order(minions::id.asc());
 
         // Filtering
+        let mut has_grain_filters = false;
+        let mut has_package_filters = false;
+        for filter in &filters {
+            match filter.field_type {
+                FilterFieldType::None => {}
+                FilterFieldType::Object => match filter.field.as_str() {
+                    "id" => match filter.operand {
+                        FilterOperand::Contains => {
+                            query = query.filter(minions::id.like(format!("%{}%", filter.value)))
+                        }
+                        FilterOperand::NotContains => {
+                            query =
+                                query.filter(minions::id.not_like(format!("%{}%", filter.value)))
+                        }
+                        FilterOperand::Equals => {
+                            query = query.filter(minions::id.eq(filter.value.clone()))
+                        }
+                        FilterOperand::NotEquals => {
+                            query = query.filter(minions::id.ne(filter.value.clone()))
+                        }
+                        FilterOperand::StartsWith => {
+                            query = query.filter(minions::id.like(format!("{}%", filter.value)))
+                        }
+                        FilterOperand::EndsWith => {
+                            query = query.filter(minions::id.like(format!("%{}", filter.value)))
+                        }
+                        FilterOperand::GreaterThanOrEqual => {
+                            query = query.filter(minions::id.ge(filter.value.clone()))
+                        }
+                        FilterOperand::LessThanOrEqual => {
+                            query = query.filter(minions::id.le(filter.value.clone()))
+                        }
+                    },
+                    "os_type" => match filter.operand {
+                        FilterOperand::Contains => {
+                            query =
+                                query.filter(minions::os_type.like(format!("%{}%", filter.value)))
+                        }
+                        FilterOperand::NotContains => {
+                            query = query
+                                .filter(minions::os_type.not_like(format!("%{}%", filter.value)))
+                        }
+                        FilterOperand::Equals => {
+                            query = query.filter(minions::os_type.eq(filter.value.clone()))
+                        }
+                        FilterOperand::NotEquals => {
+                            query = query.filter(minions::os_type.ne(filter.value.clone()))
+                        }
+                        FilterOperand::StartsWith => {
+                            query =
+                                query.filter(minions::os_type.like(format!("{}%", filter.value)))
+                        }
+                        FilterOperand::EndsWith => {
+                            query =
+                                query.filter(minions::os_type.like(format!("%{}", filter.value)))
+                        }
+                        FilterOperand::GreaterThanOrEqual => {
+                            query = query.filter(minions::os_type.ge(filter.value.clone()))
+                        }
+                        FilterOperand::LessThanOrEqual => {
+                            query = query.filter(minions::os_type.le(filter.value.clone()))
+                        }
+                    },
+                    "last_seen" => {
+                        let timestamp: chrono::NaiveDateTime =
+                            chrono::NaiveDateTime::parse_from_str(
+                                &filter.value,
+                                "%Y-%m-%d %H:%M:%S",
+                            )
+                            .map_err(|e| format!("{:?}", e))?;
+
+                        // Contains, not contains, starts with, and end withds does not exist for Timestamp.
+                        match filter.operand {
+                            FilterOperand::Equals => {
+                                query = query.filter(minions::last_seen.eq(timestamp))
+                            }
+                            FilterOperand::NotEquals => {
+                                query = query.filter(minions::last_seen.ne(timestamp))
+                            }
+                            FilterOperand::GreaterThanOrEqual => {
+                                query = query.filter(minions::last_seen.ge(timestamp))
+                            }
+                            FilterOperand::LessThanOrEqual => {
+                                query = query.filter(minions::last_seen.le(timestamp))
+                            }
+                            FilterOperand::Contains
+                            | FilterOperand::NotContains
+                            | FilterOperand::StartsWith
+                            | FilterOperand::EndsWith => {
+                                return Err("Invalid OBJECT last_seen filter operand".to_string())
+                            }
+                        }
+                    }
+                    "conformity_success" => {
+                        let number = filter.value.parse::<i32>().map_err(|e| {
+                            format!("Invalid OBJECT conformity_success filter value: {:?}", e)
+                        })?;
+
+                        // Contains, not contains, starts with, and end withds does not exist for i32.
+                        match filter.operand {
+                            FilterOperand::Equals => {
+                                query = query.filter(minions::conformity_success.eq(number))
+                            }
+                            FilterOperand::NotEquals => {
+                                query = query.filter(minions::conformity_success.ne(number))
+                            }
+                            FilterOperand::GreaterThanOrEqual => {
+                                query = query.filter(minions::conformity_success.ge(number))
+                            }
+                            FilterOperand::LessThanOrEqual => {
+                                query = query.filter(minions::conformity_success.le(number))
+                            }
+                            FilterOperand::Contains
+                            | FilterOperand::NotContains
+                            | FilterOperand::StartsWith
+                            | FilterOperand::EndsWith => {
+                                return Err(
+                                    "Invalid OBJECT conformity_success filter operand".to_string()
+                                )
+                            }
+                        }
+                    }
+                    "conformity_incorrect" => {
+                        let number = filter.value.parse::<i32>().map_err(|e| {
+                            format!("Invalid OBJECT conformity_incorrect filter value: {:?}", e)
+                        })?;
+
+                        // Contains, not contains, starts with, and end withds does not exist for i32.
+                        match filter.operand {
+                            FilterOperand::Equals => {
+                                query = query.filter(minions::conformity_incorrect.eq(number))
+                            }
+                            FilterOperand::NotEquals => {
+                                query = query.filter(minions::conformity_incorrect.ne(number))
+                            }
+                            FilterOperand::GreaterThanOrEqual => {
+                                query = query.filter(minions::conformity_incorrect.ge(number))
+                            }
+                            FilterOperand::LessThanOrEqual => {
+                                query = query.filter(minions::conformity_incorrect.le(number))
+                            }
+                            FilterOperand::Contains
+                            | FilterOperand::NotContains
+                            | FilterOperand::StartsWith
+                            | FilterOperand::EndsWith => {
+                                return Err("Invalid OBJECT conformity_incorrect filter operand"
+                                    .to_string())
+                            }
+                        }
+                    }
+                    "conformity_error" => {
+                        let number = filter.value.parse::<i32>().map_err(|e| {
+                            format!("Invalid OBJECT conformity_error filter value: {:?}", e)
+                        })?;
+
+                        // Contains, not contains, starts with, and end withds does not exist for i32.
+                        match filter.operand {
+                            FilterOperand::Equals => {
+                                query = query.filter(minions::conformity_error.eq(number))
+                            }
+                            FilterOperand::NotEquals => {
+                                query = query.filter(minions::conformity_error.ne(number))
+                            }
+                            FilterOperand::GreaterThanOrEqual => {
+                                query = query.filter(minions::conformity_error.ge(number))
+                            }
+                            FilterOperand::LessThanOrEqual => {
+                                query = query.filter(minions::conformity_error.le(number))
+                            }
+                            FilterOperand::Contains
+                            | FilterOperand::NotContains
+                            | FilterOperand::StartsWith
+                            | FilterOperand::EndsWith => {
+                                return Err(
+                                    "Invalid OBJECT conformity_error filter operand".to_string()
+                                )
+                            }
+                        }
+                    }
+                    _ => {
+                        log::warn!("Unknown OBJECT filter field: {}", filter.field);
+                    }
+                },
+                // Grains are JSON-encoded, so we need to use the JSON operators. The "filter.field" is a valid "JSONPath".
+                // Use the JSONPath to get the value out of the minion.grains JSON field, and filter the value on filter.value.
+                FilterFieldType::Grain => has_grain_filters = true,
+                FilterFieldType::Package => has_package_filters = true,
+            }
+        }
 
         // Sorting
         match sort.unwrap_or(String::from("id.asc")).as_str() {
@@ -308,12 +499,263 @@ impl Storage {
         }
 
         // Pagination
-        query = query.limit(limit.unwrap_or(100));
-        query = query.offset(offset.unwrap_or(0));
+        if !has_grain_filters && !has_package_filters {
+            query = query.limit(limit.unwrap_or(100));
+            query = query.offset(offset.unwrap_or(0));
+        }
 
-        query
+        let mut minions: Vec<Minion> = query
             .load::<Minion>(&mut connection)
-            .map_err(|e| format!("{:?}", e))
+            .map_err(|e| format!("{:?}", e))?;
+
+        // 2nd stage JSON Filtering
+        // Util
+        let value_to_simple_str = |value: &Value| -> String {
+            match value {
+                Value::String(s) => crate::storage::config::strip_quotes!(s.to_string()),
+                Value::Number(n) => n.to_string(),
+                Value::Bool(b) => b.to_string(),
+                Value::Array(a) => a
+                    .iter()
+                    .map(|v| crate::storage::config::strip_quotes!(v.to_string()))
+                    .collect::<Vec<String>>()
+                    .join(", "),
+                Value::Object(_) => String::from("<OBJECT>"),
+                Value::Null => String::from("null"),
+            }
+        };
+        // Filter on grains
+        if has_grain_filters {
+            // Map grain values to json paths
+            // If filter.field does not start with "$.", prepend it.
+            let json_paths: Vec<String> = filters
+                .iter()
+                .map(|f| {
+                    f.field
+                        .starts_with("$.")
+                        .then(|| f.field.clone())
+                        .unwrap_or(format!("$.{}", f.field))
+                })
+                .collect();
+
+            // Filter
+            minions.retain(|minion| {
+                // Parse Grains from JSON
+                let grains = minion.grains.clone().unwrap_or_default();
+                let grains: Value = serde_json::from_str(&grains).unwrap_or_default();
+                // Iterate filters with index
+                for (i, filter) in filters.iter().enumerate() {
+                    // Skip filters that are not of type Grain, when filtering grains
+                    if filter.field_type != FilterFieldType::Grain {
+                        continue;
+                    }
+
+                    let json_path = &json_paths[i];
+                    let selected = match jsonpath_lib::select(&grains, json_path) {
+                        Ok(selected) => selected,
+                        Err(_) => {
+                            log::warn!("Filtering on grain with invalid JSONPath: {}", json_path);
+                            return false;
+                        }
+                    };
+
+                    log::info!("Selected: {:?}", selected);
+
+                    // Convert the selected JSON value to a string. "selected" is always a JSON array.
+                    // If it is empty, return an empty string.
+                    // If it contains just one object, return that, without quotes.
+                    // If it contains multiple objects, join them with ", " and without each string having quotes.
+                    let selected_str = match selected.len() {
+                        0 => {
+                            if filter.operand == FilterOperand::NotContains
+                                && filter.value.is_empty()
+                            {
+                                return false;
+                            }
+                            String::new()
+                        }
+                        1 => value_to_simple_str(selected[0]),
+                        _ => selected
+                            .iter()
+                            .map(|s| value_to_simple_str(s.clone()))
+                            .collect::<Vec<String>>()
+                            .join(", "),
+                    };
+
+                    log::debug!("Selected stringified: {}", selected_str);
+
+                    match filter.operand {
+                        FilterOperand::Contains => {
+                            if !selected_str.contains(&filter.value) {
+                                return false;
+                            }
+                        }
+                        FilterOperand::NotContains => {
+                            if selected_str.contains(&filter.value) {
+                                return false;
+                            }
+                        }
+                        FilterOperand::Equals => {
+                            if selected_str != filter.value {
+                                return false;
+                            }
+                        }
+                        FilterOperand::NotEquals => {
+                            if selected_str == filter.value {
+                                return false;
+                            }
+                        }
+                        FilterOperand::StartsWith => {
+                            if !selected_str.starts_with(&filter.value) {
+                                return false;
+                            }
+                        }
+                        FilterOperand::EndsWith => {
+                            if !selected_str.ends_with(&filter.value) {
+                                return false;
+                            }
+                        }
+                        FilterOperand::GreaterThanOrEqual => {
+                            let selected_float = match selected_str.parse::<f64>() {
+                                Ok(selected_float) => selected_float,
+                                Err(_) => {
+                                    return false;
+                                }
+                            };
+                            let filter_float = match filter.value.parse::<f64>() {
+                                Ok(filter_float) => filter_float,
+                                Err(_) => {
+                                    return false;
+                                }
+                            };
+                            if selected_float < filter_float {
+                                return false;
+                            }
+                        }
+                        FilterOperand::LessThanOrEqual => {
+                            let selected_float = match selected_str.parse::<f64>() {
+                                Ok(selected_float) => selected_float,
+                                Err(_) => {
+                                    return false;
+                                }
+                            };
+                            let filter_float = match filter.value.parse::<f64>() {
+                                Ok(filter_float) => filter_float,
+                                Err(_) => {
+                                    return false;
+                                }
+                            };
+                            if selected_float > filter_float {
+                                return false;
+                            }
+                        }
+                    };
+                }
+
+                return true;
+            });
+        }
+        if has_package_filters {
+            // Filtering on packages is much easier, as we don't use JSONPath's here. The JSON object is a simple "Map<String,String> | null".
+            minions.retain(|minion| {
+                // Parse Grains from JSON
+                let packages = minion.pkgs.clone().unwrap_or_default();
+                let packages: Value = serde_json::from_str(&packages).unwrap_or_default();
+                // Iterate filters with index
+                for filter in &filters {
+                    // Skip filters that are not of type Grain, when filtering grains
+                    if filter.field_type != FilterFieldType::Package {
+                        continue;
+                    }
+
+                    let filter_value = filter.value.trim().to_owned();
+                    let version = match &packages[&filter.field] {
+                        Value::String(s) => Some(s),
+                        _ => None,
+                    };
+
+                    match filter.operand {
+                        FilterOperand::Contains => {
+                            if filter_value.len() == 0 {
+                                if version.is_none() {
+                                    return false;
+                                }
+                            } else if version.is_none() || !version.unwrap().contains(&filter_value)
+                            {
+                                return false;
+                            }
+                        }
+                        FilterOperand::NotContains => {
+                            if filter_value.len() == 0 {
+                                if version.is_some() {
+                                    return false;
+                                }
+                            } else if version.is_some() && version.unwrap().contains(&filter_value)
+                            {
+                                return false;
+                            }
+                        }
+                        FilterOperand::Equals => {
+                            if version.is_none() || version.unwrap() != &filter_value {
+                                return false;
+                            }
+                        }
+                        FilterOperand::NotEquals => {
+                            if version.is_none() || version.unwrap() == &filter_value {
+                                return false;
+                            }
+                        }
+                        FilterOperand::StartsWith => {
+                            if version.is_none() || !version.unwrap().starts_with(&filter_value) {
+                                return false;
+                            }
+                        }
+                        FilterOperand::EndsWith => {
+                            if version.is_none() || !version.unwrap().ends_with(&filter_value) {
+                                return false;
+                            }
+                        }
+                        FilterOperand::GreaterThanOrEqual => {
+                            if version.is_none() {
+                                return false;
+                            }
+                            match version_compare::compare_to(
+                                version.unwrap(),
+                                &filter_value,
+                                Cmp::Ge,
+                            ) {
+                                Ok(result) => {
+                                    if !result {
+                                        return false;
+                                    }
+                                }
+                                Err(_) => return false,
+                            }
+                        }
+                        FilterOperand::LessThanOrEqual => {
+                            if version.is_none() {
+                                return false;
+                            }
+                            match version_compare::compare_to(
+                                version.unwrap(),
+                                &filter_value,
+                                Cmp::Le,
+                            ) {
+                                Ok(result) => {
+                                    if !result {
+                                        return false;
+                                    }
+                                }
+                                Err(_) => return false,
+                            }
+                        }
+                    };
+                }
+                return true;
+            });
+        }
+
+        return Ok(minions);
     }
 
     pub fn get_minion_by_id(&self, id: &str) -> Result<Option<Minion>, String> {

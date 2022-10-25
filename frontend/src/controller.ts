@@ -254,7 +254,9 @@ export async function getMinions(
     offset?: number,
 ): Promise<Array<Minion>> {
     const token = requireToken();
-    const filter = filters && filters.length > 0 ? JSON.stringify(filters) : undefined;
+    const filter: string | undefined =
+        filters && filters.length > 0 ? encodeURIComponent(JSON.stringify(filters)) : undefined;
+    console.log(decodeURIComponent(filter));
     return apiListMinions(token, filter, sort, limit, offset);
 }
 

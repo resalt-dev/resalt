@@ -2,7 +2,7 @@
     import type Filter from '../../models/Filter';
     import MinionsFiltersBox from './MinionsFiltersBox.svelte';
 
-    export let tabData: { update: (filters: Filter[]) => void };
+    export let tabData: { setFilters: (filters: Filter[]) => void };
 </script>
 
-<MinionsFiltersBox update={tabData.update} />
+<MinionsFiltersBox setFilters={tabData.setFilters} />

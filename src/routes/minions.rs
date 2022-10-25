@@ -5,6 +5,7 @@ use serde::Deserialize;
 
 #[derive(Deserialize)]
 pub struct MinionsListGetQuery {
+    filter: Option<String>, // URL-encoded JSON
     sort: Option<String>,
     limit: Option<i64>,
     offset: Option<i64>,
@@ -14,11 +15,34 @@ pub async fn route_minions_get(
     data: web::Data<Storage>,
     query: web::Query<MinionsListGetQuery>,
 ) -> Result<impl Responder> {
+    let filter = query.filter.clone();
+    let filter = match filter {
+        Some(filter) => Some(match urlencoding::decode(filter.as_str()) {
+            Ok(filter) => filter.to_string(),
+            Err(e) => {
+                error!("Failed to decode filter: {}", e);
+                return Err(api_error_invalid_request());
+            }
+        }),
+        None => None,
+    };
+
     let sort = query.sort.clone();
     let limit = query.limit;
     let offset = query.offset;
 
-    let minions = match data.list_minions(sort, limit, offset) {
+    let filters: Vec<Filter> = match filter {
+        Some(filter) => match serde_json::from_str(&filter) {
+            Ok(filters) => filters,
+            Err(e) => {
+                error!("Failed to parse filter: {}", e);
+                return Err(api_error_invalid_request());
+            }
+        },
+        None => vec![],
+    };
+
+    let minions = match data.list_minions(filters, sort, limit, offset) {
         Ok(minions) => minions,
         Err(e) => {
             error!("{:?}", e);

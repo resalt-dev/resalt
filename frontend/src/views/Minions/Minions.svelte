@@ -78,7 +78,7 @@
         {
             label: 'Search',
             component: MinionsTabSearch,
-            data: { update: setFilters },
+            data: { setFilters },
         },
         {
             label: 'Groups',
@@ -262,7 +262,7 @@
             {#if $minions === null}
                 <p>Loading</p>
             {:else if $minions.length === 0 && paginationPage === 1}
-                <div class="p-3">No minions detected. Try force reload.</div>
+                <div class="p-3">No minions returned.</div>
             {:else}
                 {#each $minions as minion}
                     <tr>

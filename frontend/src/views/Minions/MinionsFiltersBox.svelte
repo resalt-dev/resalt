@@ -1,16 +1,20 @@
 <script lang="ts">
-    import { afterUpdate, onMount } from 'svelte';
+    import { afterUpdate, beforeUpdate, onMount } from 'svelte';
     import { Button, Col, Input, Label, Row } from 'sveltestrap';
     import { FilterFieldType } from '../../models/FilterFieldType';
     import { FilterOperand } from '../../models/FilterOperand';
     import { TempusDominus, Namespace, extend } from '@eonasdan/tempus-dominus';
+    import customDateFormat from '@eonasdan/tempus-dominus/dist/plugins/customDateFormat';
     import { writable } from 'svelte/store';
     import Icon from '../../components/Icon.svelte';
     import type Filter from '../../models/Filter';
     import { theme } from '../../stores';
 
-    export let update: (filters: Filter[]) => void;
+    // Enable customDateFormat plugin in Tempus Dominus (datepicker)
+    extend(customDateFormat, undefined);
 
+    export let setFilters: (filters: Filter[]) => void;
+    const pickers: TempusDominus[] = [];
     const filters = writable<Filter[]>([
         {
             fieldType: FilterFieldType.NONE,
@@ -130,11 +134,15 @@
                 picker.subscribe(Namespace.events.change, (e) => {
                     // Update the filter's value to the picker's date
                     filters.update((f) => {
-                        console.log(picker.dates.picked);
-                        f[index].value = picker.dates.picked[0].toISOString();
+                        f[index].value = picker.dates.picked[0]
+                            .toISOString()
+                            .replace('T', ' ')
+                            .split('.')[0];
                         return f;
                     });
                 });
+
+                pickers.push(picker);
             }
         });
     }
@@ -144,12 +152,22 @@
             console.log(filters);
 
             // Fetch new data from API
-            update(
+            setFilters(
                 filters
                     .filter((f) => f.fieldType !== FilterFieldType.NONE)
-                    .filter((f) => f.field !== ''),
+                    .filter((f) => f.field !== '')
+                    // Filter out where field is 'last_seen' and value is empty
+                    .filter(
+                        (f) => !(f.field === 'last_seen' && f.value === ''),
+                    ),
             );
         });
+    });
+
+    beforeUpdate(() => {
+        // Destroy all pickers
+        pickers.forEach((picker) => picker.dispose());
+        pickers.length = 0;
     });
 
     afterUpdate(() => {
@@ -249,12 +267,7 @@
                             </option>
                         </Input>
                     {:else}
-                        <Input
-                            type="text"
-                            bsSize="sm"
-                            bind:value={filter.field}
-                            required
-                        />
+                        <Input type="text" bind:value={filter.field} required />
                     {/if}
                     {#if filter.fieldType === FilterFieldType.PACKAGE}
                         <Label>Package</Label>
@@ -276,7 +289,7 @@
                         name="select"
                         bind:value={filter.operand}
                     >
-                        {#if !(filter.fieldType === FilterFieldType.OBJECT && filter.field === 'last_seen')}
+                        {#if !(filter.fieldType === FilterFieldType.OBJECT && (filter.field === 'last_seen' || filter.field === 'conformity_success' || filter.field === 'conformity_incorrect' || filter.field === 'conformity_error'))}
                             <option
                                 value={FilterOperand.CONTAINS}
                                 selected={filter.operand ===
@@ -305,7 +318,7 @@
                         >
                             does not equal
                         </option>
-                        {#if !(filter.fieldType === FilterFieldType.OBJECT && filter.field === 'last_seen')}
+                        {#if !(filter.fieldType === FilterFieldType.OBJECT && (filter.field === 'last_seen' || filter.field === 'conformity_success' || filter.field === 'conformity_incorrect' || filter.field === 'conformity_error'))}
                             <option value={FilterOperand.STARTS_WITH}>
                                 starts with
                             </option>
@@ -362,8 +375,12 @@
                             : 'mb-3'}"
                     >
                         <Input
-                            type="text"
-                            name="text"
+                            type={filter.fieldType === FilterFieldType.OBJECT &&
+                            (filter.field === 'conformity_success' ||
+                                filter.field === 'conformity_incorrect' ||
+                                filter.field === 'conformity_error')
+                                ? 'number'
+                                : 'text'}
                             bind:value={filter.value}
                             required
                         />

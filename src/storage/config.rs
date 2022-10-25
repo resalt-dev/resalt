@@ -36,6 +36,7 @@ macro_rules! strip_quotes {
         }
     };
 }
+pub(crate) use strip_quotes;
 
 #[allow(dead_code)]
 impl SConfig {
