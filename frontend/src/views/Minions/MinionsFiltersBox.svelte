@@ -1,11 +1,13 @@
 <script lang="ts">
-    import { writable } from 'svelte/store';
-    import { TempusDominus } from '@eonasdan/tempus-dominus';
+    import { afterUpdate, onMount } from 'svelte';
     import { Button, Col, Input, Label, Row } from 'sveltestrap';
-    import Icon from '../../components/Icon.svelte';
-    import type Filter from '../../models/Filter';
     import { FilterFieldType } from '../../models/FilterFieldType';
     import { FilterOperand } from '../../models/FilterOperand';
+    import { TempusDominus, Namespace, extend } from '@eonasdan/tempus-dominus';
+    import { writable } from 'svelte/store';
+    import Icon from '../../components/Icon.svelte';
+    import type Filter from '../../models/Filter';
+    import { theme } from '../../stores';
 
     export let update: (filters: Filter[]) => void;
 
@@ -17,18 +19,6 @@
             value: '',
         },
     ]);
-
-    function localUpdate() {
-        update(
-            $filters
-                .filter((f) => f.fieldType !== FilterFieldType.NONE)
-                .filter((f) => f.field !== ''),
-        );
-    }
-
-    function onBlur() {
-        localUpdate();
-    }
 
     function localAddFilter() {
         filters.update((f) => [
@@ -44,7 +34,6 @@
 
     function localRemoveFilterByIndex(index: number) {
         filters.update((f) => f.filter((_, i) => i !== index));
-        localUpdate();
     }
 
     function localResetFilterByIndex(index: number) {
@@ -57,20 +46,115 @@
             };
             return f;
         });
-        localUpdate();
     }
 
     function localFilterFieldTypeChanged(index: number, event: Event) {
         const target = event.target as HTMLInputElement;
-        const fieldType = target.value as FilterFieldType;
+        const newFieldType = target.value as FilterFieldType;
 
         // Set field to empty once fieldType when changed.
         filters.update((f) => {
-            f[index].field = fieldType === FilterFieldType.OBJECT ? 'id' : '';
+            f[index].field =
+                newFieldType === FilterFieldType.OBJECT ? 'id' : '';
             return f;
         });
-        localUpdate();
     }
+
+    function localFilterFieldChanged(index: number, event: Event) {
+        const target = event.target as HTMLInputElement;
+        const newField = target.value;
+
+        // Check if fieldType OBJECT and field "last_seen", then set operand to FilterOperand.GREATER_THAN_OR_EQUAL
+        filters.update((f) => {
+            if (
+                f[index].fieldType === FilterFieldType.OBJECT &&
+                newField === 'last_seen'
+            ) {
+                f[index].operand = FilterOperand.GREATER_THAN_OR_EQUAL;
+            }
+            return f;
+        });
+    }
+
+    function createDateTimePickers() {
+        // Use TempusDominus
+        // Loop through all $filters and create a datetime picker for each
+        // that has a fieldType of FilterFieldType.OBJECT and a field of "last_seen".
+
+        // Loop over all $filters with index
+        $filters.forEach((filter, index) => {
+            // Check if fieldType OBJECT and field "last_seen"
+            if (
+                filter.fieldType === FilterFieldType.OBJECT &&
+                filter.field === 'last_seen'
+            ) {
+                // Create a new TempusDominus datetime picker
+                const picker = new TempusDominus(
+                    document.getElementById(`datetimepicker${index}`),
+                    {
+                        localization: {
+                            format: 'yyyy-MM-dd HH:mm:ss',
+                        },
+                        display: {
+                            theme: $theme.dark ? 'dark' : 'light',
+                            icons: {
+                                type: 'icons',
+                                time: 'bx fs-4 bx-time',
+                                date: 'bx fs-4 bx-calendar',
+                                up: 'bx fs-4 bx-up-arrow-alt',
+                                down: 'bx fs-4 bx-down-arrow-alt',
+
+                                previous: 'bx fs-4 bx-chevron-left',
+                                next: 'bx fs-4 bx-chevron-right',
+
+                                // Unused
+                                today: 'bx fs-5 bx-calendar-check',
+                                clear: 'bx fs-5 bx-trash',
+                                close: 'bx fs-5 bx-x',
+                            },
+                            buttons: {
+                                today: false,
+                                close: false,
+                                clear: false,
+                            },
+                        },
+                    },
+                );
+
+                if (filter.value.length > 0) {
+                    const parsedDate = picker.dates.parseInput(filter.value);
+                    picker.dates.setValue(parsedDate);
+                }
+
+                // Add an event listener to the picker
+                picker.subscribe(Namespace.events.change, (e) => {
+                    // Update the filter's value to the picker's date
+                    filters.update((f) => {
+                        console.log(picker.dates.picked);
+                        f[index].value = picker.dates.picked[0].toISOString();
+                        return f;
+                    });
+                });
+            }
+        });
+    }
+
+    onMount(() => {
+        filters.subscribe((filters) => {
+            console.log(filters);
+
+            // Fetch new data from API
+            update(
+                filters
+                    .filter((f) => f.fieldType !== FilterFieldType.NONE)
+                    .filter((f) => f.field !== ''),
+            );
+        });
+    });
+
+    afterUpdate(() => {
+        createDateTimePickers();
+    });
 </script>
 
 {#each $filters as filter, i}
@@ -89,10 +173,26 @@
                         localFilterFieldTypeChanged(i, event);
                     }}
                 >
-                    <option value={FilterFieldType.NONE} />
-                    <option value={FilterFieldType.OBJECT}>Minion</option>
-                    <option value={FilterFieldType.GRAIN}>Grain</option>
-                    <option value={FilterFieldType.PACKAGE}>Package</option>
+                    <option
+                        value={FilterFieldType.NONE}
+                        selected={filter.fieldType === FilterFieldType.NONE}
+                        >None</option
+                    >
+                    <option
+                        value={FilterFieldType.OBJECT}
+                        selected={filter.fieldType === FilterFieldType.OBJECT}
+                        >Minion</option
+                    >
+                    <option
+                        value={FilterFieldType.GRAIN}
+                        selected={filter.fieldType === FilterFieldType.GRAIN}
+                        >Grain</option
+                    >
+                    <option
+                        value={FilterFieldType.PACKAGE}
+                        selected={filter.fieldType === FilterFieldType.PACKAGE}
+                        >Package</option
+                    >
                 </Input>
                 <Label>Filter Type</Label>
             </div>
@@ -109,18 +209,43 @@
                             type="select"
                             name="select"
                             bind:value={filter.field}
+                            on:change={(event) => {
+                                localFilterFieldChanged(i, event);
+                            }}
                         >
-                            <option value="id" selected>Minion ID</option>
-                            <option value="os_type">OS Type</option>
-                            <option value="last_seen">Last Seen</option>
-                            <option value="conformity_success">
-                                # Conformity Success
+                            <option value="id" selected={filter.field === 'id'}>
+                                Minion ID
                             </option>
-                            <option value="conformity_incorrect">
-                                # Conformity Incorrect
+                            <option
+                                value="os_type"
+                                selected={filter.field === 'os_type'}
+                            >
+                                OS Type
                             </option>
-                            <option value="conformity_error">
-                                # Conformity Error
+                            <option
+                                value="last_seen"
+                                selected={filter.field === 'last_seen'}
+                            >
+                                Last Seen
+                            </option>
+                            <option
+                                value="conformity_success"
+                                selected={filter.field === 'conformity_success'}
+                            >
+                                Conformity Success
+                            </option>
+                            <option
+                                value="conformity_incorrect"
+                                selected={filter.field ===
+                                    'conformity_incorrect'}
+                            >
+                                Conformity Incorrect
+                            </option>
+                            <option
+                                value="conformity_error"
+                                selected={filter.field === 'conformity_error'}
+                            >
+                                Conformity Error
                             </option>
                         </Input>
                     {:else}
@@ -128,7 +253,6 @@
                             type="text"
                             bsSize="sm"
                             bind:value={filter.field}
-                            on:blur={onBlur}
                             required
                         />
                     {/if}
@@ -152,26 +276,49 @@
                         name="select"
                         bind:value={filter.operand}
                     >
-                        <option value={FilterOperand.CONTAINS}>contains</option>
-                        <option value={FilterOperand.NOT_CONTAINS}
-                            >does not contain</option
+                        {#if !(filter.fieldType === FilterFieldType.OBJECT && filter.field === 'last_seen')}
+                            <option
+                                value={FilterOperand.CONTAINS}
+                                selected={filter.operand ===
+                                    FilterOperand.CONTAINS}
+                            >
+                                contains
+                            </option>
+                            <option
+                                value={FilterOperand.NOT_CONTAINS}
+                                selected={filter.operand ===
+                                    FilterOperand.NOT_CONTAINS}
+                            >
+                                does not contain
+                            </option>
+                        {/if}
+                        <option
+                            value={FilterOperand.EQUALS}
+                            selected={filter.operand === FilterOperand.EQUALS}
                         >
-                        <option value={FilterOperand.EQUALS}>equals</option>
-                        <option value={FilterOperand.NOT_EQUALS}
-                            >does not equal</option
+                            equals
+                        </option>
+                        <option
+                            value={FilterOperand.NOT_EQUALS}
+                            selected={filter.operand ===
+                                FilterOperand.NOT_EQUALS}
                         >
-                        <option value={FilterOperand.STARTS_WITH}
-                            >starts with</option
-                        >
-                        <option value={FilterOperand.ENDS_WITH}
-                            >ends with</option
-                        >
-                        <option value={FilterOperand.GREATER_THAN_OR_EQUAL}
-                            >&gt;=</option
-                        >
-                        <option value={FilterOperand.LESS_THAN_OR_EQUAL}
-                            >&lt;=</option
-                        >
+                            does not equal
+                        </option>
+                        {#if !(filter.fieldType === FilterFieldType.OBJECT && filter.field === 'last_seen')}
+                            <option value={FilterOperand.STARTS_WITH}>
+                                starts with
+                            </option>
+                            <option value={FilterOperand.ENDS_WITH}>
+                                ends with
+                            </option>
+                        {/if}
+                        <option value={FilterOperand.GREATER_THAN_OR_EQUAL}>
+                            &gt;=
+                        </option>
+                        <option value={FilterOperand.LESS_THAN_OR_EQUAL}>
+                            &lt;=
+                        </option>
                     </Input>
                     <Label>Operand</Label>
                 </div>
@@ -198,7 +345,10 @@
                             <Label>Date</Label>
                         </div>
                         <span
-                            class="input-group-text mb-3"
+                            class="input-group-text btn-secondary {i + 1 ===
+                            $filters.length
+                                ? 'mb-0'
+                                : 'mb-3'}"
                             data-td-target="#datetimepicker{i}"
                             data-td-toggle="datetimepicker"
                         >
@@ -215,7 +365,7 @@
                             type="text"
                             name="text"
                             bind:value={filter.value}
-                            on:blur={onBlur}
+                            required
                         />
                         {#if filter.fieldType === FilterFieldType.PACKAGE}
                             <Label>Version</Label>
