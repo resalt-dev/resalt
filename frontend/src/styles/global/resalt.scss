@@ -218,9 +218,17 @@ $bluegray-10: #0e1418;
 /* .bx {
 } */
 
-.sort-icon {
-    margin-top: -0.3rem;
-    margin-bottom: -0.3rem;
+.sort-icon-up,
+.sort-icon-down {
+    line-height: 0.5 !important;
+    display: block !important;
+}
+.sort-icon-up:hover:not(.sort-active),
+.sort-icon-down:hover:not(.sort-active) {
+    opacity: 0.5;
+}
+.sort-icon-up {
+    margin-top: 0.2rem;
 }
 
 /*

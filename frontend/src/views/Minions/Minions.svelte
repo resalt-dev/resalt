@@ -5,6 +5,7 @@
     import { MessageType } from '../../models/MessageType';
     import { onMount } from 'svelte';
     import { refreshMinions } from '../../controller';
+    import { SortOrder } from '../../models/SortOrder';
     import { theme } from '../../stores';
     import { writable, type Writable } from 'svelte/store';
     import Icon from '../../components/Icon.svelte';
@@ -19,17 +20,18 @@
     export let navigate: NavigateFn;
 
     let filters: Filter[] = [];
-    let sort: string = null;
+    let sortField: string | null = null;
+    let sortOrder: SortOrder = SortOrder.Up;
     let paginationSize: number = 20;
     let paginationPage: number = 1;
 
-    const SORT_COLOR: string = 'text-orange';
+    const SORT_COLOR = `text-orange sort-active`;
     const minions: Writable<Minion[] | null> = writable(null);
 
     function updateData(): void {
         getMinions(
             filters,
-            sort,
+            sortField + '.' + sortOrder,
             paginationSize,
             (paginationPage - 1) * paginationSize,
         )
@@ -46,24 +48,23 @@
         updateData();
     }
 
-    function toggleSort(field: string): void {
-        // field.order
-        let parts = (sort || 'null.null').split('.');
-        if (parts[0] === field) {
-            switch (parts[1]) {
-                case 'asc':
-                    sort = field + '.desc';
-                    break;
-                case 'desc':
-                    sort = null;
-                    break;
-                default:
-                    sort = field + '.asc';
-                    break;
+    function toggleSort(field: string, order: SortOrder): void {
+        if (sortField === null) {
+            sortField = field;
+            sortOrder = order;
+        } else if (sortField === field) {
+            if (order !== sortOrder) {
+                sortOrder = order;
+            } else {
+                sortField = null;
+                sortOrder = SortOrder.Up;
             }
         } else {
-            sort = field + '.asc';
+            sortField = field;
+            sortOrder = order;
         }
+
+        console.log('toggleSort', field, order, sortField, sortOrder);
 
         updateData();
     }
@@ -96,27 +97,27 @@
                 <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center ps-2">ID</div>
-                        <div class="col-auto align-self-center d-grid">
+                        <div class="col-auto">
                             <Icon
-                                size="1.125"
+                                size="1.25"
                                 name="chevron-up"
-                                class="sort-icon mouse-pointer {sort ===
-                                'id.asc'
+                                class="sort-icon-up {sortField === 'id' &&
+                                sortOrder === SortOrder.Up
                                     ? SORT_COLOR
                                     : ''}"
                                 on:click={() => {
-                                    toggleSort('id');
+                                    toggleSort('id', SortOrder.Up);
                                 }}
                             />
                             <Icon
-                                size="1.125"
+                                size="1.25"
                                 name="chevron-down"
-                                class="sort-icon mouse-pointer {sort ===
-                                'id.desc'
+                                class="sort-icon-down {sortField === 'id' &&
+                                sortOrder === SortOrder.Down
                                     ? SORT_COLOR
                                     : ''}"
                                 on:click={() => {
-                                    toggleSort('id');
+                                    toggleSort('id', SortOrder.Down);
                                 }}
                             />
                         </div>
@@ -125,27 +126,29 @@
                 <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">OS</div>
-                        <div class="col-auto align-self-center d-grid">
+                        <div class="col-auto">
                             <Icon
-                                size="1.125"
+                                size="1.25"
                                 name="chevron-up"
-                                class="sort-icon mouse-pointer {sort ===
-                                'osType.asc'
-                                    ? SORT_COLOR
+                                class="sort-icon-up {sortField === 'osType'
+                                    ? sortOrder === SortOrder.Up
+                                        ? SORT_COLOR
+                                        : ''
                                     : ''}"
                                 on:click={() => {
-                                    toggleSort('osType');
+                                    toggleSort('osType', SortOrder.Up);
                                 }}
                             />
                             <Icon
-                                size="1.125"
+                                size="1.25"
                                 name="chevron-down"
-                                class="sort-icon mouse-pointer {sort ===
-                                'osType.desc'
-                                    ? SORT_COLOR
+                                class="sort-icon-down {sortField === 'osType'
+                                    ? sortOrder === SortOrder.Down
+                                        ? SORT_COLOR
+                                        : ''
                                     : ''}"
                                 on:click={() => {
-                                    toggleSort('osType');
+                                    toggleSort('osType', SortOrder.Down);
                                 }}
                             />
                         </div>
@@ -154,27 +157,27 @@
                 <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">Last seen</div>
-                        <div class="col-auto align-self-center d-grid">
+                        <div class="col-auto">
                             <Icon
-                                size="1.125"
+                                size="1.25"
                                 name="chevron-up"
-                                class="sort-icon mouse-pointer {sort ===
-                                'lastSeen.asc'
+                                class="sort-icon-up {sortField === 'lastSeen' &&
+                                sortOrder === SortOrder.Up
                                     ? SORT_COLOR
                                     : ''}"
                                 on:click={() => {
-                                    toggleSort('lastSeen');
+                                    toggleSort('lastSeen', SortOrder.Up);
                                 }}
                             />
                             <Icon
-                                size="1.125"
+                                size="1.25"
                                 name="chevron-down"
-                                class="sort-icon mouse-pointer {sort ===
-                                'lastSeen.desc'
+                                class="sort-icon-down {sortField ===
+                                    'lastSeen' && sortOrder === SortOrder.Down
                                     ? SORT_COLOR
                                     : ''}"
                                 on:click={() => {
-                                    toggleSort('lastSeen');
+                                    toggleSort('lastSeen', SortOrder.Down);
                                 }}
                             />
                         </div>
@@ -183,75 +186,96 @@
                 <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">Conformity</div>
-                        <div class="col-auto align-self-center d-grid">
+                        <div class="col-auto">
                             <Icon
-                                size="1.125"
+                                size="1.25"
                                 name="chevron-up"
-                                class="sort-icon mouse-pointer {sort ===
-                                'conformitySuccess.asc'
+                                class="sort-icon-up {sortField ===
+                                    'conformitySuccess' &&
+                                sortOrder === SortOrder.Up
                                     ? SORT_COLOR
                                     : 'text-success'}"
                                 on:click={() => {
-                                    toggleSort('conformitySuccess');
+                                    toggleSort(
+                                        'conformitySuccess',
+                                        SortOrder.Up,
+                                    );
                                 }}
                             />
                             <Icon
-                                size="1.125"
+                                size="1.25"
                                 name="chevron-down"
-                                class="sort-icon mouse-pointer {sort ===
-                                'conformitySuccess.desc'
+                                class="sort-icon-down {sortField ===
+                                    'conformitySuccess' &&
+                                sortOrder === SortOrder.Down
                                     ? SORT_COLOR
                                     : 'text-success'}"
                                 on:click={() => {
-                                    toggleSort('conformitySuccess');
+                                    toggleSort(
+                                        'conformitySuccess',
+                                        SortOrder.Down,
+                                    );
                                 }}
                             />
                         </div>
-                        <div class="col-auto align-self-center d-grid">
+                        <div class="col-auto">
                             <Icon
-                                size="1.125"
+                                size="1.25"
                                 name="chevron-up"
-                                class="sort-icon mouse-pointer {sort ===
-                                'conformityIncorrect.asc'
+                                class="sort-icon-up {sortField ===
+                                    'conformityIncorrect' &&
+                                sortOrder === SortOrder.Up
                                     ? SORT_COLOR
                                     : 'text-warning'}"
                                 on:click={() => {
-                                    toggleSort('conformityIncorrect');
+                                    toggleSort(
+                                        'conformityIncorrect',
+                                        SortOrder.Up,
+                                    );
                                 }}
                             />
                             <Icon
-                                size="1.125"
+                                size="1.25"
                                 name="chevron-down"
-                                class="sort-icon mouse-pointer {sort ===
-                                'conformityIncorrect.desc'
+                                class="sort-icon-down {sortField ===
+                                    'conformityIncorrect' &&
+                                sortOrder === SortOrder.Down
                                     ? SORT_COLOR
                                     : 'text-warning'}"
                                 on:click={() => {
-                                    toggleSort('conformityIncorrect');
+                                    toggleSort(
+                                        'conformityIncorrect',
+                                        SortOrder.Down,
+                                    );
                                 }}
                             />
                         </div>
-                        <div class="col-auto align-self-center d-grid">
+                        <div class="col-auto">
                             <Icon
-                                size="1.125"
+                                size="1.25"
                                 name="chevron-up"
-                                class="sort-icon mouse-pointer {sort ===
-                                'conformityError.asc'
+                                class="sort-icon-up {sortField ===
+                                    'conformityError' &&
+                                sortOrder === SortOrder.Up
                                     ? SORT_COLOR
                                     : 'text-danger'}"
                                 on:click={() => {
-                                    toggleSort('conformityError');
+                                    toggleSort('conformityError', SortOrder.Up);
                                 }}
                             />
                             <Icon
-                                size="1.125"
+                                size="1.25"
                                 name="chevron-down"
-                                class="sort-icon mouse-pointer {sort ===
-                                'conformityError.desc'
+                                class="sort-icon-down {sortField ===
+                                    'conformityError' &&
+                                sortOrder === SortOrder.Down
                                     ? SORT_COLOR
                                     : 'text-danger'}"
                                 on:click={() => {
-                                    toggleSort('conformityError');
+                                    toggleSort(
+                                        'conformityError',
+                                        SortOrder.Down,
+                                    );
                                 }}
                             />
                         </div>

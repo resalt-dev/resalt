@@ -9,7 +9,7 @@
     export let tabData: Writable<Minion>;
     let rawData = false;
 
-    enum SortOrder {
+    enum ConformSortOption {
         Incremental = 'Incremental order',
         Decremental = 'Decremental order',
         LongestRuntime = 'Longest runtime',
@@ -35,7 +35,7 @@
         data: ConformData;
     }
 
-    let sortOrder: SortOrder = SortOrder.Incremental;
+    let sortOrder: ConformSortOption = ConformSortOption.Incremental;
     let showSuccess: boolean = true;
     let showIncorrect: boolean = true;
     let showError: boolean = true;
@@ -72,13 +72,13 @@
         })
         .sort((a, b) => {
             switch (sortOrder) {
-                case SortOrder.Incremental:
+                case ConformSortOption.Incremental:
                     return a.data.__run_num__ - b.data.__run_num__;
-                case SortOrder.Decremental:
+                case ConformSortOption.Decremental:
                     return b.data.__run_num__ - a.data.__run_num__;
-                case SortOrder.LongestRuntime:
+                case ConformSortOption.LongestRuntime:
                     return b.data.duration - a.data.duration;
-                case SortOrder.BestResult:
+                case ConformSortOption.BestResult:
                     return (
                         (a.data.result === true
                             ? 1
@@ -91,7 +91,7 @@
                             ? 3
                             : 2)
                     );
-                case SortOrder.WorstResult:
+                case ConformSortOption.WorstResult:
                     return (
                         (b.data.result === true
                             ? 1
@@ -132,18 +132,19 @@
                         <h5 class="card-title">Sort method</h5>
 
                         <!-- loop through sort orders-->
-                        {#each Object.entries(SortOrder) as [sortKey, sortTitle]}
+                        {#each Object.entries(ConformSortOption) as [sortKey, sortTitle]}
                             <div
                                 class="form-check"
                                 on:click={() =>
-                                    (sortOrder = SortOrder[sortKey])}
+                                    (sortOrder = ConformSortOption[sortKey])}
                             >
                                 <input
                                     class="form-check-input form-check-input-{$theme.color}"
                                     type="radio"
                                     name="sortMethod"
                                     id={`sortMethod-${sortKey}`}
-                                    checked={sortOrder === SortOrder[sortKey]}
+                                    checked={sortOrder ===
+                                        ConformSortOption[sortKey]}
                                 />
                                 <label
                                     class="form-check-label"

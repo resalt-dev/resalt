@@ -83,16 +83,16 @@
                 <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center ps-2">Tag</div>
-                        <div class="col-auto align-self-center d-grid">
+                        <div class="col-auto">
                             <Icon
-                                size="1.125"
+                                size="1.25"
                                 name="chevron-up"
-                                class="sort-icon mouse-pointer"
+                                class="sort-icon-up"
                             />
                             <Icon
-                                size="1.125"
+                                size="1.25"
                                 name="chevron-down"
-                                class="sort-icon mouse-pointer"
+                                class="sort-icon-down"
                             />
                         </div>
                         <div class="col-auto align-self-center">
@@ -103,16 +103,16 @@
                 <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">Function</div>
-                        <div class="col-auto align-self-center d-grid">
+                        <div class="col-auto">
                             <Icon
-                                size="1.125"
+                                size="1.25"
                                 name="chevron-up"
-                                class="sort-icon mouse-pointer"
+                                class="sort-icon-up"
                             />
                             <Icon
-                                size="1.125"
+                                size="1.25"
                                 name="chevron-down"
-                                class="sort-icon mouse-pointer"
+                                class="sort-icon-down"
                             />
                         </div>
                         <div class="col-auto align-self-center">
@@ -123,16 +123,16 @@
                 <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">Target</div>
-                        <div class="col-auto align-self-center d-grid">
+                        <div class="col-auto">
                             <Icon
-                                size="1.125"
+                                size="1.25"
                                 name="chevron-up"
-                                class="sort-icon mouse-pointer"
+                                class="sort-icon-up"
                             />
                             <Icon
-                                size="1.125"
+                                size="1.25"
                                 name="chevron-down"
-                                class="sort-icon mouse-pointer"
+                                class="sort-icon-down"
                             />
                         </div>
                         <div class="col-auto align-self-center">
@@ -143,16 +143,16 @@
                 <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">Job ID</div>
-                        <div class="col-auto align-self-center d-grid">
+                        <div class="col-auto">
                             <Icon
-                                size="1.125"
+                                size="1.25"
                                 name="chevron-up"
-                                class="sort-icon mouse-pointer"
+                                class="sort-icon-up"
                             />
                             <Icon
-                                size="1.125"
+                                size="1.25"
                                 name="chevron-down"
-                                class="sort-icon mouse-pointer"
+                                class="sort-icon-down"
                             />
                         </div>
                         <div class="col-auto align-self-center">
@@ -163,16 +163,16 @@
                 <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">Date</div>
-                        <div class="col-auto align-self-center d-grid">
+                        <div class="col-auto">
                             <Icon
-                                size="1.125"
+                                size="1.25"
                                 name="chevron-up"
-                                class="sort-icon mouse-pointer"
+                                class="sort-icon-up"
                             />
                             <Icon
-                                size="1.125"
+                                size="1.25"
                                 name="chevron-down"
-                                class="sort-icon mouse-pointer"
+                                class="sort-icon-down"
                             />
                         </div>
                     </div>
@@ -194,7 +194,7 @@
                             class="mouse-pointer"
                         >
                             <Icon
-                                size="1.125"
+                                size="1.25"
                                 name={$expandedEvents.includes(
                                     event.unique_index,
                                 )

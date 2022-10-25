@@ -2,9 +2,9 @@
 
 // eslint-disable-next-line no-shadow
 export enum SortOrder {
-    Up = 'up',
-    Down = 'down',
-    None = 'none',
+    Up = 'asc',
+    Down = 'desc',
+    None = 'null',
 }
 
 // eslint-disable-next-line no-redeclare
