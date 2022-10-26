@@ -30,6 +30,7 @@
     } from 'chart.js';
     import Color from '../../models/Color';
     import type MetricResult from '../../models/MetricResult';
+    import type { NavigateFn } from 'svelte-navigator';
     ChartJS.register(
         ArcElement,
         BarElement,
@@ -41,6 +42,11 @@
         Title,
         Tooltip,
     );
+
+    // svelte-ignore unused-export-let
+    export let location: Location;
+    // svelte-ignore unused-export-let
+    export let navigate: NavigateFn;
 
     const metrics: Writable<MetricResult[] | null> = writable(null);
 

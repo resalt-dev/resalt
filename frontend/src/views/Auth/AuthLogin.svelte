@@ -3,10 +3,13 @@
     import { loadCurrentUser, login, showToast } from '../../controller';
     import { config, theme } from '../../stores';
     import paths from '../../paths';
-    import { useNavigate } from 'svelte-navigator';
     import { MessageType } from '../../models/MessageType';
     import { FormGroup, Input, Label, Progress } from 'sveltestrap';
-    const navigate = useNavigate();
+    import type { NavigateFn } from 'svelte-navigator';
+
+    // svelte-ignore unused-export-let
+    export let location: Location;
+    export let navigate: NavigateFn;
 
     let usernameField: HTMLInputElement;
     let usernameFieldValue: string = '';

@@ -8,6 +8,12 @@
     import { MessageType } from '../../models/MessageType';
     import type Job from '../../models/Job';
     import { SortOrder } from '../../models/SortOrder';
+    import type { NavigateFn } from 'svelte-navigator';
+
+    // svelte-ignore unused-export-let
+    export let location: Location;
+    // svelte-ignore unused-export-let
+    export let navigate: NavigateFn;
 
     let sortField: string | null = null;
     let sortOrder: SortOrder = SortOrder.Up;

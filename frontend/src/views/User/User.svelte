@@ -9,7 +9,6 @@
 
     import { onMount } from 'svelte';
     import {
-        Badge,
         Card,
         CardBody,
         CardHeader,
@@ -28,11 +27,14 @@
         P_ADMIN_USER,
         P_USER_PASSWORD,
     } from '../../perms';
+    import type { NavigateFn } from 'svelte-navigator';
 
     const PASSWORD_MIN_LENGTH: number = 8;
 
-    // export let navigate;
-    // export let location;
+    // svelte-ignore unused-export-let
+    export let location: Location;
+    // svelte-ignore unused-export-let
+    export let navigate: NavigateFn;
     export let userId: string;
 
     const user: Writable<User | null> = writable(null);

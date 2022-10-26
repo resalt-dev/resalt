@@ -1,10 +1,15 @@
 <script lang="ts">
     import { writable, type Writable } from 'svelte/store';
-    import { theme } from '../../stores';
     import Tabs from '../../components/Tabs.svelte';
     import ConsoleChangeBranch from '../../components/ConsoleChangeBranch.svelte';
     import RunTabLive from './RunTabLive.svelte';
     import { Card } from 'sveltestrap';
+    import type { NavigateFn } from 'svelte-navigator';
+
+    // svelte-ignore unused-export-let
+    export let location: Location;
+    // svelte-ignore unused-export-let
+    export let navigate: NavigateFn;
 
     const SHIFT = 0;
 

@@ -107,6 +107,7 @@
     }
 
     // https://stackoverflow.com/a/62569233/2479087
+    // https://stackoverflow.com/a/71747360/2479087
     function beforeUnload(event: BeforeUnloadEvent) {
         // Cancel the event as stated by the standard.
         event.preventDefault();
@@ -116,7 +117,8 @@
         closeEvents();
 
         // more compatibility
-        return '...';
+        //return '...';
+        return null; // return null to avoid pop up
     }
 </script>
 

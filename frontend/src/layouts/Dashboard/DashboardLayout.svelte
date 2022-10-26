@@ -50,7 +50,10 @@
             <div class="px-4 py-3">
                 <Router primary={false}>
                     <Route path="home" component={Home} />
-                    <Route path="minions/:minionId/*" component={Minion} />
+                    <Route
+                        path="minions/:minionId/*section"
+                        component={Minion}
+                    />
                     <Route path="minions" component={Minions} />
                     <Route path="run" component={Run} />
                     <Route path="jobs/:jobId" component={Job} />

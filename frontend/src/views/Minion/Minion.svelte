@@ -20,7 +20,9 @@
     // svelte-ignore unused-export-let
     export let location: Location;
     export let navigate: NavigateFn;
+
     export let minionId: string;
+    export let section: string;
 
     const minion: Writable<Minion | null> = writable(null);
 
@@ -85,8 +87,7 @@
     // Find index of subPage in subPagesNav, or 0 otherwise.
     $: currentSubPage = Math.max(
         subPagesNav.findIndex(
-            (page) =>
-                page.label.toLowerCase() === location.pathname.split('/')[4],
+            (page) => page.label.toLowerCase() === section.toLowerCase(),
         ),
         0,
     );

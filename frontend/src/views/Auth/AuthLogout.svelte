@@ -1,10 +1,15 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { Link } from 'svelte-navigator';
+    import { Link, type NavigateFn } from 'svelte-navigator';
     import paths from '../../paths';
     import { theme } from '../../stores';
     import { logout, showToast } from '../../controller';
     import { MessageType } from '../../models/MessageType';
+
+    // svelte-ignore unused-export-let
+    export let location: Location;
+    // svelte-ignore unused-export-let
+    export let navigate: NavigateFn;
 
     let loggingOut: boolean = true;
 

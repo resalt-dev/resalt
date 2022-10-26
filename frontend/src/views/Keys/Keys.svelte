@@ -15,6 +15,8 @@
     import { MessageType } from '../../models/MessageType';
     import type { NavigateFn } from 'svelte-navigator';
 
+    // svelte-ignore unused-export-let
+    export let location: Location;
     export let navigate: NavigateFn;
 
     let paginationSize: number = 20;

@@ -6,6 +6,12 @@
     import TablePaginate from '../../components/TablePaginate.svelte';
     import { MessageType } from '../../models/MessageType';
     import { writable, type Writable } from 'svelte/store';
+    import type { NavigateFn } from 'svelte-navigator';
+
+    // svelte-ignore unused-export-let
+    export let location: Location;
+    // svelte-ignore unused-export-let
+    export let navigate: NavigateFn;
 
     let paginationSize: number = 20;
     let paginationPage: number = 1;
