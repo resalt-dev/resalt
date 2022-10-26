@@ -2,11 +2,12 @@
     import { onMount } from 'svelte';
     import { Router, Route, useNavigate } from 'svelte-navigator';
     import { currentUser, toasts } from '../../stores';
-    import { loadCurrentUser, logout } from '../../controller';
+    import { loadCurrentUser } from '../../controller';
     import paths from '../../paths';
     import Sidebar from './DashboardSidebar.svelte';
     import DashboardHeader from './DashboardHeader.svelte';
     import Redirect from '../../components/Redirect.svelte';
+    import SSEConnector from '../../components/SSEConnector.svelte';
 
     import Home from '../../views/Home/Home.svelte';
     import Minion from '../../views/Minion/Minion.svelte';
@@ -31,7 +32,6 @@
             })
             .catch((err) => {
                 console.error(err);
-                logout();
                 navigate(paths.logout.path);
             });
     });
@@ -40,6 +40,7 @@
 {#if $currentUser === null}
     <p>Loading...</p>
 {:else}
+    <SSEConnector />
     <div class="d-flex flex-row h-100">
         <div class="">
             <Sidebar />

@@ -5,7 +5,6 @@
     import DashboardLayout from './layouts/Dashboard/DashboardLayout.svelte';
     import PortalLayout from './layouts/Portal/PortalLayout.svelte';
     import Redirect from './components/Redirect.svelte';
-    import SSEConnector from './components/SSEConnector.svelte';
     import { loadConfig } from './controller';
     import { onMount } from 'svelte';
     import { config, theme } from './stores';
@@ -42,7 +41,6 @@
         <p>Loading...</p>
     {:else}
         <Router basepath={constants.basePath} primary={false}>
-            <SSEConnector />
             <Route path="auth/*">
                 <PortalLayout />
             </Route>

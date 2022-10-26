@@ -3,7 +3,6 @@ import {
     auth as authStore,
     config as configStore,
     currentUser as currentUserStore,
-    socket as socketStore,
     toasts,
 } from './stores';
 import {
@@ -78,102 +77,9 @@ export async function logout(): Promise<void> {
     currentUserStore.set(null);
 }
 
-let source: EventSource;
-export function closeEvents(): void {
-    if (source) {
-        source.close();
-    }
-}
-
-export async function connectEvents(
-    timeout: number = 1000,
-): Promise<EventSource> {
-    if (source && source.readyState === EventSource.OPEN) {
-        console.log(
-            'Tried connecting to SSE when already connected, returning same.',
-        );
-        return source;
-    }
-    if (get(socketStore).connected) {
-        socketStore.set({ connected: false, last_ping: null });
-    }
-
+export function createSSESocket(): Promise<EventSource> {
     const token = requireToken();
-    source = await apiCreateEventConnection(token);
-
-    source.addEventListener(
-        'message',
-        (e) => {
-            const data = JSON.parse(e.data);
-            console.log('data', data);
-
-            // eslint-disable-next-line no-unused-vars
-            const { content } = data;
-
-            switch (data.type) {
-            /* case 'update_minion':
-                minionsStore.update((minions: Array<Minion>) => {
-                    // minions is a Vector of Minions.
-                    // If minion exists, replace it. If not, then add it.
-                    const index = minions.findIndex(
-                        (minion) => minion.id === content.minion.id,
-                    );
-                    if (index >= 0) {
-                        minions[index] = content.minion;
-                    } else {
-                        minions.push(content.minion);
-                    }
-                    return minions;
-                });
-                break; */
-            default:
-                console.log('Unknown event type', data.type);
-            }
-        },
-        false,
-    );
-
-    source.addEventListener(
-        'ping',
-        (e) => {
-            const time = new Date(`${JSON.parse(e.data).time}Z`);
-            socketStore.update((s) => {
-                s.last_ping = time;
-                return s;
-            });
-            // console.log("ping", time);
-        },
-        false,
-    );
-
-    source.addEventListener(
-        'open',
-        () => {
-            // Connection was opened.
-            socketStore.set({ connected: true, last_ping: null });
-            console.log('SSE Connected');
-        },
-        false,
-    );
-
-    source.addEventListener(
-        'error',
-        () => {
-            // Connection was closed.
-            socketStore.set({ connected: false, last_ping: null });
-            console.log(
-                `Retrying SSE connection in ${Math.round(
-                    timeout / 1000,
-                )} seconds...`,
-            );
-            setTimeout(() => {
-                connectEvents(Math.min(timeout * 2, 5 * 60 * 1000));
-            }, timeout);
-        },
-        false,
-    );
-
-    return source;
+    return apiCreateEventConnection(token);
 }
 
 export async function loadConfig(): Promise<Config> {

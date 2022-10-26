@@ -1,11 +1,6 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import {
-        loadCurrentUser,
-        login,
-        logout,
-        showToast,
-    } from '../../controller';
+    import { loadCurrentUser, login, showToast } from '../../controller';
     import { config, theme } from '../../stores';
     import paths from '../../paths';
     import { useNavigate } from 'svelte-navigator';
@@ -53,7 +48,7 @@
                             'Failed fetching user',
                             err,
                         );
-                        logout();
+                        navigate(paths.logout.path);
                     });
             })
             .catch((err) => {
