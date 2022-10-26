@@ -17,8 +17,9 @@
     import RunResult from '../../models/RunResult';
     import RunCommand from '../../models/RunCommand';
     import { MessageType } from '../../models/MessageType';
+    import type { Writable } from 'svelte/store';
 
-    export let tabData: any;
+    export let returns: Writable<any[]>;
 
     let runConfirmDialog = false;
 
@@ -124,7 +125,7 @@
         )
             .then((result) => {
                 console.log(result);
-                tabData.returns.update((returns: RunResult[]) => [
+                returns.update((returns: RunResult[]) => [
                     new RunResult(command, returns.length, result),
                     ...returns,
                 ]);

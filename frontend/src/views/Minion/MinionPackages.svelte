@@ -4,13 +4,13 @@
     import JsonViewer from '../../components/JsonViewer.svelte';
     import type Minion from '../../models/Minion';
 
-    export let tabData: Writable<Minion>;
+    export let minion: Writable<Minion>;
     let rawData = false;
 
-    $: pkgs = JSON.parse($tabData.pkgs);
+    $: pkgs = JSON.parse($minion.pkgs);
 </script>
 
-{#if !$tabData.pkgs}
+{#if !$minion.pkgs}
     <div class="p-3">No packages data. Please refresh minion.</div>
 {:else}
     <button
@@ -21,7 +21,7 @@
         {rawData ? 'View List' : 'View JSON'}
     </button>
     {#if rawData}
-        <JsonViewer data={JSON.parse($tabData.pkgs)} collapse={false} />
+        <JsonViewer data={JSON.parse($minion.pkgs)} collapse={false} />
     {:else}
         <Card class="table-responsive border-bottom-0">
             <Table hover class="b-0 mb-0">

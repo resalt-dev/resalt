@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { writable } from 'svelte/store';
+    import { writable, type Writable } from 'svelte/store';
     import { theme } from '../../stores';
     import Tabs from '../../components/Tabs.svelte';
     import ConsoleChangeBranch from '../../components/ConsoleChangeBranch.svelte';
@@ -8,7 +8,7 @@
 
     const SHIFT = 0;
 
-    let returns = writable([]);
+    let returns: Writable<any[]> = writable([]);
 </script>
 
 <h1>Run</h1>

@@ -33,8 +33,7 @@
         <CardBody>
             <svelte:component
                 this={children[selected].component}
-                label={children[selected].label}
-                tabData={children[selected].data || undefined}
+                {...children[selected].data}
             />
         </CardBody>
     </Card>

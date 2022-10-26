@@ -3,9 +3,9 @@
     import { Card, CardBody, CardHeader, Col, Row, Table } from 'sveltestrap';
     import type Minion from '../../models/Minion';
 
-    export let tabData: Writable<Minion>;
+    export let minion: Writable<Minion>;
 
-    $: grains = JSON.parse($tabData.grains ?? '{}');
+    $: grains = JSON.parse($minion.grains ?? '{}');
     $: console.log(grains);
 
     function formatAsSize(megabytes: number | null | undefined) {
@@ -27,7 +27,7 @@
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
                     <strong>ID</strong>
-                    <span class="float-end">{$tabData.id}</span>
+                    <span class="float-end">{$minion.id}</span>
                 </li>
                 <li class="list-group-item">
                     <strong>F.Q.D.N</strong>
@@ -120,37 +120,37 @@
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
                     <strong>Last seen</strong>
-                    <span class="float-end">{$tabData.lastSeen} UTC</span>
+                    <span class="float-end">{$minion.lastSeen} UTC</span>
                 </li>
                 <li class="list-group-item">
                     <strong>Conformity check</strong>
                     <span class="float-end"
-                        >{$tabData.lastUpdatedConformity != null
-                            ? $tabData.lastUpdatedConformity + ' UTC'
+                        >{$minion.lastUpdatedConformity != null
+                            ? $minion.lastUpdatedConformity + ' UTC'
                             : 'Never'}</span
                     >
                 </li>
                 <li class="list-group-item">
                     <strong>Grains fetched</strong>
                     <span class="float-end"
-                        >{$tabData.lastUpdatedGrains != null
-                            ? $tabData.lastUpdatedGrains + ' UTC'
+                        >{$minion.lastUpdatedGrains != null
+                            ? $minion.lastUpdatedGrains + ' UTC'
                             : 'Never'}</span
                     >
                 </li>
                 <li class="list-group-item">
                     <strong>Pillars fetched</strong>
                     <span class="float-end"
-                        >{$tabData.lastUpdatedPillars != null
-                            ? $tabData.lastUpdatedPillars + ' UTC'
+                        >{$minion.lastUpdatedPillars != null
+                            ? $minion.lastUpdatedPillars + ' UTC'
                             : 'Never'}</span
                     >
                 </li>
                 <li class="list-group-item">
                     <strong>Packages fetched</strong>
                     <span class="float-end"
-                        >{$tabData.lastUpdatedPkgs != null
-                            ? $tabData.lastUpdatedPkgs + ' UTC'
+                        >{$minion.lastUpdatedPkgs != null
+                            ? $minion.lastUpdatedPkgs + ' UTC'
                             : 'Never'}</span
                     >
                 </li>

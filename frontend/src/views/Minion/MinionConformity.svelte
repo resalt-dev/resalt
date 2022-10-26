@@ -6,7 +6,7 @@
     import type Minion from '../../models/Minion';
     import { theme } from '../../stores';
 
-    export let tabData: Writable<Minion>;
+    export let minion: Writable<Minion>;
     let rawData = false;
 
     enum ConformSortOption {
@@ -41,7 +41,7 @@
     let showError: boolean = true;
     let showCollapsed: boolean = true;
 
-    $: conformity = Object.entries(JSON.parse($tabData.conformity) ?? [])
+    $: conformity = Object.entries(JSON.parse($minion.conformity) ?? [])
         .map(([key, v]) => {
             let value: any = v;
 
@@ -110,7 +110,7 @@
         });
 </script>
 
-{#if !$tabData.conformity}
+{#if !$minion.conformity}
     <div class="p-3">No conformity data. Please refresh minion.</div>
 {:else}
     <button
@@ -122,7 +122,7 @@
     </button>
 
     {#if rawData}
-        <JsonViewer data={JSON.parse($tabData.conformity)} />
+        <JsonViewer data={JSON.parse($minion.conformity)} />
     {:else}
         <Row>
             <Col xs="3">

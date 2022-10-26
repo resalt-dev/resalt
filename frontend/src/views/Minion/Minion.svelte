@@ -17,8 +17,9 @@
     import type Minion from '../../models/Minion';
     import type User from '../../models/User';
 
+    // svelte-ignore unused-export-let
+    export let location: Location;
     export let navigate: NavigateFn;
-    export let location: { pathname: string };
     export let minionId: string;
 
     const minion: Writable<Minion | null> = writable(null);
@@ -47,17 +48,17 @@
             {
                 label: 'General',
                 component: MinionInfo,
-                data: minion,
+                data: { minion },
             },
             {
                 label: 'Conformity',
                 component: MinionConformity,
-                data: minion,
+                data: { minion },
             },
             {
                 label: 'Grains',
                 component: MinionGrains,
-                data: minion,
+                data: { minion },
             },
         ];
 
@@ -66,14 +67,14 @@
             navs.push({
                 label: 'Pillars',
                 component: MinionPillars,
-                data: minion,
+                data: { minion },
             });
         }
 
         navs.push({
             label: 'Packages',
             component: MinionPackages,
-            data: minion,
+            data: { minion },
         });
 
         return navs;

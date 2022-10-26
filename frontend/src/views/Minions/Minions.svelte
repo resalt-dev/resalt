@@ -17,6 +17,8 @@
     import type Filter from '../../models/Filter';
     import type Minion from '../../models/Minion';
 
+    // svelte-ignore unused-export-let
+    export let location: Location;
     export let navigate: NavigateFn;
 
     let filters: Filter[] = [];

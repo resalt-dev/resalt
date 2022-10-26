@@ -1,13 +1,5 @@
 <script lang="ts">
-    import {
-        Row,
-        Col,
-        FormGroup,
-        Button,
-        Card,
-        CardHeader,
-        CardBody,
-    } from 'sveltestrap';
+    import { Row, Col, Button, Card, CardHeader, CardBody } from 'sveltestrap';
     import Icon from '../../components/Icon.svelte';
     import constants from '../../constants';
     import { showToast } from '../../controller';
