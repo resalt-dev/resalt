@@ -938,10 +938,17 @@ impl SaltAPI {
         // let keys = self.get_keys(salt_token).await?;
         // info!("keys: {:?}", keys);
 
-        let mut map = HashMap::new();
-        map.insert("test".to_owned(), "True".to_owned());
+        let mut mapTestTrue = HashMap::new();
+        mapTestTrue.insert("test".to_owned(), "True".to_owned());
         match self
-            .run_job_local_async(salt_token, "*", "state.highstate", None, None, Some(map))
+            .run_job_local_async(
+                salt_token,
+                "*",
+                "state.highstate",
+                None,
+                None,
+                Some(mapTestTrue),
+            )
             .await
         {
             Ok(_) => (),
