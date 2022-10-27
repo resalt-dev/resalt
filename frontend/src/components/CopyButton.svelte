@@ -13,7 +13,7 @@
     color={$theme.color}
     size="sm"
     class="ms-2"
-    style="margin-bottom: -0.15rem;"
+    style="margin-bottom: -0.15rem;margin-top: -0.15rem;"
     on:click={() => {
         navigator.clipboard.writeText(value);
         showToast(

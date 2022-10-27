@@ -27,8 +27,11 @@
             <CardHeader>Common</CardHeader>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
-                    <strong>ID</strong>
-                    <span class="float-end">{$minion.id}</span>
+                    <strong class="align-middle">ID</strong>
+                    <span class="float-end">
+                        <span class="align-middle">{$minion.id}</span>
+                        <CopyButton name="Minion ID" value={$minion.id} />
+                    </span>
                 </li>
                 <li class="list-group-item">
                     <strong>F.Q.D.N</strong>
