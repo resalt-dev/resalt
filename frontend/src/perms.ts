@@ -73,8 +73,8 @@ export function hasResaltPermission(
     }
     testPerms.push('admin.superadmin');
 
-    console.log('testPerms', testPerms);
-    console.log('resaltPermissions', resaltPermissions);
+    // console.log('testPerms', testPerms);
+    // console.log('resaltPermissions', resaltPermissions);
 
     for (const userPermission of resaltPermissions) {
         for (const testPerm of testPerms) {

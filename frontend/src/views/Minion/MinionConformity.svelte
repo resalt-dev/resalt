@@ -5,6 +5,12 @@
     import ResultBox from '../../components/ResultBox.svelte';
     import type Minion from '../../models/Minion';
     import { theme } from '../../stores';
+    import ConformityTreeView from './ConformityTreeView.svelte';
+    import type {
+        ConformData,
+        Conform,
+        ConformTreeNode,
+    } from './ConformityTypes';
 
     export let minion: Writable<Minion>;
     let rawData = false;
@@ -15,24 +21,6 @@
         LongestRuntime = 'Longest runtime',
         BestResult = 'Success first',
         WorstResult = 'Errors first',
-    }
-    // Salt structure
-    class ConformData {
-        __id__: string;
-        __run_num__: number;
-        __sls__: string;
-        changes: any;
-        comment: string;
-        duration: number;
-        name: string;
-        result: boolean | null;
-        start_time: string;
-    }
-    class Conform {
-        title: string;
-        fun: string;
-        color: string;
-        data: ConformData;
     }
 
     let sortOrder: ConformSortOption = ConformSortOption.Incremental;
@@ -108,6 +96,60 @@
                     return 0;
             }
         });
+
+    // Reduce above Conformity states to a tree of SLS files
+    // - a (1)
+    //   - aa (1)
+    //   - ab (1)
+    // - common
+    //   - init
+    //     - test (2)
+    // - editor (1)
+    //   - vim (7)
+    function sortSubtreeRecursively(subtree: ConformTreeNode[]) {
+        subtree.sort((a, b) => a.name.localeCompare(b.name));
+        subtree.forEach((node) => {
+            sortSubtreeRecursively(node.subtree);
+        });
+    }
+
+    $: conformity_tree = conformity
+        // .filter((c) => {
+        //     if (!showSuccess && c.data.result === true) return false;
+        //     if (!showIncorrect && c.data.result === null) return false;
+        //     if (!showError && c.data.result === false) return false;
+        //     return true;
+        // })
+        .reduce(
+            (acc, c) => {
+                let parts = c.data.__sls__.split('.');
+                let current = acc;
+                for (let i = 0; i < parts.length; i++) {
+                    let part = parts[i];
+                    let existing = current.subtree.find((e) => e.name === part);
+                    if (!existing) {
+                        existing = {
+                            name: part,
+                            subtree: [],
+                            items: [],
+                        };
+                        current.subtree.push(existing);
+                    }
+                    current = existing;
+                }
+                current.items.push(c);
+                return acc;
+            },
+            {
+                name: '#',
+                subtree: [],
+                items: [],
+            } as ConformTreeNode,
+        );
+    // Recursively sort tree alphabetically
+    $: sortSubtreeRecursively(conformity_tree.subtree);
+
+    $: console.log(conformity_tree);
 </script>
 
 {#if !$minion.conformity}
@@ -133,16 +175,15 @@
 
                         <!-- loop through sort orders-->
                         {#each Object.entries(ConformSortOption) as [sortKey, sortTitle]}
-                            <div
-                                class="form-check"
-                                on:click={() =>
-                                    (sortOrder = ConformSortOption[sortKey])}
-                            >
+                            <div class="form-check">
                                 <input
                                     class="form-check-input form-check-input-{$theme.color}"
                                     type="radio"
                                     name="sortMethod"
                                     id={`sortMethod-${sortKey}`}
+                                    on:click={() =>
+                                        (sortOrder =
+                                            ConformSortOption[sortKey])}
                                     checked={sortOrder ===
                                         ConformSortOption[sortKey]}
                                 />
@@ -158,17 +199,15 @@
                         <h5 class="card-title mt-3">Visibility</h5>
 
                         <!-- showSuccess -->
-                        <div
-                            class="form-check"
-                            on:click={() => (showSuccess = !showSuccess)}
-                        >
+                        <div class="form-check">
                             <input
                                 class="form-check-input form-check-input-success"
                                 type="checkbox"
                                 id="showSuccess"
+                                on:click={() => (showSuccess = !showSuccess)}
                                 checked={showSuccess}
                             />
-                            <label class="form-check-label" for="showRawData">
+                            <label class="form-check-label" for="showSuccess">
                                 Show Succeeded ({conformity.filter(
                                     (c) => c.data.result === true,
                                 ).length})
@@ -224,10 +263,10 @@
                 </Card>
 
                 <Card class="mb-3">
-                    <CardHeader>Tree view</CardHeader>
+                    <CardHeader>File Structure</CardHeader>
                     <CardBody>
-                        <h5 class="card-title">Title</h5>
-                        <p class="card-text">Text</p>
+                        <!-- Render Tree structure in a recursive fashion. -->
+                        <ConformityTreeView node={conformity_tree} />
                     </CardBody>
                 </Card>
             </Col>
