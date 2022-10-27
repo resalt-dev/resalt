@@ -223,6 +223,7 @@ $bluegray-10: #0e1418;
     line-height: 0.5 !important;
     display: block !important;
 }
+.hover-icon:hover,
 .sort-icon-up:hover:not(.sort-active),
 .sort-icon-down:hover:not(.sort-active) {
     opacity: 0.5;

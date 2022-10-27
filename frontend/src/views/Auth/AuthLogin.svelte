@@ -4,8 +4,9 @@
     import { config, theme } from '../../stores';
     import paths from '../../paths';
     import { MessageType } from '../../models/MessageType';
-    import { FormGroup, Input, Label, Progress } from 'sveltestrap';
+    import { FormGroup, Input, Label } from 'sveltestrap';
     import type { NavigateFn } from 'svelte-navigator';
+    import ResaltProgress from '../../components/ResaltProgress.svelte';
 
     // svelte-ignore unused-export-let
     export let location: Location;
@@ -77,12 +78,7 @@
         SSO (Single Sign On) enabled. Please wait while authenticating...
     </p>
 
-    <Progress
-        animated
-        color={null}
-        barClassName={'bg-' + $theme.color}
-        value={100}
-    />
+    <ResaltProgress />
 {:else}
     <p class="fw-bold">
         This is a restricted admin area. Please log in to continue.

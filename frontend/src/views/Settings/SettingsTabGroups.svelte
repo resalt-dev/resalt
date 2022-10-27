@@ -11,7 +11,6 @@
         FormGroup,
         Input,
         Label,
-        Progress,
         Row,
         Table,
     } from 'sveltestrap';
@@ -30,6 +29,7 @@
     import { resaltWebPermissions } from '../../perms';
     import { theme } from '../../stores';
     import type PermissionGroup from '../../models/PermissionGroup';
+    import ResaltProgress from '../../components/ResaltProgress.svelte';
 
     let paginationSize: number = 20;
     let paginationPage: number = 1;
@@ -602,9 +602,7 @@
                 {updateData}
             />
             {#if !$groups}
-                <Progress animated color={$theme.color} value={100}>
-                    Loading...
-                </Progress>
+                <ResaltProgress />
             {/if}
         </div>
     </Col>

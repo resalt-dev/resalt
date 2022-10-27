@@ -16,10 +16,13 @@
     import Tabs from '../../components/Tabs.svelte';
     import type Filter from '../../models/Filter';
     import type Minion from '../../models/Minion';
+    import ResaltProgress from '../../components/ResaltProgress.svelte';
 
     // svelte-ignore unused-export-let
     export let location: Location;
     export let navigate: NavigateFn;
+
+    const loading = writable<boolean>(true);
 
     let filters: Filter[] = [];
     let sortField: string | null = null;
@@ -31,6 +34,7 @@
     const minions: Writable<Minion[] | null> = writable(null);
 
     function updateData(): void {
+        loading.set(true);
         getMinions(
             filters,
             sortField === null ? null : sortField + '.' + sortOrder,
@@ -39,6 +43,7 @@
         )
             .then((data) => {
                 minions.set(data);
+                loading.set(false);
             })
             .catch((err) => {
                 showToast(MessageType.ERROR, 'Failed fetching minions', err);
@@ -283,7 +288,21 @@
                         </div>
                     </div></th
                 >
-                <th class="border-secondary">Actions</th>
+                <th class="border-secondary">
+                    <div class="row g-1">
+                        <div class="col-auto align-self-center">Actions</div>
+                        <div class="col align-self-bottom canRotate">
+                            <Icon
+                                size="1.5"
+                                name="refresh"
+                                class="float-end hover-icon mouse-pointer"
+                                on:click={() => {
+                                    updateData();
+                                }}
+                            />
+                        </div>
+                    </div>
+                </th>
             </tr>
         </thead>
         <tbody class="align-middle">
@@ -340,6 +359,10 @@
     last={$minions === null || $minions.length < paginationSize}
     {updateData}
 />
+
+{#if $loading}
+    <ResaltProgress />
+{/if}
 
 <br />
 
