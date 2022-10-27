@@ -107,7 +107,6 @@
     }
 
     function beforeUnload(event: BeforeUnloadEvent) {
-        console.log('BEFORE_UNLOAD');
         closeEvents();
     }
 </script>
