@@ -761,12 +761,7 @@ impl Storage {
         if has_grain_filters || has_package_filters {
             let offset = offset as usize;
             let limit = limit as usize;
-            if offset > 0 {
-                minions = minions[offset..].to_vec();
-            }
-            if limit > 0 {
-                minions = minions[..limit].to_vec();
-            }
+            minions = minions.into_iter().skip(offset).take(limit).collect();
         }
 
         return Ok(minions);
