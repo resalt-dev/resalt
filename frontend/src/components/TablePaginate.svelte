@@ -26,6 +26,7 @@
     }
     function setSize(newSize: number): void {
         size = newSize;
+        page = 1;
         updateData();
     }
 </script>
