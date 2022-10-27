@@ -45,9 +45,9 @@
                     >
                 </li>
                 <li class="list-group-item">
-                    <strong>Kernel</strong>
+                    <strong>Serial Number</strong>
                     <span class="float-end"
-                        >{grains.kernelrelease ?? 'Unknown'}</span
+                        >{grains.serialnumber ?? 'Unknown'}</span
                     >
                 </li>
             </ul>
@@ -66,7 +66,8 @@
                 </li>
                 <li class="list-group-item">
                     <strong>Number of CPUs</strong>
-                    <span class="float-end">{grains.numCpus ?? 'Unknown'}</span>
+                    <span class="float-end">{grains.num_cpus ?? 'Unknown'}</span
+                    >
                 </li>
                 <li class="list-group-item">
                     <strong>Memory</strong>
