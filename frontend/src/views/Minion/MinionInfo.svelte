@@ -1,6 +1,7 @@
 <script lang="ts">
     import type { Writable } from 'svelte/store';
     import { Card, CardBody, CardHeader, Col, Row, Table } from 'sveltestrap';
+    import CopyButton from '../../components/CopyButton.svelte';
     import type Minion from '../../models/Minion';
 
     export let minion: Writable<Minion>;
@@ -31,24 +32,49 @@
                 </li>
                 <li class="list-group-item">
                     <strong>F.Q.D.N</strong>
-                    <span class="float-end">{grains.fqdn ?? 'Unknown'}</span>
+                    <span class="float-end">
+                        {#if grains.fqdn}
+                            {grains.fqdn}
+                        {:else}
+                            <em>Unknown</em>
+                        {/if}
+                    </span>
                 </li>
                 <li class="list-group-item">
                     <strong>OS</strong>
-                    <span class="float-end">{grains.os ?? 'Unknown'}</span>
+                    <span class="float-end">
+                        {#if grains.os}
+                            {grains.os}
+                        {:else}
+                            <em>Unknown</em>
+                        {/if}
+                    </span>
                 </li>
                 <li class="list-group-item ">
                     <strong>OS Version</strong>
-                    <span class="float-end"
-                        >{grains.osrelease ?? 'Unknown'} ({grains.oscodename ??
-                            'Unknown'})</span
-                    >
+                    <span class="float-end">
+                        {#if grains.osrelease}
+                            {grains.osrelease}
+                        {:else}
+                            <em>Unknown</em>
+                        {/if}
+                    </span>
                 </li>
                 <li class="list-group-item">
-                    <strong>Serial Number</strong>
-                    <span class="float-end"
-                        >{grains.serialnumber ?? 'Unknown'}</span
-                    >
+                    <strong class="align-middle">Serial Number</strong>
+                    <span class="float-end">
+                        {#if grains.serialnumber}
+                            <span class="align-middle">
+                                {grains.serialnumber}
+                            </span>
+                            <CopyButton
+                                name="Serial Number"
+                                value={grains.serialnumber}
+                            />
+                        {:else}
+                            <em>Unknown</em>
+                        {/if}
+                    </span>
                 </li>
             </ul>
         </Card>
@@ -60,30 +86,53 @@
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">
                     <strong>CPU</strong>
-                    <span class="float-end"
-                        >{grains.cpu_model ?? 'Unknown'}</span
-                    >
+                    <span class="float-end">
+                        {#if grains.cpu_model}
+                            {grains.cpu_model}
+                        {:else}
+                            <em>Unknown</em>
+                        {/if}
+                    </span>
                 </li>
                 <li class="list-group-item">
                     <strong>Number of CPUs</strong>
-                    <span class="float-end">{grains.num_cpus ?? 'Unknown'}</span
-                    >
+                    <span class="float-end">
+                        {#if grains.num_cpus}
+                            {grains.num_cpus}
+                        {:else}
+                            <em>Unknown</em>
+                        {/if}
+                    </span>
                 </li>
                 <li class="list-group-item">
                     <strong>Memory</strong>
-                    <span class="float-end"
-                        >{formatAsSize(grains.mem_total) ?? 'Unknown'}</span
-                    >
+                    <span class="float-end">
+                        {#if grains.mem_total}
+                            {formatAsSize(grains.mem_total)}
+                        {:else}
+                            <em>Unknown</em>
+                        {/if}
+                    </span>
                 </li>
                 <li class="list-group-item">
                     <strong>Swap</strong>
-                    <span class="float-end"
-                        >{formatAsSize(grains.swap_total) ?? 'Unknown'}</span
-                    >
+                    <span class="float-end">
+                        {#if grains.swap_total}
+                            {formatAsSize(grains.swap_total)}
+                        {:else}
+                            <em>Unknown</em>
+                        {/if}
+                    </span>
                 </li>
                 <li class="list-group-item">
                     <strong>Virtual</strong>
-                    <span class="float-end">{grains.virtual ?? 'Unknown'}</span>
+                    <span class="float-end">
+                        {#if grains.virtual}
+                            {grains.virtual}
+                        {:else}
+                            <em>Unknown</em>
+                        {/if}
+                    </span>
                 </li>
             </ul>
         </Card>
@@ -125,35 +174,43 @@
                 </li>
                 <li class="list-group-item">
                     <strong>Conformity check</strong>
-                    <span class="float-end"
-                        >{$minion.lastUpdatedConformity != null
-                            ? $minion.lastUpdatedConformity + ' UTC'
-                            : 'Never'}</span
-                    >
+                    <span class="float-end">
+                        {#if $minion.lastUpdatedConformity != null}
+                            {$minion.lastUpdatedConformity} UTC
+                        {:else}
+                            <em>Unknown</em>
+                        {/if}
+                    </span>
                 </li>
                 <li class="list-group-item">
                     <strong>Grains fetched</strong>
-                    <span class="float-end"
-                        >{$minion.lastUpdatedGrains != null
-                            ? $minion.lastUpdatedGrains + ' UTC'
-                            : 'Never'}</span
-                    >
+                    <span class="float-end">
+                        {#if $minion.lastUpdatedGrains != null}
+                            {$minion.lastUpdatedGrains} UTC
+                        {:else}
+                            <em>Unknown</em>
+                        {/if}
+                    </span>
                 </li>
                 <li class="list-group-item">
                     <strong>Pillars fetched</strong>
-                    <span class="float-end"
-                        >{$minion.lastUpdatedPillars != null
-                            ? $minion.lastUpdatedPillars + ' UTC'
-                            : 'Never'}</span
-                    >
+                    <span class="float-end">
+                        {#if $minion.lastUpdatedPillars != null}
+                            {$minion.lastUpdatedPillars} UTC
+                        {:else}
+                            <em>Unknown</em>
+                        {/if}
+                    </span>
                 </li>
                 <li class="list-group-item">
                     <strong>Packages fetched</strong>
-                    <span class="float-end"
-                        >{$minion.lastUpdatedPkgs != null
-                            ? $minion.lastUpdatedPkgs + ' UTC'
-                            : 'Never'}</span
-                    >
+                    <span class="float-end">
+                        {#if $minion.lastUpdatedPkgs != null}
+                            {$minion.lastUpdatedPkgs} UTC
+                        {:else}
+                            <em>Unknown</em>
+                        {/if}
+                    </span>
                 </li>
             </ul>
         </Card>

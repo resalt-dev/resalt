@@ -4,7 +4,7 @@
         getUserById,
         updateUserPassword,
     } from '../../controller';
-    import { theme, currentUser, config } from '../../stores';
+    import { theme, currentUser } from '../../stores';
     import { writable, type Writable } from 'svelte/store';
 
     import { onMount } from 'svelte';
@@ -28,6 +28,7 @@
         P_USER_PASSWORD,
     } from '../../perms';
     import type { NavigateFn } from 'svelte-navigator';
+    import CopyButton from '../../components/CopyButton.svelte';
 
     const PASSWORD_MIN_LENGTH: number = 8;
 
@@ -139,7 +140,10 @@
                             : ''}"
                     >
                         <strong>ID</strong>
-                        <span class="float-end">{$user.id}</span>
+                        <span class="float-end">
+                            {$user.id}
+                            <CopyButton name="User ID" value={$user.id} />
+                        </span>
                     </li>
                     <li
                         class="list-group-item {$theme.dark

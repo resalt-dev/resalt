@@ -2,6 +2,7 @@
     export let type = 'regular';
     export let name = 'bx-rocket';
     export let size = '2';
+    export let align: 'top' | 'middle' | 'bottom' = 'middle';
     let cssClass = '';
     export { cssClass as class };
     export let htmlElement = null;
@@ -15,7 +16,7 @@
     bind:this={htmlElement}
     on:click
     class="bx {full_name} {cssClass.indexOf('align-') === -1
-        ? 'align-middle'
+        ? 'align-' + align
         : ''} {cssClass}"
     style="font-size: {size}rem;{style}"
 />
