@@ -111,22 +111,25 @@ impl SConfig {
     }
 
     pub fn auth_ldap_bind_password() -> String {
-        let mut password = strip_quotes!(SETTINGS
-            .read()
-            .unwrap()
-            .get_string("auth.ldap.bind.password")
-            .unwrap());
-        let password_file = strip_quotes!(SETTINGS
+        // Read from passwordfile if set
+        // Otherwise read from "password"
+
+        let passwordfile = SETTINGS
             .read()
             .unwrap()
             .get_string("auth.ldap.bind.passwordfile")
-            .unwrap());
-        match password_file.len() {
-            0 => {}
-            _ => {
-                password = std::fs::read_to_string(password_file).unwrap();
-            }
-        }
+            .unwrap();
+        let password = match passwordfile.len() {
+            0 => SETTINGS
+                .read()
+                .unwrap()
+                .get_string("auth.ldap.bind.password")
+                .unwrap(),
+            _ => std::fs::read_to_string(passwordfile)
+                .unwrap()
+                .trim()
+                .to_string(),
+        };
         password
     }
 
@@ -168,23 +171,22 @@ impl SConfig {
             .unwrap()
             .get_string("database.username")
             .unwrap());
-        let mut password = strip_quotes!(SETTINGS
-            .read()
-            .unwrap()
-            .get_string("database.password")
-            .unwrap());
-        let password_file = strip_quotes!(SETTINGS
+        let passwordfile = strip_quotes!(SETTINGS
             .read()
             .unwrap()
             .get_string("database.passwordfile")
             .unwrap());
-        info!("password_file: {}", password_file);
-        match password_file.len() {
-            0 => {}
-            _ => {
-                password = std::fs::read_to_string(password_file).unwrap();
-            }
-        }
+        let password = match passwordfile.len() {
+            0 => strip_quotes!(SETTINGS
+                .read()
+                .unwrap()
+                .get_string("database.password")
+                .unwrap()),
+            _ => std::fs::read_to_string(passwordfile)
+                .unwrap()
+                .trim()
+                .to_string(),
+        };
         let host = strip_quotes!(SETTINGS
             .read()
             .unwrap()
@@ -222,22 +224,22 @@ impl SConfig {
     }
 
     pub fn salt_api_system_service_token() -> String {
-        let mut token = strip_quotes!(SETTINGS
-            .read()
-            .unwrap()
-            .get_string("salt.api.token")
-            .unwrap());
-        let token_file = strip_quotes!(SETTINGS
+        let tokenfile = strip_quotes!(SETTINGS
             .read()
             .unwrap()
             .get_string("salt.api.tokenfile")
             .unwrap());
-        match token_file.len() {
-            0 => {}
-            _ => {
-                token = std::fs::read_to_string(token_file).unwrap();
-            }
-        }
+        let token = match tokenfile.len() {
+            0 => strip_quotes!(SETTINGS
+                .read()
+                .unwrap()
+                .get_string("salt.api.token")
+                .unwrap()),
+            _ => std::fs::read_to_string(tokenfile)
+                .unwrap()
+                .trim()
+                .to_string(),
+        };
         token
     }
 
