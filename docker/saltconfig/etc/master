@@ -403,7 +403,7 @@
 #      - test.*
 external_auth:
   rest:
-    ^url: http://backend:8000/resalt/api/1/auth/token
+    ^url: http://backend:8000/api/1/auth/token
 keep_acl_in_token: True
 
 

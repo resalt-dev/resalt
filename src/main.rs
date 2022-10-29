@@ -173,7 +173,7 @@ async fn main() -> std::io::Result<()> {
                     .default_service(route_fallback_404),
             )
             // Proxy web interface
-            .service(web::scope("/").default_service(route_frontend_get))
+            .service(web::scope("").default_service(route_frontend_get))
     })
     .bind(("0.0.0.0", SConfig::http_port()))?
     .run()
