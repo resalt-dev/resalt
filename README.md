@@ -5,9 +5,9 @@
 ## THIS PROJECT IS UNDER RAPID DEVELOPMENT, NO SUPPORT IS GIVEN YET
 ## THIS PROJECT IS UNDER RAPID DEVELOPMENT, NO SUPPORT IS GIVEN YET
 
-<p align="center"><a href="https://github.com/foorack/resalt" target="_blank" rel="noopener noreferrer"><img src="docs/images/logo.png?raw=true" alt="re-frame logo"></a></p>
+<p align="center"><a href="https://github.com/resalt-dev/resalt" target="_blank" rel="noopener noreferrer"><img src="docs/images/logo.png?raw=true" alt="re-frame logo"></a></p>
 
-[![License](https://img.shields.io/github/license/foorack/resalt?style=for-the-badge)](https://github.com/foorack/resalt/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/resalt-dev/resalt?style=for-the-badge)](https://github.com/resalt-dev/resalt/blob/main/LICENSE)
 
 Resalt is a free, open-source, self-hosted, web-based administration and monitoring panel for SaltStack.
 
