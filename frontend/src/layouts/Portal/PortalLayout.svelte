@@ -29,15 +29,9 @@
 
                         <!-- Content -->
                         <div class="px-5 py-4" style="max-width: 54rem;">
-                            <Router
-                                primary={false}
-                                basepath={constants.basePath + '/auth'}
-                            >
+                            <Router primary={false}>
                                 <Route path="login" component={AuthLogin} />
                                 <Route path="logout" component={AuthLogout} />
-                                <!-- <Route path="*">
-                                    <Redirect to={paths.login.path} />
-                                </Route> -->
                             </Router>
 
                             <div class="clearfix" />
