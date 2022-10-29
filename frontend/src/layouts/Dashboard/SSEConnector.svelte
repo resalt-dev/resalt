@@ -1,8 +1,8 @@
 <script lang="ts">
     import { get } from 'svelte/store';
-    import { createSSESocket } from '../controller';
-    import { auth } from '../stores';
-    import { socket as socketStore } from '../stores';
+    import { createSSESocket } from '../../controller';
+    import { auth } from '../../stores';
+    import { socket as socketStore } from '../../stores';
 
     let stream: EventSource | null;
 

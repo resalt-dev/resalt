@@ -8,18 +8,17 @@
     export let collapsed: boolean;
 
     const location = useLocation();
-    // $: isActive = $location.pathname === route.path;
-    $: isActiveOrSub = $location.pathname.startsWith(path.path);
+    $: isActive = $location.pathname.startsWith(path.path);
 </script>
 
 <li class="nav-item" style="height: 4.5rem;">
     <Link
         to={path.path}
-        class="nav-link {$theme.color === 'yellow' && isActiveOrSub
+        class="nav-link {$theme.color === 'yellow' && isActive
             ? 'text-dark'
-            : 'text-white'} {isActiveOrSub
+            : 'text-white'} {isActive
             ? ''
-            : 'fw-light'} d-flex align-items-center {isActiveOrSub
+            : 'fw-light'} d-flex align-items-center {isActive
             ? `bg-${$theme.color}`
             : ''}"
         style="height: inherit;"

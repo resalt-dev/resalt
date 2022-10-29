@@ -1,13 +1,49 @@
 <script lang="ts">
-    import { Router, Route } from 'svelte-navigator';
-    import paths from './paths';
+    import type RawLocation from 'svelte-navigator/types/RawLocation';
     import DashboardLayout from './layouts/Dashboard/DashboardLayout.svelte';
     import PortalLayout from './layouts/Portal/PortalLayout.svelte';
-    import Redirect from './components/Redirect.svelte';
     import { loadConfig } from './controller';
     import { onMount } from 'svelte';
     import { config, theme } from './stores';
     import type Config from './models/Config';
+    import { globalHistory, type NavigatorHistory } from 'svelte-navigator';
+    import { writable } from 'svelte/store';
+
+    const isPortalView = writable<boolean>(
+        window.location.pathname.startsWith('/auth'),
+    );
+
+    function onUrlChange() {
+        let result = window.location.pathname.startsWith('/auth');
+        if (result !== $isPortalView) {
+            isPortalView.set(result);
+        }
+    }
+
+    // Wrap globalHistory, pass forward all function calls, except also call onUrlChange() on every change.
+    function wrapFunction<A extends any[], R>(someFunction: (...a: A) => R) {
+        const wrappedFunction = function (...args: A) {
+            let result = someFunction(...args);
+            onUrlChange();
+            console.log('foorack-wrapFunction', result);
+            return result;
+        };
+        return { execute: wrappedFunction };
+    }
+
+    class WrapperGlobalHistory implements NavigatorHistory {
+        readonly location: RawLocation = globalHistory.location;
+        listen = globalHistory.listen;
+        /*
+        type NavigateFn<State extends AnyObject = AnyObject> = {
+            (to: string, options?: NavigateOptions<State>): void;
+            (delta: number): void;
+        };
+        Implement the above type as a function:
+        */
+        navigate: any = wrapFunction(globalHistory.navigate).execute;
+    }
+    const wrapperGlobalHistory: NavigatorHistory = new WrapperGlobalHistory();
 
     onMount(() => {
         loadConfig()
@@ -31,18 +67,10 @@
 <main class={$theme.dark ? 'theme-dark' : ''}>
     {#if $config === null || $theme.color === null}
         <p>Loading...</p>
+    {:else if $isPortalView}
+        <PortalLayout history={wrapperGlobalHistory} />
     {:else}
-        <Router primary={false}>
-            <Route path="auth/*">
-                <PortalLayout />
-            </Route>
-            <Route path="dashboard/*">
-                <DashboardLayout />
-            </Route>
-            <Route path="*">
-                <Redirect to={paths.home.path} />
-            </Route>
-        </Router>
+        <DashboardLayout history={wrapperGlobalHistory} />
     {/if}
 </main>
 

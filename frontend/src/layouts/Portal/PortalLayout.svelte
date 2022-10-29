@@ -1,10 +1,14 @@
 <script lang="ts">
-    import { Router, Route } from 'svelte-navigator';
+    import { Router, Route, type NavigatorHistory } from 'svelte-navigator';
     import { Toast, ToastBody, ToastHeader } from 'sveltestrap';
     import { toasts, theme } from '../../stores';
     import AuthLogin from '../../views/Auth/AuthLogin.svelte';
     import AuthLogout from '../../views/Auth/AuthLogout.svelte';
     import Logo from '../../components/Logo.svelte';
+    import Redirect from '../../components/Redirect.svelte';
+    import paths from '../../paths';
+
+    export let history: NavigatorHistory;
 </script>
 
 <div class="portal-background h-100">
@@ -25,9 +29,18 @@
 
                         <!-- Content -->
                         <div class="px-5 py-4" style="max-width: 54rem;">
-                            <Router primary={false}>
-                                <Route path="login" component={AuthLogin} />
-                                <Route path="logout" component={AuthLogout} />
+                            <Router primary={false} {history}>
+                                <Route
+                                    path="auth/login"
+                                    component={AuthLogin}
+                                />
+                                <Route
+                                    path="auth/logout"
+                                    component={AuthLogout}
+                                />
+                                <Route path="*">
+                                    <Redirect to={paths.login.path} />
+                                </Route>
                             </Router>
 
                             <div class="clearfix" />

@@ -38,29 +38,29 @@ const paths = {
     login: new Path(0, 'login', '/auth/login', 'Login'),
     logout: new Path(1, 'logout', '/auth/logout', 'Logout'),
 
-    home: new Path(10, 'home', '/dashboard/home', 'Dashboard', 'home', true),
+    home: new Path(10, 'home', '/home', 'Dashboard', 'home', true),
 
-    run: new Path(21, 'run', '/dashboard/run', 'Run', 'play', true),
+    run: new Path(21, 'run', '/run', 'Run', 'play', true),
 
-    minion: new Path(30, 'minion', '/dashboard/minions/:minionId/:subPage', 'Minion', '', false, true),
-    minions: new Path(31, 'minions', '/dashboard/minions', 'Minions', 'server', true),
+    minion: new Path(30, 'minion', '/minions/:minionId/:subPage', 'Minion', '', false, true),
+    minions: new Path(31, 'minions', '/minions', 'Minions', 'server', true),
 
-    job: new Path(40, 'job', '/dashboard/jobs/:jobId', 'Job', '', false, true),
-    jobs: new Path(41, 'jobs', '/dashboard/jobs', 'Jobs', 'briefcase', true),
-    events: new Path(42, 'events', '/dashboard/events', 'Events', 'list-ul', true),
+    job: new Path(40, 'job', '/jobs/:jobId', 'Job', '', false, true),
+    jobs: new Path(41, 'jobs', '/jobs', 'Jobs', 'briefcase', true),
+    events: new Path(42, 'events', '/events', 'Events', 'list-ul', true),
 
-    keys: new Path(50, 'keys', '/dashboard/keys', 'Keys', 'lock', true),
+    keys: new Path(50, 'keys', '/keys', 'Keys', 'lock', true),
 
     // -----
 
-    user: new Path(60, 'user', '/dashboard/users/:userId', 'User', '', false, true),
-    users: new Path(61, 'users', '/dashboard/users', 'Users', 'user-circle', true),
+    user: new Path(60, 'user', '/users/:userId', 'User', '', false, true),
+    users: new Path(61, 'users', '/users', 'Users', 'user-circle', true),
 
-    settings_page: new Path(70, 'settings_page', '/dashboard/settings/:settingsPage', 'Settings', '', false, true),
-    settings: new Path(71, 'settings', '/dashboard/settings', 'Settings', 'cog', true),
+    settings_page: new Path(70, 'settings_page', '/settings/:settingsPage', 'Settings', '', false, true),
+    settings: new Path(71, 'settings', '/settings', 'Settings', 'cog', true),
 
-    preferences_page: new Path(80, 'preferences_page', '/dashboard/preferences/:preferencesPage', 'Preferences', '', false, true),
-    preferences: new Path(81, 'preferences', '/dashboard/preferences', 'Preferences', 'wrench', true),
+    preferences_page: new Path(80, 'preferences_page', '/preferences/:preferencesPage', 'Preferences', '', false, true),
+    preferences: new Path(81, 'preferences', '/preferences', 'Preferences', 'wrench', true),
 
     // -----
 

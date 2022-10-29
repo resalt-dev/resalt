@@ -1,13 +1,12 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
-    import { Router, Route, useNavigate } from 'svelte-navigator';
+    import { Router, Route, type NavigatorHistory } from 'svelte-navigator';
     import { currentUser, toasts } from '../../stores';
-    import { loadCurrentUser } from '../../controller';
     import paths from '../../paths';
     import Sidebar from './DashboardSidebar.svelte';
     import DashboardHeader from './DashboardHeader.svelte';
     import Redirect from '../../components/Redirect.svelte';
-    import SSEConnector from '../../components/SSEConnector.svelte';
+    import SSEConnector from './SSEConnector.svelte';
+    import UserLoadConnector from './UserLoadConnector.svelte';
 
     import Home from '../../views/Home/Home.svelte';
     import Minion from '../../views/Minion/Minion.svelte';
@@ -23,32 +22,22 @@
     import Preferences from '../../views/Preferences/Preferences.svelte';
     import { Toast, ToastBody, ToastHeader } from 'sveltestrap';
 
-    const navigate = useNavigate();
-
-    onMount(() => {
-        loadCurrentUser()
-            .then((data) => {
-                currentUser.set(data);
-            })
-            .catch((err) => {
-                console.error(err);
-                navigate(paths.logout.path);
-            });
-    });
+    export let history: NavigatorHistory;
 </script>
 
-{#if $currentUser === null}
-    <p>Loading...</p>
-{:else}
-    <SSEConnector />
-    <div class="d-flex flex-row h-100">
-        <div class="">
-            <Sidebar />
-        </div>
-        <div class="w-100 overflow-auto bg-white">
-            <DashboardHeader />
-            <div class="px-4 py-3">
-                <Router primary={false}>
+<Router primary={false} {history}>
+    <UserLoadConnector />
+    {#if $currentUser === null}
+        <p>Loading...</p>
+    {:else}
+        <SSEConnector />
+        <div class="d-flex flex-row h-100">
+            <div class="">
+                <Sidebar />
+            </div>
+            <div class="w-100 overflow-auto bg-white">
+                <DashboardHeader />
+                <div class="px-4 py-3">
                     <Route path="home" component={Home} />
                     <Route
                         path="minions/:minionId/*section"
@@ -72,11 +61,11 @@
                     <Route path="*">
                         <Redirect to={paths.home.path} />
                     </Route>
-                </Router>
+                </div>
             </div>
         </div>
-    </div>
-{/if}
+    {/if}
+</Router>
 
 <!-- Toast / Alerts -->
 <div class="position-fixed top-0 end-0 mt-5 me-5" style="z-index: 11">
