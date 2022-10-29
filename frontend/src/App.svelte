@@ -29,17 +29,9 @@
         };
         return { execute: wrappedFunction };
     }
-
     class WrapperGlobalHistory implements NavigatorHistory {
         readonly location: RawLocation = globalHistory.location;
         listen = globalHistory.listen;
-        /*
-        type NavigateFn<State extends AnyObject = AnyObject> = {
-            (to: string, options?: NavigateOptions<State>): void;
-            (delta: number): void;
-        };
-        Implement the above type as a function:
-        */
         navigate: any = wrapFunction(globalHistory.navigate).execute;
     }
     const wrapperGlobalHistory: NavigatorHistory = new WrapperGlobalHistory();
