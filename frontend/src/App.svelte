@@ -1,6 +1,5 @@
 <script lang="ts">
     import { Router, Route } from 'svelte-navigator';
-    import constants from './constants';
     import paths from './paths';
     import DashboardLayout from './layouts/Dashboard/DashboardLayout.svelte';
     import PortalLayout from './layouts/Portal/PortalLayout.svelte';
@@ -9,13 +8,6 @@
     import { onMount } from 'svelte';
     import { config, theme } from './stores';
     import type Config from './models/Config';
-
-    // check if URL starts with basePath, if not then redirect
-    const basePath = constants.basePath;
-    const path = window.location.pathname;
-    if (!path.startsWith(basePath)) {
-        window.location.href = basePath;
-    }
 
     onMount(() => {
         loadConfig()
@@ -40,7 +32,7 @@
     {#if $config === null || $theme.color === null}
         <p>Loading...</p>
     {:else}
-        <Router basepath={constants.basePath} primary={false}>
+        <Router primary={false}>
             <Route path="auth/*">
                 <PortalLayout />
             </Route>

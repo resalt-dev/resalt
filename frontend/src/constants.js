@@ -1,5 +1,8 @@
-const appName = 'Resalt'; // THESE ARE NOT CONFIGS - they are constants
-const basePath = '/resalt';
+// THESE ARE NOT CONFIGS - they are constants
+// THESE ARE NOT CONFIGS - they are constants
+// THESE ARE NOT CONFIGS - they are constants
+
+const appName = 'Resalt';
 const themeColors = [
     'red',
     'volcano',
@@ -15,8 +18,8 @@ const themeColors = [
 ];
 const githubUrl = 'https://github.com/resalt-dev/resalt';
 
-const apiUrl = `${basePath}/api/1`;
+const apiUrl = '/api/1';
 
 export default {
-    apiUrl, appName, basePath, themeColors, githubUrl,
+    apiUrl, appName, themeColors, githubUrl,
 };

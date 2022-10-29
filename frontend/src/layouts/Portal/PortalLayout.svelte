@@ -4,14 +4,10 @@
     import { toasts, theme } from '../../stores';
     import AuthLogin from '../../views/Auth/AuthLogin.svelte';
     import AuthLogout from '../../views/Auth/AuthLogout.svelte';
-    import constants from '../../constants';
     import Logo from '../../components/Logo.svelte';
 </script>
 
-<div
-    class="background1 h-100"
-    style="background-image: url('{constants.basePath}/assets/images/0da7530ac9cd4c88850c62138da12e66.jpg');"
->
+<div class="portal-background h-100">
     <div class="h-100 w-100">
         <div class="row g-0 h-100">
             <!-- Right side -->
@@ -51,8 +47,9 @@
 </div>
 
 <style>
-    .background1 {
+    .portal-background {
         background: var(--dark);
+        background-image: url('/assets/images/0da7530ac9cd4c88850c62138da12e66.jpg');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;

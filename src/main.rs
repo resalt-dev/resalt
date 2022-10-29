@@ -69,7 +69,7 @@ async fn main() -> std::io::Result<()> {
             // enable logger - always register Actix Web Logger middleware last
             .wrap(Logger::default())
             .service(
-                web::scope(&format!("{}/api/1", &SConfig::sub_path()))
+                web::scope("/api/1")
                     .wrap(auth::ValidateAuth::new(db.clone(), salt_api.clone()))
                     .route("/", web::get().to(route_index_get))
                     .route("/config", web::get().to(route_config_get))
@@ -172,10 +172,8 @@ async fn main() -> std::io::Result<()> {
                     // fallback to 404
                     .default_service(route_fallback_404),
             )
-            // Serve UI
-            .service(web::scope(&SConfig::sub_path()).default_service(route_frontend_get))
-            // Redirect 302 to UI if outside sub_path using lambda
-            .default_service(route_fallback_redirect)
+            // Proxy web interface
+            .service(web::scope("/").default_service(route_frontend_get))
     })
     .bind(("0.0.0.0", SConfig::http_port()))?
     .run()

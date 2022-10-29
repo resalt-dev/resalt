@@ -278,8 +278,4 @@ impl SConfig {
             .get_string("http.frontend.proxy.target")
             .unwrap())
     }
-
-    pub fn sub_path() -> String {
-        "/resalt".to_string()
-    }
 }
