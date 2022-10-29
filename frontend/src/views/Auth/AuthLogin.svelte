@@ -44,7 +44,7 @@
             .then(() => {
                 loadCurrentUser()
                     .then(() => {
-                        navigate(paths.home.path);
+                        navigate(paths.dashboard.path);
                     })
                     .catch((err) => {
                         showToast(

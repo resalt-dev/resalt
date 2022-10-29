@@ -38,7 +38,7 @@
             <div class="w-100 overflow-auto bg-white">
                 <DashboardHeader />
                 <div class="px-4 py-3">
-                    <Route path="home" component={Home} />
+                    <Route path="dashboard" component={Home} />
                     <Route
                         path="minions/:minionId/*section"
                         component={Minion}
@@ -59,7 +59,7 @@
                     <Route path="settings/:subPage" component={Settings} />
                     <Route path="settings" component={Settings} />
                     <Route path="*">
-                        <Redirect to={paths.home.path} />
+                        <Redirect to={paths.dashboard.path} />
                     </Route>
                 </div>
             </div>

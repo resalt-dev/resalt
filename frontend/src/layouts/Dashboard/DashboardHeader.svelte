@@ -13,13 +13,10 @@
             : $location.pathname
                   .split('/')
                   .filter(Boolean)
-                  .filter((path) => path !== 'home')
                   .map((str) => {
                       return {
                           title: str.charAt(0).toUpperCase() + str.slice(1),
-                          path: paths[
-                              str === 'dashboard' ? 'home' : str.toLowerCase()
-                          ]?.getPath(),
+                          path: paths[str.toLowerCase()]?.getPath(),
                       };
                   });
 </script>

@@ -25,7 +25,6 @@
         const wrappedFunction = function (...args: A) {
             let result = someFunction(...args);
             onUrlChange();
-            console.log('foorack-wrapFunction', result);
             return result;
         };
         return { execute: wrappedFunction };

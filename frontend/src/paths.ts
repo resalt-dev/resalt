@@ -38,7 +38,7 @@ const paths = {
     login: new Path(0, 'login', '/auth/login', 'Login'),
     logout: new Path(1, 'logout', '/auth/logout', 'Logout'),
 
-    home: new Path(10, 'home', '/home', 'Dashboard', 'home', true),
+    dashboard: new Path(10, 'dashboard', '/dashboard', 'Dashboard', 'home', true),
 
     run: new Path(21, 'run', '/run', 'Run', 'play', true),
 
