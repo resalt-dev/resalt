@@ -25,11 +25,6 @@ pub async fn route_frontend_proxy_get(
 
     // Send request to PROXY_TARGET using awc::Client
     let target = req.uri().path();
-    let target = target
-        .chars()
-        .into_iter()
-        .skip(SConfig::sub_path().len())
-        .collect::<String>();
     let target = format!("{}{}", SConfig::http_frontend_proxy_target(), target);
     let mut res = match awc::Client::new().get(&target).send().await {
         Ok(res) => res,
@@ -64,12 +59,12 @@ pub async fn route_frontend_static_get(
 
     // fetch file from FRONTEND_PUBLIC_DIR based on request URL
     let path = req.uri().path();
-    let path = path
-        .chars()
-        .into_iter()
-        // skip prefix and the next /
-        .skip(SConfig::sub_path().len() + 1)
-        .collect::<String>();
+    // If path starts with /, trim it
+    let path = if path.starts_with('/') {
+        &path[1..]
+    } else {
+        path
+    };
 
     // fetch using FRONTEND_PUBLIC_DIR.get_file
     let mut file = FRONTEND_PUBLIC_DIR.get_file(&path);
