@@ -22,6 +22,7 @@
     import Settings from '../../views/Settings/Settings.svelte';
     import Preferences from '../../views/Preferences/Preferences.svelte';
     import { Toast, ToastBody, ToastHeader } from 'sveltestrap';
+    import constants from '../../constants';
 
     const navigate = useNavigate();
 
@@ -48,7 +49,10 @@
         <div class="w-100 overflow-auto bg-white">
             <DashboardHeader />
             <div class="px-4 py-3">
-                <Router primary={false}>
+                <Router
+                    primary={false}
+                    basepath={constants.basePath + '/dashboard'}
+                >
                     <Route path="home" component={Home} />
                     <Route
                         path="minions/:minionId/*section"
