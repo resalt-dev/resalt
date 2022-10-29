@@ -13,7 +13,7 @@
 
 <li class="nav-item" style="height: 4.5rem;">
     <Link
-        to={path.path}
+        to={path.getPath()}
         class="nav-link {$theme.color === 'yellow' && isActive
             ? 'text-dark'
             : 'text-white'} {isActive

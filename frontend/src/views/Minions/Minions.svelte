@@ -9,18 +9,21 @@
     import { theme } from '../../stores';
     import { writable, type Writable } from 'svelte/store';
     import Icon from '../../components/Icon.svelte';
-    import MinionsTabGroups from './MinionsTabGroups.svelte';
-    import MinionsTabSearch from './MinionsTabSearch.svelte';
     import paths from '../../paths';
+    import ResaltProgress from '../../components/ResaltProgress.svelte';
     import TablePaginate from '../../components/TablePaginate.svelte';
     import Tabs from '../../components/Tabs.svelte';
     import type Filter from '../../models/Filter';
     import type Minion from '../../models/Minion';
-    import ResaltProgress from '../../components/ResaltProgress.svelte';
+    import type TabPage from '../../models/TabPage';
+
+    import MinionsTabGroups from './MinionsTabGroups.svelte';
+    import MinionsTabSearch from './MinionsTabSearch.svelte';
 
     // svelte-ignore unused-export-let
     export let location: Location;
     export let navigate: NavigateFn;
+    export let subPage: string = '';
 
     const loading = writable<boolean>(true);
 
@@ -79,23 +82,28 @@
     onMount(() => {
         updateData();
     });
-</script>
 
-<h1>Minions</h1>
-
-<Tabs
-    children={[
+    let tabs: TabPage[] = [];
+    $: tabs = [
         {
+            key: 'search',
             label: 'Search',
+            path: paths.minions.getPath('search'),
             component: MinionsTabSearch,
             data: { setFilters },
         },
         {
+            key: 'groups',
             label: 'Groups',
+            path: paths.minions.getPath('groups'),
             component: MinionsTabGroups,
         },
-    ]}
-/>
+    ];
+</script>
+
+<h1>Minions</h1>
+
+<Tabs {tabs} current={subPage} />
 
 <Card class="table-responsive border-bottom-0">
     <Table hover class="b-0 mb-0">

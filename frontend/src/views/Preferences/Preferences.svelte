@@ -1,42 +1,28 @@
 <script lang="ts">
     import paths from '../../paths';
-    import PreferencesTabTheme from './PreferencesTabTheme.svelte';
     import Tabs from '../../components/Tabs.svelte';
-    import type { NavSubPage } from '../../utils';
     import type { NavigateFn } from 'svelte-navigator';
+    import type TabPage from '../../models/TabPage';
+
+    import PreferencesTabTheme from './PreferencesTabTheme.svelte';
 
     // svelte-ignore unused-export-let
     export let location: Location;
+    // svelte-ignore unused-export-let
     export let navigate: NavigateFn;
-    export let subPage: string = 'theme';
+    export let subPage: string = '';
 
-    function calcSubPagesNav(): NavSubPage[] {
-        let navs: NavSubPage[] = [];
-
-        navs.push({
+    let tabs: TabPage[] = [];
+    $: tabs = [
+        {
+            key: 'theme',
             label: 'Theme',
+            path: paths.preferences.getPath('theme'),
             component: PreferencesTabTheme,
-        });
-
-        return navs;
-    }
-
-    $: subPagesNav = calcSubPagesNav();
-
-    // Find index of subPage in subPagesNav, or 0 otherwise.
-    $: currentSubPage = Math.max(
-        subPagesNav.findIndex((page) => page.label.toLowerCase() === subPage),
-        0,
-    );
+        },
+    ];
 </script>
 
 <h1>Preferences</h1>
 
-<Tabs
-    children={subPagesNav}
-    selected={currentSubPage}
-    onSelect={(index) => {
-        let pageLabel = subPagesNav[index].label.toLowerCase();
-        navigate(paths.preferences_page.getPath(pageLabel));
-    }}
-/>
+<Tabs {tabs} current={subPage} />

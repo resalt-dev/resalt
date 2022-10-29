@@ -21,10 +21,3 @@ export function quoteSplit(abc: string): string[] {
 }
 
 export function test(): void {}
-
-// Used by Tabs.svelte
-export type NavSubPage = {
-    label: string;
-    component: any;
-    data?: any;
-};

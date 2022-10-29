@@ -40,24 +40,22 @@
                 <div class="px-4 py-3">
                     <Route path="dashboard" component={Home} />
                     <Route
-                        path="minions/:minionId/*section"
+                        path="minion/:minionId/*subPage"
                         component={Minion}
                     />
-                    <Route path="minions" component={Minions} />
-                    <Route path="run" component={Run} />
-                    <Route path="jobs/:jobId" component={Job} />
+                    <Route path="minions/*subPage" component={Minions} />
+                    <Route path="run/*subPage" component={Run} />
+                    <Route path="job/:jobId" component={Job} />
                     <Route path="jobs" component={Jobs} />
                     <Route path="keys" component={Keys} />
                     <Route path="events" component={Events} />
-                    <Route path="users/:userId" component={User} />
+                    <Route path="user/:userId" component={User} />
                     <Route path="users" component={Users} />
                     <Route
-                        path="preferences/:subPage"
+                        path="preferences/*subPage"
                         component={Preferences}
                     />
-                    <Route path="preferences" component={Preferences} />
-                    <Route path="settings/:subPage" component={Settings} />
-                    <Route path="settings" component={Settings} />
+                    <Route path="settings/*subPage" component={Settings} />
                     <Route path="*">
                         <Redirect to={paths.dashboard.path} />
                     </Route>

@@ -1,32 +1,37 @@
 <script lang="ts">
-    import { writable, type Writable } from 'svelte/store';
-    import Tabs from '../../components/Tabs.svelte';
-    import ConsoleChangeBranch from '../../components/ConsoleChangeBranch.svelte';
-    import RunTabLive from './RunTabLive.svelte';
     import { Card } from 'sveltestrap';
+    import { writable, type Writable } from 'svelte/store';
+    import ConsoleChangeBranch from '../../components/ConsoleChangeBranch.svelte';
+    import paths from '../../paths';
+    import Tabs from '../../components/Tabs.svelte';
     import type { NavigateFn } from 'svelte-navigator';
+    import type TabPage from '../../models/TabPage';
+
+    import RunTabLive from './RunTabLive.svelte';
 
     // svelte-ignore unused-export-let
     export let location: Location;
     // svelte-ignore unused-export-let
     export let navigate: NavigateFn;
-
-    const SHIFT = 0;
+    export let subPage: string = '';
 
     let returns: Writable<any[]> = writable([]);
+
+    let tabs: TabPage[] = [];
+    $: tabs = [
+        {
+            key: 'live',
+            label: 'Live Run',
+            path: paths.run.getPath(),
+            component: RunTabLive,
+            data: { returns },
+        },
+    ];
 </script>
 
 <h1>Run</h1>
 
-<Tabs
-    children={[
-        {
-            label: 'Live Run',
-            component: RunTabLive,
-            data: { returns },
-        },
-    ]}
-/>
+<Tabs {tabs} current={subPage} />
 
 {#each $returns as ret}
     <Card class="result-box mb-3">
@@ -47,7 +52,7 @@
             <div class="card-body bg-dark text-light">
                 <div class="card-text">
                     {#if Object.keys(ret.data).length != 0}
-                        <ConsoleChangeBranch data={ret.data} shift={SHIFT} />
+                        <ConsoleChangeBranch data={ret.data} />
                     {/if}
                 </div>
             </div>

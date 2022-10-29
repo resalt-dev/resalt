@@ -2,54 +2,37 @@
     import { currentUser } from '../../stores';
     import { hasResaltPermission, P_ADMIN_GROUP } from '../../perms';
     import paths from '../../paths';
+    import Tabs from '../../components/Tabs.svelte';
+    import type TabPage from '../../models/TabPage';
+    import type { NavigateFn } from 'svelte-navigator';
+
     import SettingsTabConfig from './SettingsTabConfig.svelte';
     import SettingsTabGroups from './SettingsTabGroups.svelte';
-    import Tabs from '../../components/Tabs.svelte';
-    import type { NavSubPage } from '../../utils';
-    import type User from '../../models/User';
-    import type { NavigateFn } from 'svelte-navigator';
 
     // svelte-ignore unused-export-let
     export let location: Location;
+    // svelte-ignore unused-export-let
     export let navigate: NavigateFn;
-    export let subPage: string = 'theme';
+    export let subPage: string = '';
 
-    function calcSubPagesNav(currentUser: User | null): NavSubPage[] {
-        if (!currentUser) return [];
-
-        let navs: NavSubPage[] = [
-            {
-                label: 'Config',
-                component: SettingsTabConfig,
-            },
-        ];
-
-        if (hasResaltPermission(currentUser.perms, P_ADMIN_GROUP)) {
-            navs.push({
-                label: 'Groups',
-                component: SettingsTabGroups,
-            });
-        }
-
-        return navs;
-    }
-
-    $: subPagesNav = calcSubPagesNav($currentUser);
-
-    // Find index of subPage in subPagesNav, or 0 otherwise.
-    $: currentSubPage = Math.max(
-        subPagesNav.findIndex((page) => page.label.toLowerCase() === subPage),
-        0,
-    );
+    let tabs: TabPage[] = [];
+    $: tabs = [
+        {
+            key: 'config',
+            label: 'Config',
+            path: paths.settings.getPath('config'),
+            component: SettingsTabConfig,
+        },
+        {
+            key: 'groups',
+            label: 'Groups',
+            path: paths.settings.getPath('groups'),
+            component: SettingsTabGroups,
+            hidden: !hasResaltPermission($currentUser.perms, P_ADMIN_GROUP),
+        },
+    ];
 </script>
 
 <h1>Settings</h1>
 
-<Tabs
-    children={subPagesNav}
-    selected={currentSubPage}
-    onSelect={(index) => {
-        let pageLabel = subPagesNav[index].label.toLowerCase();
-        navigate(paths.settings_page.getPath(pageLabel));
-    }}
-/>
+<Tabs {tabs} current={subPage} />

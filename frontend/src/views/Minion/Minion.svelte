@@ -13,16 +13,15 @@
     import paths from '../../paths';
     import Tabs from '../../components/Tabs.svelte';
     import type { NavigateFn } from 'svelte-navigator';
-    import type { NavSubPage } from '../../utils';
+    import type TabPage from '../../models/TabPage';
     import type Minion from '../../models/Minion';
-    import type User from '../../models/User';
 
     // svelte-ignore unused-export-let
     export let location: Location;
+    // svelte-ignore unused-export-let
     export let navigate: NavigateFn;
-
     export let minionId: string;
-    export let section: string;
+    export let subPage: string = '';
 
     const minion: Writable<Minion | null> = writable(null);
 
@@ -40,57 +39,46 @@
             });
     });
 
-    function calcSubPagesNav(
-        currentUser: User | null,
-        minion: Writable<Minion | null>,
-    ): NavSubPage[] {
-        if (!currentUser) return [];
-
-        let navs: NavSubPage[] = [
-            {
-                label: 'General',
-                component: MinionInfo,
-                data: { minion },
-            },
-            {
-                label: 'Conformity',
-                component: MinionConformity,
-                data: { minion },
-            },
-            {
-                label: 'Grains',
-                component: MinionGrains,
-                data: { minion },
-            },
-        ];
-
-        if (hasResaltPermission(currentUser.perms, P_ADMIN_GROUP)) {
+    let tabs: TabPage[] = [];
+    $: tabs = [
+        {
+            key: 'info',
+            label: 'General',
+            path: paths.minion.getPath(minionId),
+            component: MinionInfo,
+            data: { minion },
+        },
+        {
+            key: 'conformity',
+            label: 'Conformity',
+            path: paths.minion.getPath(minionId, 'conformity'),
+            component: MinionConformity,
+            data: { minion },
+        },
+        {
+            key: 'grains',
+            label: 'Grains',
+            path: paths.minion.getPath(minionId, 'grains'),
+            component: MinionGrains,
+            data: { minion },
+        },
+        {
+            key: 'pillars',
+            label: 'Pillars',
+            path: paths.minion.getPath(minionId, 'pillars'),
+            component: MinionPillars,
+            data: { minion },
             // TODO: add perm for pillars
-            navs.push({
-                label: 'Pillars',
-                component: MinionPillars,
-                data: { minion },
-            });
-        }
-
-        navs.push({
+            hidden: !hasResaltPermission($currentUser.perms, P_ADMIN_GROUP),
+        },
+        {
+            key: 'packages',
             label: 'Packages',
+            path: paths.minion.getPath(minionId, 'packages'),
             component: MinionPackages,
             data: { minion },
-        });
-
-        return navs;
-    }
-
-    $: subPagesNav = calcSubPagesNav($currentUser, minion);
-
-    // Find index of subPage in subPagesNav, or 0 otherwise.
-    $: currentSubPage = Math.max(
-        subPagesNav.findIndex(
-            (page) => page.label.toLowerCase() === section.toLowerCase(),
-        ),
-        0,
-    );
+        },
+    ];
 </script>
 
 {#if !$minion}
@@ -98,16 +86,5 @@
 {:else}
     <h1>Minion {$minion.id}</h1>
 
-    <Tabs
-        children={subPagesNav}
-        selected={currentSubPage}
-        onSelect={(index) => {
-            let pageLabel = subPagesNav[index].label.toLowerCase();
-            if (pageLabel === 'general') {
-                navigate(paths.minion.getPath(minionId));
-            } else {
-                navigate(paths.minion.getPath(minionId, pageLabel));
-            }
-        }}
-    />
+    <Tabs {tabs} current={subPage} />
 {/if}
