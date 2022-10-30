@@ -8,7 +8,7 @@
     export let current: string;
     $: _current = current.length > 0 ? current : tabs[0].key;
     $: _currentTab = tabs.findIndex(
-        (tab) => current.length === 0 || tab.label.toLowerCase() === current,
+        (tab) => current.length === 0 || tab.key.toLowerCase() === current,
     );
 </script>
 

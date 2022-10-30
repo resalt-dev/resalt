@@ -1,14 +1,16 @@
 <script lang="ts">
-    import { Router, Route, type NavigatorHistory } from 'svelte-navigator';
     import { currentUser, toasts } from '../../stores';
-    import paths from '../../paths';
-    import Sidebar from './DashboardSidebar.svelte';
+    import { Router, Route, type NavigatorHistory } from 'svelte-navigator';
+    import { Toast, ToastBody, ToastHeader } from 'sveltestrap';
     import DashboardHeader from './DashboardHeader.svelte';
+    import DashboardSidebar from './DashboardSidebar.svelte';
+    import paths from '../../paths';
     import Redirect from '../../components/Redirect.svelte';
     import SSEConnector from './SSEConnector.svelte';
     import UserLoadConnector from './UserLoadConnector.svelte';
 
-    import Home from '../../views/Home/Home.svelte';
+    // Pages
+    import Home from '../../views/Dashboard/Dashboard.svelte';
     import Minion from '../../views/Minion/Minion.svelte';
     import Minions from '../../views/Minions/Minions.svelte';
     import Run from '../../views/Run/Run.svelte';
@@ -20,7 +22,6 @@
     import Users from '../../views/Users/Users.svelte';
     import Settings from '../../views/Settings/Settings.svelte';
     import Preferences from '../../views/Preferences/Preferences.svelte';
-    import { Toast, ToastBody, ToastHeader } from 'sveltestrap';
 
     export let history: NavigatorHistory;
 </script>
@@ -33,12 +34,12 @@
         <SSEConnector />
         <div class="d-flex flex-row h-100">
             <div class="">
-                <Sidebar />
+                <DashboardSidebar />
             </div>
             <div class="w-100 overflow-auto bg-white">
                 <DashboardHeader />
                 <div class="px-4 py-3">
-                    <Route path="dashboard" component={Home} />
+                    <Route path="dashboard/*subPage" component={Home} />
                     <Route
                         path="minion/:minionId/*subPage"
                         component={Minion}

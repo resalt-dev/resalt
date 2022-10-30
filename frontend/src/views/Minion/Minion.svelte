@@ -1,20 +1,21 @@
 <script lang="ts">
-    import { MessageType } from '../../models/MessageType';
     import { currentUser } from '../../stores';
     import { hasResaltPermission, P_ADMIN_GROUP } from '../../perms';
+    import { MessageType } from '../../models/MessageType';
     import { onMount } from 'svelte';
     import { showToast, getMinionById } from '../../controller';
     import { writable, type Writable } from 'svelte/store';
-    import MinionConformity from './MinionConformity.svelte';
-    import MinionGrains from './MinionGrains.svelte';
-    import MinionInfo from './MinionInfo.svelte';
-    import MinionPackages from './MinionPackages.svelte';
-    import MinionPillars from './MinionPillars.svelte';
     import paths from '../../paths';
     import Tabs from '../../components/Tabs.svelte';
     import type { NavigateFn } from 'svelte-navigator';
-    import type TabPage from '../../models/TabPage';
     import type Minion from '../../models/Minion';
+    import type TabPage from '../../models/TabPage';
+
+    import MinionTabConformity from './MinionTabConformity.svelte';
+    import MinionTabGrains from './MinionTabGrains.svelte';
+    import MinionTabInfo from './MinionTabInfo.svelte';
+    import MinionTabPackages from './MinionTabPackages.svelte';
+    import MinionTabPillars from './MinionTabPillars.svelte';
 
     // svelte-ignore unused-export-let
     export let location: Location;
@@ -45,28 +46,28 @@
             key: 'info',
             label: 'General',
             path: paths.minion.getPath(minionId),
-            component: MinionInfo,
+            component: MinionTabInfo,
             data: { minion },
         },
         {
             key: 'conformity',
             label: 'Conformity',
             path: paths.minion.getPath(minionId, 'conformity'),
-            component: MinionConformity,
+            component: MinionTabConformity,
             data: { minion },
         },
         {
             key: 'grains',
             label: 'Grains',
             path: paths.minion.getPath(minionId, 'grains'),
-            component: MinionGrains,
+            component: MinionTabGrains,
             data: { minion },
         },
         {
             key: 'pillars',
             label: 'Pillars',
             path: paths.minion.getPath(minionId, 'pillars'),
-            component: MinionPillars,
+            component: MinionTabPillars,
             data: { minion },
             // TODO: add perm for pillars
             hidden: !hasResaltPermission($currentUser.perms, P_ADMIN_GROUP),
@@ -75,7 +76,7 @@
             key: 'packages',
             label: 'Packages',
             path: paths.minion.getPath(minionId, 'packages'),
-            component: MinionPackages,
+            component: MinionTabPackages,
             data: { minion },
         },
     ];

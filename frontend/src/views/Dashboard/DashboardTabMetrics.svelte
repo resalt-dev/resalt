@@ -43,11 +43,6 @@
         Tooltip,
     );
 
-    // svelte-ignore unused-export-let
-    export let location: Location;
-    // svelte-ignore unused-export-let
-    export let navigate: NavigateFn;
-
     const metrics: Writable<MetricResult[] | null> = writable(null);
 
     onMount(() => {
@@ -81,8 +76,6 @@
 {#if !$metrics}
     <h1>Loading...</h1>
 {:else}
-    <h1>Dashboard</h1>
-
     <Row>
         {#each $metrics as metric}
             <Col xs="12" md="6" lg="4">
