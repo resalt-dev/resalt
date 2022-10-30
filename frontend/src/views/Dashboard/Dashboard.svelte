@@ -14,8 +14,6 @@
     export let navigate: NavigateFn;
     export let subPage: string = '';
 
-    $: console.log('subPage:', subPage);
-
     let tabs: TabPage[] = [];
     $: tabs = [
         {
