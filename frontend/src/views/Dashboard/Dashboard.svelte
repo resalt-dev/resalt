@@ -27,6 +27,9 @@
             label: 'Reports',
             path: paths.dashboard.getPath('reports'),
             component: DashboardTabReports,
+            data: {
+                report: subPage.split('/')[1] || null,
+            },
         },
         {
             key: 'metrics',
@@ -39,4 +42,4 @@
 
 <h1>Dashboard</h1>
 
-<Tabs {tabs} current={subPage} />
+<Tabs {tabs} current={subPage.split('/')[0]} />

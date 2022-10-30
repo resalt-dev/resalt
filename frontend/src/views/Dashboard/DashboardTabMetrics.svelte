@@ -6,7 +6,6 @@
         Card,
         CardBody,
         CardHeader,
-        CardSubtitle,
         CardTitle,
         Col,
         Row,
@@ -103,9 +102,9 @@
                                 }}
                             />
                         {:else}
-                            <CardSubtitle
-                                >Unknown chart type "{metric.chart}".</CardSubtitle
-                            >
+                            <h5 class="card-title">
+                                Unknown chart type "{metric.chart}".
+                            </h5>
                         {/if}
                     </CardBody>
                 </Card>
