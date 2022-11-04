@@ -742,6 +742,9 @@ hr {
 /*
  * Text
  */
+.form-label {
+    color: var(--muted) !important;
+}
 .text-red {
     color: var(--red) !important;
 }
@@ -796,7 +799,7 @@ hr {
 .text-dark {
     color: var(--black) !important;
 }
-.text-muted, .form-label {
+.text-muted {
     color: var(--muted) !important;
 }
 .text-white {
