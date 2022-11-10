@@ -3,7 +3,6 @@ version: '3'
 services:
   db:
     image: mariadb
-    restart: always
     environment:
       MYSQL_DATABASE: salt
       MYSQL_ROOT_PASSWORD: supersecretpassword
