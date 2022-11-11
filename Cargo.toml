@@ -19,7 +19,7 @@ diesel = { version = "2.0.0", features = ["mysql", "chrono", "r2d2"] }
 diesel_migrations = "2.0.0"
 
 # Auth
-ldap3 = { version = "0.10.5", features = ["tls-native"], default-features = false }
+ldap3 = { version = "0.10.5", features = ["tls-rustls"], default-features = false }
 argon2 = "0.4.1"
 
 # Logging
