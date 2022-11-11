@@ -31,7 +31,9 @@ jobs:
 
       - name: "Build backend"
         run: |
-          cargo build --release
+          rustup target add x86_64-unknown-linux-musl
+          apt install musl-tools -y
+          RUSTFLAGS='-C link-arg=-s' cargo build --release --target x86_64-unknown-linux-musl
           cp ./target/release/resalt ./resalt
 
       - uses: katyo/publish-crates@v1
