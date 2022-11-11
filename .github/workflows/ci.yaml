@@ -11,12 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     name: Build
     steps:
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 18
-      - uses: actions/checkout@v3
       - name: 'Cache node_modules'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ./frontend/node_modules
           key: ${{ runner.os }}-node-v18-${{ hashFiles('./frontend/package-lock.json') }}
@@ -32,7 +32,7 @@ jobs:
       - name: "Build backend"
         run: |
           rustup target add x86_64-unknown-linux-musl
-          sudo apt install musl-tools -y
+          sudo apt install musl-tools gcc-multilib -y
           RUSTFLAGS='-C link-arg=-s' cargo build --release --target x86_64-unknown-linux-musl
           cp ./target/release/resalt ./resalt
 
