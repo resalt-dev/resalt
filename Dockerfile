@@ -1,5 +1,5 @@
 # SHIP APP
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 
 # Upgrade System and Install dependencies
 RUN apt-get update && \
