@@ -32,7 +32,7 @@ jobs:
       - name: "Build backend"
         run: |
           rustup target add x86_64-unknown-linux-musl
-          apt install musl-tools -y
+          sudo apt install musl-tools -y
           RUSTFLAGS='-C link-arg=-s' cargo build --release --target x86_64-unknown-linux-musl
           cp ./target/release/resalt ./resalt
 
