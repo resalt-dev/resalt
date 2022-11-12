@@ -1,3 +1,15 @@
+# BUILD ENVIRONMENT
+FROM rust:1.63-slim as build
+
+# Upgrade System and Install dependencies
+RUN apt-get update && \
+  apt-get upgrade -y -o DPkg::Options::=--force-confold && \
+  apt-get install -y -o DPkg::Options::=--force-confold build-essential pkg-config libssl-dev mariadb-client libmariadb-dev default-libmysqlclient-dev
+
+RUN cargo build --release
+
+
+
 # SHIP APP
 FROM debian:bookworm-slim
 
@@ -6,10 +18,12 @@ RUN apt-get update && \
   apt-get upgrade -y -o DPkg::Options::=--force-confold && \
   apt-get install -y -o DPkg::Options::=--force-confold libssl-dev libssl-dev mariadb-client libmariadb-dev default-libmysqlclient-dev 
 
-COPY ./resalt /usr/src/app/resalt
+# Copy the binary from the build stage
+COPY --from=build ./resalt /usr/src/app/resalt
 
 ENV RESALT_HTTP_FRONTEND_PROXY_ENABLED false
 ENV RUST_LOG_STYLE always
+
 EXPOSE 8000
 WORKDIR /usr/src/app
 
