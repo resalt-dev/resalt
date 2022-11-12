@@ -20,19 +20,12 @@ jobs:
         with:
           path: ./frontend/node_modules
           key: ${{ runner.os }}-node-v18-${{ hashFiles('./frontend/package-lock.json') }}
-      - name: 'Cache Rust dependencies'
-        uses: Swatinem/rust-cache@v2
 
       - name: "cd into /frontend and build"
         run: |
           cd frontend
           npm install
           npm run build
-
-      - name: "Build backend"
-        run: |
-          cargo build --release
-          cp ./target/release/resalt ./resalt
 
       - uses: katyo/publish-crates@v1
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
