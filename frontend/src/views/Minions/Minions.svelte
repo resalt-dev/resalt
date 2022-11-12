@@ -19,6 +19,7 @@
 
     import MinionsTabGroups from './MinionsTabGroups.svelte';
     import MinionsTabSearch from './MinionsTabSearch.svelte';
+    import SortIcon from '../../components/SortIcon.svelte';
 
     // svelte-ignore unused-export-let
     export let location: Location;
@@ -29,11 +30,11 @@
 
     let filters: Filter[] = [];
     let sortField: string | null = null;
-    let sortOrder: SortOrder = SortOrder.Up;
+    let sortOrder: SortOrder = SortOrder.Down;
     let paginationSize: number = 20;
     let paginationPage: number = 1;
+    $: active = sortField + ':' + sortOrder;
 
-    const SORT_COLOR = `text-orange sort-active`;
     const minions: Writable<Minion[] | null> = writable(null);
 
     function updateData(): void {
@@ -67,7 +68,7 @@
                 sortOrder = order;
             } else {
                 sortField = null;
-                sortOrder = SortOrder.Up;
+                sortOrder = SortOrder.Down;
             }
         } else {
             sortField = field;
@@ -113,27 +114,17 @@
                     <div class="row g-1">
                         <div class="col-auto align-self-center ps-2">ID</div>
                         <div class="col-auto">
-                            <Icon
-                                size="1.25"
-                                name="chevron-up"
-                                class="sort-icon-up {sortField === 'id' &&
-                                sortOrder === SortOrder.Up
-                                    ? SORT_COLOR
-                                    : ''}"
-                                on:click={() => {
-                                    toggleSort('id', SortOrder.Up);
-                                }}
+                            <SortIcon
+                                {active}
+                                field="id"
+                                order={SortOrder.Down}
+                                click={toggleSort}
                             />
-                            <Icon
-                                size="1.25"
-                                name="chevron-down"
-                                class="sort-icon-down {sortField === 'id' &&
-                                sortOrder === SortOrder.Down
-                                    ? SORT_COLOR
-                                    : ''}"
-                                on:click={() => {
-                                    toggleSort('id', SortOrder.Down);
-                                }}
+                            <SortIcon
+                                {active}
+                                field="id"
+                                order={SortOrder.Up}
+                                click={toggleSort}
                             />
                         </div>
                     </div>
@@ -142,29 +133,17 @@
                     <div class="row g-1">
                         <div class="col-auto align-self-center">OS</div>
                         <div class="col-auto">
-                            <Icon
-                                size="1.25"
-                                name="chevron-up"
-                                class="sort-icon-up {sortField === 'osType'
-                                    ? sortOrder === SortOrder.Up
-                                        ? SORT_COLOR
-                                        : ''
-                                    : ''}"
-                                on:click={() => {
-                                    toggleSort('osType', SortOrder.Up);
-                                }}
+                            <SortIcon
+                                {active}
+                                field="osType"
+                                order={SortOrder.Down}
+                                click={toggleSort}
                             />
-                            <Icon
-                                size="1.25"
-                                name="chevron-down"
-                                class="sort-icon-down {sortField === 'osType'
-                                    ? sortOrder === SortOrder.Down
-                                        ? SORT_COLOR
-                                        : ''
-                                    : ''}"
-                                on:click={() => {
-                                    toggleSort('osType', SortOrder.Down);
-                                }}
+                            <SortIcon
+                                {active}
+                                field="osType"
+                                order={SortOrder.Up}
+                                click={toggleSort}
                             />
                         </div>
                     </div>
@@ -173,27 +152,17 @@
                     <div class="row g-1">
                         <div class="col-auto align-self-center">Last seen</div>
                         <div class="col-auto">
-                            <Icon
-                                size="1.25"
-                                name="chevron-up"
-                                class="sort-icon-up {sortField === 'lastSeen' &&
-                                sortOrder === SortOrder.Up
-                                    ? SORT_COLOR
-                                    : ''}"
-                                on:click={() => {
-                                    toggleSort('lastSeen', SortOrder.Up);
-                                }}
+                            <SortIcon
+                                {active}
+                                field="lastSeen"
+                                order={SortOrder.Down}
+                                click={toggleSort}
                             />
-                            <Icon
-                                size="1.25"
-                                name="chevron-down"
-                                class="sort-icon-down {sortField ===
-                                    'lastSeen' && sortOrder === SortOrder.Down
-                                    ? SORT_COLOR
-                                    : ''}"
-                                on:click={() => {
-                                    toggleSort('lastSeen', SortOrder.Down);
-                                }}
+                            <SortIcon
+                                {active}
+                                field="lastSeen"
+                                order={SortOrder.Up}
+                                click={toggleSort}
                             />
                         </div>
                     </div>
@@ -202,100 +171,55 @@
                     <div class="row g-1">
                         <div class="col-auto align-self-center">Conformity</div>
                         <div class="col-auto">
-                            <Icon
-                                size="1.25"
-                                name="chevron-up"
-                                class="sort-icon-up {sortField ===
-                                    'conformitySuccess' &&
-                                sortOrder === SortOrder.Up
-                                    ? SORT_COLOR
-                                    : 'text-success'}"
-                                on:click={() => {
-                                    toggleSort(
-                                        'conformitySuccess',
-                                        SortOrder.Up,
-                                    );
-                                }}
+                            <SortIcon
+                                {active}
+                                field="conformitySuccess"
+                                order={SortOrder.Down}
+                                click={toggleSort}
+                                color="success"
                             />
-                            <Icon
-                                size="1.25"
-                                name="chevron-down"
-                                class="sort-icon-down {sortField ===
-                                    'conformitySuccess' &&
-                                sortOrder === SortOrder.Down
-                                    ? SORT_COLOR
-                                    : 'text-success'}"
-                                on:click={() => {
-                                    toggleSort(
-                                        'conformitySuccess',
-                                        SortOrder.Down,
-                                    );
-                                }}
+                            <SortIcon
+                                {active}
+                                field="conformitySuccess"
+                                order={SortOrder.Up}
+                                click={toggleSort}
+                                color="success"
                             />
                         </div>
                         <div class="col-auto">
-                            <Icon
-                                size="1.25"
-                                name="chevron-up"
-                                class="sort-icon-up {sortField ===
-                                    'conformityIncorrect' &&
-                                sortOrder === SortOrder.Up
-                                    ? SORT_COLOR
-                                    : 'text-warning'}"
-                                on:click={() => {
-                                    toggleSort(
-                                        'conformityIncorrect',
-                                        SortOrder.Up,
-                                    );
-                                }}
+                            <SortIcon
+                                {active}
+                                field="conformityIncorrect"
+                                order={SortOrder.Down}
+                                click={toggleSort}
+                                color="warning"
                             />
-                            <Icon
-                                size="1.25"
-                                name="chevron-down"
-                                class="sort-icon-down {sortField ===
-                                    'conformityIncorrect' &&
-                                sortOrder === SortOrder.Down
-                                    ? SORT_COLOR
-                                    : 'text-warning'}"
-                                on:click={() => {
-                                    toggleSort(
-                                        'conformityIncorrect',
-                                        SortOrder.Down,
-                                    );
-                                }}
+                            <SortIcon
+                                {active}
+                                field="conformityIncorrect"
+                                order={SortOrder.Up}
+                                click={toggleSort}
+                                color="warning"
                             />
                         </div>
                         <div class="col-auto">
-                            <Icon
-                                size="1.25"
-                                name="chevron-up"
-                                class="sort-icon-up {sortField ===
-                                    'conformityError' &&
-                                sortOrder === SortOrder.Up
-                                    ? SORT_COLOR
-                                    : 'text-danger'}"
-                                on:click={() => {
-                                    toggleSort('conformityError', SortOrder.Up);
-                                }}
+                            <SortIcon
+                                {active}
+                                field="conformityError"
+                                order={SortOrder.Down}
+                                click={toggleSort}
+                                color="danger"
                             />
-                            <Icon
-                                size="1.25"
-                                name="chevron-down"
-                                class="sort-icon-down {sortField ===
-                                    'conformityError' &&
-                                sortOrder === SortOrder.Down
-                                    ? SORT_COLOR
-                                    : 'text-danger'}"
-                                on:click={() => {
-                                    toggleSort(
-                                        'conformityError',
-                                        SortOrder.Down,
-                                    );
-                                }}
+                            <SortIcon
+                                {active}
+                                field="conformityError"
+                                order={SortOrder.Up}
+                                click={toggleSort}
+                                color="danger"
                             />
                         </div>
-                    </div></th
-                >
+                    </div>
+                </th>
                 <th class="border-secondary">
                     <div class="row g-1">
                         <div class="col-auto align-self-center">Actions</div>
@@ -351,8 +275,9 @@
                             <Link
                                 to={paths.minion.getPath(minion.id)}
                                 class="btn btn-{$theme.color} btn-sm px-3"
-                                >View</Link
                             >
+                                View
+                            </Link>
                         </td>
                     </tr>
                 {/each}
