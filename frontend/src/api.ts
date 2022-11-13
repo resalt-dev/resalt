@@ -77,12 +77,12 @@ export async function login(
     username: string,
     password: string,
 ): Promise<string> {
-    return (
-        await sendUnauthenticatedRequest('POST', '/auth/login', {
-            username,
-            password,
-        })
-    ).token;
+    const { token } = await sendUnauthenticatedRequest('POST', '/auth/login', {
+        username,
+        password,
+    });
+    authStore.set(token);
+    return token;
 }
 
 export async function getConfig(): Promise<Config> {
@@ -99,8 +99,8 @@ export async function getCurrentUser(): Promise<User> {
 
 export async function logout(): Promise<void> {
     // No remote function call for this yet.
-    authStore.set(null);
     currentUserStore.set(null);
+    authStore.set(null);
 }
 
 ///

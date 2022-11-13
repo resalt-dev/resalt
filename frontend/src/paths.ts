@@ -36,7 +36,6 @@ export class Path {
 
 const paths = {
     login: new Path(0, 'login', '/auth/login', 'Login'),
-    logout: new Path(1, 'logout', '/auth/logout', 'Logout'),
 
     dashboard: new Path(10, 'dashboard', '/dashboard/:subPage', 'Dashboard', 'home', true),
 

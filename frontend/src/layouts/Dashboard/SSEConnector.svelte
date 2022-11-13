@@ -11,6 +11,7 @@
             console.log('Connecting to SSE...');
             openEvents();
         } else {
+            console.log('Closing SSE...');
             closeEvents();
         }
     }

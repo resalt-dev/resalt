@@ -112,7 +112,7 @@ impl Default for Minion {
     fn default() -> Self {
         Self {
             id: "".to_string(),
-            last_seen: chrono::NaiveDateTime::from_timestamp(0, 0),
+            last_seen: chrono::NaiveDateTime::default(),
             grains: None,
             pillars: None,
             pkgs: None,

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { login } from '../../api';
-    import { config, theme, toasts } from '../../stores';
+    import { auth, config, theme, toasts } from '../../stores';
     import paths from '../../paths';
     import { MessageType } from '../../models/MessageType';
     import { FormGroup, Input, Label } from 'sveltestrap';
@@ -42,7 +42,7 @@
         let password = passwordFieldValue;
         login(username, password)
             .then(() => {
-                navigate(paths.dashboard.path);
+                // Redirect is done automatic by router, once auth is set.
             })
             .catch((err) => {
                 toasts.add(MessageType.ERROR, 'Login Error', err);

@@ -1,9 +1,10 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { useNavigate } from 'svelte-navigator';
-    import { currentUser } from '../../stores';
-    import { getCurrentUser } from '../../api';
+    import { currentUser, toasts } from '../../stores';
+    import { getCurrentUser, logout } from '../../api';
     import paths from '../../paths';
+    import { MessageType } from '../../models/MessageType';
 
     const navigate = useNavigate();
 
@@ -14,7 +15,18 @@
             })
             .catch((err) => {
                 console.error(err);
-                navigate(paths.logout.path);
+                logout()
+                    .then(() => {
+                        toasts.add(
+                            MessageType.WARNING,
+                            'Logged out',
+                            'You have been logged out due to the token being invalid.',
+                        );
+                        navigate(paths.login.getPath());
+                    })
+                    .catch((err) => {
+                        toasts.add(MessageType.ERROR, 'Logout Error', err);
+                    });
             });
     });
 </script>

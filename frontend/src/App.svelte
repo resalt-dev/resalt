@@ -7,7 +7,7 @@
     import { config, theme } from './stores';
     import type Config from './models/Config';
     import { globalHistory, type NavigatorHistory } from 'svelte-navigator';
-    import { writable } from 'svelte/store';
+    import { get, writable } from 'svelte/store';
 
     const isPortalView = writable<boolean>(
         window.location.pathname.startsWith('/auth'),
@@ -15,6 +15,13 @@
 
     function onUrlChange() {
         let result = window.location.pathname.startsWith('/auth');
+        console.log(
+            'onUrlChange',
+            window.location.pathname,
+            result,
+            get(config) === null,
+            get(theme).color === null,
+        );
         if (result !== $isPortalView) {
             isPortalView.set(result);
         }
@@ -58,7 +65,7 @@
 
 <main class={$theme.dark ? 'theme-dark' : ''}>
     {#if $config === null || $theme.color === null}
-        <p>Loading...</p>
+        <p>Loading....</p>
     {:else if $isPortalView}
         <PortalLayout history={wrapperGlobalHistory} />
     {:else}

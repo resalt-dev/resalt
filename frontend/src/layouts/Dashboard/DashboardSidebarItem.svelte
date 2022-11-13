@@ -8,7 +8,7 @@
     export let collapsed: boolean;
 
     const location = useLocation();
-    $: isActive = $location.pathname.startsWith(path.path);
+    $: isActive = $location.pathname.startsWith(path.getPath());
 </script>
 
 <li class="nav-item" style="height: 4.5rem;">

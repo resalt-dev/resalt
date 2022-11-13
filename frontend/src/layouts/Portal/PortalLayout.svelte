@@ -1,9 +1,8 @@
 <script lang="ts">
     import { Router, Route, type NavigatorHistory } from 'svelte-navigator';
     import { Toast, ToastBody, ToastHeader } from 'sveltestrap';
-    import { toasts, theme } from '../../stores';
+    import { auth, toasts, theme } from '../../stores';
     import AuthLogin from '../../views/Auth/AuthLogin.svelte';
-    import AuthLogout from '../../views/Auth/AuthLogout.svelte';
     import Logo from '../../components/Logo.svelte';
     import Redirect from '../../components/Redirect.svelte';
     import paths from '../../paths';
@@ -34,12 +33,18 @@
                                     path="auth/login"
                                     component={AuthLogin}
                                 />
-                                <Route
-                                    path="auth/logout"
-                                    component={AuthLogout}
-                                />
+                                <!-- <Route
+                                    path="auth/reset"
+                                    component={AuthReset}
+                                /> -->
                                 <Route path="*">
-                                    <Redirect to={paths.login.path} />
+                                    {#if $auth === null}
+                                        <Redirect to={paths.login.getPath()} />
+                                    {:else}
+                                        <Redirect
+                                            to={paths.dashboard.getPath()}
+                                        />
+                                    {/if}
                                 </Route>
                             </Router>
 

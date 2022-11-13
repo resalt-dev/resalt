@@ -1,10 +1,13 @@
 <script lang="ts">
-    import { useLocation, Link } from 'svelte-navigator';
-    import { currentUser, socket, theme } from '../../stores';
+    import { useLocation, Link, useNavigate } from 'svelte-navigator';
+    import { currentUser, socket, theme, toasts } from '../../stores';
     import paths from '../../paths';
     import { Col, Row } from 'sveltestrap';
     import Icon from '../../components/Icon.svelte';
+    import { logout } from '../../api';
+    import { MessageType } from '../../models/MessageType';
 
+    const navigate = useNavigate();
     const location = useLocation();
 
     $: navbar =
@@ -69,13 +72,13 @@
             aria-labelledby="dropdownUser1"
         >
             <li>
-                <Link to={paths.preferences.path} class="dropdown-item"
+                <Link to={paths.preferences.getPath()} class="dropdown-item"
                     >Preferences</Link
                 >
             </li>
             <li><hr class="dropdown-divider" /></li>
             <li>
-                <Link to={paths.logout.path} class="dropdown-item"
+                <Link to={paths.logout.getPath()} class="dropdown-item"
                     >Sign out</Link
                 >
             </li>
@@ -90,13 +93,26 @@
     <Col xs="auto">
         <div class="vr sep" />
     </Col>
-    <Link
-        to={paths.logout.path}
-        class="col-auto px-3 text-reset text-decoration-none"
+    <div
+        class="col-auto px-3 text-reset text-decoration-none mouse-pointer"
+        on:click={() => {
+            logout()
+                .then(() => {
+                    toasts.add(
+                        MessageType.SUCCESS,
+                        'Logout Success',
+                        'You have now been logged out.',
+                    );
+                    navigate(paths.login.getPath());
+                })
+                .catch((err) => {
+                    toasts.add(MessageType.ERROR, 'Logout Error', err);
+                });
+        }}
     >
         <Icon name="log-out" size="1.5" class="pe-1" />
         Logout
-    </Link>
+    </div>
 </Row>
 
 <style lang="scss">
