@@ -1,7 +1,6 @@
 <script lang="ts">
     import { Router, Route, type NavigatorHistory } from 'svelte-navigator';
-    import { Toast, ToastBody, ToastHeader } from 'sveltestrap';
-    import { auth, toasts, theme } from '../../stores';
+    import { auth, theme } from '../../stores';
     import AuthLogin from '../../views/Auth/AuthLogin.svelte';
     import Logo from '../../components/Logo.svelte';
     import Redirect from '../../components/Redirect.svelte';
@@ -47,15 +46,6 @@
                                     {/if}
                                 </Route>
                             </Router>
-
-                            <div class="clearfix" />
-
-                            {#each $toasts as toast}
-                                <Toast class="{'toast-' + toast.type} mb-2">
-                                    <ToastHeader>{toast.title}</ToastHeader>
-                                    <ToastBody>{toast.message}</ToastBody>
-                                </Toast>
-                            {/each}
                         </div>
                     </div>
                 </div>

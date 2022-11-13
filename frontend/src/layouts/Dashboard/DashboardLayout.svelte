@@ -1,7 +1,6 @@
 <script lang="ts">
-    import { currentUser, toasts } from '../../stores';
+    import { currentUser } from '../../stores';
     import { Router, Route, type NavigatorHistory } from 'svelte-navigator';
-    import { Toast, ToastBody, ToastHeader } from 'sveltestrap';
     import DashboardHeader from './DashboardHeader.svelte';
     import DashboardSidebar from './DashboardSidebar.svelte';
     import paths from '../../paths';
@@ -65,13 +64,3 @@
         </div>
     {/if}
 </Router>
-
-<!-- Toast / Alerts -->
-<div class="position-fixed top-0 end-0 mt-5 me-5" style="z-index: 11">
-    {#each $toasts as toast}
-        <Toast class="{'toast-' + toast.type} mb-2">
-            <ToastHeader>{toast.title}</ToastHeader>
-            <ToastBody>{toast.message}</ToastBody>
-        </Toast>
-    {/each}
-</div>

@@ -4,10 +4,11 @@
     import PortalLayout from './layouts/Portal/PortalLayout.svelte';
     import { getConfig } from './api';
     import { onMount } from 'svelte';
-    import { config, theme } from './stores';
+    import { config, theme, toasts } from './stores';
     import type Config from './models/Config';
     import { globalHistory, type NavigatorHistory } from 'svelte-navigator';
     import { get, writable } from 'svelte/store';
+    import { Toast, ToastBody, ToastHeader } from 'sveltestrap';
 
     const isPortalView = writable<boolean>(
         window.location.pathname.startsWith('/auth'),
@@ -71,6 +72,16 @@
     {:else}
         <DashboardLayout history={wrapperGlobalHistory} />
     {/if}
+
+    <!-- Toast / Alerts -->
+    <div class="position-fixed top-0 end-0 mt-5 me-5" style="z-index: 11">
+        {#each $toasts as toast}
+            <Toast class="{'toast-' + toast.type} mb-2">
+                <ToastHeader>{toast.title}</ToastHeader>
+                <ToastBody>{toast.message}</ToastBody>
+            </Toast>
+        {/each}
+    </div>
 </main>
 
 <!-- svelte-ignore css-unused-selector -->
