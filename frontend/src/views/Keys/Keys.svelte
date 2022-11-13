@@ -1,12 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import {
-        acceptKey,
-        deleteKey,
-        getKeys,
-        rejectKey,
-        showToast,
-    } from '../../controller';
+    import { acceptKey, deleteKey, getKeys, rejectKey } from '../../api';
+    import { toasts } from '../../stores';
     import { Badge, Button, Card, Table } from 'sveltestrap';
     import { writable, type Writable } from 'svelte/store';
     import TablePaginate from '../../components/TablePaginate.svelte';
@@ -32,7 +27,7 @@
                 fakePaginate();
             })
             .catch((err) => {
-                showToast(MessageType.ERROR, 'Failed fetching keys', err);
+                toasts.add(MessageType.ERROR, 'Failed fetching keys', err);
             });
     }
 
@@ -47,14 +42,14 @@
         acceptKey(key)
             .then(() => {
                 updateData();
-                showToast(
+                toasts.add(
                     MessageType.SUCCESS,
                     'Key accepted',
                     `Key ${key.id} accepted`,
                 );
             })
             .catch((err) => {
-                showToast(MessageType.ERROR, 'Failed accepting key', err);
+                toasts.add(MessageType.ERROR, 'Failed accepting key', err);
             });
     }
 
@@ -62,14 +57,14 @@
         rejectKey(key)
             .then(() => {
                 updateData();
-                showToast(
+                toasts.add(
                     MessageType.SUCCESS,
                     'Key rejected',
                     `Key ${key.id} rejected`,
                 );
             })
             .catch((err) => {
-                showToast(MessageType.ERROR, 'Failed rejecting key', err);
+                toasts.add(MessageType.ERROR, 'Failed rejecting key', err);
             });
     }
 
@@ -77,14 +72,14 @@
         deleteKey(key)
             .then(() => {
                 updateData();
-                showToast(
+                toasts.add(
                     MessageType.SUCCESS,
                     'Key deleted',
                     `Key ${key.id} deleted`,
                 );
             })
             .catch((err) => {
-                showToast(MessageType.ERROR, 'Failed deleting key', err);
+                toasts.add(MessageType.ERROR, 'Failed deleting key', err);
             });
     }
 

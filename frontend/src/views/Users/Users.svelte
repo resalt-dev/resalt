@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { theme, currentUser } from '../../stores';
-    import { getUsers, showToast } from '../../controller';
+    import { theme, currentUser, toasts } from '../../stores';
+    import { getUsers } from '../../api';
     import { Badge, Card, Table } from 'sveltestrap';
     import { writable, type Writable } from 'svelte/store';
     import TablePaginate from '../../components/TablePaginate.svelte';
@@ -25,7 +25,7 @@
                 users.set(data);
             })
             .catch((err) => {
-                showToast(MessageType.ERROR, 'Failed fetching users', err);
+                toasts.add(MessageType.ERROR, 'Failed fetching users', err);
             });
     }
 

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Button } from 'sveltestrap';
     import Icon from '../components/Icon.svelte';
-    import { showToast } from '../controller';
+    import { toasts } from '../stores';
     import { MessageType } from '../models/MessageType';
     import { theme } from '../stores';
 
@@ -16,7 +16,7 @@
     style="margin-bottom: -0.15rem;margin-top: -0.15rem;"
     on:click={() => {
         navigator.clipboard.writeText(value);
-        showToast(
+        toasts.add(
             MessageType.SUCCESS,
             'Copied to Clipboard',
             `Copied ${name} "${value}" to clipboard.`,

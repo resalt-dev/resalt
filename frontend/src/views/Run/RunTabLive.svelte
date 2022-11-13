@@ -12,8 +12,8 @@
         Row,
     } from 'sveltestrap';
     import { quoteSplit } from '../../utils';
-    import { theme } from '../../stores';
-    import { runJob, showToast } from '../../controller';
+    import { theme, toasts } from '../../stores';
+    import { runJob } from '../../api';
     import RunResult from '../../models/RunResult';
     import RunCommand from '../../models/RunCommand';
     import { MessageType } from '../../models/MessageType';
@@ -132,7 +132,7 @@
             })
             .catch((error) => {
                 console.error(error);
-                showToast(MessageType.ERROR, 'Failed executing job', error);
+                toasts.add(MessageType.ERROR, 'Failed executing job', error);
             });
         closeRunNowDialog();
     }

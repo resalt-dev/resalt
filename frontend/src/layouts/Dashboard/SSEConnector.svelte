@@ -1,6 +1,6 @@
 <script lang="ts">
     import { get } from 'svelte/store';
-    import { createSSESocket } from '../../controller';
+    import { createSSESocket } from '../../api';
     import { auth } from '../../stores';
     import { socket as socketStore } from '../../stores';
 

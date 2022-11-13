@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { loadCurrentUser, login, showToast } from '../../controller';
-    import { config, theme } from '../../stores';
+    import { login } from '../../api';
+    import { config, theme, toasts } from '../../stores';
     import paths from '../../paths';
     import { MessageType } from '../../models/MessageType';
     import { FormGroup, Input, Label } from 'sveltestrap';
@@ -42,21 +42,10 @@
         let password = passwordFieldValue;
         login(username, password)
             .then(() => {
-                loadCurrentUser()
-                    .then(() => {
-                        navigate(paths.dashboard.path);
-                    })
-                    .catch((err) => {
-                        showToast(
-                            MessageType.ERROR,
-                            'Failed fetching user',
-                            err,
-                        );
-                        navigate(paths.logout.path);
-                    });
+                navigate(paths.dashboard.path);
             })
             .catch((err) => {
-                showToast(MessageType.ERROR, 'Login Error', err);
+                toasts.add(MessageType.ERROR, 'Login Error', err);
             });
     }
 

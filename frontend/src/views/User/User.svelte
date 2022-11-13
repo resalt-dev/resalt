@@ -1,12 +1,7 @@
 <script lang="ts">
-    import {
-        showToast,
-        getUserById,
-        updateUserPassword,
-    } from '../../controller';
-    import { theme, currentUser } from '../../stores';
+    import { getUserById, updateUserPassword } from '../../api';
+    import { theme, currentUser, toasts } from '../../stores';
     import { writable, type Writable } from 'svelte/store';
-
     import { onMount } from 'svelte';
     import {
         Card,
@@ -51,7 +46,7 @@
                 user.set(data);
             })
             .catch((err) => {
-                showToast(
+                toasts.add(
                     MessageType.ERROR,
                     'Failed fetching user: ' + userId,
                     err,
@@ -76,7 +71,7 @@
                 updateData();
             })
             .catch((err) => {
-                showToast(
+                toasts.add(
                     MessageType.ERROR,
                     'Failed updating password for user: ' + userId,
                     err,

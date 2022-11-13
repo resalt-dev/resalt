@@ -2,7 +2,8 @@
     import { onMount } from 'svelte';
     import { Card, Table } from 'sveltestrap';
     import Icon from '../../components/Icon.svelte';
-    import { getEvents, showToast } from '../../controller';
+    import { getEvents } from '../../api';
+    import { toasts } from '../../stores';
     import TablePaginate from '../../components/TablePaginate.svelte';
     import { MessageType } from '../../models/MessageType';
     import { writable, type Writable } from 'svelte/store';
@@ -70,7 +71,7 @@
                 );
             })
             .catch((err) => {
-                showToast(MessageType.ERROR, 'Failed fetching events', err);
+                toasts.add(MessageType.ERROR, 'Failed fetching events', err);
             });
     }
 

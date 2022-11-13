@@ -10,9 +10,11 @@
         Col,
         Row,
     } from 'sveltestrap';
-    import { getMetricResults, showToast } from '../../controller';
+    import { getMetricResults } from '../../api';
     import { MessageType } from '../../models/MessageType';
-    import { theme } from '../../stores';
+    import { theme, toasts } from '../../stores';
+    import Color from '../../models/Color';
+    import type MetricResult from '../../models/MetricResult';
 
     import { Pie, Line, Bar } from 'svelte-chartjs';
     import {
@@ -27,9 +29,6 @@
         Title,
         Tooltip,
     } from 'chart.js';
-    import Color from '../../models/Color';
-    import type MetricResult from '../../models/MetricResult';
-    import type { NavigateFn } from 'svelte-navigator';
     ChartJS.register(
         ArcElement,
         BarElement,
@@ -50,7 +49,7 @@
                 metrics.set(data);
             })
             .catch((err) => {
-                showToast(
+                toasts.add(
                     MessageType.ERROR,
                     'Failed fetching dashboard metrics',
                     err,

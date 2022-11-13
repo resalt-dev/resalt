@@ -22,12 +22,11 @@
         deletePermissionGroup,
         getPermissionGroups,
         removeUserFromPermissionGroup,
-        showToast,
         updatePermissionGroup,
-    } from '../../controller';
+    } from '../../api';
     import { MessageType } from '../../models/MessageType';
     import { resaltWebPermissions } from '../../perms';
-    import { theme } from '../../stores';
+    import { theme, toasts } from '../../stores';
     import type PermissionGroup from '../../models/PermissionGroup';
     import ResaltProgress from '../../components/ResaltProgress.svelte';
 
@@ -86,7 +85,11 @@
                     resolve();
                 })
                 .catch((err) => {
-                    showToast(MessageType.ERROR, 'Failed fetching groups', err);
+                    toasts.add(
+                        MessageType.ERROR,
+                        'Failed fetching groups',
+                        err,
+                    );
                     reject();
                 });
         });
@@ -166,7 +169,7 @@
             .then((group) => {
                 updateData();
                 selectedGroup.set(group);
-                showToast(
+                toasts.add(
                     MessageType.SUCCESS,
                     'Create group',
                     'Created group!',
@@ -174,7 +177,7 @@
             })
             .catch((err) => {
                 console.error(err);
-                showToast(MessageType.ERROR, 'Failed creating group', err);
+                toasts.add(MessageType.ERROR, 'Failed creating group', err);
             });
     }
 
@@ -193,7 +196,7 @@
                         selectedGroup.set(null);
                     }
                 });
-                showToast(
+                toasts.add(
                     MessageType.SUCCESS,
                     'Delete group',
                     'Deleted group!',
@@ -201,7 +204,7 @@
             })
             .catch((err) => {
                 console.error(err);
-                showToast(MessageType.ERROR, 'Failed deleting group', err);
+                toasts.add(MessageType.ERROR, 'Failed deleting group', err);
             });
     }
 
@@ -216,7 +219,7 @@
         addUserToPermissionGroup(addUserFieldValue, $selectedGroup.id)
             .then(() => {
                 updateData();
-                showToast(
+                toasts.add(
                     MessageType.SUCCESS,
                     'Add user to group',
                     'Added user to group!',
@@ -224,7 +227,7 @@
             })
             .catch((err) => {
                 console.error(err);
-                showToast(
+                toasts.add(
                     MessageType.ERROR,
                     'Failed adding user to group',
                     err,
@@ -239,7 +242,7 @@
         removeUserFromPermissionGroup(userId, $selectedGroup.id)
             .then(() => {
                 updateData();
-                showToast(
+                toasts.add(
                     MessageType.SUCCESS,
                     'Remove user from group',
                     'Removed user from group!',
@@ -247,7 +250,7 @@
             })
             .catch((err) => {
                 console.error(err);
-                showToast(
+                toasts.add(
                     MessageType.ERROR,
                     'Failed removing user from group',
                     err,
@@ -281,7 +284,7 @@
         )
             .then(() => {
                 updateData();
-                showToast(
+                toasts.add(
                     MessageType.SUCCESS,
                     'Update group',
                     'Updated group name!',
@@ -289,7 +292,7 @@
             })
             .catch((err) => {
                 console.error(err);
-                showToast(MessageType.ERROR, 'Failed updating group', err);
+                toasts.add(MessageType.ERROR, 'Failed updating group', err);
             });
     }
 

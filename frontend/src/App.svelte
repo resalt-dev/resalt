@@ -2,7 +2,7 @@
     import type RawLocation from 'svelte-navigator/types/RawLocation';
     import DashboardLayout from './layouts/Dashboard/DashboardLayout.svelte';
     import PortalLayout from './layouts/Portal/PortalLayout.svelte';
-    import { loadConfig } from './controller';
+    import { getConfig } from './api';
     import { onMount } from 'svelte';
     import { config, theme } from './stores';
     import type Config from './models/Config';
@@ -37,8 +37,9 @@
     const wrapperGlobalHistory: NavigatorHistory = new WrapperGlobalHistory();
 
     onMount(() => {
-        loadConfig()
+        getConfig()
             .then((data: Config) => {
+                config.set(data);
                 // set default color if theme.color is null
                 if (!$theme.color) {
                     $theme.color = data.defaultThemeColor;

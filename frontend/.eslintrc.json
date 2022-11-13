@@ -21,7 +21,7 @@
         "function-paren-newline": "off",
         "operator-linebreak": ["error", "after"],
         "no-restricted-syntax": ["error", "LabeledStatement", "WithStatement"],
-
+        "jsx-a11y/click-events-have-key-events": "off",
         "lit-a11y/click-events-have-key-events": "off",
 
         // Enabled later for TypeScript files

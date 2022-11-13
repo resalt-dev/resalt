@@ -1,9 +1,10 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
     import { currentUser } from '../../stores';
     import { hasResaltPermission, P_ADMIN_GROUP } from '../../perms';
     import { MessageType } from '../../models/MessageType';
-    import { onMount } from 'svelte';
-    import { showToast, getMinionById } from '../../controller';
+    import { getMinionById } from '../../api';
+    import { toasts } from '../../stores';
     import { writable, type Writable } from 'svelte/store';
     import paths from '../../paths';
     import Tabs from '../../components/Tabs.svelte';
@@ -32,7 +33,7 @@
                 minion.set(data);
             })
             .catch((err) => {
-                showToast(
+                toasts.add(
                     MessageType.ERROR,
                     'Failed fetching minion: ' + minionId,
                     err,

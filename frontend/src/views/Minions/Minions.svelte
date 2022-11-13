@@ -1,12 +1,12 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
     import { Button, Card, Table } from 'sveltestrap';
-    import { getMinions, showToast } from '../../controller';
     import { Link, type NavigateFn } from 'svelte-navigator';
     import { MessageType } from '../../models/MessageType';
-    import { onMount } from 'svelte';
-    import { refreshMinions } from '../../controller';
+    import { refreshMinions, getMinions } from '../../api';
     import { SortOrder } from '../../models/SortOrder';
     import { theme } from '../../stores';
+    import { toasts } from '../../stores';
     import { writable, type Writable } from 'svelte/store';
     import Icon from '../../components/Icon.svelte';
     import paths from '../../paths';
@@ -50,7 +50,7 @@
                 loading.set(false);
             })
             .catch((err) => {
-                showToast(MessageType.ERROR, 'Failed fetching minions', err);
+                toasts.add(MessageType.ERROR, 'Failed fetching minions', err);
             });
     }
 

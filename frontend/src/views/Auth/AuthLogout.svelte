@@ -2,8 +2,8 @@
     import { onMount } from 'svelte';
     import { Link, type NavigateFn } from 'svelte-navigator';
     import paths from '../../paths';
-    import { theme } from '../../stores';
-    import { logout, showToast } from '../../controller';
+    import { theme, toasts } from '../../stores';
+    import { logout } from '../../api';
     import { MessageType } from '../../models/MessageType';
 
     // svelte-ignore unused-export-let
@@ -17,14 +17,14 @@
         logout()
             .then(() => {
                 loggingOut = false;
-                showToast(
+                toasts.add(
                     MessageType.SUCCESS,
                     'Logout Success',
                     'You have now been logged out.',
                 );
             })
             .catch((err) => {
-                showToast(MessageType.ERROR, 'Logout Error', err);
+                toasts.add(MessageType.ERROR, 'Logout Error', err);
             });
     });
 </script>

@@ -2,13 +2,13 @@
     import { onMount } from 'svelte';
     import { useNavigate } from 'svelte-navigator';
     import { currentUser } from '../../stores';
-    import { loadCurrentUser } from '../../controller';
+    import { getCurrentUser } from '../../api';
     import paths from '../../paths';
 
     const navigate = useNavigate();
 
     onMount(() => {
-        loadCurrentUser()
+        getCurrentUser()
             .then((data) => {
                 currentUser.set(data);
             })

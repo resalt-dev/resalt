@@ -2,7 +2,6 @@
     import { Row, Col, Button, Card, CardHeader, CardBody } from 'sveltestrap';
     import Icon from '../../components/Icon.svelte';
     import constants from '../../constants';
-    import { showToast } from '../../controller';
     import { MessageType } from '../../models/MessageType';
     import { config, theme, toasts } from '../../stores';
 
@@ -101,7 +100,7 @@
         <Button
             color="warning"
             on:click={() => {
-                showToast(
+                toasts.add(
                     MessageType[
                         Object.keys(MessageType).filter((k) =>
                             isNaN(Number(k)),

@@ -3,7 +3,8 @@ import { writable as writableLocalStorage } from 'svelte-local-storage-store';
 import constants from './constants';
 import type User from './models/User';
 import type Config from './models/Config';
-import type Message from './models/Message';
+import Message from './models/Message';
+import type { MessageType } from './models/MessageType';
 
 const prefix = `${constants.appName.toLowerCase()}_`;
 
@@ -41,10 +42,12 @@ export const currentUser: Writable<User | null> = writableLocalStorage(
 interface ToastStore extends Readable<Message[]> {
     /**
      * Add a toast to the store.
-     * @param message The message to add.
+     * @param {MessageType} type - The type of the toast (success, error, etc.)
+     * @param {string} title - The title of the toast, preferably short.
+     * @param {string} message - The message of the toast.
      */
     // eslint-disable-next-line no-unused-vars
-    add(this: void, message: Message): void;
+    add(this: void, type: MessageType, title: string, message: string): void;
     /**
      * Clear all toasts from the store.
      */
@@ -56,9 +59,10 @@ function createToastStore(): ToastStore {
 
     return {
         subscribe,
-        add: (message: Message) => {
+        add: (type: MessageType, title: string, message: string) => {
+            const newToast = new Message(type, title, message);
             update((messages) => {
-                messages.push(message);
+                messages.push(newToast);
                 return messages;
             });
             setTimeout(() => {
