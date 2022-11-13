@@ -2,7 +2,7 @@
     import type { Writable } from 'svelte/store';
     import { Card, CardBody, CardHeader, Col, Row } from 'sveltestrap';
     import JsonViewer from '../../components/JsonViewer.svelte';
-    import ResultBox from '../../components/ResultBox.svelte';
+    import ResultBox from './ResultBox.svelte';
     import type Minion from '../../models/Minion';
     import { theme } from '../../stores';
     import ConformityTreeView from './ConformityTreeView.svelte';
@@ -28,6 +28,8 @@
     let showIncorrect: boolean = true;
     let showError: boolean = true;
     let showCollapsed: boolean = true;
+    let filterNamespace: string = '';
+    let collapseList: string[] = [];
 
     $: conformity = Object.entries(JSON.parse($minion.conformity) ?? [])
         .map(([key, v]) => {
@@ -130,6 +132,8 @@
                     if (!existing) {
                         existing = {
                             name: part,
+                            color: '',
+                            parent: current,
                             subtree: [],
                             items: [],
                         };
@@ -138,10 +142,27 @@
                     current = existing;
                 }
                 current.items.push(c);
+                // Set min color for chain going up
+                let parent = current;
+                while (parent !== null) {
+                    if (c.color === 'danger') {
+                        parent.color = 'danger';
+                    } else if (
+                        c.color === 'warning' &&
+                        parent.color !== 'danger'
+                    ) {
+                        parent.color = 'warning';
+                    } else if (c.color === 'success' && parent.color === '') {
+                        parent.color = 'success';
+                    }
+                    parent = parent.parent;
+                }
                 return acc;
             },
             {
                 name: '#',
+                color: '',
+                parent: null,
                 subtree: [],
                 items: [],
             } as ConformTreeNode,
@@ -263,16 +284,20 @@
                 </Card>
 
                 <Card class="mb-3">
-                    <CardHeader>File Structure</CardHeader>
+                    <CardHeader>States</CardHeader>
                     <CardBody>
                         <!-- Render Tree structure in a recursive fashion. -->
-                        <ConformityTreeView node={conformity_tree} />
+                        <ConformityTreeView
+                            node={conformity_tree}
+                            bind:filterNamespace
+                            bind:collapseList
+                        />
                     </CardBody>
                 </Card>
             </Col>
             <Col>
                 <div class="d-grid">
-                    {#each conformity as conform}
+                    {#each conformity.filter( (c) => c.data.__sls__.startsWith(filterNamespace), ) as conform}
                         <div
                             class=" {!(
                                 (showSuccess && conform.data.result === true) ||

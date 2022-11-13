@@ -3,39 +3,98 @@
     import type { ConformTreeNode } from './ConformityTypes';
     export let node: ConformTreeNode;
     export let depth: number = 0;
+    export let filterNamespace: string;
+    export let collapseList: string[];
+
+    $: sls = calculateFullNamespace(node);
+    $: collapsed = collapseList.includes(sls);
+    $: icon = collapsed
+        ? 'caret-up-square'
+        : sls === filterNamespace
+        ? 'caret-right-square'
+        : 'caret-down-square';
+
+    function calculateFullNamespace(node: ConformTreeNode): string {
+        // Traverse parents up
+        let namespace = node.name;
+        let parent = node.parent;
+        while (parent && parent.name != '#') {
+            namespace = parent.name + '.' + namespace;
+            parent = parent.parent;
+        }
+        return namespace;
+    }
 </script>
 
 <!--
 export type ConformTreeNode = {
     name: string;
+    color: string;
     subtree: ConformTreeNode[];
     items: Conform[];
 };
 -->
 
-<Icon name="folder-open" size="1" class="text-blue" />
-{' '}{node.name}
+<Icon
+    name={icon}
+    size="1.5"
+    class="text-{node.color} me-1 mouse-pointer"
+    on:click={() => {
+        if (collapseList.includes(sls)) {
+            collapseList.splice(collapseList.indexOf(sls), 1);
+        } else {
+            collapseList.push(sls);
+        }
+        // Trigger svelte bind update
+        collapseList = [...collapseList];
+    }}
+/>
+<span
+    class={node.name === '#' ? 'no-select' : 'mouse-pointer'}
+    on:click={() => {
+        if (node.name === '#') {
+            return;
+        }
+        if (sls === filterNamespace) {
+            filterNamespace = '';
+        } else {
+            filterNamespace = sls;
+        }
+    }}
+>
+    <span class={sls === filterNamespace ? 'fw-bold text-orange' : ''}>
+        {#if node.name === '#'}
+            <span>top.sls</span>
+        {:else}
+            {node.name}
+        {/if}
+    </span>
 
-{#if node.items.length > 0}
-    <span>({node.items.length})</span>
+    {#if node.items.length > 0}
+        <em class="text-muted">
+            ({node.items.length}{#if collapsed}+...{/if})
+        </em>
+    {:else if collapsed}
+        <em class="text-muted">(...)</em>
+    {/if}
+</span>
+
+{#if !collapsed}
+    <ul>
+        {#each node.subtree as subNode}
+            <li>
+                <svelte:self
+                    node={subNode}
+                    depth={depth + 1}
+                    bind:filterNamespace
+                    bind:collapseList
+                />
+            </li>
+        {/each}
+    </ul>
 {/if}
 
-<ul>
-    {#each node.subtree as subNode}
-        <li>
-            <svelte:self node={subNode} depth={depth + 1} />
-        </li>
-    {/each}
-</ul>
-
 <style lang="scss">
-    span {
-        font-size: 13px;
-        font-style: italic;
-        letter-spacing: 0.4px;
-        color: #a8a8a8;
-    }
-
     ul {
         margin-bottom: 0; // override bootstrap
         padding-left: 5px;

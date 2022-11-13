@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Card } from 'sveltestrap';
-    import ConsoleChangeBranch from './ConsoleChangeBranch.svelte';
+    import ConsoleChangeBranch from '../../components/ConsoleChangeBranch.svelte';
 
     const SHIFT = 10;
 

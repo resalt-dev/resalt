@@ -7,7 +7,6 @@
     export let minion: Writable<Minion>;
 
     $: grains = JSON.parse($minion.grains ?? '{}');
-    $: console.log(grains);
 
     function formatAsSize(megabytes: number | null | undefined) {
         if (megabytes === undefined) {

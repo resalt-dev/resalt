@@ -9,8 +9,6 @@
     export let order: SortOrder;
     export let click: (field: string, order: SortOrder) => void;
     export let color: string = '';
-
-    $: console.log('active', active, `${field}:${order}`);
 </script>
 
 <Icon

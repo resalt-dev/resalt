@@ -17,6 +17,8 @@ export type Conform = {
 };
 export type ConformTreeNode = {
     name: string;
+    color: string;
+    parent: ConformTreeNode | null;
     subtree: ConformTreeNode[];
     items: Conform[];
 };
