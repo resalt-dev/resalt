@@ -17,7 +17,7 @@
     import type Minion from '../../models/Minion';
     import type TabPage from '../../models/TabPage';
 
-    import MinionsTabGroups from './MinionsTabGroups.svelte';
+    import MinionsTabPresets from './MinionsTabPresets.svelte';
     import MinionsTabSearch from './MinionsTabSearch.svelte';
     import SortIcon from '../../components/SortIcon.svelte';
 
@@ -94,10 +94,10 @@
             data: { setFilters },
         },
         {
-            key: 'groups',
-            label: 'Groups',
-            path: paths.minions.getPath('groups'),
-            component: MinionsTabGroups,
+            key: 'presets',
+            label: 'Presets',
+            path: paths.minions.getPath('presets'),
+            component: MinionsTabPresets,
         },
     ];
 </script>
