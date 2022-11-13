@@ -9,25 +9,43 @@
     import { resaltLight } from './codemirror-resalt-theme-light';
 
     export let data: any;
-    export let collapse: boolean = true;
 
     let editorElement: HTMLElement;
     let cm: EditorView = undefined;
 
     $: {
         if (cm) {
-            createJSONView('$ update');
-
-            if (!(data instanceof Array) && collapse) {
+            if (
+                !(data instanceof Array) &&
+                JSON.stringify(data).includes('cpu_flags')
+            ) {
                 foldAll(cm);
             }
         }
     }
 
-    function createJSONView(caller: string) {
-        console.log('createJSONView caller: ' + caller);
+    function isObject(v: any): boolean {
+        return '[object Object]' === Object.prototype.toString.call(v);
+    }
+
+    function sortJSON(o: any): any {
+        if (Array.isArray(o)) {
+            return o.sort().map(sortJSON);
+        } else if (isObject(o)) {
+            return Object.keys(o)
+                .sort()
+                .reduce(function (a, k) {
+                    a[k] = sortJSON(o[k]);
+
+                    return a;
+                }, {});
+        }
+        return o;
+    }
+
+    function createJSONView() {
         let state = EditorState.create({
-            doc: JSON.stringify(data, null, 2),
+            doc: JSON.stringify(sortJSON(data), null, 2),
             extensions: [
                 basicSetup,
                 $theme.dark ? resaltDark : resaltLight,
@@ -43,7 +61,6 @@
         } else {
             console.error('Syntax tree parsing timed out.');
         }
-
         //cm.dispatch({});
     }
 
@@ -53,9 +70,7 @@
             unsub();
             unsub = null;
         }
-        unsub = theme.subscribe((newTheme) => {
-            createJSONView('theme.subscribe');
-        });
+        unsub = theme.subscribe(createJSONView);
     });
 
     onDestroy(() => {

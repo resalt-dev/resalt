@@ -9,5 +9,5 @@
 {#if !$minion.pillars}
     <div class="p-3">No pillars data. Please refresh minion.</div>
 {:else}
-    <JsonViewer data={JSON.parse($minion.pillars)} collapse={false} />
+    <JsonViewer data={JSON.parse($minion.pillars)} />
 {/if}

@@ -21,7 +21,7 @@
         {rawData ? 'View List' : 'View JSON'}
     </button>
     {#if rawData}
-        <JsonViewer data={JSON.parse($minion.pkgs)} collapse={false} />
+        <JsonViewer data={JSON.parse($minion.pkgs)} />
     {:else}
         <Card class="table-responsive border-bottom-0">
             <Table hover class="b-0 mb-0">
