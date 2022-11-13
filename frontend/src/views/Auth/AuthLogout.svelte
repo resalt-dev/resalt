@@ -35,7 +35,7 @@
     <p class="fw-bold">You have been successfully signed out.</p>
     <br />
     <Link
-        to={paths.login.path}
+        to={paths.login.getPath()}
         class={`btn btn-${$theme.color} float-start px-5 fw-bold mb-3`}
     >
         Go back
