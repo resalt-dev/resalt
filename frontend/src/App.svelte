@@ -15,13 +15,13 @@
 
     function onUrlChange() {
         let result = window.location.pathname.startsWith('/auth');
-        console.log(
-            'onUrlChange',
-            window.location.pathname,
-            result,
-            get(config) === null,
-            get(theme).color === null,
-        );
+        // console.log(
+        //     'onUrlChange',
+        //     window.location.pathname,
+        //     result,
+        //     get(config) === null,
+        //     get(theme).color === null,
+        // );
         if (result !== $isPortalView) {
             isPortalView.set(result);
         }

@@ -42,7 +42,7 @@
         let password = passwordFieldValue;
         login(username, password)
             .then(() => {
-                // Redirect is done automatic by router, once auth is set.
+                navigate(paths.dashboard.getPath());
             })
             .catch((err) => {
                 toasts.add(MessageType.ERROR, 'Login Error', err);
