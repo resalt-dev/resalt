@@ -58,7 +58,7 @@
                     />
                     <Route path="settings/*subPage" component={Settings} />
                     <Route path="*">
-                        <Redirect to={paths.dashboard.path} />
+                        <Redirect to={paths.dashboard.getPath()} />
                     </Route>
                 </div>
             </div>

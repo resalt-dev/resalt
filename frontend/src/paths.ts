@@ -3,7 +3,7 @@ export class Path {
 
     name: string;
 
-    path: string;
+    private path: string;
 
     label: string;
 
