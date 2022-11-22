@@ -1,6 +1,5 @@
 use super::SaltAPI;
 use crate::prelude::*;
-use crate::storage::SConfig;
 use futures::{pin_mut, StreamExt};
 use log::*;
 use regex::Regex;

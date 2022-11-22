@@ -13,7 +13,7 @@ lazy_static::lazy_static! {
                 .collect::<String>();
     static ref SETTINGS: RwLock<config::Config> = RwLock::new(config::Config::builder()
     // load defaults from resalt.default.toml via include_str!
-    .add_source(config::File::from_str(include_str!("../../resalt.default.toml"), config::FileFormat::Toml))
+    .add_source(config::File::from_str(include_str!("../resalt.default.toml"), config::FileFormat::Toml))
     .add_source(config::File::with_name("/etc/resalt/resalt").required(false))
     .add_source(config::File::with_name("resalt").required(false))
     // Add in settings from the environment (with a prefix of RESALT)

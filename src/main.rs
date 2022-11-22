@@ -10,6 +10,7 @@ use tokio::task;
 
 mod auth;
 mod components;
+mod config;
 mod models;
 mod pipeline;
 mod prelude;

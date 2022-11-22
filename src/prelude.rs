@@ -1,5 +1,6 @@
 pub use crate::auth::*;
 pub use crate::components::*;
+pub use crate::config::*;
 pub use crate::models::*;
 pub use crate::pipeline::*;
 pub use crate::routes::*;
