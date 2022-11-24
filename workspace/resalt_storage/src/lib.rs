@@ -1,6 +1,8 @@
 mod storage;
+mod util;
 
 pub use storage::*;
+pub use util::*;
 
 // #[cfg(test)]
 // mod tests {
