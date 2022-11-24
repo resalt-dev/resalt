@@ -1,6 +1,7 @@
 [package]
 name = "resalt"
 version = "0.0.11"
+authors = ["Max Faxälv <max@foorack.com>"]
 edition = "2021"
 readme = "README.md"
 repository = "https://github.com/resalt-dev/resalt"
@@ -9,21 +10,28 @@ description = "Resalt is a free, open-source, self-hosted, web-based administrat
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[workspace]
+members = [
+    "workspace/resalt_models",
+    "workspace/resalt_salt",
+    "workspace/resalt_storage",
+    "workspace/resalt_storage_mysql",
+]
+
 [dependencies]
+# Own Modules
+resalt_salt = { path = "workspace/resalt_salt" }
+
 # Web
 actix-web = { version = "4.1.0", features=["compress-gzip"], default-features = false }
 awc = { version = "3", features=["rustls", "compress-gzip"], default-features = false }
-
-# DB
-diesel = { version = "2.0.0", features = ["mysql", "chrono", "r2d2"] }
-diesel_migrations = "2.0.0"
 
 # Auth
 ldap3 = { version = "0.10.5", features = ["tls-rustls"], default-features = false }
 argon2 = "0.4.1"
 
 # Logging
-log = { version = "0.4.16" }
+log = { version = "0.4.17" }
 env_logger = "0.9.0"
 
 # Threading

@@ -1,8 +1,3 @@
-#[macro_use]
-extern crate diesel;
-#[macro_use]
-extern crate diesel_migrations;
-
 use actix_web::{http::header, middleware::*, web, App, HttpServer};
 use log::error;
 use prelude::*;
@@ -11,13 +6,11 @@ use tokio::task;
 mod auth;
 mod components;
 mod config;
-mod models;
 mod pipeline;
 mod prelude;
 mod routes;
 mod salt;
 mod scheduler;
-mod schema;
 mod storage;
 mod update;
 
@@ -33,7 +26,6 @@ async fn main() -> std::io::Result<()> {
     let db = Storage::connect(&database_url)
         .await
         .unwrap_or_else(|_| panic!("Error connecting to {}", &database_url));
-    db.init().await;
 
     // Salt WebSocket
     let salt_listener_pipeline = pipeline.clone();

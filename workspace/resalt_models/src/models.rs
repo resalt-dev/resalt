@@ -1,4 +1,3 @@
-use crate::{prelude::evalute_resalt_permission, schema::*};
 use serde::{ser::SerializeStruct, *};
 use serde_json::{json, Value};
 
@@ -8,11 +7,7 @@ use serde_json::{json, Value};
 =========================
 */
 
-#[derive(
-    Clone, Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset, Associations,
-)]
-#[diesel(belongs_to(User, foreign_key = user_id))]
-#[diesel(table_name = authtokens)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct AuthToken {
     pub id: String,
     pub user_id: String,
@@ -20,8 +15,7 @@ pub struct AuthToken {
     pub salt_token: Option<String>,
 }
 
-#[derive(Clone, Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset)]
-#[diesel(table_name = events)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Event {
     pub id: String,
     pub timestamp: chrono::NaiveDateTime,
@@ -44,11 +38,7 @@ impl Serialize for Event {
     }
 }
 
-#[derive(
-    Clone, Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset, Associations,
-)]
-#[diesel(belongs_to(Event, foreign_key = event_id))]
-#[diesel(table_name = jobs)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Job {
     pub id: String,
     pub timestamp: chrono::NaiveDateTime,
@@ -73,13 +63,7 @@ impl Serialize for Job {
     }
 }
 
-#[derive(
-    Clone, Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset, Associations,
-)]
-#[diesel(belongs_to(Job, foreign_key = job_id))]
-#[diesel(belongs_to(Event, foreign_key = event_id))]
-#[diesel(belongs_to(Minion, foreign_key = minion_id))]
-#[diesel(table_name = job_returns)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct JobReturn {
     pub id: String,
     pub timestamp: chrono::NaiveDateTime,
@@ -89,8 +73,7 @@ pub struct JobReturn {
     pub minion_id: String,
 }
 
-#[derive(Clone, Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset)]
-#[diesel(table_name = minions)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Minion {
     pub id: String,
     pub last_seen: chrono::NaiveDateTime,
@@ -167,8 +150,7 @@ impl Serialize for Minion {
     }
 }
 
-#[derive(Clone, Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset)]
-#[diesel(table_name = users)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct User {
     pub id: String,
     pub username: String,
@@ -200,18 +182,17 @@ impl User {
         })
     }
 
-    pub fn has_permission(&self, perm: &str) -> bool {
-        let perms: Value = match serde_json::from_str(&self.perms) {
-            Ok(perms) => perms,
-            Err(_) => return false,
-        };
-        evalute_resalt_permission(&perms, perm)
-            || evalute_resalt_permission(&perms, "admin.superadmin")
-    }
+    // pub fn has_permission(&self, perm: &str) -> bool {
+    //     let perms: Value = match serde_json::from_str(&self.perms) {
+    //         Ok(perms) => perms,
+    //         Err(_) => return false,
+    //     };
+    //     evalute_resalt_permission(&perms, perm)
+    //         || evalute_resalt_permission(&perms, "admin.superadmin")
+    // }
 }
 
-#[derive(Clone, Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset)]
-#[diesel(table_name = permission_groups)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct PermissionGroup {
     pub id: String,
     pub name: String,
@@ -238,12 +219,7 @@ impl PermissionGroup {
     }
 }
 
-#[derive(
-    Clone, Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset, Associations,
-)]
-#[diesel(belongs_to(User, foreign_key = user_id))]
-#[diesel(belongs_to(PermissionGroup, foreign_key = group_id))]
-#[diesel(table_name = permission_group_users)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct PermissionGroupUser {
     pub id: String,
     pub group_id: String,

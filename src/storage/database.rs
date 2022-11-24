@@ -45,13 +45,15 @@ impl Storage {
                     }
                 };
 
+                own.init();
+
                 Ok(own)
             }
             Err(e) => Err(format!("{:?}", e)),
         }
     }
 
-    pub async fn init(&self) {
+    fn init(&self) {
         // Create default user
         if self.get_user_by_username("admin").unwrap().is_none() {
             // Generate random password instead of using default

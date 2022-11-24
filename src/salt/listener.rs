@@ -20,6 +20,7 @@ pub struct SaltEventListener {
 
 impl SaltEventListener {
     pub fn new(pipeline: PipelineServer, storage: Storage) -> Self {
+        resalt_salt::add(1, 2);
         Self {
             api: SaltAPI::new(),
             pipeline,
