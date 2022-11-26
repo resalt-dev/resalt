@@ -1,8 +1,9 @@
 use actix_web::{web, Responder, Result};
 use log::error;
+use resalt_config::SConfig;
 use serde::Serialize;
 
-use crate::{prelude::SConfig, update};
+use crate::update;
 
 #[allow(non_snake_case)]
 #[derive(Debug, Serialize)]

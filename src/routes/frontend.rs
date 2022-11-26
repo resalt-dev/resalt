@@ -1,10 +1,11 @@
-use crate::prelude::*;
+use crate::components::*;
 use actix_web::{
     dev::{ServiceRequest, ServiceResponse},
     HttpResponse,
 };
 use include_dir::{include_dir, Dir};
 use log::{error, warn};
+use resalt_config::SConfig;
 
 static FRONTEND_PUBLIC_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/frontend/public");
 

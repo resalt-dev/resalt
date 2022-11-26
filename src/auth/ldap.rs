@@ -1,6 +1,6 @@
-use crate::prelude::*;
 use ldap3::{Ldap, LdapConnAsync, LdapConnSettings, LdapError, Scope, SearchEntry};
 use log::*;
+use resalt_config::SConfig;
 
 pub struct LdapHandler {}
 

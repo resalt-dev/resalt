@@ -1,4 +1,4 @@
-use crate::prelude::*;
+use crate::{auth::update_token_salt_token, components::api_error_unauthorized, salt::SaltAPI};
 use actix_web::{
     dev::{forward_ready, Service, ServiceRequest, ServiceResponse, Transform},
     web::Query,
@@ -6,20 +6,24 @@ use actix_web::{
 };
 use futures::future::{ok, Future, Ready};
 use log::*;
+use resalt_models::AuthStatus;
+use resalt_storage::StorageImpl;
 use std::rc::Rc;
 use std::{collections::HashMap, pin::Pin};
+
+use super::validate_auth_token;
 
 // There are two steps in middleware processing.
 // 1. Middleware initialization, middleware factory gets called with
 //    next service in chain as parameter.
 // 2. Middleware's call method gets called with normal request.
 pub struct ValidateAuth {
-    db: Storage,
+    db: Box<dyn StorageImpl>,
     salt: SaltAPI,
 }
 
 impl ValidateAuth {
-    pub fn new(db: Storage, salt: SaltAPI) -> Self {
+    pub fn new(db: Box<dyn StorageImpl>, salt: SaltAPI) -> Self {
         Self { db, salt }
     }
 }
@@ -50,7 +54,7 @@ where
 
 pub struct ValidateAuthMiddleware<S: 'static> {
     service: Rc<S>,
-    db: Storage,
+    db: Box<dyn StorageImpl>,
     salt: SaltAPI,
 }
 

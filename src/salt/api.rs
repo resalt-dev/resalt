@@ -1,4 +1,3 @@
-use crate::prelude::*;
 use actix_web::http::StatusCode;
 use async_stream::stream;
 use awc::{
@@ -7,6 +6,8 @@ use awc::{
 };
 use futures::StreamExt;
 use log::*;
+use resalt_config::SConfig;
+use resalt_models::*;
 use rustls::ClientConfig;
 use rustls_native_certs::load_native_certs;
 use serde::Deserialize;

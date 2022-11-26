@@ -1,11 +1,14 @@
-use crate::prelude::*;
 use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
+use resalt_models::*;
+use resalt_storage::StorageImpl;
 use serde::Deserialize;
+
+use crate::{components::*, salt::*};
 
 pub async fn route_keys_get(
     salt: web::Data<SaltAPI>,
-    data: web::Data<Storage>,
+    data: web::Data<Box<dyn StorageImpl>>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
     let ext = req.extensions_mut();

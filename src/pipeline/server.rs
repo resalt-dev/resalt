@@ -1,6 +1,6 @@
-use super::{Broadcaster, Client};
-use crate::prelude::*;
+use super::{Broadcaster, BroadcasterError, Client};
 use actix_web::web::Data;
+use resalt_models::Minion;
 use serde_json::{json, Value};
 use std::sync::Mutex;
 

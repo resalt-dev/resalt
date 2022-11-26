@@ -1,7 +1,7 @@
 use chrono::*;
 use resalt_models::*;
 
-pub trait Storage {
+pub trait StorageImpl: Copy {
     fn create_user(
         &self,
         username: String,

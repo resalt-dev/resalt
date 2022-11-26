@@ -41,6 +41,7 @@ attribute = "uid"
 lifespan = 86400
 
 [database]
+type = "mysql"
 username = "resalt"
 password = "resalt"
 passwordfile = ""

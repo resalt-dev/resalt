@@ -1,8 +1,9 @@
-use crate::prelude::*;
+use crate::components::*;
 use actix_web::{web, Responder, Result};
 use log::*;
+use resalt_storage::StorageImpl;
 
-pub async fn route_metrics_get(data: web::Data<Storage>) -> Result<impl Responder> {
+pub async fn route_metrics_get(data: web::Data<Box<dyn StorageImpl>>) -> Result<impl Responder> {
     let results = match data.get_metric_results() {
         Ok(results) => results,
         Err(e) => {

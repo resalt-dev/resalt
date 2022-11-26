@@ -1,9 +1,17 @@
-use crate::prelude::*;
 use actix_web::{web, Result};
 use log::*;
+use resalt_config::SConfig;
+use resalt_models::*;
+use resalt_security::verify_password;
+use resalt_storage::StorageImpl;
+
+use crate::components::*;
+use crate::salt::SaltAPI;
+
+use super::LdapHandler;
 
 pub async fn update_token_salt_token(
-    data: &Storage,
+    data: &Box<dyn StorageImpl>,
     salt: &SaltAPI,
     user_id: &str,
     token: &str,
@@ -42,7 +50,7 @@ pub async fn update_token_salt_token(
 }
 
 pub fn validate_auth_token(
-    data: &Storage,
+    data: &Box<dyn StorageImpl>,
     token: &str,
 ) -> Result<Option<AuthStatus>, actix_web::Error> {
     if token.len() < 20 {
@@ -84,7 +92,7 @@ pub fn validate_auth_token(
 }
 
 pub fn auth_login_classic(
-    data: &web::Data<Storage>,
+    data: &web::Data<Box<dyn StorageImpl>>,
     username: &str,
     password: &str,
 ) -> Result<Option<User>, actix_web::Error> {
@@ -118,7 +126,7 @@ pub fn auth_login_classic(
 }
 
 pub async fn auth_login_ldap(
-    data: &web::Data<Storage>,
+    data: &web::Data<Box<dyn StorageImpl>>,
     username: &str,
     password: &str,
 ) -> Result<Option<User>, actix_web::Error> {

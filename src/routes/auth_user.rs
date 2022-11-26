@@ -1,9 +1,11 @@
-use crate::prelude::*;
+use crate::components::*;
 use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
+use resalt_models::AuthStatus;
+use resalt_storage::StorageImpl;
 
 pub async fn route_auth_user_get(
-    data: web::Data<Storage>,
+    data: web::Data<Box<dyn StorageImpl>>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
     let db = data;

@@ -1,7 +1,7 @@
-mod storage;
+mod interface;
 mod util;
 
-pub use storage::*;
+pub use interface::*;
 pub use util::*;
 
 // #[cfg(test)]

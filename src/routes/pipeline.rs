@@ -1,7 +1,8 @@
-use crate::prelude::*;
+use crate::pipeline::PipelineServer;
 use actix_web::{
     http::header, web::Data, HttpMessage, HttpRequest, HttpResponse, Responder, Result,
 };
+use resalt_models::AuthStatus;
 
 pub async fn route_pipeline_get(
     pipeline: Data<PipelineServer>,

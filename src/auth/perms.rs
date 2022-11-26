@@ -1,9 +1,8 @@
-use crate::{
-    models::User,
-    prelude::{api_error_database, Storage},
-};
+use crate::components::*;
 use actix_web::web;
 use log::*;
+use resalt_models::User;
+use resalt_storage::StorageImpl;
 use serde_json::Value;
 
 pub const P_ADMIN_SUPERADMIN: &str = "admin.superadmin";
@@ -12,7 +11,7 @@ pub const P_ADMIN_USER: &str = "admin.user";
 pub const P_USER_PASSWORD: &str = "user.password";
 
 pub fn has_permission(
-    data: &web::Data<Storage>,
+    data: &web::Data<Box<dyn StorageImpl>>,
     user_id: &str,
     permission: &str,
 ) -> Result<bool, actix_web::Error> {
@@ -86,7 +85,7 @@ pub fn evalute_resalt_permission(permissions: &Value, permission: &str) -> bool 
 }
 
 pub fn update_user_permissions_from_groups(
-    data: &web::Data<Storage>,
+    data: &web::Data<Box<dyn StorageImpl>>,
     user: &User,
 ) -> Result<(), actix_web::Error> {
     let groups = match data.list_permission_groups_by_user_id(&user.id) {
@@ -131,7 +130,7 @@ pub fn update_user_permissions_from_groups(
 mod tests {
     use serde_json::from_str;
 
-    use crate::prelude::evalute_resalt_permission;
+    use crate::auth::evalute_resalt_permission;
 
     #[test]
     fn test_evalute_resalt_permission() {

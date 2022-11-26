@@ -9,7 +9,7 @@ use diesel_migrations::EmbeddedMigrations;
 use log::*;
 use rand::Rng;
 use resalt_models::*;
-use resalt_storage::Storage;
+use resalt_storage::StorageImpl;
 use serde_json::{json, Value};
 
 type DbPooledConnection = PooledConnection<ConnectionManager<MysqlConnection>>;
@@ -143,7 +143,7 @@ impl StorageMySQL {
     }
 }
 
-impl Storage for StorageMySQL {
+impl StorageImpl for StorageMySQL {
     /////////////
     /// Users ///
     /////////////

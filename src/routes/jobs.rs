@@ -1,6 +1,8 @@
-use crate::prelude::*;
+use crate::{components::*, salt::*};
 use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
+use resalt_models::*;
+use resalt_storage::StorageImpl;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize)]
@@ -11,7 +13,7 @@ pub struct JobsListGetQuery {
 }
 
 pub async fn route_jobs_get(
-    data: web::Data<Storage>,
+    data: web::Data<Box<dyn StorageImpl>>,
     query: web::Query<JobsListGetQuery>,
 ) -> Result<impl Responder> {
     let sort = query.sort.clone();
@@ -154,7 +156,7 @@ pub struct JobGetResponse {
 }
 
 pub async fn route_job_get(
-    data: web::Data<Storage>,
+    data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<JobGetInfo>,
 ) -> Result<impl Responder> {
     let job = match data.get_job_by_jid(&info.jid) {

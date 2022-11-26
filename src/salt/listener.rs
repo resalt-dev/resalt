@@ -1,8 +1,11 @@
 use super::SaltAPI;
-use crate::prelude::*;
+use crate::pipeline::PipelineServer;
 use futures::{pin_mut, StreamExt};
 use log::*;
 use regex::Regex;
+use resalt_config::SConfig;
+use resalt_models::SaltToken;
+use resalt_storage::StorageImpl;
 use serde_json::Value;
 
 pub const RESALT_SALT_SYSTEM_SERVICE_USERNAME: &str = "$superadmin/svc/resalt$";
@@ -15,11 +18,11 @@ lazy_static::lazy_static! {
 pub struct SaltEventListener {
     api: SaltAPI,
     pipeline: PipelineServer,
-    storage: Storage,
+    storage: Box<dyn StorageImpl>,
 }
 
 impl SaltEventListener {
-    pub fn new(pipeline: PipelineServer, storage: Storage) -> Self {
+    pub fn new(pipeline: PipelineServer, storage: Box<dyn StorageImpl>) -> Self {
         resalt_salt::add(1, 2);
         Self {
             api: SaltAPI::new(),

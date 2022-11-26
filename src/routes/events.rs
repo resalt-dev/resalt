@@ -1,7 +1,9 @@
-use crate::prelude::*;
 use actix_web::{web, Responder, Result};
 use log::*;
+use resalt_storage::StorageImpl;
 use serde::{Deserialize, Serialize};
+
+use crate::components::api_error_database;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct EventsListGetQuery {
@@ -10,7 +12,7 @@ pub struct EventsListGetQuery {
 }
 
 pub async fn route_events_get(
-    data: web::Data<Storage>,
+    data: web::Data<Box<dyn StorageImpl>>,
     query: web::Query<EventsListGetQuery>,
 ) -> Result<impl Responder> {
     let limit = query.limit;

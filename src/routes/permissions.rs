@@ -1,10 +1,15 @@
-use crate::prelude::*;
+use crate::{auth::*, components::*};
 use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
+use resalt_models::*;
+use resalt_storage::StorageImpl;
 use serde::{Deserialize, Deserializer};
 use serde_json::Value;
 
-async fn get_group(data: &web::Data<Storage>, group_id: &String) -> Result<impl Responder> {
+async fn get_group(
+    data: &web::Data<Box<dyn StorageImpl>>,
+    group_id: &String,
+) -> Result<impl Responder> {
     let permission_group = match data.get_permission_group_by_id(group_id) {
         Ok(permission_group) => permission_group,
         Err(e) => {
@@ -35,7 +40,7 @@ pub struct PermissionGroupsListGetQuery {
 }
 /// # Route: /permissions (GET)
 pub async fn route_permissions_get(
-    data: web::Data<Storage>,
+    data: web::Data<Box<dyn StorageImpl>>,
     query: web::Query<PermissionGroupsListGetQuery>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
@@ -80,7 +85,7 @@ pub struct PermissionGroupCreateRequest {
 
 /// # Route: /permissions (POST)
 pub async fn route_permissions_post(
-    data: web::Data<Storage>,
+    data: web::Data<Box<dyn StorageImpl>>,
     input: web::Json<PermissionGroupCreateRequest>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
@@ -126,7 +131,7 @@ pub struct PermissionInfo {
 }
 /// # Route: /permissions/{id} (GET)
 pub async fn route_permission_get(
-    data: web::Data<Storage>,
+    data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<PermissionInfo>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
@@ -151,7 +156,7 @@ pub struct PermissionGroupUpdateRequest {
 }
 /// # Route: /permissions/{id} (PUT)
 pub async fn route_permission_update(
-    data: web::Data<Storage>,
+    data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<PermissionInfo>,
     input: web::Json<PermissionGroupUpdateRequest>,
     req: HttpRequest,
@@ -210,7 +215,7 @@ pub async fn route_permission_update(
 
 /// # Route: /permissions/{id} (DELETE)
 pub async fn route_permission_delete(
-    data: web::Data<Storage>,
+    data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<PermissionInfo>,
     req: HttpRequest,
 ) -> Result<impl Responder> {

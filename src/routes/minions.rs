@@ -1,6 +1,8 @@
-use crate::prelude::*;
+use crate::{components::*, salt::SaltAPI};
 use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
+use resalt_models::*;
+use resalt_storage::StorageImpl;
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -12,7 +14,7 @@ pub struct MinionsListGetQuery {
 }
 
 pub async fn route_minions_get(
-    data: web::Data<Storage>,
+    data: web::Data<Box<dyn StorageImpl>>,
     query: web::Query<MinionsListGetQuery>,
 ) -> Result<impl Responder> {
     let filter = query.filter.clone();
@@ -59,7 +61,7 @@ pub struct MinionGetInfo {
 }
 
 pub async fn route_minion_get(
-    data: web::Data<Storage>,
+    data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<MinionGetInfo>,
 ) -> Result<impl Responder> {
     let minion = match data.get_minion_by_id(&info.id) {
@@ -81,7 +83,7 @@ pub async fn route_minion_get(
 }
 
 pub async fn route_minions_refresh_post(
-    salt: web::Data<SaltAPI>,
+    salt: web::Data<Box<SaltAPI>>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
     let ext = req.extensions_mut();

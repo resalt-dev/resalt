@@ -1,6 +1,9 @@
-use crate::prelude::*;
+use crate::{auth::*, components::*, salt::SaltAPI};
 use actix_web::{web, HttpRequest, Responder, Result};
 use log::*;
+use resalt_config::SConfig;
+use resalt_models::User;
+use resalt_storage::StorageImpl;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Debug)]
@@ -15,7 +18,7 @@ struct LoginResponse {
 }
 
 pub async fn route_auth_login_post(
-    data: web::Data<Storage>,
+    data: web::Data<Box<dyn StorageImpl>>,
     salt: web::Data<SaltAPI>,
     input: web::Json<LoginRequest>,
     req: HttpRequest,

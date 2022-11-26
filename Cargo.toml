@@ -22,7 +22,12 @@ members = [
 
 [dependencies]
 # Own Modules
+resalt_config = { path = "workspace/resalt_config" }
+resalt_models = { path = "workspace/resalt_models" }
 resalt_salt = { path = "workspace/resalt_salt" }
+resalt_security = { path = "workspace/resalt_security" }
+resalt_storage = { path = "workspace/resalt_storage" }
+resalt_storage_mysql = { path = "workspace/resalt_storage_mysql" }
 
 # Web
 actix-web = { version = "4.1.0", features=["compress-gzip"], default-features = false }
@@ -44,7 +49,6 @@ clokwerk = "0.3.5"
 
 # Utils
 chrono = "0.4"
-config = { version = "0.13.1", features = ["toml"],  default-features = false }
 lazy_static = "1.4.0"
 rand = "0.8.5"
 regex = "1.6.0"

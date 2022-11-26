@@ -1,6 +1,9 @@
-use crate::prelude::*;
+use crate::{auth::*, components::*};
 use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
+use resalt_models::AuthStatus;
+use resalt_security::hash_password;
+use resalt_storage::StorageImpl;
 use serde::Deserialize;
 use serde_json::Value;
 
@@ -11,7 +14,7 @@ pub struct UsersListGetQuery {
 }
 
 pub async fn route_users_get(
-    data: web::Data<Storage>,
+    data: web::Data<Box<dyn StorageImpl>>,
     query: web::Query<UsersListGetQuery>,
 ) -> Result<impl Responder> {
     // Pagination
@@ -48,7 +51,7 @@ pub struct UserGetInfo {
 }
 
 pub async fn route_user_get(
-    data: web::Data<Storage>,
+    data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<UserGetInfo>,
 ) -> Result<impl Responder> {
     let user = match data.get_user_by_id(&info.user_id) {
@@ -83,7 +86,7 @@ pub struct UserPostPasswordData {
 }
 
 pub async fn route_user_password_post(
-    data: web::Data<Storage>,
+    data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<UserGetInfo>,
     req: HttpRequest,
     body: web::Json<UserPostPasswordData>,
@@ -142,7 +145,7 @@ pub struct UserPermissionInfo {
 
 /// # Route: /users/{user_id}/permission/{group_id} (PUT)
 pub async fn route_user_permission_post(
-    data: web::Data<Storage>,
+    data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<UserPermissionInfo>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
@@ -213,7 +216,7 @@ pub async fn route_user_permission_post(
 
 /// # Route: /users/{user_id}/permission/{group_id} (DELETE)
 pub async fn route_user_permission_delete(
-    data: web::Data<Storage>,
+    data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<UserPermissionInfo>,
     req: HttpRequest,
 ) -> Result<impl Responder> {

@@ -1,6 +1,8 @@
-use crate::prelude::*;
+use crate::{auth::*, components::*, salt::*};
 use actix_web::{web, HttpResponse, Responder, Result};
 use log::*;
+use resalt_config::SConfig;
+use resalt_storage::StorageImpl;
 use serde::Deserialize;
 use serde_json::Value;
 
@@ -11,7 +13,7 @@ pub struct TokenValidateRequest {
 }
 
 pub async fn route_auth_token_post(
-    data: web::Data<Storage>,
+    data: web::Data<Box<dyn StorageImpl>>,
     input: web::Form<TokenValidateRequest>,
 ) -> Result<impl Responder> {
     let db = data;

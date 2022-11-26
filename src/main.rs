@@ -1,18 +1,41 @@
 use actix_web::{http::header, middleware::*, web, App, HttpServer};
 use log::error;
-use prelude::*;
+use pipeline::PipelineServer;
+use resalt_config::SConfig;
+use resalt_storage::StorageImpl;
+use resalt_storage_mysql::StorageMySQL;
+use routes::*;
+use salt::{SaltAPI, SaltEventListener};
 use tokio::task;
 
 mod auth;
 mod components;
-mod config;
 mod pipeline;
-mod prelude;
 mod routes;
 mod salt;
 mod scheduler;
-mod storage;
 mod update;
+
+async fn init_db() -> Box<dyn StorageImpl> {
+    match SConfig::database_type().to_lowercase().as_str() {
+        "mysql" => {
+            let database_url = format!(
+                "mysql://{}:{}@{}:{}/{}",
+                SConfig::database_username(),
+                SConfig::database_password(),
+                SConfig::database_host(),
+                SConfig::database_port(),
+                SConfig::database_database()
+            );
+            Box::new(
+                StorageMySQL::connect(&database_url)
+                    .await
+                    .unwrap_or_else(|_| panic!("Error connecting to {}", &database_url)),
+            )
+        }
+        _ => todo!(),
+    }
+}
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
@@ -22,10 +45,7 @@ async fn main() -> std::io::Result<()> {
     let pipeline = PipelineServer::new();
 
     // Database
-    let database_url = SConfig::database_url();
-    let db = Storage::connect(&database_url)
-        .await
-        .unwrap_or_else(|_| panic!("Error connecting to {}", &database_url));
+    let db: Box<dyn StorageImpl> = init_db().await;
 
     // Salt WebSocket
     let salt_listener_pipeline = pipeline.clone();
@@ -52,7 +72,7 @@ async fn main() -> std::io::Result<()> {
 
         App::new()
             .app_data(web::Data::new(pipeline.clone()))
-            .app_data(web::Data::new(db.clone()))
+            .app_data(web::Data::new(db))
             .app_data(web::Data::new(salt_api.clone()))
             .app_data(web::Data::new(scheduler.clone()))
             // Prevent sniffing of content type
@@ -63,7 +83,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
             .service(
                 web::scope("/api/1")
-                    .wrap(auth::ValidateAuth::new(db.clone(), salt_api.clone()))
+                    .wrap(auth::ValidateAuth::new(db, salt_api.clone()))
                     .route("/", web::get().to(route_index_get))
                     .route("/config", web::get().to(route_config_get))
                     // auth
