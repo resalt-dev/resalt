@@ -1,7 +1,9 @@
 use chrono::*;
 use resalt_models::*;
 
-pub trait StorageImpl: Copy {
+pub trait StorageImpl: Send {
+    fn clone(&self) -> Box<dyn StorageImpl>;
+
     fn create_user(
         &self,
         username: String,

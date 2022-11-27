@@ -144,6 +144,10 @@ impl StorageMySQL {
 }
 
 impl StorageImpl for StorageMySQL {
+    fn clone(&self) -> Box<dyn StorageImpl> {
+        Box::new(Clone::clone(self))
+    }
+
     /////////////
     /// Users ///
     /////////////

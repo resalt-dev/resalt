@@ -2,7 +2,7 @@ use actix_web::{http::header, middleware::*, web, App, HttpServer};
 use log::error;
 use pipeline::PipelineServer;
 use resalt_config::SConfig;
-use resalt_storage::StorageImpl;
+use resalt_storage::{StorageCloneWrapper, StorageImpl};
 use resalt_storage_mysql::StorageMySQL;
 use routes::*;
 use salt::{SaltAPI, SaltEventListener};
@@ -66,13 +66,16 @@ async fn main() -> std::io::Result<()> {
     scheduler.add_system_jobs();
     scheduler.start();
 
+    let db_clone_wrapper = StorageCloneWrapper {
+        storage: db.clone(),
+    };
     HttpServer::new(move || {
         // Salt API
         let salt_api = SaltAPI::new();
 
         App::new()
             .app_data(web::Data::new(pipeline.clone()))
-            .app_data(web::Data::new(db))
+            .app_data(web::Data::new(db_clone_wrapper.clone().storage))
             .app_data(web::Data::new(salt_api.clone()))
             .app_data(web::Data::new(scheduler.clone()))
             // Prevent sniffing of content type
@@ -83,7 +86,10 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
             .service(
                 web::scope("/api/1")
-                    .wrap(auth::ValidateAuth::new(db, salt_api.clone()))
+                    .wrap(auth::ValidateAuth::new(
+                        db_clone_wrapper.clone().storage,
+                        salt_api.clone(),
+                    ))
                     .route("/", web::get().to(route_index_get))
                     .route("/config", web::get().to(route_config_get))
                     // auth
