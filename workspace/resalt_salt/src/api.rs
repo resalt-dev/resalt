@@ -12,11 +12,7 @@ use rustls::ClientConfig;
 use rustls_native_certs::load_native_certs;
 use serde::Deserialize;
 use serde_json::{json, Value};
-use std::{
-    collections::HashMap,
-    sync::{Arc, Mutex},
-    time::Duration,
-};
+use std::{collections::HashMap, sync::Arc, time::Duration};
 
 const X_AUTH_TOKEN: &str = "X-Auth-Token";
 
