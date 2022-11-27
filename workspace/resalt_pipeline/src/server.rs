@@ -38,6 +38,7 @@ impl PipelineServer {
         self.broadcaster.lock().unwrap().send(&packet.to_string());
     }
 
+    #[allow(dead_code)]
     fn send_to(&self, user_id: &str, name: &str, value: Value) -> Result<(), BroadcasterError> {
         let packet = json!({
             "type": name,
