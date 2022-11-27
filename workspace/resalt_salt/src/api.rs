@@ -1,8 +1,8 @@
 use actix_web::http::StatusCode;
 use async_stream::stream;
 use awc::{
-    error::{JsonPayloadError, SendRequestError},
-    *,
+    error::{JsonPayloadError, PayloadError, SendRequestError},
+    ClientResponse, Connector,
 };
 use futures::StreamExt;
 use log::*;
@@ -36,7 +36,7 @@ pub enum SaltError {
                     std::pin::Pin<
                         Box<
                             dyn futures_core::Stream<
-                                Item = Result<actix_web::web::Bytes, error::PayloadError>,
+                                Item = Result<actix_web::web::Bytes, PayloadError>,
                             >,
                         >,
                     >,
