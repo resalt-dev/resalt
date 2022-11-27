@@ -15,6 +15,7 @@ use serde_json::{json, Value};
 use std::{
     collections::HashMap,
     sync::{Arc, Mutex},
+    time::Duration,
 };
 
 const X_AUTH_TOKEN: &str = "X-Auth-Token";
@@ -192,22 +193,27 @@ lazy_static::lazy_static! {
     };
 }
 
+pub fn create_awc_client() -> awc::Client {
+    awc::Client::builder()
+        .connector(
+            Connector::new()
+                .rustls(Arc::new(AWC_CONFIG.to_owned()))
+                .timeout(Duration::from_secs(3)), // Connector timeout, 3 seconds
+        )
+        .timeout(Duration::from_secs(60 * 20)) // Request timeout, 20 minutes
+        .finish()
+}
+
 #[derive(Clone)]
 pub struct SaltAPI {
-    client: Arc<Mutex<awc::Client>>,
+    client: Arc<awc::Client>,
 }
 
 impl SaltAPI {
-    pub fn create_awc_client() -> awc::Client {
-        awc::Client::builder()
-            .connector(Connector::new().rustls(Arc::new(AWC_CONFIG.to_owned())))
-            .finish()
-    }
-
     pub fn new() -> Self {
         Self {
             //client: Client::default(),
-            client: Arc::new(Mutex::new(SaltAPI::create_awc_client())),
+            client: Arc::new(create_awc_client()),
         }
     }
 
@@ -217,8 +223,6 @@ impl SaltAPI {
         // This will contact us back on the /token endpoint to validate auth token
         let mut res = match self
             .client
-            .lock()
-            .unwrap()
             .post(url)
             .send_json(&serde_json::json!({
                 "eauth": "rest",
@@ -297,7 +301,7 @@ impl SaltAPI {
             salt_token.token.clone()
         );
 
-        let client = self.client.lock().unwrap().clone();
+        let client = self.client.clone();
         stream! {
             debug!("Connecting to SSE stream: {}", &url);
             let mut stream = client
@@ -436,8 +440,6 @@ impl SaltAPI {
 
         let mut res = match self
             .client
-            .lock()
-            .unwrap()
             .post(url)
             .append_header((X_AUTH_TOKEN, salt_token.token.clone()))
             .send_json(&data)
