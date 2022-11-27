@@ -1,4 +1,5 @@
 use super::SaltAPI;
+use chrono::NaiveDateTime;
 use futures::{pin_mut, StreamExt};
 use log::*;
 use regex::Regex;
@@ -14,6 +15,8 @@ lazy_static::lazy_static! {
     static ref REGEX_JOB_NEW: Regex = Regex::new("salt/job/([0-9]+)/new").unwrap();
     static ref REGEX_JOB_RETURN: Regex = Regex::new("salt/job/([0-9]+)/ret/(.+)").unwrap();
 }
+
+const TIME_FMT: &str = "%Y-%m-%dT%H:%M:%S.%f";
 
 pub struct SaltEventListener {
     api: SaltAPI,
@@ -62,13 +65,49 @@ impl SaltEventListener {
         while let Some(event) = stream.next().await {
             debug!("{:?}", event);
 
-            // Unwrap string to JSON structure
-            let data: Value = serde_json::from_str(&event.data).unwrap();
-            let data = data.get("data").unwrap().as_object().unwrap();
+            // Unpack string to JSON structure
+            let data: Value = match serde_json::from_str(&event.data) {
+                Ok(data) => data,
+                Err(err) => {
+                    error!("Failed to parse event data: {:?}", err);
+                    continue;
+                }
+            };
+            let data = match data.get("data") {
+                Some(data) => data,
+                None => {
+                    error!("Failed to get data from event data");
+                    continue;
+                }
+            };
+            let data = match data.as_object() {
+                Some(data) => data,
+                None => {
+                    error!("Failed to get data as object");
+                    continue;
+                }
+            };
 
             // Unpack timestamp
-            let time = data["_stamp"].as_str().unwrap();
-            let time = chrono::NaiveDateTime::parse_from_str(time, "%Y-%m-%dT%H:%M:%S.%f").unwrap();
+            let time = match data.get("_stamp") {
+                Some(time) => match time.as_str() {
+                    Some(time) => match NaiveDateTime::parse_from_str(time, TIME_FMT) {
+                        Ok(time) => time,
+                        Err(err) => {
+                            error!("Failed to parse timestamp: {:?}", err);
+                            continue;
+                        }
+                    },
+                    None => {
+                        error!("Failed to get timestamp from event data");
+                        continue;
+                    }
+                },
+                None => {
+                    error!("Failed to get timestamp from event data");
+                    continue;
+                }
+            };
 
             // Insert event into database
             let event_id = match self
@@ -85,8 +124,20 @@ impl SaltEventListener {
             // Check tag type
             if let Some(capture) = REGEX_JOB_NEW.captures(&event.tag) {
                 // Assumed always present
-                let jid = capture.get(1).unwrap().as_str().to_string();
-                let user = data["user"].as_str().map(|s| s.to_string());
+                let jid = match capture.get(1) {
+                    Some(jid) => jid.as_str().to_string(),
+                    None => {
+                        error!("Failed to get JID from event tag");
+                        continue;
+                    }
+                };
+                let user = match data.get("user") {
+                    Some(user) => user.as_str().map(|s| s.to_string()),
+                    None => {
+                        error!("Failed to get user from event data");
+                        continue;
+                    }
+                };
 
                 // Insert job into database
                 match self.storage.insert_job(jid, user, Some(event_id), time) {
@@ -95,10 +146,46 @@ impl SaltEventListener {
                 }
             } else if let Some(capture) = REGEX_JOB_RETURN.captures(&event.tag) {
                 // Assumed always present
-                let jid = capture.get(1).unwrap().as_str().to_string();
-                let minion_id = capture.get(2).unwrap().as_str().to_string();
-                let fun = data["fun"].as_str().unwrap();
-                let fun_args = data["fun_args"].as_array().unwrap();
+                let jid = match capture.get(1) {
+                    Some(jid) => jid.as_str().to_string(),
+                    None => {
+                        error!("Failed to get JID from event tag");
+                        continue;
+                    }
+                };
+                let minion_id = match capture.get(2) {
+                    Some(minion_id) => minion_id.as_str().to_string(),
+                    None => {
+                        error!("Failed to get minion ID from event tag");
+                        continue;
+                    }
+                };
+                let fun = match data.get("fun") {
+                    Some(fun) => match fun.as_str() {
+                        Some(fun) => fun,
+                        None => {
+                            error!("Failed to get function from event data");
+                            continue;
+                        }
+                    },
+                    None => {
+                        error!("Failed to get function from event data");
+                        continue;
+                    }
+                };
+                let fun_args = match data.get("fun_args") {
+                    Some(fun_args) => match fun_args.as_array() {
+                        Some(fun_args) => fun_args,
+                        None => {
+                            error!("Failed to get function arguments from event data");
+                            continue;
+                        }
+                    },
+                    None => {
+                        error!("Failed to get function arguments from event data");
+                        continue;
+                    }
+                };
 
                 // Insert job return into database
                 match self.storage.get_job_by_jid(&jid) {
@@ -126,9 +213,38 @@ impl SaltEventListener {
                 debug!("salt event job fun: {:?}", fun);
                 match fun {
                     "grains.items" => {
-                        let minion_id = data["id"].as_str().unwrap().to_string();
-                        let grains = data.get("return").unwrap().as_object().unwrap();
-                        let grains = serde_json::to_string(grains).unwrap();
+                        let minion_id = match data.get("id") {
+                            Some(minion_id) => match minion_id.as_str() {
+                                Some(minion_id) => minion_id.to_string(),
+                                None => {
+                                    error!("Failed to get minion ID from event data");
+                                    continue;
+                                }
+                            },
+                            None => {
+                                error!("Failed to get minion ID from event data");
+                                continue;
+                            }
+                        };
+                        let grains = match data.get("return") {
+                            Some(grains) => match grains.as_object() {
+                                Some(grains) => match serde_json::to_string(grains) {
+                                    Ok(grains) => grains,
+                                    Err(err) => {
+                                        error!("Failed to serialize grains: {:?}", err);
+                                        continue;
+                                    }
+                                },
+                                None => {
+                                    error!("Failed to get grains from event data");
+                                    continue;
+                                }
+                            },
+                            None => {
+                                error!("Failed to get grains from event data");
+                                continue;
+                            }
+                        };
                         match self
                             .storage
                             .update_minion_grains(minion_id.clone(), time, grains)
@@ -140,9 +256,38 @@ impl SaltEventListener {
                         }
                     }
                     "pillar.items" => {
-                        let minion_id = data["id"].as_str().unwrap().to_string();
-                        let pillar = data.get("return").unwrap().as_object().unwrap();
-                        let pillar = serde_json::to_string(pillar).unwrap();
+                        let minion_id = match data.get("id") {
+                            Some(minion_id) => match minion_id.as_str() {
+                                Some(minion_id) => minion_id.to_string(),
+                                None => {
+                                    error!("Failed to get minion ID from event data");
+                                    continue;
+                                }
+                            },
+                            None => {
+                                error!("Failed to get minion ID from event data");
+                                continue;
+                            }
+                        };
+                        let pillar = match data.get("return") {
+                            Some(pillar) => match pillar.as_object() {
+                                Some(pillar) => match serde_json::to_string(pillar) {
+                                    Ok(pillar) => pillar,
+                                    Err(err) => {
+                                        error!("Failed to serialize pillar: {:?}", err);
+                                        continue;
+                                    }
+                                },
+                                None => {
+                                    error!("Failed to get pillar from event data");
+                                    continue;
+                                }
+                            },
+                            None => {
+                                error!("Failed to get pillar from event data");
+                                continue;
+                            }
+                        };
                         match self
                             .storage
                             .update_minion_pillars(minion_id.clone(), time, pillar)
@@ -154,9 +299,38 @@ impl SaltEventListener {
                         }
                     }
                     "pkg.list_pkgs" => {
-                        let minion_id = data["id"].as_str().unwrap().to_string();
-                        let pkgs = data.get("return").unwrap().as_object().unwrap();
-                        let pkgs = serde_json::to_string(pkgs).unwrap();
+                        let minion_id = match data.get("id") {
+                            Some(minion_id) => match minion_id.as_str() {
+                                Some(minion_id) => minion_id.to_string(),
+                                None => {
+                                    error!("Failed to get minion ID from event data");
+                                    continue;
+                                }
+                            },
+                            None => {
+                                error!("Failed to get minion ID from event data");
+                                continue;
+                            }
+                        };
+                        let pkgs = match data.get("return") {
+                            Some(pkgs) => match pkgs.as_object() {
+                                Some(pkgs) => match serde_json::to_string(pkgs) {
+                                    Ok(pkgs) => pkgs,
+                                    Err(err) => {
+                                        error!("Failed to serialize pkgs: {:?}", err);
+                                        continue;
+                                    }
+                                },
+                                None => {
+                                    error!("Failed to get pkgs from event data");
+                                    continue;
+                                }
+                            },
+                            None => {
+                                error!("Failed to get pkgs from event data");
+                                continue;
+                            }
+                        };
                         match self
                             .storage
                             .update_minion_pkgs(minion_id.clone(), time, pkgs)
@@ -170,52 +344,132 @@ impl SaltEventListener {
                     "state.apply" | "state.highstate" => {
                         // Check if empty args, or if empty args but test=True is only argument.
                         // If so, then we can assume this is a highstate run.
-                        let is_highstate = fun_args.is_empty()
-                            || (fun_args.len() == 1
-                                && ((fun_args[0].is_string()
-                                    && fun_args[0].as_str().unwrap() == "test=True")
-                                    || (fun_args[0].is_object()
-                                        && fun_args[0]
-                                            .as_object()
-                                            .unwrap()
-                                            .get("test")
-                                            .unwrap()
-                                            .as_str()
-                                            .unwrap()
-                                            .to_lowercase()
-                                            == "true")));
+                        let only_arg_is_test_true = match fun_args.get(0) {
+                            Some(arg) => match arg.is_string() {
+                                // If the arg is a string, check if it's test=True
+                                true => match arg.as_str() {
+                                    Some(arg) => arg.to_lowercase() == "test=true",
+                                    None => false,
+                                },
+                                // If the arg is an object, check if it's test: True
+                                false => match arg.is_object() {
+                                    true => match arg.get("test") {
+                                        // Value can be both string or bool
+                                        Some(test) => match test.is_string() {
+                                            true => match test.as_str() {
+                                                Some(test) => test.to_lowercase() == "true",
+                                                None => false,
+                                            },
+                                            false => match test.is_boolean() {
+                                                true => match test.as_bool() {
+                                                    Some(test) => test,
+                                                    None => false,
+                                                },
+                                                false => false,
+                                            },
+                                        },
+                                        None => false,
+                                    },
+                                    false => false,
+                                },
+                            },
+                            None => false,
+                        };
+                        let no_args = fun_args.is_empty();
+                        let is_highstate = no_args || only_arg_is_test_true;
                         if !is_highstate {
                             continue;
                         }
-                        let retcode = data["retcode"].as_i64().unwrap();
+                        let retcode = match data.get("retcode") {
+                            Some(retcode) => match retcode.as_i64() {
+                                Some(retcode) => retcode,
+                                None => {
+                                    error!("Failed to get retcode from event data");
+                                    continue;
+                                }
+                            },
+                            None => {
+                                error!("Failed to get retcode from event data");
+                                continue;
+                            }
+                        };
                         if retcode == 1 {
                             continue;
                         }
 
-                        let minion_id = data["id"].as_str().unwrap().to_string();
+                        let minion_id = match data.get("id") {
+                            Some(minion_id) => match minion_id.as_str() {
+                                Some(minion_id) => minion_id.to_string(),
+                                None => {
+                                    error!("Failed to get minion ID from event data");
+                                    continue;
+                                }
+                            },
+                            None => {
+                                error!("Failed to get minion ID from event data");
+                                continue;
+                            }
+                        };
 
                         // Loop over return's and count success/incorrect/error
                         let mut success = 0;
                         let mut incorrect = 0;
                         let mut error = 0;
 
-                        let ret = data.get("return").unwrap().as_object().unwrap();
+                        let ret = match data.get("return") {
+                            Some(ret) => match ret.as_object() {
+                                Some(ret) => ret,
+                                None => {
+                                    error!("Failed to get return from event data");
+                                    continue;
+                                }
+                            },
+                            None => {
+                                error!("Failed to get return from event data");
+                                continue;
+                            }
+                        };
                         for item in ret.values() {
                             let item = match item.as_object() {
                                 Some(item) => item,
                                 None => continue,
                             };
-                            match item.get("result").unwrap().as_bool() {
-                                Some(true) => success += 1,
-                                Some(false) => error += 1,
-                                None => incorrect += 1, // test=True mode, result will be Null
-                            };
+                            match item.get("result") {
+                                Some(result) => match result.as_bool() {
+                                    Some(true) => success += 1,
+                                    Some(false) => error += 1,
+                                    None => incorrect += 1, // test=True mode, result will be Null
+                                },
+                                None => {
+                                    error!("Failed to get result from event data");
+                                    continue;
+                                }
+                            }
                         }
 
+                        let confirmity: String = match data.get("return") {
+                            Some(confirmity) => match confirmity.as_object() {
+                                Some(confirmity) => match serde_json::to_string(confirmity) {
+                                    Ok(confirmity) => confirmity,
+                                    Err(err) => {
+                                        error!("Failed to serialize confirmity: {:?}", err);
+                                        continue;
+                                    }
+                                },
+                                None => {
+                                    error!("Failed to get confirmity from event data");
+                                    continue;
+                                }
+                            },
+                            None => {
+                                error!("Failed to get confirmity from event data");
+                                continue;
+                            }
+                        };
                         match self.storage.update_minion_conformity(
                             minion_id.clone(),
                             time,
-                            data.get("return").unwrap().to_string(),
+                            confirmity,
                             success,
                             incorrect,
                             error,
@@ -229,12 +483,36 @@ impl SaltEventListener {
                     _ => {}
                 }
             } else if event.tag == "salt/auth" {
-                let result = data.get("result").unwrap().as_bool().unwrap();
+                let result = match data.get("result") {
+                    Some(result) => match result.as_bool() {
+                        Some(result) => result,
+                        None => {
+                            error!("Failed to get result from event data");
+                            continue;
+                        }
+                    },
+                    None => {
+                        error!("Failed to get result from event data");
+                        continue;
+                    }
+                };
                 if !result {
                     continue;
                 }
 
-                let minion_id = data["id"].as_str().unwrap().to_string();
+                let minion_id = match data.get("id") {
+                    Some(minion_id) => match minion_id.as_str() {
+                        Some(minion_id) => minion_id.to_string(),
+                        None => {
+                            error!("Failed to get minion ID from event data");
+                            continue;
+                        }
+                    },
+                    None => {
+                        error!("Failed to get minion ID from event data");
+                        continue;
+                    }
+                };
                 match self.storage.update_minion_last_seen(minion_id, time) {
                     Ok(_) => {}
                     Err(e) => error!("Failed updating minion last seen {:?}", e),
