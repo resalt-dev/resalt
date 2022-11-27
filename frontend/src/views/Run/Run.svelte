@@ -27,6 +27,15 @@
             data: { returns },
         },
     ];
+
+    function formatKwargPrint(kwarg: any) {
+        let value = JSON.stringify(Object.fromEntries(kwarg));
+        if (value.length > 0) {
+            return ' ' + value;
+        } else {
+            return '';
+        }
+    }
 </script>
 
 <h1>Run</h1>
@@ -43,7 +52,12 @@
         >
             <span>Result : </span>
             ({ret.command.targetType}) {ret.command.target}
-            <small class="text-muted">({ret.command.fun})</small>
+            <small class="text-muted">
+                ({ret.command.fun}
+                {ret.command.arg
+                    .map((s) => (s.indexOf(' ') > -1 ? `"${s}"` : s))
+                    .join(' ')}{formatKwargPrint(ret.command.kwarg)})
+            </small>
             <small class="float-end text-muted pt-1">
                 # {ret.num + 1}
             </small>

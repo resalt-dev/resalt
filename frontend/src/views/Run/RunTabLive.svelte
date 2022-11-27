@@ -313,7 +313,7 @@
             <br />
             Function: <b>{command.fun}</b>
             <br />
-            Arguments: <b>{JSON.stringify(command.arg)}</b>
+            Arguments: <b>{command.arg.join(', ')}</b>
             <br />
             Keyword Arguments:
             <pre class="fw-bold d-inline"><b
