@@ -1,18 +1,16 @@
 use actix_web::{http::header, middleware::*, web, App, HttpServer};
 use log::error;
-use pipeline::PipelineServer;
 use resalt_config::SConfig;
+use resalt_pipeline::PipelineServer;
+use resalt_salt::{SaltAPI, SaltEventListener};
 use resalt_storage::{StorageCloneWrapper, StorageImpl};
 use resalt_storage_mysql::StorageMySQL;
 use routes::*;
-use salt::{SaltAPI, SaltEventListener};
 use tokio::task;
 
 mod auth;
 mod components;
-mod pipeline;
 mod routes;
-mod salt;
 mod scheduler;
 mod update;
 

@@ -1,10 +1,11 @@
 use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 use resalt_models::*;
+use resalt_salt::{SaltAPI, SaltKeyState};
 use resalt_storage::StorageImpl;
 use serde::Deserialize;
 
-use crate::{components::*, salt::*};
+use crate::components::*;
 
 pub async fn route_keys_get(
     salt: web::Data<SaltAPI>,

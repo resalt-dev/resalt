@@ -1,10 +1,10 @@
 use super::SaltAPI;
-use crate::pipeline::PipelineServer;
 use futures::{pin_mut, StreamExt};
 use log::*;
 use regex::Regex;
 use resalt_config::SConfig;
 use resalt_models::SaltToken;
+use resalt_pipeline::PipelineServer;
 use resalt_storage::StorageImpl;
 use serde_json::Value;
 
@@ -23,7 +23,6 @@ pub struct SaltEventListener {
 
 impl SaltEventListener {
     pub fn new(pipeline: PipelineServer, storage: Box<dyn StorageImpl>) -> Self {
-        resalt_salt::add(1, 2);
         Self {
             api: SaltAPI::new(),
             pipeline,

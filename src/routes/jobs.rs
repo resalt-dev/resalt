@@ -1,7 +1,8 @@
-use crate::{components::*, salt::*};
+use crate::components::*;
 use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 use resalt_models::*;
+use resalt_salt::*;
 use resalt_storage::StorageImpl;
 use serde::{Deserialize, Serialize};
 

@@ -1,4 +1,4 @@
-use crate::{auth::update_token_salt_token, components::api_error_unauthorized, salt::SaltAPI};
+use crate::{auth::update_token_salt_token, components::api_error_unauthorized};
 use actix_web::{
     dev::{forward_ready, Service, ServiceRequest, ServiceResponse, Transform},
     web::Query,
@@ -7,6 +7,7 @@ use actix_web::{
 use futures::future::{ok, Future, Ready};
 use log::*;
 use resalt_models::AuthStatus;
+use resalt_salt::SaltAPI;
 use resalt_storage::StorageImpl;
 use std::rc::Rc;
 use std::{collections::HashMap, pin::Pin};

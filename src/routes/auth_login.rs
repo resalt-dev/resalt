@@ -1,8 +1,9 @@
-use crate::{auth::*, components::*, salt::SaltAPI};
+use crate::{auth::*, components::*};
 use actix_web::{web, HttpRequest, Responder, Result};
 use log::*;
 use resalt_config::SConfig;
 use resalt_models::User;
+use resalt_salt::SaltAPI;
 use resalt_storage::StorageImpl;
 use serde::{Deserialize, Serialize};
 

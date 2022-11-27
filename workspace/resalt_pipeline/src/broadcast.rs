@@ -1,5 +1,5 @@
 //
-// MODIFIED VERSION OF
+// VERY MODIFIED VERSION OF
 // https://github.com/upbasedev/sse-actix-web/blob/89c876580071231cc3fde19918fd055c0ed6c0ac/src/lib.rs
 //
 // MIT License, upbasedev / sse-actix-web

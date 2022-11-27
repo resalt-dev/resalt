@@ -2,11 +2,11 @@ use actix_web::{web, Result};
 use log::*;
 use resalt_config::SConfig;
 use resalt_models::*;
+use resalt_salt::SaltAPI;
 use resalt_security::verify_password;
 use resalt_storage::StorageImpl;
 
 use crate::components::*;
-use crate::salt::SaltAPI;
 
 use super::LdapHandler;
 

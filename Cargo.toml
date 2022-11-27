@@ -24,6 +24,7 @@ members = [
 # Own Modules
 resalt_config = { path = "workspace/resalt_config" }
 resalt_models = { path = "workspace/resalt_models" }
+resalt_pipeline = { path = "workspace/resalt_pipeline" }
 resalt_salt = { path = "workspace/resalt_salt" }
 resalt_security = { path = "workspace/resalt_security" }
 resalt_storage = { path = "workspace/resalt_storage" }
@@ -57,7 +58,6 @@ include_dir = "0.7.2"
 
 # TLS
 rustls = "0.20.6"
-rustls-native-certs = "0.6.2"
 
 # Parsing
 serde = { version = "1.0.139", features = ["derive"] }
