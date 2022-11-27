@@ -21,4 +21,4 @@ EXPOSE 8000
 WORKDIR /usr/src/app
 
 # Remember to mount source code to the container as volume!
-CMD cargo watch --poll -w src -x "+nightly -Z sparse-registry run"
+CMD cargo watch --poll -w src -w workspace -x "+nightly -Z sparse-registry run"
