@@ -84,7 +84,7 @@ pub async fn route_minion_get(
 }
 
 pub async fn route_minions_refresh_post(
-    salt: web::Data<Box<SaltAPI>>,
+    salt: web::Data<SaltAPI>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
     let ext = req.extensions_mut();
