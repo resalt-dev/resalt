@@ -19,7 +19,7 @@
     import { MessageType } from '../../models/MessageType';
     import type { Writable } from 'svelte/store';
 
-    export let returns: Writable<any[]>;
+    export let returns: Writable<RunResult[]>;
 
     let runConfirmDialog = false;
 

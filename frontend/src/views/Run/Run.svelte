@@ -8,6 +8,7 @@
     import type TabPage from '../../models/TabPage';
 
     import RunTabLive from './RunTabLive.svelte';
+    import type RunResult from '../../models/RunResult';
 
     // svelte-ignore unused-export-let
     export let location: Location;
@@ -15,7 +16,7 @@
     export let navigate: NavigateFn;
     export let subPage: string = '';
 
-    let returns: Writable<any[]> = writable([]);
+    let returns: Writable<RunResult[]> = writable([]);
     let collapsed: Writable<number[]> = writable([]);
 
     let tabs: TabPage[] = [];
