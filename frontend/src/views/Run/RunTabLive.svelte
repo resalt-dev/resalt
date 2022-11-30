@@ -10,6 +10,7 @@
         ModalFooter,
         ModalHeader,
         Row,
+        Table,
     } from 'sveltestrap';
     import { quoteSplit } from '../../utils';
     import { theme, toasts } from '../../stores';
@@ -18,6 +19,7 @@
     import RunCommand from '../../models/RunCommand';
     import { MessageType } from '../../models/MessageType';
     import type { Writable } from 'svelte/store';
+    import CopyButton from '../../components/CopyButton.svelte';
 
     export let returns: Writable<RunResult[]>;
 
@@ -32,9 +34,8 @@
     let runAsync = false;
     let runBatch = false;
     let runBatchSize = '';
-    let runTimeout = null;
 
-    // Pre-comupted before showing the confirmation modal.
+    // Pre-computed before showing the confirmation modal.
     let command: RunCommand = null;
 
     function formSaveTemplate() {}
@@ -101,7 +102,6 @@
             arg,
             kwarg,
             runBatchSize,
-            runTimeout,
         );
 
         // Show confirm dialog
@@ -121,7 +121,6 @@
             command.arg,
             command.kwarg,
             command.batchSize,
-            command.timeout,
         )
             .then((result) => {
                 console.log(result);
@@ -187,20 +186,6 @@
             <FormGroup floating={true}>
                 <Input id="batchSize" type="text" bind:value={runBatchSize} />
                 <Label for="batchSize">Batch Size</Label>
-            </FormGroup>
-        {/if}
-    </Col>
-    <Col
-        class="ps-3 mb-0"
-        md="3"
-        lg={{ size: 3, offset: 1 }}
-        xl={{ size: 2, offset: 1 }}
-        xxl={{ size: 2, offset: 1 }}
-    >
-        {#if runClientType === 'local' && (runBatch || (!runBatch && !runAsync))}
-            <FormGroup floating={true}>
-                <Input id="timeout" type="number" bind:value={runTimeout} />
-                <Label for="timeout">Timeout</Label>
             </FormGroup>
         {/if}
     </Col>
@@ -302,37 +287,72 @@
             Live-Run Execution
         </ModalHeader>
         <ModalBody>
-            You are about to execute the following job:
+            The following command is about to be executed:
             <br />
             <br />
-            Client Type: <b>{command.client}</b>
+
+            <!-- Summarize what is about to be run -->
+            <Table>
+                <tbody>
+                    <tr>
+                        <th style="width: 50%">Client Type</th>
+                        <td>{runClientType}</td>
+                    </tr>
+                    {#if runClientType === 'local'}
+                        <tr>
+                            <th>Target Type</th>
+                            <td>{runTargetType}</td>
+                        </tr>
+                        <tr>
+                            <th>Target</th>
+                            <td>{runTarget}</td>
+                        </tr>
+                    {/if}
+                    <tr>
+                        <th>Function</th>
+                        <td>{runFunction}</td>
+                    </tr>
+                    <tr>
+                        <th>Arguments</th>
+                        <td>{runArguments}</td>
+                    </tr>
+                    <tr>
+                        <th>Keyword Arguments</th>
+                        <td>{runKeywordArguments}</td>
+                    </tr>
+                    <tr>
+                        <th>Async</th>
+                        <td>{runAsync}</td>
+                    </tr>
+                    {#if runClientType === 'local'}
+                        <tr>
+                            <th>Batch</th>
+                            <td
+                                >{runBatch}
+                                {#if runBatch}({runBatchSize}){/if}</td
+                            >
+                        </tr>
+                    {/if}
+                </tbody>
+            </Table>
+
             <br />
-            Target Type: <b>{command.targetType}</b>
+            Command-line equivalent:<br />
             <br />
-            Target: <b>{command.target}</b>
+
+            <!-- Generate the command-line equivalent -->
+            <code>{command.toCommandLine()}</code>
+
             <br />
-            Function: <b>{command.fun}</b>
             <br />
-            Arguments: <b>{command.arg.join(', ')}</b>
             <br />
-            Keyword Arguments:
-            <pre class="fw-bold d-inline"><b
-                    >{JSON.stringify(
-                        Object.fromEntries(command.kwarg),
-                        null,
-                        2,
-                    )}</b
-                ></pre>
-            <br />
-            Timeout:{' '}<b
-                >{command.timeout == null ? 'none' : command.timeout}</b
-            >
-            <br />
+
+            <div class="text-center">
+                <Button color="warning" on:click={closeRunNowDialog}
+                    >Cancel</Button
+                >
+                <Button color="danger" on:click={executeRunNow}>Execute</Button>
+            </div>
         </ModalBody>
-        <ModalFooter>
-            <Button color="warning" on:click={executeRunNow}>Run Now</Button>
-            <Button color="secondary" on:click={closeRunNowDialog}>Close</Button
-            >
-        </ModalFooter>
     </Modal>
 </div>

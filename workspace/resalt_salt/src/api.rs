@@ -494,7 +494,6 @@ impl SaltAPI {
         tgt: S,
         fun: S,
         arg: Option<Vec<SV>>,
-        timeout: Option<u64>,
         tgt_type: Option<SaltTgtType>,
         kwarg: Option<Dictionary>,
     ) -> Result<Value, SaltError> {
@@ -510,7 +509,6 @@ impl SaltAPI {
                 }
                 args
             }).unwrap_or(vec![]),
-            "timeout": timeout,
             "tgt_type": (tgt_type.unwrap_or_default()).to_string(),
             "kwarg": kwarg.unwrap_or_default(),
         });

@@ -237,7 +237,6 @@ export async function runJob(
     arg: Array<string>,
     kwarg: Map<string, string>,
     batchSize: string,
-    timeout: number,
 ): Promise<any> {
     return sendAuthenticatedRequest('POST', '/jobs', {
         client,
@@ -247,7 +246,6 @@ export async function runJob(
         arg,
         kwarg,
         batchSize,
-        timeout,
     });
 }
 

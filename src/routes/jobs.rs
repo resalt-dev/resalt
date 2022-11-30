@@ -43,7 +43,6 @@ pub struct JobRunRequest {
     kwarg: Dictionary,
     #[serde(rename = "batchSize")]
     batch_size: String,
-    timeout: Option<u64>,
 }
 
 pub async fn route_jobs_post(
@@ -69,7 +68,6 @@ pub async fn route_jobs_post(
                 input.tgt.clone(),
                 input.fun.clone(),
                 Some(input.arg.clone().into_iter().map(|a| SV::S(a)).collect()),
-                input.timeout,
                 Some(input.tgt_type.clone()),
                 Some(input.kwarg.clone()),
             )
