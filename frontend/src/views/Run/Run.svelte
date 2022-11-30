@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Card } from 'sveltestrap';
+    import { Card, Collapse } from 'sveltestrap';
     import { writable, type Writable } from 'svelte/store';
     import ConsoleChangeBranch from '../../components/ConsoleChangeBranch.svelte';
     import paths from '../../paths';
@@ -16,6 +16,7 @@
     export let subPage: string = '';
 
     let returns: Writable<any[]> = writable([]);
+    let collapsed: Writable<number[]> = writable([]);
 
     let tabs: TabPage[] = [];
     $: tabs = [
@@ -36,6 +37,16 @@
             return '';
         }
     }
+
+    function toggleCollapsedResult(index: number) {
+        collapsed.update((collapsed) => {
+            if (collapsed.includes(index)) {
+                return collapsed.filter((i) => i !== index);
+            } else {
+                return [...collapsed, index];
+            }
+        });
+    }
 </script>
 
 <h1>Run</h1>
@@ -47,8 +58,7 @@
         <div
             type="button"
             class="card-header"
-            data-bs-toggle="collapse"
-            data-bs-target="#conformityCollapse{ret.num}"
+            on:click={() => toggleCollapsedResult(ret.num)}
         >
             <span>Result : </span>
             ({ret.command.targetType}) {ret.command.target}
@@ -62,7 +72,7 @@
                 # {ret.num + 1}
             </small>
         </div>
-        <div class="collapse show" id="conformityCollapse{ret.num}">
+        <Collapse isOpen={!$collapsed.includes(ret.num)}>
             <div class="card-body bg-dark text-light">
                 <div class="card-text">
                     {#if Object.keys(ret.data).length != 0}
@@ -70,6 +80,6 @@
                     {/if}
                 </div>
             </div>
-        </div>
+        </Collapse>
     </Card>
 {/each}
