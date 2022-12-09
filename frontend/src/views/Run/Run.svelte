@@ -50,8 +50,6 @@
     }
 </script>
 
-<h1>Run</h1>
-
 <Tabs {tabs} current={subPage} />
 
 {#each $returns as ret}

@@ -40,6 +40,4 @@
     ];
 </script>
 
-<h1>Dashboard</h1>
-
 <Tabs {tabs} current={subPage.split('/')[0]} />

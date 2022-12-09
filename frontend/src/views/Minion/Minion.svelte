@@ -86,7 +86,5 @@
 {#if !$minion}
     <h1>Loading...</h1>
 {:else}
-    <h1>Minion {$minion.id}</h1>
-
     <Tabs {tabs} current={subPage} />
 {/if}

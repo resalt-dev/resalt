@@ -52,6 +52,4 @@
     ];
 </script>
 
-<h1>Minions</h1>
-
 <Tabs {tabs} current={subPage} />

@@ -23,6 +23,4 @@
     ];
 </script>
 
-<h1>Preferences</h1>
-
 <Tabs {tabs} current={subPage} />

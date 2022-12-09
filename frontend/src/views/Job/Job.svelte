@@ -7,6 +7,4 @@
     export let navigate: NavigateFn;
 </script>
 
-<h1>Job</h1>
-
 Under development.

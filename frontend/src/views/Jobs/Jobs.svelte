@@ -44,8 +44,6 @@
     let jobIdTooltipElement;
 </script>
 
-<h1>Jobs</h1>
-
 <Card class="table-responsive border-bottom-0">
     <Table hover class="b-0 mb-0">
         <thead class="bg-dark border-0 text-white">
