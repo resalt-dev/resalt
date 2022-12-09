@@ -5,26 +5,19 @@
     import { FilterOperand } from '../../models/FilterOperand';
     import { TempusDominus, Namespace, extend } from '@eonasdan/tempus-dominus';
     import customDateFormat from '@eonasdan/tempus-dominus/dist/plugins/customDateFormat';
-    import { writable } from 'svelte/store';
     import Icon from '../../components/Icon.svelte';
     import type Filter from '../../models/Filter';
     import { theme } from '../../stores';
+    import type { Writable } from 'svelte/store';
 
     // Enable customDateFormat plugin in Tempus Dominus (datepicker)
     extend(customDateFormat, undefined);
 
-    export let setFilters: (filters: Filter[]) => void;
-    const pickers: TempusDominus[] = [];
-    const filters = writable<Filter[]>([
-        {
-            fieldType: FilterFieldType.NONE,
-            field: '',
-            operand: FilterOperand.CONTAINS,
-            value: '',
-        },
-    ]);
+    export let filters: Writable<Filter[]>;
 
-    function localAddFilter() {
+    const pickers: TempusDominus[] = [];
+
+    function addFilter() {
         filters.update((f) => [
             ...f,
             {
@@ -36,11 +29,11 @@
         ]);
     }
 
-    function localRemoveFilterByIndex(index: number) {
+    function removeFilterByIndex(index: number) {
         filters.update((f) => f.filter((_, i) => i !== index));
     }
 
-    function localResetFilterByIndex(index: number) {
+    function resetFilterByIndex(index: number) {
         filters.update((f) => {
             f[index] = {
                 fieldType: FilterFieldType.NONE,
@@ -52,7 +45,7 @@
         });
     }
 
-    function localFilterFieldTypeChanged(index: number, event: Event) {
+    function filterFieldTypeChanged(index: number, event: Event) {
         const target = event.target as HTMLInputElement;
         const newFieldType = target.value as FilterFieldType;
 
@@ -64,7 +57,7 @@
         });
     }
 
-    function localFilterFieldChanged(index: number, event: Event) {
+    function filterFieldChanged(index: number, event: Event) {
         const target = event.target as HTMLInputElement;
         const newField = target.value;
 
@@ -147,21 +140,6 @@
         });
     }
 
-    onMount(() => {
-        filters.subscribe((filters) => {
-            // Fetch new data from API
-            setFilters(
-                filters
-                    .filter((f) => f.fieldType !== FilterFieldType.NONE)
-                    .filter((f) => f.field !== '')
-                    // Filter out where field is 'last_seen' and value is empty
-                    .filter(
-                        (f) => !(f.field === 'last_seen' && f.value === ''),
-                    ),
-            );
-        });
-    });
-
     beforeUpdate(() => {
         // Destroy all pickers
         pickers.forEach((picker) => picker.dispose());
@@ -186,7 +164,7 @@
                     name="select"
                     bind:value={filter.fieldType}
                     on:change={(event) => {
-                        localFilterFieldTypeChanged(i, event);
+                        filterFieldTypeChanged(i, event);
                     }}
                 >
                     <option
@@ -226,7 +204,7 @@
                             name="select"
                             bind:value={filter.field}
                             on:change={(event) => {
-                                localFilterFieldChanged(i, event);
+                                filterFieldChanged(i, event);
                             }}
                         >
                             <option value="id" selected={filter.field === 'id'}>
@@ -400,7 +378,7 @@
                         class="mouse-pointer"
                         style="transform: translateY(65%);"
                         on:click={() => {
-                            localResetFilterByIndex(i);
+                            resetFilterByIndex(i);
                         }}
                     />
                 </div>
@@ -412,7 +390,7 @@
                 class="float-end"
                 disabled={$filters.length === 1}
                 on:click={() => {
-                    localRemoveFilterByIndex(i);
+                    removeFilterByIndex(i);
                 }}
             >
                 <Icon name="minus" size="1" style="margin-top: -2px;" />
@@ -424,7 +402,7 @@
                 class="float-end me-2"
                 disabled={$filters.length === 5}
                 on:click={() => {
-                    localAddFilter();
+                    addFilter();
                 }}
             >
                 <Icon name="plus" size="1" style="margin-top: -2px;" />
@@ -432,6 +410,6 @@
         </Col>
     </Row>
     {#if i + 1 !== $filters.length}
-        <hr class="text-light mt-0" />
+        <hr class="bg-light mt-0" />
     {/if}
 {/each}
