@@ -8,7 +8,10 @@
     export let collapsed: boolean;
 
     const location = useLocation();
-    $: isActive = $location.pathname.startsWith(path.getPath());
+    $: slugPath = path.getPath().split('/')[1] ?? '';
+    $: slugLocation = $location.pathname.split('/')[1];
+    //$: console.log('path', slugPath, slugLocation);
+    $: isActive = slugPath.startsWith(slugLocation);
 </script>
 
 <li class="nav-item" style="height: 4.5rem;">
