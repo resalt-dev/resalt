@@ -66,7 +66,7 @@ export default class RunResult {
             } else if (this.targetType === 'ipcidr') {
                 result += ' -S';
             }
-            result += ` '${this.target}'`;
+            result += ` "${this.target}"`;
         } else if (this.client === RunClientType.RUNNER) {
             result += 'salt-run';
         }
@@ -86,7 +86,7 @@ export default class RunResult {
 
         // Args
         if (this.arg.length > 0) {
-            result += ` ${this.arg.join(' ')}`;
+            result += ` ${this.arg.map((arg) => arg.indexOf(' ') == -1 ? arg : `"${arg}"`).join(' ')}`;
         }
 
         // KWargs
