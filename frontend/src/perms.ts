@@ -36,12 +36,12 @@ export const resaltWebPermissions: {
     //     permission: 'user.email',
     //     title: '[User] Manage Email',
     //     description:
-    //         'Allows local user to edit their email address in Resalt. LDAP users always sync from LDAP.',
+    //         'Allows local user to edit their email address in Resalt. (LDAP users always sync from LDAP)',
     // },
     {
         permission: P_USER_PASSWORD,
         title: '[User] Manage Password',
-        description: 'Allows the user to change their own password in Resalt. LDAP users cannot set or log in with local password.',
+        description: 'Allows the user to change their own password in Resalt. (LDAP users cannot set or log in with local password)',
     },
 ];
 
