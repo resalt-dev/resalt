@@ -8,6 +8,7 @@
     import { MessageType } from '../../models/MessageType';
     import { writable, type Writable } from 'svelte/store';
     import type { NavigateFn } from 'svelte-navigator';
+	import type EventsWriteableData from '../../models/EventsWriteableData';
 
     // svelte-ignore unused-export-let
     export let location: Location;
@@ -16,22 +17,6 @@
 
     let paginationSize: number = 20;
     let paginationPage: number = 1;
-
-    class EventsWriteableData {
-        // SaltEvent
-        id: string;
-        timestamp: string;
-        tag: string;
-        data: string;
-
-        // Added by loop
-        jid: string;
-        target: string;
-        fun: string;
-        data_parsed: any;
-        data_formatted: string;
-        unique_index: string;
-    }
 
     const events: Writable<EventsWriteableData[] | null> = writable(null);
     const expandedEvents: Writable<string[]> = writable([]);

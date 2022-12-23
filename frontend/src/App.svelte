@@ -1,5 +1,4 @@
 <script lang="ts">
-    import type RawLocation from 'svelte-navigator/types/RawLocation';
     import DashboardLayout from './layouts/Dashboard/DashboardLayout.svelte';
     import PortalLayout from './layouts/Portal/PortalLayout.svelte';
     import { getConfig } from './api';
@@ -7,8 +6,9 @@
     import { config, theme, toasts } from './stores';
     import type Config from './models/Config';
     import { globalHistory, type NavigatorHistory } from 'svelte-navigator';
-    import { get, writable } from 'svelte/store';
+    import { writable } from 'svelte/store';
     import { Toast, ToastBody, ToastHeader } from 'sveltestrap';
+	import WrapperGlobalHistory from './models/WrapperGlobalHistory';
 
     const isPortalView = writable<boolean>(
         window.location.pathname.startsWith('/auth'),
@@ -37,12 +37,12 @@
         };
         return { execute: wrappedFunction };
     }
-    class WrapperGlobalHistory implements NavigatorHistory {
-        readonly location: RawLocation = globalHistory.location;
-        listen = globalHistory.listen;
-        navigate: any = wrapFunction(globalHistory.navigate).execute;
-    }
-    const wrapperGlobalHistory: NavigatorHistory = new WrapperGlobalHistory();
+
+    const wrapperGlobalHistory: NavigatorHistory = new WrapperGlobalHistory(
+        globalHistory.location,
+        globalHistory.listen,
+        wrapFunction(globalHistory.navigate).execute as any,
+    );
 
     onMount(() => {
         getConfig()

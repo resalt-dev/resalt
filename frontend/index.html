@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <link rel="icon" href="/assets/favicon.ico" />
 
         <title>Resalt</title>
 
@@ -12,16 +13,17 @@
             href="/assets/css/bootstrap-directional-buttons.min.css"
             rel="stylesheet"
         />
-        <script src="/assets/js/bootstrap.bundle-5.2.2.min.js"></script>
+        <script src="/assets/js/bootstrap.bundle-5.2.2.min.js" type="module"></script>
 
         <!-- Svelte -->
         <link rel="icon" type="image/png" href="/favicon.png" />
-        <link rel="stylesheet" href="/build/bundle.css" />
-        <script defer src="/build/bundle.js"></script>
 
         <!-- Boxicons -->
         <link href="/assets/css/boxicons-2.1.2.min.css" rel="stylesheet" />
     </head>
 
-    <body></body>
+    <body>
+        <div id="app"></div>
+        <script type="module" src="/src/main.ts"></script>
+    </body>
 </html>

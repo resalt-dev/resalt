@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { login } from '../../api';
-    import { auth, config, theme, toasts } from '../../stores';
+    import { config, theme, toasts } from '../../stores';
     import paths from '../../paths';
     import { MessageType } from '../../models/MessageType';
     import { FormGroup, Input, Label } from 'sveltestrap';
