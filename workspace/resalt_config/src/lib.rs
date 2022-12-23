@@ -94,10 +94,8 @@ lazy_static::lazy_static! {
             .to_string(),
     };
     static ref HTTP_PORT: u16 = conf!("http.port").parse().unwrap();
-    static ref HTTP_FRONTEND_PROXY_ENABLED: bool = conf!("http.frontend.proxy.enabled").parse().unwrap();
     static ref HTTP_FRONTEND_THEME_ENABLED: bool = conf!("http.frontend.theme.enabled").parse().unwrap();
     static ref HTTP_FRONTEND_THEME_COLOR: String = conf!("http.frontend.theme.color");
-    static ref HTTP_FRONTEND_PROXY_TARGET: String = conf!("http.frontend.proxy.target");
 }
 
 pub struct SConfig {}
@@ -186,20 +184,12 @@ impl SConfig {
         *HTTP_PORT
     }
 
-    pub fn http_frontend_proxy_enabled() -> bool {
-        *HTTP_FRONTEND_PROXY_ENABLED
-    }
-
     pub fn http_frontend_theme_enabled() -> bool {
         *HTTP_FRONTEND_THEME_ENABLED
     }
 
     pub fn http_frontend_theme_color() -> String {
         HTTP_FRONTEND_THEME_COLOR.clone()
-    }
-
-    pub fn http_frontend_proxy_target() -> String {
-        HTTP_FRONTEND_PROXY_TARGET.clone()
     }
 }
 
@@ -232,9 +222,7 @@ mod tests {
         SConfig::salt_api_tls_skipverify();
         SConfig::salt_api_system_service_token();
         SConfig::http_port();
-        SConfig::http_frontend_proxy_enabled();
         SConfig::http_frontend_theme_enabled();
         SConfig::http_frontend_theme_color();
-        SConfig::http_frontend_proxy_target();
     }
 }

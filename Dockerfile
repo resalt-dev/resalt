@@ -26,7 +26,6 @@ RUN apt-get update && \
 # Copy the binary from the build stage
 COPY --from=build /usr/src/app/target/release/resalt /usr/src/app/resalt
 
-ENV RESALT_HTTP_FRONTEND_PROXY_ENABLED false
 ENV RUST_LOG_STYLE always
 
 EXPOSE 8000

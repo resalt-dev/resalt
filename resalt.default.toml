@@ -59,9 +59,6 @@ skipverify = true
 
 [http]
 port = 8000
-[http.frontend.proxy]
-enabled = false
-target = "http://frontend:5555"
 [http.frontend.theme]
 enabled = true
 color = "primary"

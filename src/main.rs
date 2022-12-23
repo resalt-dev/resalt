@@ -189,7 +189,7 @@ async fn main() -> std::io::Result<()> {
                     // fallback to 404
                     .default_service(route_fallback_404),
             )
-            // Proxy web interface
+            // Embed web interface
             .service(web::scope("").default_service(route_frontend_get))
     })
     .bind(("0.0.0.0", SConfig::http_port()))?
