@@ -89,10 +89,6 @@ $bluegray-10: #0e1418;
         background-color: $bluegray-8 !important;
         color: var(--light-gray) !important;
     }
-    // Table nested in Card
-    .card-body .table {
-        background-color: $bluegray-7 !important;
-    }
 
     .table-hover > tbody > tr:hover,
     .table-hover > tbody > tr:hover > td,
