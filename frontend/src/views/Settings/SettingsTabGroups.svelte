@@ -1040,6 +1040,23 @@
                                     {/each}
                                 </tbody>
                             </Table>
+                            <!-- Display warning if any has "*" as target, instead of ".*" -->
+                            {#if $permissionMinionsFields.some(
+                                (mt) => mt.target === '*',
+                            )}
+                                <Alert
+                                    color="warning"
+                                    dismissible={false}
+                                    fade={false}
+                                    class="mt-3"
+                                >
+                                    <strong>Warning!</strong> One or more
+                                    minion targets have a target of <code>*</code>
+                                    instead of ".*". This will not match
+                                    any minions. Please change the target
+                                    to ".*" to match all minions.
+                                </Alert>
+                            {/if}
                         </Col>
                         <Col class="ps-3 mb-0" xs="12">
                             <h3>Actions</h3>

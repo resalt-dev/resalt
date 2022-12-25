@@ -12,6 +12,7 @@
         ModalFooter,
         ModalHeader,
     } from 'sveltestrap';
+	import Clickable from '../../components/Clickable.svelte';
 
     function handleClickCollapse(): void {
         collapsed.update((n) => !n);
@@ -27,8 +28,8 @@
         ? 'width: 4.5rem;'
         : 'width: 17.5rem;'}"
 >
-    <div
-        on:click={handleClickCollapse}
+    <Clickable
+        event={handleClickCollapse}
         class="d-flex text-decoration-none mouse-pointer"
     >
         <div
@@ -45,7 +46,7 @@
                 class="mb-0 h3 text-white {!$collapsed && 'd-none'}"
             />
         </div>
-    </div>
+    </Clickable>
 
     <hr class="mt-0 mb-3" />
 
@@ -66,10 +67,9 @@
 
     <hr class="mb-0" />
 
-    <div
-        on:click={handleClickCollapse}
+    <Clickable
+        event={handleClickCollapse}
         class="btn-dark bg-dark border-0 pt-3 pb-3 px-3 fw-light mouse-pointer d-flex align-items-center"
-        aria-current="page"
     >
         <Icon
             name={$collapsed ? 'right-arrow-alt' : 'left-arrow-alt'}
@@ -80,14 +80,15 @@
         {#if !$collapsed}
             <span class="fs-5">Collapse</span>
         {/if}
-    </div>
+    </Clickable>
 
     <hr class="mt-0 mb-0" />
 
     {#if $config.latestVersion === 'unknown'}
-        <span
+        <Clickable
+            type="span"
+            event={toggleUpdate}
             class="text-center link-danger text-decoration-underline mouse-pointer"
-            on:click={toggleUpdate}
         >
             {#if $collapsed}
                 {$config.currentVersion}
@@ -96,11 +97,12 @@
                 {constants.appName} - {$config.currentVersion}
                 <Icon name="chevrons-up" />
             {/if}
-        </span>
+        </Clickable>
     {:else if $config.currentVersion !== $config.latestVersion}
-        <span
+        <Clickable
+            type="span"
+            event={toggleUpdate}
             class="text-center link-warning text-decoration-underline mouse-pointer"
-            on:click={toggleUpdate}
         >
             {#if $collapsed}
                 {$config.currentVersion}
@@ -109,7 +111,7 @@
                 {constants.appName} - {$config.currentVersion}
                 <Icon name="chevrons-up" />
             {/if}
-        </span>
+        </Clickable>
     {:else}
         <span class="text-center text-secondary">
             {#if $collapsed}

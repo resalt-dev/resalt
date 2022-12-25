@@ -4,6 +4,7 @@
     import constants from '../../constants';
     import { MessageType } from '../../models/MessageType';
     import { config, theme, toasts } from '../../stores';
+    import Clickable from '../../components/Clickable.svelte';
 
     function selectColor(color: string): void {
         console.log('selectColor', color);
@@ -78,17 +79,16 @@
                 </div>
             </Col>
             <Col xs="auto">
-                <div
+                <Clickable
+                    event={() => setDarkMode(true)}
                     class="theme-box mouse-pointer bg-dark mb-4 border-{$theme.dark
                         ? 'secondary'
                         : 'light'}"
-                    on:click={() => setDarkMode(true)}
-                    on:keypress={() => setDarkMode(true)}
                 >
                     {#if $theme.dark === true}
                         <Icon name="check" class="text-white" size="3" />
                     {/if}
-                </div>
+                </Clickable>
             </Col>
         </Row>
 
