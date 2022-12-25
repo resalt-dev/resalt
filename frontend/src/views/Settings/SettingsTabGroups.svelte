@@ -1050,11 +1050,11 @@
                                     fade={false}
                                     class="mt-3"
                                 >
-                                    <strong>Warning!</strong> One or more
-                                    minion targets have a target of <code>*</code>
-                                    instead of ".*". This will not match
-                                    any minions. Please change the target
-                                    to ".*" to match all minions.
+                                    <strong>Warning!</strong> One or more minion targets have a
+                                    target of <code>"*"</code> instead of <code>".*"</code>.
+                                    <br />
+                                    This will not match any minions. Please change the target
+                                    to <code>".*"</code> to match all minions.
                                 </Alert>
                             {/if}
                         </Col>
