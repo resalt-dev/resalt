@@ -952,7 +952,7 @@
                                                         />
                                                     {/if}
                                                     <div
-                                                        class="input-group flex-nowrap"
+                                                        class="input-group flex-nowrap width-fit-content"
                                                     >
                                                         {#each minionModule.args as arg, ai}
                                                             <div
@@ -1067,3 +1067,9 @@
         </Card>
     </Col>
 </Row>
+
+<style lang="scss">
+    .width-fit-content {
+        width: fit-content;
+    }
+</style>
