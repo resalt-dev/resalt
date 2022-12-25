@@ -57,7 +57,7 @@
 <style>
     .portal-background {
         background: var(--dark);
-        background-image: url('/assets/images/0da7530ac9cd4c88850c62138da12e66.jpg');
+        background-image: url('/assets/img/0da7530ac9cd4c88850c62138da12e66.jpg');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
