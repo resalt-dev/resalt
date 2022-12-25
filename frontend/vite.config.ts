@@ -1,6 +1,5 @@
-import { defineConfig } from 'vite'
-import { svelte } from '@sveltejs/vite-plugin-svelte'
-import liveReload from 'vite-plugin-live-reload'
+import { defineConfig } from 'vite';
+import { svelte } from '@sveltejs/vite-plugin-svelte';
 import autoprefixer from 'autoprefixer';
 import sveltePreprocess from 'svelte-preprocess';
 
@@ -15,7 +14,6 @@ export default defineConfig({
 		outDir: 'build',
 	},
 	plugins: [
-		!production && liveReload('./src/**/*'),
 		svelte({
 			preprocess: sveltePreprocess({
 				sourceMap: !production,
