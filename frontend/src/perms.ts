@@ -2,7 +2,26 @@
 export const P_ADMIN_SUPERADMIN: string = 'admin.superadmin';
 export const P_ADMIN_GROUP: string = 'admin.group';
 export const P_ADMIN_USER: string = 'admin.user';
+
 export const P_USER_PASSWORD: string = 'user.password';
+
+export const P_RUN_LIVE: string = 'run.live';
+export const P_RUN_APPROVAL_LIST: string = 'run.approval.list';
+export const P_RUN_APPROVAL_SUBMIT: string = 'run.approval.submit';
+export const P_RUN_APPROVAL_JUDGE: string = 'run.approval.judge';
+export const P_RUN_APPROVAL_EXECUTE: string = 'run.approval.execute';
+export const P_RUN_APPROVAL_RECOUNT: string = 'run.approval.recount'; // Can reset all approvals/rejects
+export const P_RUN_APPROVAL_CLOSE: string = 'run.approval.close';
+export const P_RUN_APPROVAL_DELETE: string = 'run.approval.delete';
+export const P_RUN_TEMPLATE_LIST: string = 'run.template.list';
+export const P_RUN_TEMPLATE_LOCAL: string = 'run.template.local'; // Can create local templates
+export const P_RUN_TEMPLATE_GLOBAL: string = 'run.template.global'; // Can create global templates
+
+export const P_MINION_LIST: string = 'minion.list';
+export const P_MINION_GRAINEXPLORER: string = 'minion.grainexplorer';
+export const P_MINION_CONFORMITY: string = 'minion.conformity';
+export const P_MINION_PILLARS: string = 'minion.pillars';
+export const P_MINION_PACKAGES: string = 'minion.packages';
 
 export const resaltWebPermissions: {
     permission: string;
@@ -18,13 +37,13 @@ export const resaltWebPermissions: {
         permission: P_ADMIN_GROUP,
         title: '[Admin] Manage Groups',
         description:
-            'Allows the user to create, edit, and delete groups in Resalt.',
+            'Allow to create, edit, and delete Groups in Resalt.',
     },
     {
         permission: P_ADMIN_USER,
         title: '[Admin] Manage Users',
         description:
-            'Allows the user to create, edit, and delete users in Resalt.',
+            'Allow to create, edit, and delete Users in Resalt.',
     },
     // {
     //     permission: 'user.profile',
@@ -41,7 +60,7 @@ export const resaltWebPermissions: {
     {
         permission: P_USER_PASSWORD,
         title: '[User] Manage Password',
-        description: 'Allows the user to change their own password in Resalt. (LDAP users cannot set or log in with local password)',
+        description: 'Allow user to change their own password in Resalt. (LDAP users cannot set or log in with local password)',
     },
 ];
 

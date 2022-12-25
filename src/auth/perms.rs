@@ -8,7 +8,26 @@ use serde_json::Value;
 pub const P_ADMIN_SUPERADMIN: &str = "admin.superadmin";
 pub const P_ADMIN_GROUP: &str = "admin.group";
 pub const P_ADMIN_USER: &str = "admin.user";
+
 pub const P_USER_PASSWORD: &str = "user.password";
+
+pub const P_RUN_LIVE: &str = "run.live";
+pub const P_RUN_APPROVAL_LIST: &str = "run.approval.list";
+pub const P_RUN_APPROVAL_SUBMIT: &str = "run.approval.submit";
+pub const P_RUN_APPROVAL_JUDGE: &str = "run.approval.judge";
+pub const P_RUN_APPROVAL_EXECUTE: &str = "run.approval.execute";
+pub const P_RUN_APPROVAL_RECOUNT: &str = "run.approval.recount"; // Can reset all approvals/rejects
+pub const P_RUN_APPROVAL_CLOSE: &str = "run.approval.close";
+pub const P_RUN_APPROVAL_DELETE: &str = "run.approval.delete";
+pub const P_RUN_TEMPLATE_LIST: &str = "run.template.list";
+pub const P_RUN_TEMPLATE_LOCAL: &str = "run.template.local"; // Can create local templates
+pub const P_RUN_TEMPLATE_GLOBAL: &str = "run.template.global"; // Can create global templates
+
+pub const P_MINION_LIST: &str = "minion.list";
+pub const P_MINION_GRAINEXPLORER: &str = "minion.grainexplorer";
+pub const P_MINION_CONFORMITY: &str = "minion.conformity";
+pub const P_MINION_PILLARS: &str = "minion.pillars";
+pub const P_MINION_PACKAGES: &str = "minion.packages";
 
 pub fn has_permission(
     data: &web::Data<Box<dyn StorageImpl>>,
