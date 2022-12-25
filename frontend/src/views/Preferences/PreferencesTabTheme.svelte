@@ -32,6 +32,7 @@
                                 ? 'secondary'
                                 : 'light'}"
                             on:click={() => selectColor(color)}
+                            on:keypress={() => selectColor(color)}
                         >
                             {#if $theme.color === color}
                                 <Icon
@@ -69,6 +70,7 @@
                         : 'light'}"
                     style="background-color: #fff;"
                     on:click={() => setDarkMode(false)}
+                    on:keypress={() => setDarkMode(false)}
                 >
                     {#if $theme.dark === false}
                         <Icon name="check" class="text-black" size="3" />
@@ -81,6 +83,7 @@
                         ? 'secondary'
                         : 'light'}"
                     on:click={() => setDarkMode(true)}
+                    on:keypress={() => setDarkMode(true)}
                 >
                     {#if $theme.dark === true}
                         <Icon name="check" class="text-white" size="3" />
