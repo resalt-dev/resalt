@@ -18,7 +18,6 @@ export const P_RUN_TEMPLATE_LOCAL: string = 'run.template.local'; // Can create 
 export const P_RUN_TEMPLATE_GLOBAL: string = 'run.template.global'; // Can create global templates
 
 export const P_MINION_LIST: string = 'minion.list';
-export const P_MINION_GRAINEXPLORER: string = 'minion.grainexplorer';
 export const P_MINION_CONFORMITY: string = 'minion.conformity';
 export const P_MINION_PILLARS: string = 'minion.pillars';
 export const P_MINION_PACKAGES: string = 'minion.packages';
@@ -45,22 +44,99 @@ export const resaltWebPermissions: {
         description:
             'Allow to create, edit, and delete Users in Resalt.',
     },
-    // {
-    //     permission: 'user.profile',
-    //     title: '[User] Manage Profile',
-    //     description:
-    //         'Allows the user to edit their profile information in Resalt.',
-    // },
-    // {
-    //     permission: 'user.email',
-    //     title: '[User] Manage Email',
-    //     description:
-    //         'Allows local user to edit their email address in Resalt. (LDAP users always sync from LDAP)',
-    // },
     {
         permission: P_USER_PASSWORD,
         title: '[User] Manage Password',
         description: 'Allow user to change their own password in Resalt. (LDAP users cannot set or log in with local password)',
+    },
+    {
+        permission: P_RUN_LIVE,
+        title: '[Run] Live',
+        description: 'Allow user to run live commands on minions they have access to.',
+    },
+    {
+        permission: P_RUN_APPROVAL_LIST,
+        title: '[Run] List Approvals',
+        description:
+            'Allow user to list commands pending approval requests.',
+    },
+    {
+        permission: P_RUN_APPROVAL_SUBMIT,
+        title: '[Run] Submit Approvals',
+        description:
+            'Allow user to submit commands for approval.',
+    },
+    {
+        permission: P_RUN_APPROVAL_JUDGE,
+        title: '[Run] Judge Approvals',
+        description:
+            'Allow user to approve or deny approvals.',
+    },
+    {
+        permission: P_RUN_APPROVAL_EXECUTE,
+        title: '[Run] Execute Approvals',
+        description:
+            'Allow user to execute approved approvals.',
+    },
+    {
+        permission: P_RUN_APPROVAL_RECOUNT,
+        title: '[Run] Recount Approvals',
+        description:
+            'Allow user to reset approvals/rejects on a pending approval.',
+    },
+    {
+        permission: P_RUN_APPROVAL_CLOSE,
+        title: '[Run] Close Approvals',
+        description:
+            'Allow user to close (and re-open) voting on approval request.',
+    },
+    {
+        permission: P_RUN_APPROVAL_DELETE,
+        title: '[Run] Delete Approvals',
+        description:
+            'Allow user to delete approval requests.',
+    },
+    {
+        permission: P_RUN_TEMPLATE_LIST,
+        title: '[Run] List Templates',
+        description:
+            'Allow user to list templates.',
+    },
+    {
+        permission: P_RUN_TEMPLATE_LOCAL,
+        title: '[Run] Create Local Templates',
+        description:
+            'Allow user to create local templates.',
+    },
+    {
+        permission: P_RUN_TEMPLATE_GLOBAL,
+        title: '[Run] Create Global Templates',
+        description:
+            'Allow user to create global templates.',
+    },
+    {
+        permission: P_MINION_LIST,
+        title: '[Minion] List Minions',
+        description:
+            'Allow user to list minions.',
+    },
+    {
+        permission: P_MINION_CONFORMITY,
+        title: '[Minion] See Conformity',
+        description:
+            'Allow user to see the conformity of minions.',
+    },
+    {
+        permission: P_MINION_PILLARS,
+        title: '[Minion] See Pillars',
+        description:
+            'Allow user to see the pillars of minions.',
+    },
+    {
+        permission: P_MINION_PACKAGES,
+        title: '[Minion] See Packages',
+        description:
+            'Allow user to see the packages of minions.',
     },
 ];
 

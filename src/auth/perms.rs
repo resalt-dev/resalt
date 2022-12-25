@@ -24,7 +24,6 @@ pub const P_RUN_TEMPLATE_LOCAL: &str = "run.template.local"; // Can create local
 pub const P_RUN_TEMPLATE_GLOBAL: &str = "run.template.global"; // Can create global templates
 
 pub const P_MINION_LIST: &str = "minion.list";
-pub const P_MINION_GRAINEXPLORER: &str = "minion.grainexplorer";
 pub const P_MINION_CONFORMITY: &str = "minion.conformity";
 pub const P_MINION_PILLARS: &str = "minion.pillars";
 pub const P_MINION_PACKAGES: &str = "minion.packages";

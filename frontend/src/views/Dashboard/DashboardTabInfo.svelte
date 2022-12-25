@@ -89,9 +89,3 @@
         </Card>
     </Col>
 </Row>
-
-<style>
-    * {
-        /* outline: 1px solid plum; */
-    }
-</style>
