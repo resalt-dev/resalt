@@ -24,4 +24,6 @@ Setup development system:
 docker compose up -d
 ```
 
+Access it at [http://localhost:1234](http://localhost:1234).
+
 Both the frontend (Svelte) and backend (Rust) will reload automatically.
