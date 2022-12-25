@@ -9,6 +9,7 @@
     import { resaltLight } from './codemirror-resalt-theme-light';
 
     export let data: any;
+    export let sort: boolean = true;
 
     let editorElement: HTMLElement;
     let cm: EditorView = undefined;
@@ -45,7 +46,7 @@
 
     function createJSONView() {
         let state = EditorState.create({
-            doc: JSON.stringify(sortJSON(data), null, 2),
+            doc: JSON.stringify(sort ? sortJSON(data) : data, null, 2),
             extensions: [
                 basicSetup,
                 $theme.dark ? resaltDark : resaltLight,

@@ -252,7 +252,7 @@
                 <CardHeader>
                     <CardTitle class="mb-0">Permissions</CardTitle>
                 </CardHeader>
-                <JsonViewer data={$user.perms} />
+                <JsonViewer data={$user.perms} sort={false} />
             </Card>
         </Col>
     </Row>
