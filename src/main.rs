@@ -115,8 +115,8 @@ async fn main() -> std::io::Result<()> {
                         web::scope("/minions")
                             .wrap(auth::RequireAuth::new())
                             .route("", web::get().to(route_minions_get))
-                            .route("/refresh", web::post().to(route_minions_refresh_post))
                             .route("/{id}", web::get().to(route_minion_get))
+                            .route("/{id}/refresh", web::post().to(route_minion_refresh_post))
                             .default_service(route_fallback_404),
                     )
                     // jobs

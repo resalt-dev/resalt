@@ -118,8 +118,9 @@ pub async fn route_minion_get(
     Ok(web::Json(minion))
 }
 
-pub async fn route_minions_refresh_post(
+pub async fn route_minion_refresh_post(
     salt: web::Data<SaltAPI>,
+    info: web::Path<MinionGetInfo>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
     let ext = req.extensions_mut();
@@ -132,10 +133,10 @@ pub async fn route_minions_refresh_post(
             return Err(api_error_unauthorized());
         }
     };
-    match salt.refresh_minions(salt_token).await {
+    match salt.refresh_minion(salt_token, &info.id).await {
         Ok(_) => (),
         Err(e) => {
-            error!("refresh_minions {:?}", e);
+            error!("refresh_minion {:?}", e);
             return Err(api_error_internal_error());
         }
     };

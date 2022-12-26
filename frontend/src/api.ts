@@ -197,14 +197,14 @@ export async function getMinions(
     );
 }
 
-export async function refreshMinions(): Promise<void> {
-    await sendAuthenticatedRequest('POST', '/minions/refresh');
-}
-
 export async function getMinionById(minionId: string): Promise<Minion> {
     return sendAuthenticatedRequest('GET', `/minions/${minionId}`).then(
         (data: any) => Minion.fromObject(data),
     );
+}
+
+export async function refreshMinion(minionId: string): Promise<void> {
+    await sendAuthenticatedRequest('POST', `/minions/${minionId}/refresh`);
 }
 
 ///

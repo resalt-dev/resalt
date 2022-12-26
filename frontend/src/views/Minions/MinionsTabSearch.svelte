@@ -2,8 +2,8 @@
     import { onMount } from 'svelte';
     import { Link, type NavigateFn } from 'svelte-navigator';
     import { writable, type Writable } from 'svelte/store';
-    import { Button, Card, Table } from 'sveltestrap';
-    import { getMinions, refreshMinions } from '../../api';
+    import { Button, Card, Spinner, Table } from 'sveltestrap';
+    import { getMinions, refreshMinion } from '../../api';
     import Icon from '../../components/Icon.svelte';
     import ResaltProgress from '../../components/ResaltProgress.svelte';
     import SortIcon from '../../components/SortIcon.svelte';
@@ -23,6 +23,7 @@
 
     const loading = writable<boolean>(true);
     const minions: Writable<Minion[] | null> = writable(null);
+    const refreshing: Writable<string[]> = writable([]);
 
     let sortField: string | null = null;
     let sortOrder: SortOrder = SortOrder.Down;
@@ -70,6 +71,14 @@
         console.log('toggleSort', field, order, sortField, sortOrder);
 
         updateData();
+    }
+
+    function resync(minionId: string) {
+        refreshing.update((r) => [...r, minionId]);
+        refreshMinion(minionId).then(() => {
+            refreshing.update((r) => r.filter((id) => id !== minionId));
+            updateData();
+        });
     }
 
     onMount(() => {
@@ -253,10 +262,17 @@
                         <td>
                             <Link
                                 to={paths.minion.getPath(minion.id)}
-                                class="btn btn-{$theme.color} btn-sm px-3"
+                                class="btn btn-{$theme.color} btn-sm px-3 me-2"
                             >
                                 View
                             </Link>
+                            <Button color="secondary" size="sm" class="px-3" on:click={() => resync(minion.id)} disabled={$refreshing.indexOf(minion.id) !== -1}>
+                                {#if $refreshing.indexOf(minion.id) !== -1}
+                                    <Spinner size="sm" />
+                                {:else}
+                                    Resync
+                                {/if}
+                            </Button>                            
                         </td>
                     </tr>
                 {/each}
@@ -275,9 +291,3 @@
 {#if $loading}
     <ResaltProgress />
 {/if}
-
-<br />
-
-<Button color="secondary" size="sm" on:click={() => refreshMinions()}>
-    Force reload minions
-</Button>

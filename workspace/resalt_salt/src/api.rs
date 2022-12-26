@@ -930,17 +930,13 @@ impl SaltAPI {
         Ok(())
     }
 
-    pub async fn refresh_minions(&self, salt_token: &SaltToken) -> Result<(), SaltError> {
-        // TODO: move this to a /keys endpoint
-        // let keys = self.get_keys(salt_token).await?;
-        // info!("keys: {:?}", keys);
-
+    pub async fn refresh_minion(&self, salt_token: &SaltToken, id: &str) -> Result<(), SaltError> {
         let mut map_test_true = HashMap::new();
         map_test_true.insert("test".to_owned(), "True".to_owned());
         match self
             .run_job_local_async(
                 salt_token,
-                "*",
+                id,
                 "state.highstate",
                 None,
                 None,
@@ -952,35 +948,28 @@ impl SaltAPI {
             Err(e) => return Err(e),
         };
         match self
-            .run_job_local_async(salt_token, "*", "grains.items", None, None, None)
+            .run_job_local_async(salt_token, id, "grains.items", None, None, None)
             .await
         {
             Ok(_) => (),
             Err(e) => return Err(e),
         };
         match self
-            .run_job_local_async(salt_token, "*", "pillar.items", None, None, None)
+            .run_job_local_async(salt_token, id, "pillar.items", None, None, None)
             .await
         {
             Ok(_) => (),
             Err(e) => return Err(e),
         };
         match self
-            .run_job_local_async(salt_token, "*", "pkg.list_pkgs", None, None, None)
+            .run_job_local_async(salt_token, id, "pkg.list_pkgs", None, None, None)
             .await
         {
             Ok(_) => (),
             Err(e) => return Err(e),
         };
-        /*match self
-            .run_job_wheel_async(salt_token, "key.finger", Some(vec!["*"]), None)
-            .await
-        {
-            Ok(_) => (),
-            Err(e) => return Err(e),
-        };*/
 
-        // TODO: sync with key-management, add non-responsive minions, and remove deleted ones
+        // TODO: sync with key-management: check non-responsive minion, and remove deleted ones
 
         Ok(())
     }
