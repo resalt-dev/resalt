@@ -30,6 +30,7 @@
         "a11y-structure": "ignore",
         "a11y-mouse-events-have-key-events": "ignore",
         "a11y-missing-content": "ignore",
+        "unused-export-let": "ignore",
     },
     "rust-analyzer.server.extraEnv": {
         "RUSTC_WRAPPER": "sccache"

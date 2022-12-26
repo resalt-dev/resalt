@@ -1,6 +1,6 @@
 <script lang="ts">
     import paths from '../../paths';
-    import { sidebarCollapsed as collapsed, theme, config } from '../../stores';
+    import { sidebarCollapsed as collapsed, theme, config, currentUser } from '../../stores';
     import Icon from '../../components/Icon.svelte';
     import Logo from '../../components/Logo.svelte';
     import SidebarItem from './DashboardSidebarItem.svelte';
@@ -56,7 +56,7 @@
             : 'mx-2'}"
     >
         {#each Object.values(paths) as path}
-            {#if path.showInNav}
+            {#if path.showInNav && path.hasPermission($currentUser.perms)}
                 {#if path.name === 'users'}
                     <li><hr /></li>
                 {/if}

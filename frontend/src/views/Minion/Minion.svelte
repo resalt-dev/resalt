@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { currentUser } from '../../stores';
-    import { hasResaltPermission, P_ADMIN_GROUP } from '../../perms';
+    import { hasResaltPermission, P_ADMIN_GROUP, P_MINION_CONFORMITY, P_MINION_PACKAGES, P_MINION_PILLARS } from '../../perms';
     import { MessageType } from '../../models/MessageType';
     import { getMinionById } from '../../api';
     import { toasts } from '../../stores';
@@ -56,6 +56,7 @@
             path: paths.minion.getPath(minionId, 'conformity'),
             component: MinionTabConformity,
             data: { minion },
+            hidden: !hasResaltPermission($currentUser.perms, P_MINION_CONFORMITY),
         },
         {
             key: 'grains',
@@ -70,8 +71,7 @@
             path: paths.minion.getPath(minionId, 'pillars'),
             component: MinionTabPillars,
             data: { minion },
-            // TODO: add perm for pillars
-            hidden: !hasResaltPermission($currentUser.perms, P_ADMIN_GROUP),
+            hidden: !hasResaltPermission($currentUser.perms, P_MINION_PILLARS),
         },
         {
             key: 'packages',
@@ -79,6 +79,7 @@
             path: paths.minion.getPath(minionId, 'packages'),
             component: MinionTabPackages,
             data: { minion },
+            hidden: !hasResaltPermission($currentUser.perms, P_MINION_PACKAGES),
         },
     ];
 </script>
