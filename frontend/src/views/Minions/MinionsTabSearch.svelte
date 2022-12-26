@@ -266,7 +266,7 @@
                             >
                                 View
                             </Link>
-                            <Button color="secondary" size="sm" class="px-3" on:click={() => resync(minion.id)} disabled={$refreshing.indexOf(minion.id) !== -1}>
+                            <Button color="secondary" size="sm" style="width: 65px;" on:click={() => resync(minion.id)} disabled={$refreshing.indexOf(minion.id) !== -1}>
                                 {#if $refreshing.indexOf(minion.id) !== -1}
                                     <Spinner size="sm" />
                                 {:else}
