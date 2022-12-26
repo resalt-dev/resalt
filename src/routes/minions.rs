@@ -1,4 +1,4 @@
-use crate::components::*;
+use crate::{auth::*, components::*};
 use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 use resalt_models::*;
@@ -17,7 +17,16 @@ pub struct MinionsListGetQuery {
 pub async fn route_minions_get(
     data: web::Data<Box<dyn StorageImpl>>,
     query: web::Query<MinionsListGetQuery>,
+    req: HttpRequest,
 ) -> Result<impl Responder> {
+    let ext = req.extensions_mut();
+    let auth = ext.get::<AuthStatus>().unwrap();
+
+    // Validate permission
+    if !has_permission(&data, &auth.user_id, P_MINION_LIST)? {
+        return Err(api_error_forbidden());
+    }
+
     let filter = query.filter.clone();
     let filter = match filter {
         Some(filter) => Some(match urlencoding::decode(filter.as_str()) {
@@ -45,13 +54,30 @@ pub async fn route_minions_get(
         None => vec![],
     };
 
-    let minions = match data.list_minions(filters, sort, limit, offset) {
+    let mut minions = match data.list_minions(filters, sort, limit, offset) {
         Ok(minions) => minions,
         Err(e) => {
             error!("{:?}", e);
             return Err(api_error_database());
         }
     };
+
+    // Validate extra permission
+    if !has_permission(&data, &auth.user_id, P_MINION_CONFORMITY)? {
+        for minion in minions.iter_mut() {
+            minion.conformity = None;
+        }
+    }
+    if !has_permission(&data, &auth.user_id, P_MINION_PILLARS)? {
+        for minion in minions.iter_mut() {
+            minion.pillars = None;
+        }
+    }
+    if !has_permission(&data, &auth.user_id, P_MINION_PACKAGES)? {
+        for minion in minions.iter_mut() {
+            minion.pkgs = None;
+        }
+    }
 
     Ok(web::Json(minions))
 }
@@ -64,7 +90,16 @@ pub struct MinionGetInfo {
 pub async fn route_minion_get(
     data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<MinionGetInfo>,
+    req: HttpRequest,
 ) -> Result<impl Responder> {
+    let ext = req.extensions_mut();
+    let auth = ext.get::<AuthStatus>().unwrap();
+
+    // Validate permission
+    if !has_permission(&data, &auth.user_id, P_MINION_LIST)? {
+        return Err(api_error_forbidden());
+    }
+
     let minion = match data.get_minion_by_id(&info.id) {
         Ok(minion) => minion,
         Err(e) => {

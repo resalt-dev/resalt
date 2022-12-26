@@ -12,15 +12,25 @@ pub const P_ADMIN_USER: &str = "admin.user";
 pub const P_USER_PASSWORD: &str = "user.password";
 
 pub const P_RUN_LIVE: &str = "run.live";
+#[allow(dead_code)]
 pub const P_RUN_APPROVAL_LIST: &str = "run.approval.list";
+#[allow(dead_code)]
 pub const P_RUN_APPROVAL_SUBMIT: &str = "run.approval.submit";
+#[allow(dead_code)]
 pub const P_RUN_APPROVAL_JUDGE: &str = "run.approval.judge";
+#[allow(dead_code)]
 pub const P_RUN_APPROVAL_EXECUTE: &str = "run.approval.execute";
+#[allow(dead_code)]
 pub const P_RUN_APPROVAL_RECOUNT: &str = "run.approval.recount"; // Can reset all approvals/rejects
+#[allow(dead_code)]
 pub const P_RUN_APPROVAL_CLOSE: &str = "run.approval.close";
+#[allow(dead_code)]
 pub const P_RUN_APPROVAL_DELETE: &str = "run.approval.delete";
+#[allow(dead_code)]
 pub const P_RUN_TEMPLATE_LIST: &str = "run.template.list";
+#[allow(dead_code)]
 pub const P_RUN_TEMPLATE_LOCAL: &str = "run.template.local"; // Can create local templates
+#[allow(dead_code)]
 pub const P_RUN_TEMPLATE_GLOBAL: &str = "run.template.global"; // Can create global templates
 
 pub const P_MINION_LIST: &str = "minion.list";

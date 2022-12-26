@@ -1,4 +1,7 @@
-use crate::components::*;
+use crate::{
+    auth::{has_permission, P_RUN_LIVE},
+    components::*,
+};
 use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 use resalt_models::*;
@@ -47,11 +50,17 @@ pub struct JobRunRequest {
 
 pub async fn route_jobs_post(
     salt: web::Data<SaltAPI>,
+    data: web::Data<Box<dyn StorageImpl>>,
     input: web::Json<JobRunRequest>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
     let ext = req.extensions_mut();
     let auth = ext.get::<AuthStatus>().unwrap();
+
+    // Validate permission
+    if !has_permission(&data, &auth.user_id, P_RUN_LIVE)? {
+        return Err(api_error_forbidden());
+    }
 
     let salt_token = match &auth.salt_token {
         Some(salt_token) => salt_token,
