@@ -121,10 +121,26 @@ export async function getUsers(
     );
 }
 
+export async function createUser(
+    username: string,
+    email: string | null,
+    ldapSync: string | null,
+): Promise<User> {
+    return sendAuthenticatedRequest('POST', '/users', {
+        username,
+        email,
+        ldapSync,
+    }).then((data: any) => User.fromObject(data));
+}
+
 export async function getUserById(userId: string): Promise<User> {
     return sendAuthenticatedRequest('GET', `/users/${userId}`).then(
         (data: any) => User.fromObject(data),
     );
+}
+
+export async function deleteUser(userId: string): Promise<void> {
+    return sendAuthenticatedRequest('DELETE', `/users/${userId}`);
 }
 
 export async function updateUserPassword(

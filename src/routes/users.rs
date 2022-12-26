@@ -16,7 +16,16 @@ pub struct UsersListGetQuery {
 pub async fn route_users_get(
     data: web::Data<Box<dyn StorageImpl>>,
     query: web::Query<UsersListGetQuery>,
+    req: HttpRequest,
 ) -> Result<impl Responder> {
+    let ext = req.extensions_mut();
+    let auth = ext.get::<AuthStatus>().unwrap();
+
+    // Validate permission
+    if !has_permission(&data, &auth.user_id, P_ADMIN_USER)? {
+        return Err(api_error_forbidden());
+    }
+
     // Pagination
     let limit = query.limit;
     let offset = query.offset;
@@ -46,6 +55,67 @@ pub async fn route_users_get(
 }
 
 #[derive(Deserialize)]
+pub struct UserCreateRequest {
+    pub username: String,
+    pub email: Option<String>,
+    #[serde(rename = "ldapSync")]
+    pub ldap_sync: Option<String>,
+}
+
+pub async fn route_users_post(
+    data: web::Data<Box<dyn StorageImpl>>,
+    body: web::Json<UserCreateRequest>,
+    req: HttpRequest,
+) -> Result<impl Responder> {
+    let ext = req.extensions_mut();
+    let auth = ext.get::<AuthStatus>().unwrap();
+
+    // Validate permission
+    if !has_permission(&data, &auth.user_id, P_ADMIN_USER)? {
+        return Err(api_error_forbidden());
+    }
+
+    // Check if username is taken
+    let user = match data.get_user_by_username(&body.username) {
+        Ok(user) => user,
+        Err(e) => {
+            error!("{:?}", e);
+            return Err(api_error_database());
+        }
+    };
+
+    if user.is_some() {
+        return Err(api_error_invalid_request());
+    }
+
+    // Create user
+    let user = match data.create_user(
+        body.username.clone(),
+        None,
+        body.email.clone(),
+        body.ldap_sync.clone(),
+    ) {
+        Ok(user) => user,
+        Err(e) => {
+            error!("{:?}", e);
+            return Err(api_error_database());
+        }
+    };
+
+    // Map to - among other things - remove password
+    let permission_group = match data.list_permission_groups_by_user_id(&user.id) {
+        Ok(permission_groups) => permission_groups,
+        Err(e) => {
+            error!("{:?}", e);
+            return Err(api_error_database());
+        }
+    };
+    let user = user.public(permission_group);
+
+    Ok(web::Json(user))
+}
+
+#[derive(Deserialize)]
 pub struct UserGetInfo {
     user_id: String,
 }
@@ -53,7 +123,21 @@ pub struct UserGetInfo {
 pub async fn route_user_get(
     data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<UserGetInfo>,
+    req: HttpRequest,
 ) -> Result<impl Responder> {
+    let ext = req.extensions_mut();
+    let auth = ext.get::<AuthStatus>().unwrap();
+
+    // Validate permission
+    if !has_permission(&data, &auth.user_id, P_ADMIN_USER)? {
+        return Err(api_error_forbidden());
+    }
+
+    // Don't allow deleting self
+    if auth.user_id == info.user_id {
+        return Err(api_error_forbidden());
+    }
+
     let user = match data.get_user_by_id(&info.user_id) {
         Ok(user) => user,
         Err(e) => {
@@ -78,6 +162,31 @@ pub async fn route_user_get(
     let user = user.public(permission_group);
 
     Ok(web::Json(user))
+}
+
+pub async fn route_user_delete(
+    data: web::Data<Box<dyn StorageImpl>>,
+    info: web::Path<UserGetInfo>,
+    req: HttpRequest,
+) -> Result<impl Responder> {
+    let ext = req.extensions_mut();
+    let auth = ext.get::<AuthStatus>().unwrap();
+
+    // Validate permission
+    if !has_permission(&data, &auth.user_id, P_ADMIN_USER)? {
+        return Err(api_error_forbidden());
+    }
+
+    // Delete user
+    match data.delete_user(&info.user_id) {
+        Ok(_) => (),
+        Err(e) => {
+            error!("{:?}", e);
+            return Err(api_error_database());
+        }
+    };
+
+    return Ok(web::Json(()));
 }
 
 #[derive(Deserialize)]
@@ -143,8 +252,8 @@ pub struct UserPermissionInfo {
     group_id: String,
 }
 
-/// # Route: /users/{user_id}/permission/{group_id} (PUT)
-pub async fn route_user_permission_post(
+/// # Route: /users/{user_id}/permissions/{group_id} (PUT)
+pub async fn route_user_permissions_post(
     data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<UserPermissionInfo>,
     req: HttpRequest,
@@ -153,7 +262,7 @@ pub async fn route_user_permission_post(
     let auth = ext.get::<AuthStatus>().unwrap();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_ADMIN_USER)? {
+    if !has_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
         return Err(api_error_forbidden());
     }
 
@@ -214,8 +323,8 @@ pub async fn route_user_permission_post(
     return Ok(web::Json(()));
 }
 
-/// # Route: /users/{user_id}/permission/{group_id} (DELETE)
-pub async fn route_user_permission_delete(
+/// # Route: /users/{user_id}/permissions/{group_id} (DELETE)
+pub async fn route_user_permissions_delete(
     data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<UserPermissionInfo>,
     req: HttpRequest,

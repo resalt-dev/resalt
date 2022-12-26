@@ -50,7 +50,7 @@
                     <Route path="keys" component={Keys} />
                     <Route path="events" component={Events} />
                     <Route path="user/:userId" component={User} />
-                    <Route path="users" component={Users} />
+                    <Route path="users/*subPage" component={Users} />
                     <Route
                         path="preferences/*subPage"
                         component={Preferences}

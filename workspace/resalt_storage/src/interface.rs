@@ -20,6 +20,8 @@ pub trait StorageImpl: Send {
 
     fn update_user(&self, user: &User) -> Result<(), String>;
 
+    fn delete_user(&self, id: &str) -> Result<(), String>;
+
     fn create_authtoken(&self, user_id: String) -> Result<AuthToken, String>;
 
     fn get_authtoken_by_id(&self, id: &str) -> Result<Option<AuthToken>, String>;

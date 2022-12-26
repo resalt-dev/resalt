@@ -227,6 +227,14 @@ impl StorageImpl for StorageMySQL {
             .map(|_| ())
     }
 
+    fn delete_user(&self, id: &str) -> Result<(), String> {
+        let mut connection = self.create_connection()?;
+        diesel::delete(users::table.find(id))
+            .execute(&mut connection)
+            .map_err(|e| format!("{:?}", e))
+            .map(|_| ())
+    }
+
     ///////////////////
     /// Auth tokens ///
     ///////////////////

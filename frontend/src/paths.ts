@@ -1,4 +1,4 @@
-import { P_MINION_LIST, P_RUN_APPROVAL_LIST, P_RUN_APPROVAL_SUBMIT, P_RUN_LIVE, P_RUN_TEMPLATE_GLOBAL, P_RUN_TEMPLATE_LIST, P_RUN_TEMPLATE_LOCAL, hasResaltPermission } from "./perms";
+import { P_ADMIN_USER, P_MINION_LIST, P_RUN_APPROVAL_LIST, P_RUN_APPROVAL_SUBMIT, P_RUN_LIVE, P_RUN_TEMPLATE_GLOBAL, P_RUN_TEMPLATE_LIST, P_RUN_TEMPLATE_LOCAL, hasResaltPermission } from "./perms";
 
 export class Path {
     order: number;
@@ -72,8 +72,8 @@ const paths = {
 
     // -----
 
-    user: new Path(100, 'user', '/user/:userId', 'User', null, []),
-    users: new Path(101, 'users', '/users', 'Users', 'user-circle', []),
+    user: new Path(100, 'user', '/user/:userId', 'User', null, [P_ADMIN_USER]),
+    users: new Path(101, 'users', '/users/:usersPage', 'Users', 'user-circle', [P_ADMIN_USER]),
 
     settings: new Path(110, 'settings', '/settings/:settingsPage', 'Settings', 'cog', []),
 
