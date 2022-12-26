@@ -28,12 +28,11 @@
             <Row>
                 {#each constants.themeColors as color}
                     <Col xs="auto">
-                        <div
-                            class="theme-box mouse-pointer bg-{color} mb-4 border-{$theme.dark
+                        <Clickable
+                            event={() => selectColor(color)}
+                            class="theme-selector-box mouse-pointer bg-{color} mb-4 border-{$theme.dark
                                 ? 'secondary'
                                 : 'light'}"
-                            on:click={() => selectColor(color)}
-                            on:keypress={() => selectColor(color)}
                         >
                             {#if $theme.color === color}
                                 <Icon
@@ -44,7 +43,7 @@
                                     size="3"
                                 />
                             {/if}
-                        </div>
+                        </Clickable>
                     </Col>
                 {/each}
             </Row>
@@ -65,23 +64,22 @@
     <CardBody>
         <Row>
             <Col xs="auto">
-                <div
-                    class="theme-box mouse-pointer mb-4 border-{$theme.dark
+                <Clickable
+                    event={() => setDarkMode(false)}
+                    class="theme-selector-box mouse-pointer mb-4 border-{$theme.dark
                         ? 'secondary'
                         : 'light'}"
                     style="background-color: #fff;"
-                    on:click={() => setDarkMode(false)}
-                    on:keypress={() => setDarkMode(false)}
                 >
                     {#if $theme.dark === false}
                         <Icon name="check" class="text-black" size="3" />
                     {/if}
-                </div>
+                </Clickable>
             </Col>
             <Col xs="auto">
                 <Clickable
                     event={() => setDarkMode(true)}
-                    class="theme-box mouse-pointer bg-dark mb-4 border-{$theme.dark
+                    class="theme-selector-box mouse-pointer bg-dark mb-4 border-{$theme.dark
                         ? 'secondary'
                         : 'light'}"
                 >
@@ -121,7 +119,7 @@
 
 <style lang="scss">
     $theme-box-size: 75px;
-    .theme-box {
+    :global(.theme-selector-box) {
         width: $theme-box-size;
         height: $theme-box-size;
         border-radius: 10px;
