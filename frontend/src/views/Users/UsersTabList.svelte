@@ -9,6 +9,7 @@
     import { Link, type NavigateFn } from 'svelte-navigator';
     import { MessageType } from '../../models/MessageType';
     import type User from '../../models/User';
+	import Clickable from '../../components/Clickable.svelte';
 
     // svelte-ignore unused-export-let
     export let location: Location;
@@ -68,16 +69,17 @@ Search box here.
             {:else}
                 {#each $users as user}
                     <tr>
-                        <th
-                            class="mouse-pointer"
-                            on:click={() =>
-                                navigate(paths.user.getPath(user.id))}
+                        <Clickable
+                            event={() => navigate(paths.user.getPath(user.id))}
+                            type="th"
                         >
-                            {user.username}
-                            {#if user.id === $currentUser.id}
-                                <span class="text-{$theme.color}"> (You)</span>
-                            {/if}
-                        </th>
+                            <Link to={paths.user.getPath(user.id)} class="text-decoration-none text-reset">
+                                {user.username}
+                                {#if user.id === $currentUser.id}
+                                    <span class="text-{$theme.color}"> (You)</span>
+                                {/if}
+                            </Link>
+                        </Clickable>
                         <td>{user.id}</td>
                         <td>
                             {#if user.ldapSync !== null}

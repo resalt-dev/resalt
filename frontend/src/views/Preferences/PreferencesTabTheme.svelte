@@ -30,7 +30,7 @@
                     <Col xs="auto">
                         <Clickable
                             event={() => selectColor(color)}
-                            class="theme-selector-box mouse-pointer bg-{color} mb-4 border-{$theme.dark
+                            class="theme-selector-box bg-{color} mb-4 border-{$theme.dark
                                 ? 'secondary'
                                 : 'light'}"
                         >
@@ -66,7 +66,7 @@
             <Col xs="auto">
                 <Clickable
                     event={() => setDarkMode(false)}
-                    class="theme-selector-box mouse-pointer mb-4 border-{$theme.dark
+                    class="theme-selector-box mb-4 border-{$theme.dark
                         ? 'secondary'
                         : 'light'}"
                     style="background-color: #fff;"
@@ -79,7 +79,7 @@
             <Col xs="auto">
                 <Clickable
                     event={() => setDarkMode(true)}
-                    class="theme-selector-box mouse-pointer bg-dark mb-4 border-{$theme.dark
+                    class="theme-selector-box bg-dark mb-4 border-{$theme.dark
                         ? 'secondary'
                         : 'light'}"
                 >

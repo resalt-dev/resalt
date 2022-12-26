@@ -16,6 +16,7 @@
     import paths from '../../paths';
     import { theme, toasts } from '../../stores';
     import MinionsFiltersBox from './MinionsFiltersBox.svelte';
+    import Clickable from '../../components/Clickable.svelte';
 
     export let navigate: NavigateFn;
     export let filters: Writable<Filter[]>;
@@ -222,13 +223,14 @@
             {:else}
                 {#each $minions as minion}
                     <tr>
-                        <th
-                            class="mouse-pointer"
-                            on:click={() =>
-                                navigate(paths.minion.getPath(minion.id))}
+                        <Clickable
+                            event={() => navigate(paths.minion.getPath(minion.id))}
+                            type="th"
                         >
-                            {minion.id}
-                        </th>
+                            <Link to={paths.minion.getPath(minion.id)} class="text-decoration-none text-reset">
+                                {minion.id}
+                            </Link>
+                        </Clickable>
                         <td>{minion.osType ?? 'Unknown'}</td>
                         <td>{minion.lastSeen}</td>
                         <td>

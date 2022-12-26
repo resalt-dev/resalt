@@ -30,7 +30,7 @@
 >
     <Clickable
         event={handleClickCollapse}
-        class="d-flex text-decoration-none mouse-pointer"
+        class="d-flex text-decoration-none"
     >
         <div
             class="d-flex align-items-center py-4 {$collapsed
@@ -69,7 +69,7 @@
 
     <Clickable
         event={handleClickCollapse}
-        class="btn-dark bg-dark border-0 pt-3 pb-3 px-3 fw-light mouse-pointer d-flex align-items-center"
+        class="btn-dark bg-dark border-0 pt-3 pb-3 px-3 fw-light d-flex align-items-center"
     >
         <Icon
             name={$collapsed ? 'right-arrow-alt' : 'left-arrow-alt'}
@@ -88,7 +88,7 @@
         <Clickable
             type="span"
             event={toggleUpdate}
-            class="text-center link-danger text-decoration-underline mouse-pointer"
+            class="text-center link-danger text-decoration-underline"
         >
             {#if $collapsed}
                 {$config.currentVersion}
@@ -102,7 +102,7 @@
         <Clickable
             type="span"
             event={toggleUpdate}
-            class="text-center link-warning text-decoration-underline mouse-pointer"
+            class="text-center link-warning text-decoration-underline"
         >
             {#if $collapsed}
                 {$config.currentVersion}

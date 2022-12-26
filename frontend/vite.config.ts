@@ -8,7 +8,7 @@ const production = process.env.NODE_ENV === 'production';
 // https://vitejs.dev/config/
 export default defineConfig({
 	optimizeDeps:{
-		exclude:['svelte-routing']
+		exclude:['svelte-routing', 'svelte-navigator']
 	},
 	build: {
 		outDir: 'build',
