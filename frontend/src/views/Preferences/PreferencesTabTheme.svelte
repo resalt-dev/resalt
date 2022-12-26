@@ -93,7 +93,7 @@
         <Button
             color={null}
             class="btn-{$theme.color}"
-            on:click={() => setDarkMode(false)}
+            on:click={() => setDarkMode($config.defaultThemeDark)}
         >
             Reset
         </Button>

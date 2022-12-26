@@ -51,8 +51,9 @@
                 // set default color if theme.color is null
                 if (!$theme.color) {
                     $theme.color = data.defaultThemeColor;
+                    $theme.dark = data.defaultThemeDark;
                 }
-                // reset theme is switching is disabled
+                // reset color if switching is disabled
                 if (!data.enableThemeSwitching) {
                     $theme.color = data.defaultThemeColor;
                 }

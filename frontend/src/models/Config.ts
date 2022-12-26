@@ -5,6 +5,7 @@ export default class Config {
             data.currentVersion,
             data.latestVersion,
             data.defaultThemeColor,
+            data.defaultThemeDark,
             data.enableThemeSwitching,
         );
     }
@@ -17,6 +18,8 @@ export default class Config {
 
     defaultThemeColor: string;
 
+    defaultThemeDark: boolean;
+
     enableThemeSwitching: boolean;
 
     constructor(
@@ -24,12 +27,14 @@ export default class Config {
         currentVersion: string,
         latestVersion: string,
         defaultThemeColor: string,
+        defaultThemeDark: boolean,
         enableThemeSwitching: boolean,
     ) {
         this.authForwardEnabled = authForwardEnabled;
         this.currentVersion = currentVersion;
         this.latestVersion = latestVersion;
         this.defaultThemeColor = defaultThemeColor;
+        this.defaultThemeDark = defaultThemeDark;
         this.enableThemeSwitching = enableThemeSwitching;
     }
 }

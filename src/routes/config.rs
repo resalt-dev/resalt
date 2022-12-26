@@ -12,6 +12,7 @@ struct ApiConfig {
     currentVersion: String,
     latestVersion: String,
     defaultThemeColor: String,
+    defaultThemeDark: bool,
     enableThemeSwitching: bool,
 }
 
@@ -27,6 +28,7 @@ pub async fn route_config_get() -> Result<impl Responder> {
             }
         },
         defaultThemeColor: SConfig::http_frontend_theme_color(),
+        defaultThemeDark: SConfig::http_frontend_theme_dark(),
         enableThemeSwitching: SConfig::http_frontend_theme_enabled(),
     };
     Ok(web::Json(config))

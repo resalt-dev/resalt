@@ -62,3 +62,4 @@ port = 8000
 [http.frontend.theme]
 enabled = true
 color = "primary"
+dark = false
