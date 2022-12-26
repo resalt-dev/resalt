@@ -133,11 +133,6 @@ pub async fn route_user_get(
         return Err(api_error_forbidden());
     }
 
-    // Don't allow deleting self
-    if auth.user_id == info.user_id {
-        return Err(api_error_forbidden());
-    }
-
     let user = match data.get_user_by_id(&info.user_id) {
         Ok(user) => user,
         Err(e) => {
@@ -174,6 +169,11 @@ pub async fn route_user_delete(
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_ADMIN_USER)? {
+        return Err(api_error_forbidden());
+    }
+
+    // Don't allow deleting self
+    if auth.user_id == info.user_id {
         return Err(api_error_forbidden());
     }
 

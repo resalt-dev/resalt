@@ -104,6 +104,12 @@ pub fn evalute_resalt_permission(permissions: &Value, permission: &str) -> bool 
             None => continue,
         };
         for test_perm in &test_perms {
+            log::debug!(
+                "test perm: {:?} {:?} {:?}",
+                test_perm,
+                user_permission,
+                test_perm.eq(user_permission)
+            );
             if test_perm.eq(user_permission) {
                 return true;
             }
