@@ -3,8 +3,9 @@
     import Icon from '../../components/Icon.svelte';
     import constants from '../../constants';
     import { MessageType } from '../../models/MessageType';
-    import { config, theme, toasts } from '../../stores';
+    import { config, currentUser, theme, toasts } from '../../stores';
     import Clickable from '../../components/Clickable.svelte';
+	import { hasResaltPermission, P_ADMIN_SUPERADMIN } from '../../perms';
 
     function selectColor(color: string): void {
         console.log('selectColor', color);
@@ -98,22 +99,24 @@
             Reset
         </Button>
 
-        <Button
-            color="warning"
-            on:click={() => {
-                toasts.add(
-                    MessageType[
-                        Object.keys(MessageType).filter((k) =>
-                            isNaN(Number(k)),
-                        )[$toasts.length]
-                    ],
-                    'Testing toast!',
-                    "This is a test toast message. It's a bit longer than the others, but that's okay.",
-                );
-            }}
-        >
-            Show toast
-        </Button>
+        {#if hasResaltPermission($currentUser.perms, P_ADMIN_SUPERADMIN)}
+            <Button
+                color="warning"
+                on:click={() => {
+                    toasts.add(
+                        MessageType[
+                            Object.keys(MessageType).filter((k) =>
+                                isNaN(Number(k)),
+                            )[$toasts.length]
+                        ],
+                        'Testing toast!',
+                        "This is a test toast message. It's a bit longer than the others, but that's okay.",
+                    );
+                }}
+            >
+                Show toast
+            </Button>
+        {/if}
     </CardBody>
 </Card>
 
