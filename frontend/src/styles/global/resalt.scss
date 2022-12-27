@@ -23,13 +23,19 @@ $bluegray-10: #0e1418;
         border-color: $bluegray-5 !important;
     }
     
-    .form-control {
+    .form-control, .form-select {
         background-color: $bluegray-8 !important;
         border-color: $bluegray-6;
         color: var(--light-gray);
     }
-    .form-control:focus {
-        border-color: var(--primary);
+    .form-control.is-invalid, .form-select.is-invalid {
+        border-color: var(--red);
+    }
+    .form-control:focus, .form-select:focus {
+        box-shadow: 0 0 0 .25rem $bluegray-5;
+    }
+    .form-control.is-invalid:focus, .form-select.is-invalid:focus {
+        box-shadow: 0 0 0 .25rem var(--dark-red);
     }
     .form-switch > input {
         background-color: $bluegray-8 !important;
