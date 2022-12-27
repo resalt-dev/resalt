@@ -67,7 +67,7 @@
                     </p>
                 </div>
 
-                <hr class="text-light my-3" />
+                <hr class="bg-light my-3" />
 
                 <div class="mouse-pointer py-4">
                     <Icon name="comment-dots" size="7" />
