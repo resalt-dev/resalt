@@ -54,10 +54,18 @@
     */
 
     function validateUsernameField(): void {
+        if (usernameFieldValue.length === 0) {
+            usernameFieldError = true;
+            return;
+        }
         usernameFieldError = false;
     }
 
     function validatePasswordField(): void {
+        if (passwordFieldValue.length < 8) {
+            passwordFieldError = true;
+            return;
+        }
         passwordFieldError = false;
     }
 </script>

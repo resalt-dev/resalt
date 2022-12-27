@@ -5,34 +5,36 @@
         FormGroup,
         Input,
         Label,
-        Modal,
-        ModalBody,
-        ModalHeader,
         Row,
-        Table,
     } from 'sveltestrap';
     import { quoteSplit } from '../../utils';
-    import { theme, toasts } from '../../stores';
+    import { toasts } from '../../stores';
     import { runJob } from '../../api';
     import RunResult from '../../models/RunResult';
     import RunCommand from '../../models/RunCommand';
     import { MessageType } from '../../models/MessageType';
-    import type { Writable } from 'svelte/store';
-    import CopyButton from '../../components/CopyButton.svelte';
+	import RunClientType from '../../models/RunClientType';
+	import RunConfirmLiveBox from './RunConfirmLiveBox.svelte';
+	import type { Writable } from 'svelte/store';
 
     export let returns: Writable<RunResult[]>;
 
-    let runConfirmDialog = false;
-
-    let runClientType = 'local';
-    let runTargetType = 'glob';
-    let runTarget = '';
-    let runFunction = '';
-    let runArguments = '';
-    let runKeywordArguments = '';
-    let runAsync = false;
-    let runBatch = false;
-    let runBatchSize = '';
+    let clientTypeFieldValue: string = 'local';
+    let clientTypeFieldError: boolean = false;
+    let targetTypeFieldValue: string = 'glob';
+    let targetTypeFieldError: boolean = false;
+    let targetFieldValue: string = '';
+    let targetFieldError: boolean = false;
+    let functionFieldValue: string = '';
+    let functionFieldError: boolean = false;
+    let argsFieldValue: string = '';
+    let argsFieldError: boolean = false;
+    let kwargsFieldValue: string = '';
+    let kwargsFieldError: boolean = false;
+    let asyncFieldValue = false;
+    let batchFieldValue = false;
+    let batchSizeFieldValue: string = '';
+    let batchSizeFieldError: boolean = false;
 
     // Pre-computed before showing the confirmation modal.
     let command: RunCommand = null;
@@ -43,10 +45,10 @@
 
     function formRunNow() {
         // Error-checking
-        if (runTarget.length === 0) {
+        if (targetFieldValue.length === 0) {
             return;
         }
-        if (runFunction.length === 0) {
+        if (functionFieldValue.length === 0) {
             return;
         }
 
@@ -55,37 +57,37 @@
 
     function openRunNowDialog() {
         // client
-        let client = null;
-        switch (runClientType) {
+        let client: RunClientType = null;
+        switch (clientTypeFieldValue) {
             case 'local':
-                if (runBatch && runBatchSize.length > 0) {
-                    client = 'local_batch';
-                } else if (runAsync) {
-                    client = 'local_async';
+                if (batchFieldValue && batchSizeFieldValue.length > 0) {
+                    client = RunClientType.LOCAL_BATCH;
+                } else if (asyncFieldValue) {
+                    client = RunClientType.LOCAL_ASYNC;
                 } else {
-                    client = 'local';
+                    client = RunClientType.LOCAL;
                 }
                 break;
             case 'runner':
-                if (runAsync) {
-                    client = 'runner_async';
+                if (asyncFieldValue) {
+                    client = RunClientType.RUNNER_ASYNC;
                 } else {
-                    client = 'runner';
+                    client = RunClientType.RUNNER;
                 }
                 break;
             case 'wheel':
-                if (runAsync) {
-                    client = 'wheel_async';
+                if (asyncFieldValue) {
+                    client = RunClientType.WHEEL_ASYNC;
                 } else {
-                    client = 'wheel';
+                    client = RunClientType.WHEEL;
                 }
                 break;
         }
         // arg
-        let arg = quoteSplit(runArguments);
+        let arg = quoteSplit(argsFieldValue);
         // kwarg
         let kwarg = new Map<string, string>();
-        quoteSplit(runKeywordArguments).forEach((item) => {
+        quoteSplit(kwargsFieldValue).forEach((item) => {
             let [key, value] = item.split('=');
             kwarg.set(key, value);
         });
@@ -95,23 +97,20 @@
         // the result in results array.
         command = new RunCommand(
             client,
-            runTargetType,
-            runTarget,
-            runFunction,
+            targetTypeFieldValue,
+            targetFieldValue,
+            functionFieldValue,
             arg,
             kwarg,
-            runBatchSize,
+            batchSizeFieldValue,
         );
-
-        // Show confirm dialog
-        runConfirmDialog = true;
     }
 
     function closeRunNowDialog() {
-        runConfirmDialog = false;
+        command = null;
     }
 
-    function executeRunNow() {
+    function _runNow() {
         runJob(
             command.client,
             command.targetType,
@@ -134,16 +133,49 @@
             });
         closeRunNowDialog();
     }
+
+    /*
+    // VALIDATION
+    */
+
+    function validateClientTypeField(): void {
+        clientTypeFieldError = false;
+    }
+
+    function validateTargetTypeField(): void {
+        targetTypeFieldError = false;
+    }
+
+    function validateTargetField(): void {
+        targetFieldError = false;
+    }
+
+    function validateFunctionField(): void {
+        functionFieldError = false;
+    }
+
+    function validateArgsField(): void {
+        argsFieldError = false;
+    }
+
+    function validateKwargsField(): void {
+        kwargsFieldError = false;
+    }
+
+    function validateBatchSizeField(): void {
+        batchSizeFieldError = false;
+    }
 </script>
 
 <Row>
     <Col class="ps-3 mb-0" md="3" lg="2">
         <FormGroup floating={true}>
             <Input
-                id="clientType"
                 type="select"
                 name="select"
-                bind:value={runClientType}
+                invalid={clientTypeFieldError}
+                bind:value={clientTypeFieldValue}
+                on:blur={validateClientTypeField}
             >
                 <option value="local" selected>Local</option>
                 <option value="runner">Runner</option>
@@ -153,37 +185,44 @@
         </FormGroup>
     </Col>
     <Col class="ps-3 mb-0" md="2" lg={{ size: 1, offset: 1 }}>
-        {#if !runBatch}
+        {#if !batchFieldValue}
             <div class="clearfix" />
             <Label for="async" class="ms-1 mb-0">Async</Label>
             <FormGroup floating={true} class="form-switch ps-0">
-                <input
-                    id="async"
-                    type="checkbox"
-                    class="form-check-input fs-3 ms-0 mt-0"
-                    bind:checked={runAsync}
+                <Input
+                    type="switch"
+                    class="fs-3"
+                    invalid={clientTypeFieldError}
+                    bind:checked={asyncFieldValue}
+                    on:blur={validateClientTypeField}
                 />
             </FormGroup>
         {/if}
     </Col>
     <Col class="ps-3 mb-0" md="2" lg={{ size: 1, offset: 1 }}>
-        {#if runClientType === 'local'}
+        {#if clientTypeFieldValue === 'local'}
             <div class="clearfix" />
             <Label for="batch" class="ms-1 mb-0">Batch</Label>
             <FormGroup floating={true} class="form-switch ps-0">
-                <input
-                    id="batch"
-                    type="checkbox"
-                    class="form-check-input fs-3 ms-0 mt-0"
-                    bind:checked={runBatch}
+                <Input
+                    type="switch"
+                    class="fs-3"
+                    invalid={clientTypeFieldError}
+                    bind:checked={batchFieldValue}
+                    on:blur={validateClientTypeField}
                 />
             </FormGroup>
         {/if}
     </Col>
     <Col class="ps-3 mb-0" md="2" lg="2" xl="1">
-        {#if runClientType === 'local' && runBatch}
+        {#if clientTypeFieldValue === 'local' && batchFieldValue}
             <FormGroup floating={true}>
-                <Input id="batchSize" type="text" bind:value={runBatchSize} />
+                <Input
+                    type="text"
+                    invalid={batchSizeFieldError}
+                    bind:value={batchSizeFieldValue}
+                    on:blur={validateBatchSizeField}
+                />
                 <Label for="batchSize">Batch Size</Label>
             </FormGroup>
         {/if}
@@ -192,13 +231,13 @@
 
 <Row>
     <Col class="ps-3 mb-0" md="3" lg="2" xl="2" xxl="1">
-        {#if runClientType === 'local'}
+        {#if clientTypeFieldValue === 'local'}
             <FormGroup floating={true}>
                 <Input
-                    id="targetType"
                     type="select"
-                    name="select"
-                    bind:value={runTargetType}
+                    invalid={targetTypeFieldError}
+                    bind:value={targetTypeFieldValue}
+                    on:blur={validateTargetTypeField}
                 >
                     <option value="glob" selected>Glob</option>
                     <option value="pcre">PCRE</option>
@@ -217,31 +256,47 @@
         {/if}
     </Col>
     <Col class="ps-3 mb-0" md="5" lg="2">
-        {#if runClientType === 'local'}
+        {#if clientTypeFieldValue === 'local'}
             <FormGroup floating={true}>
-                <Input id="target" type="text" bind:value={runTarget} />
+                <Input
+                    type="text"
+                    invalid={targetFieldError}
+                    bind:value={targetFieldValue}
+                    on:blur={validateTargetField}
+                />
                 <Label for="target">Target</Label>
             </FormGroup>
         {/if}
     </Col>
     <Col class="ps-3 mb-0" md="4" lg="2">
         <FormGroup floating={true}>
-            <Input id="function" type="text" bind:value={runFunction} />
+            <Input
+                type="text"
+                invalid={functionFieldError}
+                bind:value={functionFieldValue}
+                on:blur={validateFunctionField}
+            />
             <Label for="function">Function</Label>
         </FormGroup>
     </Col>
     <Col class="ps-3 mb-0" md="12" lg="3">
         <FormGroup floating={true}>
-            <Input id="arguments" type="text" bind:value={runArguments} />
+            <Input
+                type="text"
+                invalid={argsFieldError}
+                bind:value={argsFieldValue}
+                on:blur={validateArgsField}
+            />
             <Label for="arguments">Arguments</Label>
         </FormGroup>
     </Col>
     <Col class="ps-3 mb-0" md="12" lg="3" xl="3" xxl="4">
         <FormGroup floating={true}>
             <Input
-                id="keywordArguments"
                 type="text"
-                bind:value={runKeywordArguments}
+                invalid={kwargsFieldError}
+                bind:value={kwargsFieldValue}
+                on:blur={validateKwargsField}
             />
             <Label for="keywordArguments">Keyword Arguments</Label>
         </FormGroup>
@@ -257,101 +312,21 @@
             class="me-3"
             color="success"
             on:click={formSaveTemplate}
-            disabled>Save as Template</Button
+            disabled
         >
-        <Button class="me-3" color="primary" on:click={formApproval} disabled
-            >Submit for Approval</Button
-        >
-        <Button class="me-1" color="warning" on:click={formRunNow}
-            >Run Now</Button
-        >
+            Save as Template
+        </Button>
+        <Button class="me-3" color="primary" on:click={formApproval} disabled>
+            Submit for Approval
+        </Button>
+        <Button class="me-1" color="warning" on:click={formRunNow}>
+            Run Now
+        </Button>
     </Col>
 </Row>
 
-<div>
-    <Modal
-        isOpen={runConfirmDialog}
-        toggle={() => {
-            runConfirmDialog = false;
-        }}
-        class={$theme.dark ? 'theme-dark' : ''}
-        contentClassName={$theme.dark ? 'bg-secondary text-white' : ''}
-    >
-        <ModalHeader
-            toggle={() => {
-                runConfirmDialog = false;
-            }}
-            class="bg-warning text-dark"
-        >
-            Live-Run Execution
-        </ModalHeader>
-        <ModalBody>
-            The following command is about to be executed:
-            <br />
-            <br />
-
-            <!-- Summarize what is about to be run -->
-            <Table>
-                <tbody>
-                    <tr>
-                        <th style="width: 50%">Client Type</th>
-                        <td>{runClientType}</td>
-                    </tr>
-                    {#if runClientType === 'local'}
-                        <tr>
-                            <th>Target Type</th>
-                            <td>{runTargetType}</td>
-                        </tr>
-                        <tr>
-                            <th>Target</th>
-                            <td>{runTarget}</td>
-                        </tr>
-                    {/if}
-                    <tr>
-                        <th>Function</th>
-                        <td>{runFunction}</td>
-                    </tr>
-                    <tr>
-                        <th>Arguments</th>
-                        <td>{runArguments}</td>
-                    </tr>
-                    <tr>
-                        <th>Keyword Arguments</th>
-                        <td>{runKeywordArguments}</td>
-                    </tr>
-                    <tr>
-                        <th>Async</th>
-                        <td>{runAsync}</td>
-                    </tr>
-                    {#if runClientType === 'local'}
-                        <tr>
-                            <th>Batch</th>
-                            <td
-                                >{runBatch}
-                                {#if runBatch}({runBatchSize}){/if}</td
-                            >
-                        </tr>
-                    {/if}
-                </tbody>
-            </Table>
-
-            <br />
-            Command-line equivalent:<br />
-            <br />
-
-            <!-- Generate the command-line equivalent -->
-            <code>{command.toCommandLine()}</code>
-
-            <br />
-            <br />
-            <br />
-
-            <div class="text-center">
-                <Button color="warning" on:click={closeRunNowDialog}
-                    >Cancel</Button
-                >
-                <Button color="danger" on:click={executeRunNow}>Execute</Button>
-            </div>
-        </ModalBody>
-    </Modal>
-</div>
+<RunConfirmLiveBox
+    {command}
+    close={closeRunNowDialog}
+    execute={_runNow}
+/>

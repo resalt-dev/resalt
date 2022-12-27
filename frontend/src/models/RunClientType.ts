@@ -21,6 +21,20 @@ export namespace RunClientType {
     export function isAsync(client: RunClientType): boolean {
         return client.endsWith('_async');
     }
+
+    export function isBatch(client: RunClientType): boolean {
+        return client.endsWith('_batch');
+    }
+
+    export function getBaseType(client: RunClientType): string {
+        if (isAsync(client)) {
+            return client.slice(0, -6);
+        }
+        if (isBatch(client)) {
+            return client.slice(0, -6);
+        }
+        return client;
+    }
 }
 
 export default RunClientType;
