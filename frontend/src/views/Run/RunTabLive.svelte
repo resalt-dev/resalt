@@ -7,7 +7,6 @@
         Label,
         Modal,
         ModalBody,
-        ModalFooter,
         ModalHeader,
         Row,
         Table,
@@ -59,7 +58,7 @@
         let client = null;
         switch (runClientType) {
             case 'local':
-                if (runBatch) {
+                if (runBatch && runBatchSize.length > 0) {
                     client = 'local_batch';
                 } else if (runAsync) {
                     client = 'local_async';

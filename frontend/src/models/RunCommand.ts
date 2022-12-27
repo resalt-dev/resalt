@@ -41,7 +41,7 @@ export default class RunResult {
         let result = '';
 
         // Client
-        if (this.client === RunClientType.LOCAL) {
+        if (this.client === RunClientType.LOCAL || this.client === RunClientType.LOCAL_ASYNC || this.client === RunClientType.LOCAL_BATCH) {
             result += 'salt';
             if (this.targetType === 'glob') {
                 // None
@@ -67,7 +67,7 @@ export default class RunResult {
                 result += ' -S';
             }
             result += ` "${this.target}"`;
-        } else if (this.client === RunClientType.RUNNER) {
+        } else if (this.client === RunClientType.RUNNER || this.client === RunClientType.RUNNER_ASYNC) {
             result += 'salt-run';
         }
 
@@ -77,8 +77,8 @@ export default class RunResult {
         }
 
         // Batch
-        if (this.client === RunClientType.LOCAL_BATCH) {
-            result += ` --batch ${this.batchSize}`;
+        if (this.client === RunClientType.LOCAL_BATCH && this.batchSize.length > 0) {
+            result += ` --batch-size ${this.batchSize}`;
         }
 
         // Function
