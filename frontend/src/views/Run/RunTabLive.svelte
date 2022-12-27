@@ -39,16 +39,24 @@
     // Pre-computed before showing the confirmation modal.
     let command: RunCommand = null;
 
-    function formSaveTemplate() {}
-
-    function formApproval() {}
-
-    function formRunNow() {
-        // Error-checking
-        if (targetFieldValue.length === 0) {
+    function formSaveTemplate() {
+        if (!validate()) {
             return;
         }
-        if (functionFieldValue.length === 0) {
+
+        // TODO formSaveTemplate
+    }
+
+    function formApproval() {
+        if (!validate()) {
+            return;
+        }
+
+        // TODO formApproval
+    }
+
+    function formRunNow() {
+        if (!validate()) {
             return;
         }
 
@@ -111,19 +119,20 @@
     }
 
     function _runNow() {
+        let localCommand = command;
         runJob(
-            command.client,
-            command.targetType,
-            command.target,
-            command.fun,
-            command.arg,
-            command.kwarg,
-            command.batchSize,
+            localCommand.client,
+            localCommand.targetType,
+            localCommand.target,
+            localCommand.fun,
+            localCommand.arg,
+            localCommand.kwarg,
+            localCommand.batchSize,
         )
             .then((result) => {
                 console.log(result);
                 returns.update((returns: RunResult[]) => [
-                    new RunResult(command, returns.length, result),
+                    new RunResult(localCommand, returns.length, result),
                     ...returns,
                 ]);
             })
@@ -138,19 +147,60 @@
     // VALIDATION
     */
 
+    function validate(): boolean {
+        validateClientTypeField();
+        validateTargetTypeField();
+        validateTargetField();
+        validateFunctionField();
+        validateArgsField();
+        validateKwargsField();
+        validateBatchSizeField();
+
+        return (
+            !clientTypeFieldError &&
+            !targetTypeFieldError &&
+            !targetFieldError &&
+            !functionFieldError &&
+            !argsFieldError &&
+            !kwargsFieldError &&
+            !batchSizeFieldError
+        );
+    }
+
     function validateClientTypeField(): void {
         clientTypeFieldError = false;
     }
 
     function validateTargetTypeField(): void {
+        if (targetTypeFieldValue.length === 0) {
+            targetTypeFieldError = true;
+            return;
+        }
         targetTypeFieldError = false;
     }
 
     function validateTargetField(): void {
+        if (targetFieldValue.length === 0) {
+            targetFieldError = true;
+            return;
+        }
         targetFieldError = false;
     }
 
     function validateFunctionField(): void {
+        functionFieldValue = functionFieldValue.toLowerCase();
+        if (functionFieldValue.length < 3) {
+            functionFieldError = true;
+            return;
+        }
+        if (functionFieldValue.indexOf('.') === -1) {
+            functionFieldError = true;
+            return;
+        }
+        if (functionFieldValue.startsWith('.') || functionFieldValue.endsWith('.')) {
+            functionFieldError = true;
+            return;
+        }
         functionFieldError = false;
     }
 
@@ -163,7 +213,16 @@
     }
 
     function validateBatchSizeField(): void {
-        batchSizeFieldError = false;
+        if (batchFieldValue && batchSizeFieldValue.length === 0) {
+            batchSizeFieldError = true;
+            return;
+        }
+        // Error if contains anything else but numbers and percent sign
+        if (!batchSizeFieldValue.match(/[^0-9%]/)) {
+            batchSizeFieldError = false;
+            return;
+        }
+        batchSizeFieldError = true;
     }
 </script>
 

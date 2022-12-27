@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Button, Modal, ModalBody, ModalHeader, Table } from "sveltestrap";
+	import CopyButton from "../../components/CopyButton.svelte";
 	import RunClientType from "../../models/RunClientType";
 	import type RunCommand from "../../models/RunCommand";
 	import { theme } from "../../stores";
@@ -7,6 +8,18 @@
     export let command: RunCommand;
     export let close: () => void;
     export let execute: () => void;
+
+    let commandLine: string;
+    $: commandLine = command !== null ? command.toCommandLine() : '';
+    let prettyKwargs: string = '';
+    $: {
+        prettyKwargs = "";
+        if (command !== null) {
+            command.kwarg.forEach((value, key) => {
+                prettyKwargs += ` ${key}=${value}`;
+            });
+        }
+    };
 
 </script>
 
@@ -54,7 +67,7 @@
                 </tr>
                 <tr>
                     <th>Keyword Arguments</th>
-                    <td>{command.kwarg.toString()}</td>
+                    <td>{prettyKwargs}</td>
                 </tr>       
                 <tr>
                     <th>Async</th>
@@ -76,8 +89,7 @@
         Command-line equivalent:<br />
         <br />
 
-        <!-- Generate the command-line equivalent -->
-        <code>{command.toCommandLine()}</code>
+        <code>{commandLine}</code> <CopyButton name="Command" value={commandLine} />
 
         <br />
         <br />
