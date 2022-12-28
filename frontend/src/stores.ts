@@ -17,7 +17,7 @@ export const auth: Writable<string | null> = writableLocalStorage(`${prefix}auth
 export const config: Writable<Config | null> = writableLocalStorage(`${prefix}config`, null);
 export const socket = writable({
 	connected: false,
-	last_ping: null,
+	lastPing: null,
 });
 export const theme = writableLocalStorage(`${prefix}theme`, {
 	color: null,

@@ -9,6 +9,7 @@
 	import { writable, type Writable } from 'svelte/store';
 	import type { NavigateFn } from 'svelte-navigator';
 	import type EventsWriteableData from '../../models/EventsWriteableData';
+	import Clickable from '../../components/Clickable.svelte';
 
 	// svelte-ignore unused-export-let
 	export let location: Location;
@@ -42,9 +43,9 @@
 							jid: data.jid ?? '',
 							target: data.id ?? '',
 							fun: data.fun ?? '',
-							data_parsed: data,
-							data_formatted: JSON.stringify(data, null, 2),
-							unique_index: (
+							dataParsed: data,
+							dataFormatted: JSON.stringify(data, null, 2),
+							uniqueIndex: (
 								(event.tag ?? '') +
 								'_' +
 								(event.timestamp ?? '')
@@ -103,27 +104,24 @@
 				{#each $events as event}
 					<tr>
 						<!-- <th>{event.id}</th> -->
-						<td
-							on:click={() => toggleExpandEvent(event.unique_index)}
-							class="mouse-pointer"
-						>
+						<Clickable typ="td" event={() => toggleExpandEvent(event.uniqueIndex)}>
 							<Icon
 								size="1.25"
-								name={$expandedEvents.includes(event.unique_index)
+								name={$expandedEvents.includes(event.uniqueIndex)
 									? 'chevron-up'
 									: 'chevron-down'}
 							/>
 							{event.tag}
-						</td>
+						</Clickable>
 						<td>{event.fun}</td>
 						<td>{event.target}</td>
 						<td>{event.jid}</td>
 						<td><small>{event.timestamp}</small></td>
 					</tr>
-					{#if $expandedEvents.includes(event.unique_index)}
+					{#if $expandedEvents.includes(event.uniqueIndex)}
 						<tr>
 							<td class="bg-light" colspan="5">
-								<pre class="text-left">{event.data_formatted}</pre>
+								<pre class="text-left">{event.dataFormatted}</pre>
 							</td>
 						</tr>
 					{/if}

@@ -41,14 +41,14 @@ export class Path {
 		this.label = label;
 		this.icon = icon || '';
 		this.showInNav = icon !== null;
+		this.perms = perms;
 	}
 
 	getPath(...args: string[]): string {
 		let { path } = this;
 
 		// Substitute url arguments (.e.g ":id" or ":group") with args
-		// eslint-disable-next-line no-unused-vars
-		path = path.replace(/:([^/]+)/g, (_match, _p1) => args.shift() || '');
+		path = path.replace(/:([^/]+)/g, () => args.shift() || '');
 
 		// Trim trailing slashes
 		return path.replace(/\/+$/, '');

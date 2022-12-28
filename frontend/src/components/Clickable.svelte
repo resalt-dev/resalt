@@ -3,24 +3,42 @@
 	type A11yType = 'div' | 'span' | 'th';
 	let event: any,
 		type: A11yType = 'div',
+		disabled: boolean = false,
 		inputProps: any;
-	$: ({ event, type, ...inputProps } = $$props);
+	$: ({ event, type, disabled, ...inputProps } = $$props);
 	// Check if props.class contain "mouse-pointer", if not add it
-	$: if (!inputProps.class?.includes('mouse-pointer')) {
-		inputProps.class = inputProps.class ? `${inputProps.class} mouse-pointer` : 'mouse-pointer';
+	$: if (disabled) {
+		if (!inputProps.class?.includes('no-select')) {
+			inputProps.class = inputProps.class ? `${inputProps.class} no-select` : 'no-select';
+		}
+	} else {
+		if (!inputProps.class?.includes('mouse-pointer')) {
+			inputProps.class = inputProps.class
+				? `${inputProps.class} mouse-pointer`
+				: 'mouse-pointer';
+		}
+	}
+
+	function wr(event: any): () => any {
+		return () => {
+			if (disabled) {
+				return;
+			}
+			event();
+		};
 	}
 </script>
 
 {#if type === 'div' || type === undefined}
-	<div {...inputProps} on:click={event} on:keypress={event}>
+	<div {...inputProps} on:click={wr(event)} on:keypress={wr(event)}>
 		<slot />
 	</div>
 {:else if type === 'span'}
-	<span {...inputProps} on:click={event} on:keypress={event}>
+	<span {...inputProps} on:click={wr(event)} on:keypress={wr(event)}>
 		<slot />
 	</span>
 {:else if type === 'th'}
-	<th {...inputProps} on:click={event} on:keypress={event}>
+	<th {...inputProps} on:click={wr(event)} on:keypress={wr(event)}>
 		<slot />
 	</th>
 {:else}

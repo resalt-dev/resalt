@@ -21,7 +21,7 @@
 			closeEvents();
 		}
 		if (get(socketStore).connected) {
-			socketStore.set({ connected: false, last_ping: null });
+			socketStore.set({ connected: false, lastPing: null });
 		}
 
 		stream = await createSSESocket();
@@ -62,7 +62,7 @@
 			(e) => {
 				const time = new Date(`${JSON.parse(e.data).time}Z`);
 				socketStore.update((s) => {
-					s.last_ping = time;
+					s.lastPing = time;
 					return s;
 				});
 				// console.log("ping", time);
@@ -74,7 +74,7 @@
 			'open',
 			() => {
 				// Connection was opened.
-				socketStore.set({ connected: true, last_ping: null });
+				socketStore.set({ connected: true, lastPing: null });
 				console.log('SSE Connected');
 			},
 			false,
@@ -84,7 +84,7 @@
 			'error',
 			() => {
 				// Connection was closed.
-				socketStore.set({ connected: false, last_ping: null });
+				socketStore.set({ connected: false, lastPing: null });
 				console.log(`Retrying SSE connection in ${Math.round(timeout / 1000)} seconds...`);
 				setTimeout(() => {
 					openEvents(Math.min(timeout * 2, 5 * 60 * 1000));
@@ -103,7 +103,8 @@
 		}
 	}
 
-	function beforeUnload(event: BeforeUnloadEvent) {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	function beforeUnload(_event: BeforeUnloadEvent) {
 		closeEvents();
 	}
 </script>

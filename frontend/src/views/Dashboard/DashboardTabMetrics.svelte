@@ -9,6 +9,7 @@
 	import Color from '../../models/Color';
 	import type MetricResult from '../../models/MetricResult';
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	import { Pie, Line, Bar } from 'svelte-chartjs';
 	import {
 		Chart as ChartJS,

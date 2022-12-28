@@ -4,7 +4,7 @@
 	export let size: number;
 	export let page: number;
 	export let last: boolean;
-	export let updateData: Function;
+	export let updateData: () => void;
 
 	function paginateIncrement(): void {
 		if (last) {

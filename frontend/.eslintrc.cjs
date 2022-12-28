@@ -21,7 +21,7 @@ module.exports = {
 	rules: {
 		camelcase: 'error',
 		// Indent switches and nested ? : with tabs
-		indent: ['error', 'tab', { SwitchCase: 1, ignoredNodes: ['ConditionalExpression'] }],
+		indent: ['error', 'tab', { SwitchCase: 1 }],
 		'no-console': 'off',
 		'import/no-extraneous-dependencies': 'error',
 		'import/no-unresolved': 'off',
@@ -41,5 +41,8 @@ module.exports = {
 
 		// Disable operator-linebreak because Pretter doesn't format it
 		'operator-linebreak': 'off',
+
+		// Do not prefer ES2015 module syntax when we use 2021 syntax
+		'@typescript-eslint/no-namespace': 'off',
 	},
 };

@@ -11,10 +11,10 @@
 	const navigate = useNavigate();
 	const location = useLocation();
 
-	$: navbar =
-		$location.pathname.indexOf('/auth/') !== -1
-			? []
-			: $location.pathname
+	$: isAuth = $location.pathname.indexOf('/auth/') !== -1;
+	$: navbar = isAuth
+		? []
+		: $location.pathname
 				.split('/')
 				.filter(Boolean)
 				.map((str) => {
@@ -46,9 +46,9 @@
 	</Col>
 	<Col xs="auto" class="pe-3 d-flex align-items-center">
 		{#if $socket.connected}
-			<!-- display last_ping as hh:mm:ss -->
+			<!-- display lastPing as hh:mm:ss -->
 			<span class="font-monospace pt-1 ps-3"
-				>Connected: {new Date($socket.last_ping)
+				>Connected: {new Date($socket.lastPing)
 					.toLocaleTimeString('en-US', {
 						timeZone: 'UTC',
 						timeZoneName: 'short',

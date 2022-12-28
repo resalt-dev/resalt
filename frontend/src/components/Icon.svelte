@@ -8,13 +8,13 @@
 	export let htmlElement = null;
 	export let style = '';
 
-	$: full_name = (type === 'solid' ? 'bxs-' : type === 'logo' ? 'bxl-' : 'bx-') + name;
+	$: iconName = (type === 'solid' ? 'bxs-' : type === 'logo' ? 'bxl-' : 'bx-') + name;
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <i
 	bind:this={htmlElement}
 	on:click
-	class="bx {full_name} {cssClass.indexOf('align-') === -1 ? 'align-' + align : ''} {cssClass}"
+	class="bx {iconName} {cssClass.indexOf('align-') === -1 ? 'align-' + align : ''} {cssClass}"
 	style="font-size: {size}rem;{style}"
 />

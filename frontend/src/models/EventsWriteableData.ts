@@ -9,7 +9,7 @@ export default class EventsWriteableData {
 	jid: string;
 	target: string;
 	fun: string;
-	data_parsed: any;
-	data_formatted: string;
-	unique_index: string;
+	dataParsed: any;
+	dataFormatted: string;
+	uniqueIndex: string;
 }

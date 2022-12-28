@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Clickable from '../../components/Clickable.svelte';
 	import Icon from '../../components/Icon.svelte';
 	import type { ConformTreeNode } from './ConformityTypes';
 	export let node: ConformTreeNode;
@@ -49,12 +50,10 @@ export type ConformTreeNode = {
 		collapseList = [...collapseList];
 	}}
 />
-<span
-	class={node.name === '#' ? 'no-select' : 'mouse-pointer'}
-	on:click={() => {
-		if (node.name === '#') {
-			return;
-		}
+<Clickable
+	type="span"
+	disabled={node.name === '#'}
+	event={() => {
 		if (sls === filterNamespace) {
 			filterNamespace = '';
 		} else {
@@ -77,7 +76,7 @@ export type ConformTreeNode = {
 	{:else if collapsed}
 		<em class="text-muted">(...)</em>
 	{/if}
-</span>
+</Clickable>
 
 {#if !collapsed}
 	<ul>
