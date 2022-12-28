@@ -54,8 +54,7 @@ pub async fn route_jobs_post(
     input: web::Json<JobRunRequest>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
-    let ext = req.extensions_mut();
-    let auth = ext.get::<AuthStatus>().unwrap();
+    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_RUN_LIVE)? {

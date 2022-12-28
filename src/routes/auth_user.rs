@@ -9,8 +9,7 @@ pub async fn route_auth_user_get(
     req: HttpRequest,
 ) -> Result<impl Responder> {
     let db = data;
-    let ext = req.extensions_mut();
-    let auth = ext.get::<AuthStatus>().unwrap();
+    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     let user = match db.get_user_by_id(&auth.user_id) {
         Ok(user) => match user {

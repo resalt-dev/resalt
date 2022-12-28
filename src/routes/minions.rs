@@ -19,8 +19,7 @@ pub async fn route_minions_get(
     query: web::Query<MinionsListGetQuery>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
-    let ext = req.extensions_mut();
-    let auth = ext.get::<AuthStatus>().unwrap();
+    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_MINION_LIST)? {
@@ -92,8 +91,7 @@ pub async fn route_minion_get(
     info: web::Path<MinionGetInfo>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
-    let ext = req.extensions_mut();
-    let auth = ext.get::<AuthStatus>().unwrap();
+    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_MINION_LIST)? {
@@ -123,8 +121,7 @@ pub async fn route_minion_refresh_post(
     info: web::Path<MinionGetInfo>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
-    let ext = req.extensions_mut();
-    let auth = ext.get::<AuthStatus>().unwrap();
+    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     let salt_token = match &auth.salt_token {
         Some(salt_token) => salt_token,

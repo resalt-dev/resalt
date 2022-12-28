@@ -8,9 +8,8 @@ pub async fn route_pipeline_get(
     pipeline: Data<PipelineServer>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
-    let ext = req.extensions_mut();
-    let auth = ext.get::<AuthStatus>().unwrap();
-    let rx = pipeline.new_client(auth.user_id.clone());
+    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
+    let rx = pipeline.new_client(auth.user_id);
 
     Ok(HttpResponse::Ok()
         .append_header((header::CONTENT_TYPE, "text/event-stream"))

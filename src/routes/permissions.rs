@@ -8,7 +8,7 @@ use serde_json::Value;
 
 async fn get_group(
     data: &web::Data<Box<dyn StorageImpl>>,
-    group_id: &String,
+    group_id: &str,
 ) -> Result<impl Responder> {
     let permission_group = match data.get_permission_group_by_id(group_id) {
         Ok(permission_group) => permission_group,
@@ -44,8 +44,7 @@ pub async fn route_permissions_get(
     query: web::Query<PermissionGroupsListGetQuery>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
-    let ext = req.extensions_mut();
-    let auth = ext.get::<AuthStatus>().unwrap();
+    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
@@ -89,8 +88,7 @@ pub async fn route_permissions_post(
     input: web::Json<PermissionGroupCreateRequest>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
-    let ext = req.extensions_mut();
-    let auth = ext.get::<AuthStatus>().unwrap();
+    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
@@ -135,8 +133,7 @@ pub async fn route_permission_get(
     info: web::Path<PermissionInfo>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
-    let ext = req.extensions_mut();
-    let auth = ext.get::<AuthStatus>().unwrap();
+    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
@@ -161,8 +158,7 @@ pub async fn route_permission_update(
     input: web::Json<PermissionGroupUpdateRequest>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
-    let ext = req.extensions_mut();
-    let auth = ext.get::<AuthStatus>().unwrap();
+    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
@@ -219,8 +215,7 @@ pub async fn route_permission_delete(
     info: web::Path<PermissionInfo>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
-    let ext = req.extensions_mut();
-    let auth = ext.get::<AuthStatus>().unwrap();
+    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {

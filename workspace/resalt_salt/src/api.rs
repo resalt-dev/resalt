@@ -29,6 +29,7 @@ pub enum SaltError {
     RequestError(SendRequestError),
     ResponseParseError(Option<JsonPayloadError>),
     MissingExpectedDataError(String),
+    #[allow(clippy::type_complexity)]
     FailedRequest(
         ClientResponse<
             actix_web::dev::Decompress<
@@ -203,6 +204,12 @@ pub fn create_awc_client() -> awc::Client {
 #[derive(Clone)]
 pub struct SaltAPI {
     client: Arc<awc::Client>,
+}
+
+impl Default for SaltAPI {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl SaltAPI {
@@ -508,7 +515,7 @@ impl SaltAPI {
                     args.push(s.as_value());
                 }
                 args
-            }).unwrap_or(vec![]),
+            }).unwrap_or_default(),
             "tgt_type": (tgt_type.unwrap_or_default()).to_string(),
             "kwarg": kwarg.unwrap_or_default(),
         });
@@ -534,13 +541,14 @@ impl SaltAPI {
                     args.push(s.as_value());
                 }
                 args
-            }).unwrap_or(vec![]),
+            }).unwrap_or_default(),
             "tgt_type": (tgt_type.unwrap_or_default()).to_string(),
             "kwarg": kwarg.unwrap_or_default(),
         });
         self.run_job(salt_token, data).await
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub async fn run_job_local_batch<S: AsRef<str>>(
         &self,
         salt_token: &SaltToken,
@@ -561,7 +569,7 @@ impl SaltAPI {
                     args.push(s.as_value());
                 }
                 args
-            }).unwrap_or(vec![]),
+            }).unwrap_or_default(),
             "tgt_type": (tgt_type.unwrap_or_default()).to_string(),
             "kwarg": kwarg.unwrap_or_default(),
             "batch": batch.as_ref(),
@@ -585,7 +593,7 @@ impl SaltAPI {
                     args.push(s.as_value());
                 }
                 args
-            }).unwrap_or(vec![]),
+            }).unwrap_or_default(),
             "kwarg": kwarg.unwrap_or_default(),
         });
         self.run_job(salt_token, data).await
@@ -607,7 +615,7 @@ impl SaltAPI {
                     args.push(s.as_value());
                 }
                 args
-            }).unwrap_or(vec![]),
+            }).unwrap_or_default(),
             "kwarg": kwarg.unwrap_or_default(),
         });
         self.run_job(salt_token, data).await
@@ -629,7 +637,7 @@ impl SaltAPI {
                     args.push(s.as_value());
                 }
                 args
-            }).unwrap_or(vec![]),
+            }).unwrap_or_default(),
             "kwarg": kwarg.unwrap_or_default(),
         });
         let data = match self.run_job(salt_token, data).await {
@@ -673,7 +681,7 @@ impl SaltAPI {
                     args.push(s.as_value());
                 }
                 args
-            }).unwrap_or(vec![]),
+            }).unwrap_or_default(),
             "kwarg": kwarg.unwrap_or_default(),
         });
         self.run_job(salt_token, data).await
@@ -833,7 +841,7 @@ impl SaltAPI {
                 ));
             }
         };
-        if list.len() == 0 {
+        if list.is_empty() {
             return Err(SaltError::MissingExpectedDataError(
                 "accept_key: return[SaltKeyState::Accepted] is empty".to_owned(),
             ));
@@ -887,7 +895,7 @@ impl SaltAPI {
                 ));
             }
         };
-        if list.len() == 0 {
+        if list.is_empty() {
             return Err(SaltError::MissingExpectedDataError(
                 "reject_key: return[state] is empty".to_owned(),
             ));

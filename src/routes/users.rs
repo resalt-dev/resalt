@@ -18,8 +18,7 @@ pub async fn route_users_get(
     query: web::Query<UsersListGetQuery>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
-    let ext = req.extensions_mut();
-    let auth = ext.get::<AuthStatus>().unwrap();
+    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_ADMIN_USER)? {
@@ -67,8 +66,7 @@ pub async fn route_users_post(
     body: web::Json<UserCreateRequest>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
-    let ext = req.extensions_mut();
-    let auth = ext.get::<AuthStatus>().unwrap();
+    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_ADMIN_USER)? {
@@ -125,8 +123,7 @@ pub async fn route_user_get(
     info: web::Path<UserGetInfo>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
-    let ext = req.extensions_mut();
-    let auth = ext.get::<AuthStatus>().unwrap();
+    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_ADMIN_USER)? {
@@ -164,8 +161,7 @@ pub async fn route_user_delete(
     info: web::Path<UserGetInfo>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
-    let ext = req.extensions_mut();
-    let auth = ext.get::<AuthStatus>().unwrap();
+    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_ADMIN_USER)? {
@@ -200,8 +196,7 @@ pub async fn route_user_password_post(
     req: HttpRequest,
     body: web::Json<UserPostPasswordData>,
 ) -> Result<impl Responder> {
-    let ext = req.extensions_mut();
-    let auth = ext.get::<AuthStatus>().unwrap();
+    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     let permission_ok = has_permission(&data, &auth.user_id, P_ADMIN_USER)?
@@ -212,7 +207,7 @@ pub async fn route_user_password_post(
     }
 
     // Minimum password check
-    if &body.password.len() < &8 {
+    if body.password.len() < 8 {
         return Err(api_error_invalid_request());
     }
 
@@ -258,8 +253,7 @@ pub async fn route_user_permissions_post(
     info: web::Path<UserPermissionInfo>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
-    let ext = req.extensions_mut();
-    let auth = ext.get::<AuthStatus>().unwrap();
+    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
@@ -329,8 +323,7 @@ pub async fn route_user_permissions_delete(
     info: web::Path<UserPermissionInfo>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
-    let ext = req.extensions_mut();
-    let auth = ext.get::<AuthStatus>().unwrap();
+    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {

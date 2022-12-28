@@ -361,10 +361,7 @@ impl SaltEventListener {
                                                 None => false,
                                             },
                                             false => match test.is_boolean() {
-                                                true => match test.as_bool() {
-                                                    Some(test) => test,
-                                                    None => false,
-                                                },
+                                                true => test.as_bool().unwrap_or(false),
                                                 false => false,
                                             },
                                         },

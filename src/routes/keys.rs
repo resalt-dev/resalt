@@ -12,8 +12,7 @@ pub async fn route_keys_get(
     data: web::Data<Box<dyn StorageImpl>>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
-    let ext = req.extensions_mut();
-    let auth = ext.get::<AuthStatus>().unwrap();
+    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     let salt_token = match &auth.salt_token {
         Some(salt_token) => salt_token,
@@ -59,8 +58,7 @@ pub async fn route_key_accept_put(
     info: web::Path<KeyInfo>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
-    let ext = req.extensions_mut();
-    let auth = ext.get::<AuthStatus>().unwrap();
+    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     let salt_token = match &auth.salt_token {
         Some(salt_token) => salt_token,
@@ -84,8 +82,7 @@ pub async fn route_key_reject_put(
     info: web::Path<KeyInfo>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
-    let ext = req.extensions_mut();
-    let auth = ext.get::<AuthStatus>().unwrap();
+    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     let salt_token = match &auth.salt_token {
         Some(salt_token) => salt_token,
@@ -109,8 +106,7 @@ pub async fn route_key_delete_delete(
     info: web::Path<KeyInfo>,
     req: HttpRequest,
 ) -> Result<impl Responder> {
-    let ext = req.extensions_mut();
-    let auth = ext.get::<AuthStatus>().unwrap();
+    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     let salt_token = match &auth.salt_token {
         Some(salt_token) => salt_token,
