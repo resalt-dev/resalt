@@ -51,7 +51,7 @@ async fn fetch_remote_version() -> Result<String, String> {
     // Get version
     let version = match toml.package {
         Some(package) => package.version,
-        None => return Err(format!("Error parsing TOML: no package")),
+        None => return Err("Error parsing TOML: no package".to_string()),
     };
 
     if !version.eq(CURRENT_VERSION.as_str()) {
@@ -69,11 +69,15 @@ async fn fetch_remote_version() -> Result<String, String> {
 }
 
 pub async fn get_remote_version() -> Result<String, String> {
-    let mut cache = CACHE.lock().unwrap();
-    if let Some(version) = cache.version.clone() {
-        return Ok(version);
+    // Drop CACHE MutexGuard lock inbetween of fetching remote version and setting it in the cache
+    {
+        if let Some(version) = CACHE.lock().unwrap().version.clone() {
+            return Ok(version);
+        }
     }
     let version = fetch_remote_version().await?;
-    cache.version = Some(version.clone());
+    {
+        CACHE.lock().unwrap().version = Some(version.clone());
+    }
     Ok(version)
 }

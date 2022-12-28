@@ -905,7 +905,7 @@ impl StorageImpl for StorageMySQL {
             for grain in grains.iter() {
                 let value = match grain {
                     Some(ggg) => ggg
-                        .get(mid.clone())
+                        .get(*mid)
                         .and_then(|v| {
                             if v.is_string() {
                                 Some(v.as_str().unwrap().to_string())

@@ -68,7 +68,7 @@ pub fn filter_minions_on_grains(minions: &mut Vec<Minion>, filters: &Vec<Filter>
                 1 => value_to_simple_str(selected[0]),
                 _ => selected
                     .iter()
-                    .map(|s| value_to_simple_str(s.clone()))
+                    .map(|s| value_to_simple_str(s))
                     .collect::<Vec<String>>()
                     .join(", "),
             };
@@ -168,7 +168,7 @@ pub fn filter_minions_on_packages(minions: &mut Vec<Minion>, filters: &Vec<Filte
 
             match filter.operand {
                 FilterOperand::Contains => {
-                    if filter_value.len() == 0 {
+                    if filter_value.is_empty() {
                         if version.is_none() {
                             return false;
                         }
@@ -177,7 +177,7 @@ pub fn filter_minions_on_packages(minions: &mut Vec<Minion>, filters: &Vec<Filte
                     }
                 }
                 FilterOperand::NotContains => {
-                    if filter_value.len() == 0 {
+                    if filter_value.is_empty() {
                         if version.is_some() {
                             return false;
                         }

@@ -86,7 +86,7 @@ async fn main() -> std::io::Result<()> {
                 web::scope("/api/1")
                     .wrap(auth::ValidateAuth::new(
                         db_clone_wrapper.clone().storage,
-                        salt_api.clone(),
+                        salt_api,
                     ))
                     .route("/", web::get().to(route_index_get))
                     .route("/config", web::get().to(route_config_get))

@@ -7,7 +7,7 @@ use serde_json::{json, Value};
 =========================
 */
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct AuthToken {
     pub id: String,
     pub user_id: String,
@@ -15,7 +15,7 @@ pub struct AuthToken {
     pub salt_token: Option<String>,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Event {
     pub id: String,
     pub timestamp: chrono::NaiveDateTime,
@@ -38,7 +38,7 @@ impl Serialize for Event {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Job {
     pub id: String,
     pub timestamp: chrono::NaiveDateTime,
@@ -63,7 +63,7 @@ impl Serialize for Job {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct JobReturn {
     pub id: String,
     pub timestamp: chrono::NaiveDateTime,
@@ -73,7 +73,7 @@ pub struct JobReturn {
     pub minion_id: String,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Minion {
     pub id: String,
     pub last_seen: chrono::NaiveDateTime,
@@ -150,7 +150,7 @@ impl Serialize for Minion {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct User {
     pub id: String,
     pub username: String,
@@ -192,7 +192,7 @@ impl User {
     // }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PermissionGroup {
     pub id: String,
     pub name: String,
@@ -219,7 +219,7 @@ impl PermissionGroup {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PermissionGroupUser {
     pub id: String,
     pub group_id: String,
@@ -253,14 +253,14 @@ pub struct AuthStatus {
     pub salt_token: Option<SaltToken>,
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SaltMinionKey {
     pub id: String,
     pub state: String,
     pub finger: String,
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct MetricResult {
     pub title: String,
     pub chart: String,
@@ -268,13 +268,13 @@ pub struct MetricResult {
     pub data: Vec<MetricResultData>,
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct MetricResultData {
     pub label: String,
     pub data: Vec<i32>,
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Filter {
     #[serde(rename = "fieldType")]
     pub field_type: FilterFieldType,
@@ -283,7 +283,7 @@ pub struct Filter {
     pub value: String,
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum FilterFieldType {
     #[serde(rename = "")]
     None,
@@ -295,7 +295,7 @@ pub enum FilterFieldType {
     Package,
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum FilterOperand {
     #[serde(rename = "c")]
     Contains,
