@@ -5,7 +5,7 @@
 </script>
 
 <Row>
-	<Col xs="12">
+	<Col xs="12" class="pb-3">
 		<Card class={$theme.dark ? 'bg-dark' : ''}>
 			<CardBody>
 				<!-- welcome title -->
