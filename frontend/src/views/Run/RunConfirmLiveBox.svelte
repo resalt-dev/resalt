@@ -10,7 +10,7 @@
     export let execute: () => void;
 
     let commandLine: string;
-    $: commandLine = command !== null ? command.toCommandLine() : '';
+    $: commandLine = command !== null ? command.toCommandLine({}) : '';
     let prettyKwargs: string = '';
     $: {
         prettyKwargs = "";

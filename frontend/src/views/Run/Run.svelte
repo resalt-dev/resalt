@@ -31,13 +31,23 @@
         },
     ];
 
-    function formatKwargPrint(kwarg: any) {
-        let value = JSON.stringify(Object.fromEntries(kwarg));
+    function formatArgPrint(arg: string[]) {
+        let value = arg
+            .map((s) => (s.indexOf(' ') > -1 ? `"${s}"` : s))
+            .join(' ');
         if (value.length > 0) {
             return ' ' + value;
         } else {
             return '';
         }
+    }
+
+    function formatKwargPrint(kwarg: Map<string, string>) {
+        let prettyKwargs = "";
+        for (let [key, value] of kwarg) {
+            prettyKwargs += ` ${key}=${value}`;
+        }
+        return prettyKwargs;
     }
 
     function toggleCollapsedResult(index: number) {
@@ -62,10 +72,7 @@
             <span>Result : </span>
             ({ret.command.targetType}) {ret.command.target}
             <small class="text-muted">
-                ({ret.command.fun}
-                {ret.command.arg
-                    .map((s) => (s.indexOf(' ') > -1 ? `"${s}"` : s))
-                    .join(' ')}{formatKwargPrint(ret.command.kwarg)})
+                ({ret.command.toCommandLine({ forceWheel: true })})
             </small>
             <small class="float-end text-muted pt-1">
                 # {ret.num + 1}

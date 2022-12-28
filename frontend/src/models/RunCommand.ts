@@ -1,5 +1,9 @@
 import { RunClientType } from './RunClientType';
 
+export interface ToCommandLineParams {
+    forceWheel?: boolean;   
+}
+
 export default class RunResult {
     client: RunClientType;
 
@@ -34,9 +38,9 @@ export default class RunResult {
     }
 
     // return as CMD
-    toCommandLine(): string {
-        if (this.client === RunClientType.WHEEL || this.client === RunClientType.WHEEL_ASYNC) {
-            return '# Not possible to generate command-line equivalent for Wheel runtime';
+    toCommandLine({ forceWheel = false }: ToCommandLineParams): string {
+        if (!forceWheel && (this.client === RunClientType.WHEEL || this.client === RunClientType.WHEEL_ASYNC)) {
+            return '# Not possible to generate command for Wheel runtime';
         }
         let result = '';
 
@@ -69,6 +73,8 @@ export default class RunResult {
             result += ` "${this.target}"`;
         } else if (this.client === RunClientType.RUNNER || this.client === RunClientType.RUNNER_ASYNC) {
             result += 'salt-run';
+        } else if (this.client === RunClientType.WHEEL || this.client === RunClientType.WHEEL_ASYNC) {
+            result += 'salt-wheel';
         }
 
         // Async
