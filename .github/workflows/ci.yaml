@@ -7,6 +7,26 @@ env:
   REGISTRY: ghcr.io
 
 jobs:
+  frontend-lint:
+    runs-on: ubuntu-latest
+    name: Frontend Lint
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: 'Cache node_modules'
+        uses: actions/cache@v3
+        with:
+          path: ./frontend/node_modules
+          key: ${{ runner.os }}-node-v18-${{ hashFiles('./frontend/package-lock.json') }}
+      
+      - name: "cd into /frontend and lint"
+        run: |
+          cd frontend
+          npm install
+          npm run lint
+
   build:
     runs-on: ubuntu-latest
     name: Build
