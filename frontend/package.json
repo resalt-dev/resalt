@@ -10,6 +10,7 @@
 		"check": "svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --plugin-search-dir . --check src && eslint src",
+    "eslint": "eslint src",
 		"format": "prettier --plugin-search-dir . --write .",
     "start": "sirv build --no-clear --single --port 5555 --host 0.0.0.0"
 	},

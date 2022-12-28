@@ -15,8 +15,8 @@
 	export let location: Location;
 	export let navigate: NavigateFn;
 
-	let paginationSize: number = 20;
-	let paginationPage: number = 1;
+	let paginationSize = 20;
+	let paginationPage = 1;
 
 	const users: Writable<User[] | null> = writable(null);
 

@@ -404,6 +404,7 @@
 		}
 		// https://stackoverflow.com/a/26492530/2479087
 		let regex =
+			// eslint-disable-next-line no-useless-escape
 			/^(?:[A-Za-z][\w-]*|\d+(?:\.\d+)*)=(?:#(?:[\dA-Fa-f]{2})+|(?:[^,=\+<>#;\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*|"(?:[^\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*")(?:\+(?:[A-Za-z][\w-]*|\d+(?:\.\d+)*)=(?:#(?:[\dA-Fa-f]{2})+|(?:[^,=\+<>#;\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*|"(?:[^\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*"))*(?:,(?:[A-Za-z][\w-]*|\d+(?:\.\d+)*)=(?:#(?:[\dA-Fa-f]{2})+|(?:[^,=\+<>#;\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*|"(?:[^\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*")(?:\+(?:[A-Za-z][\w-]*|\d+(?:\.\d+)*)=(?:#(?:[\dA-Fa-f]{2})+|(?:[^,=\+<>#;\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*|"(?:[^\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*"))*)*$/;
 		if (!regex.test(groupLdapSyncFieldValue)) {
 			console.log('Invalid LDAP sync string', groupLdapSyncFieldValue);
@@ -468,10 +469,10 @@
 				}
 
 				// Check if any module arg starts with @resalt ignorecase
-				for (let arg of minionModule.args) {
-					// No checks currently.
-					// Args can actually be empty, to force empty argument, rather than emply which allow all arguments.
-				}
+				// No checks currently.
+				// for (let arg of minionModule.args) {
+				// 	// Args can actually be empty, to force empty argument, rather than emply which allow all arguments.
+				// }
 			}
 		}
 

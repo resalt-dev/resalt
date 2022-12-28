@@ -4,7 +4,6 @@
 	import RunCommand from '../../models/RunCommand';
 	import { quoteSplit } from '../../utils';
 
-	export let command: RunCommand | null = null;
 	export const validate = _validate;
 
 	type clientType = 'local' | 'runner' | 'wheel';

@@ -31,23 +31,6 @@
 		},
 	];
 
-	function formatArgPrint(arg: string[]) {
-		let value = arg.map((s) => (s.indexOf(' ') > -1 ? `"${s}"` : s)).join(' ');
-		if (value.length > 0) {
-			return ' ' + value;
-		} else {
-			return '';
-		}
-	}
-
-	function formatKwargPrint(kwarg: Map<string, string>) {
-		let prettyKwargs = '';
-		for (let [key, value] of kwarg) {
-			prettyKwargs += ` ${key}=${value}`;
-		}
-		return prettyKwargs;
-	}
-
 	function toggleCollapsedResult(index: number) {
 		collapsed.update((collapsed) => {
 			if (collapsed.includes(index)) {

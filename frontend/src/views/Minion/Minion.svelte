@@ -3,7 +3,6 @@
 	import { currentUser } from '../../stores';
 	import {
 		hasResaltPermission,
-		P_ADMIN_GROUP,
 		P_MINION_CONFORMITY,
 		P_MINION_PACKAGES,
 		P_MINION_PILLARS,

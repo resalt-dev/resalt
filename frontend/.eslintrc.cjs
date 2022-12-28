@@ -1,7 +1,8 @@
 module.exports = {
 	root: true,
 	parser: '@typescript-eslint/parser',
-	extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'prettier', 'airbnb-base'],
+	// extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'prettier', 'airbnb-base'],
+	extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'prettier'],
 	plugins: ['svelte3', '@typescript-eslint'],
 	ignorePatterns: ['*.cjs'],
 	overrides: [{ files: ['*.svelte'], processor: 'svelte3/svelte3' }],
@@ -19,17 +20,26 @@ module.exports = {
 	},
 	rules: {
 		'camelcase': 'error',
-        'indent': ['error', 4],
+		// Indent switches
+		'indent': ['error', 'tab', { SwitchCase: 1 }],
         'no-console': 'off',
-        'import/no-extraneous-dependencies': 'off',
+        'import/no-extraneous-dependencies': 'error',
         'import/no-unresolved': 'off',
-        'import/extensions': 'off',
-        'no-param-reassign': 'off',
+        'import/extensions': ['error', 'never'],
+        'no-param-reassign': 'error',
         'implicit-arrow-linebreak': 'off',
         'function-paren-newline': 'off',
         'operator-linebreak': ['error', 'after'],
         'no-restricted-syntax': ['error', 'LabeledStatement', 'WithStatement'],
-        'jsx-a11y/click-events-have-key-events': 'off',
-        'lit-a11y/click-events-have-key-events': 'off',
+
+		// Always enforce types
+		'@typescript-eslint/no-inferrable-types': 'off',
+		'@typescript-eslint/typedef': 'error',
+
+		// Allow any for certain reasons, like Salt permission...
+		'@typescript-eslint/no-explicit-any': 'off', // TODO: Can this be fixed with types?
+
+		// Disable operator-linebreak because Pretter doesn't format it
+		'operator-linebreak': 'off',
 	}
 };

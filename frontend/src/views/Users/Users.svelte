@@ -1,7 +1,7 @@
 <script lang="ts">
+	import type { NavigateFn } from 'svelte-navigator';
 	import paths from '../../paths';
 	import Tabs from '../../components/Tabs.svelte';
-	import type { NavigateFn } from 'svelte-navigator';
 	import type TabPage from '../../models/TabPage';
 
 	import UsersTabList from './UsersTabList.svelte';

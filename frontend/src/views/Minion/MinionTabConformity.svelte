@@ -44,13 +44,16 @@
 						: 'warning',
 				data: {
 					__id__: value.__id__ ?? parts[1] ?? 'UKNOWN ID',
+					// eslint-disable-next-line @typescript-eslint/camelcase
 					__run_num__: value.__run_num__,
+					// eslint-disable-next-line @typescript-eslint/camelcase
 					__sls__: value.__sls__,
 					changes: value.changes ?? {},
 					comment: value.comment,
 					duration: value.duration,
 					name: value.name ?? parts[2] ?? 'UKNOWN NAME',
 					result: value.result,
+					// eslint-disable-next-line @typescript-eslint/camelcase
 					start_time: value.start_time,
 				} as ConformData,
 			};
@@ -95,7 +98,7 @@
 		});
 	}
 
-	$: conformity_tree = conformity
+	$: conformityTree = conformity
 		// .filter((c) => {
 		//     if (!showSuccess && c.data.result === true) return false;
 		//     if (!showIncorrect && c.data.result === null) return false;
@@ -145,9 +148,9 @@
 			} as ConformTreeNode,
 		);
 	// Recursively sort tree alphabetically
-	$: sortSubtreeRecursively(conformity_tree.subtree);
+	$: sortSubtreeRecursively(conformityTree.subtree);
 
-	$: console.log(conformity_tree);
+	$: console.log(conformityTree);
 </script>
 
 {#if !$minion.conformity}
@@ -254,7 +257,7 @@
 					<CardBody>
 						<!-- Render Tree structure in a recursive fashion. -->
 						<ConformityTreeView
-							node={conformity_tree}
+							node={conformityTree}
 							bind:filterNamespace
 							bind:collapseList
 						/>
