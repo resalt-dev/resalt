@@ -21,7 +21,7 @@ module.exports = {
 	rules: {
 		camelcase: 'error',
 		// Indent switches and nested ? : with tabs
-		indent: ['error', 'tab', { SwitchCase: 1 }],
+		indent: ['error', 'tab', { SwitchCase: 1, ignoredNodes: ['ConditionalExpression', 'MemberExpression'] }],
 		'no-console': 'off',
 		'import/no-extraneous-dependencies': 'error',
 		'import/no-unresolved': 'off',
