@@ -93,7 +93,7 @@ const paths = {
 
 	keys: new Path(60, 'keys', '/keys', 'Keys', 'lock', []),
 
-	// -----
+	_1: new Path(99, '_', '/_', '', '', null),
 
 	user: new Path(100, 'user', '/user/:userId', 'User', null, [P_ADMIN_USER]),
 	users: new Path(101, 'users', '/users/:usersPage', 'Users', 'user-circle', [P_ADMIN_USER]),
@@ -109,9 +109,9 @@ const paths = {
 		null,
 	),
 
-	// -----
+	// _2: new Path(999, '_', '/_', '', '', null),
 
-	notFound: new Path(999, 'notFound', '/not-found', 'Not Found', null, null),
+	notFound: new Path(1000, 'notFound', '/not-found', 'Not Found', null, null),
 };
 
 export default paths;

@@ -654,14 +654,6 @@ impl SaltAPI {
                 ));
             }
         };
-        let data = match data.get("return") {
-            Some(res) => res,
-            None => {
-                return Err(SaltError::MissingExpectedDataError(
-                    "run_job_wheel: missing ['data']['return']".to_owned(),
-                ));
-            }
-        };
         Ok(data.clone())
     }
 
