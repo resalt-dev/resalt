@@ -15,14 +15,14 @@
 		$location.pathname.indexOf('/auth/') !== -1
 			? []
 			: $location.pathname
-					.split('/')
-					.filter(Boolean)
-					.map((str) => {
-						return {
-							title: str.charAt(0).toUpperCase() + str.slice(1),
-							path: paths[str.toLowerCase()]?.getPath(),
-						};
-					});
+				.split('/')
+				.filter(Boolean)
+				.map((str) => {
+					return {
+						title: str.charAt(0).toUpperCase() + str.slice(1),
+						path: paths[str.toLowerCase()]?.getPath(),
+					};
+				});
 </script>
 
 <Row id="dashboard-header" class="g-0 d-flex align-items-center bg-light">

@@ -44,16 +44,15 @@
 						: 'warning',
 				data: {
 					__id__: value.__id__ ?? parts[1] ?? 'UKNOWN ID',
-					// eslint-disable-next-line @typescript-eslint/camelcase
+					// eslint-disable-next-line camelcase
 					__run_num__: value.__run_num__,
-					// eslint-disable-next-line @typescript-eslint/camelcase
 					__sls__: value.__sls__,
 					changes: value.changes ?? {},
 					comment: value.comment,
 					duration: value.duration,
 					name: value.name ?? parts[2] ?? 'UKNOWN NAME',
 					result: value.result,
-					// eslint-disable-next-line @typescript-eslint/camelcase
+					// eslint-disable-next-line camelcase
 					start_time: value.start_time,
 				} as ConformData,
 			};
