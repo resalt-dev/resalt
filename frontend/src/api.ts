@@ -10,6 +10,7 @@ import Config from './models/Config';
 import MetricResult from './models/MetricResult';
 import PermissionGroup from './models/PermissionGroup';
 import type Filter from './models/Filter';
+import type RunCommand from './models/RunCommand';
 
 export async function createSSESocket(): Promise<EventSource> {
     const token = get(authStore);
@@ -246,22 +247,16 @@ export async function getJobs(
 }
 
 export async function runJob(
-    client: string,
-    tgtType: string,
-    tgt: string,
-    fun: string,
-    arg: Array<string>,
-    kwarg: Map<string, string>,
-    batchSize: string,
+    command: RunCommand,
 ): Promise<any> {
     return sendAuthenticatedRequest('POST', '/jobs', {
-        client,
-        tgtType,
-        tgt,
-        fun,
-        arg,
-        kwarg,
-        batchSize,
+        client: command.client,
+        tgtType: command.targetType,
+        tgt: command.target,
+        fun: command.fun,
+        arg: command.arg,
+        kwarg: command.kwarg,
+        batchSize: command.batchSize,
     });
 }
 

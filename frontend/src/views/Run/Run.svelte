@@ -9,6 +9,7 @@
 
     import RunTabLive from './RunTabLive.svelte';
     import type RunResult from '../../models/RunResult';
+	import Clickable from '../../components/Clickable.svelte';
 
     // svelte-ignore unused-export-let
     export let location: Location;
@@ -54,10 +55,10 @@
 
 {#each $returns as ret}
     <Card class="result-box mb-3">
-        <div
+        <Clickable
+            event={() => toggleCollapsedResult(ret.num)}
             type="button"
             class="card-header"
-            on:click={() => toggleCollapsedResult(ret.num)}
         >
             <span>Result : </span>
             ({ret.command.targetType}) {ret.command.target}
@@ -70,7 +71,7 @@
             <small class="float-end text-muted pt-1">
                 # {ret.num + 1}
             </small>
-        </div>
+        </Clickable>
         <Collapse isOpen={!$collapsed.includes(ret.num)}>
             <div class="card-body bg-dark text-light">
                 <div class="card-text">
