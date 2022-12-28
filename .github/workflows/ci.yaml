@@ -37,6 +37,8 @@ jobs:
         with:
           toolchain: stable
           override: true
+      - name: mkdir ./frontend/build to fake frontend being built while linting
+        run: mkdir -p ./frontend/build
       - uses: actions-rs/cargo@v1
         with:
           command: clippy
