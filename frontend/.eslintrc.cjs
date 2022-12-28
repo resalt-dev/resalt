@@ -14,7 +14,7 @@ module.exports = {
 	},
 	env: {
 		browser: true,
-		es20121: true,
+		es2021: true,
 		node: true
 	},
 	rules: {
