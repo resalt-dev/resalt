@@ -186,7 +186,7 @@ pub async fn route_user_delete(
         }
     };
 
-    return Ok(web::Json(()));
+    Ok(web::Json(()))
 }
 
 #[derive(Deserialize)]
@@ -243,7 +243,7 @@ pub async fn route_user_password_post(
         }
     }
 
-    return Ok(web::Json(()));
+    Ok(web::Json(()))
 }
 
 #[derive(Deserialize)]
@@ -320,7 +320,7 @@ pub async fn route_user_permissions_post(
         update_user_permissions_from_groups(&data, &user)?;
     }
 
-    return Ok(web::Json(()));
+    Ok(web::Json(()))
 }
 
 /// # Route: /users/{user_id}/permissions/{group_id} (DELETE)

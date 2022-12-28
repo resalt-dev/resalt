@@ -76,7 +76,7 @@ pub fn validate_auth_token(
         return Ok(None);
     }
 
-    return Ok(Some(AuthStatus {
+    Ok(Some(AuthStatus {
         user_id: authtoken.user_id,
         salt_token: match authtoken.salt_token {
             Some(v) => match serde_json::from_str::<SaltToken>(&v) {
@@ -88,7 +88,7 @@ pub fn validate_auth_token(
             },
             None => None,
         },
-    }));
+    }))
 }
 
 pub fn auth_login_classic(

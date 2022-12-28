@@ -71,7 +71,7 @@ pub async fn route_key_accept_put(
     };
 
     match salt.accept_key(salt_token, &info.state, &info.id).await {
-        Ok(()) => Ok(web::Json({})),
+        Ok(()) => Ok(web::Json(())),
         Err(e) => {
             error!("{:?}", e);
             Err(api_error_internal_error())
@@ -96,7 +96,7 @@ pub async fn route_key_reject_put(
     };
 
     match salt.reject_key(salt_token, &info.state, &info.id).await {
-        Ok(()) => Ok(web::Json({})),
+        Ok(()) => Ok(web::Json(())),
         Err(e) => {
             error!("{:?}", e);
             Err(api_error_internal_error())
@@ -121,7 +121,7 @@ pub async fn route_key_delete_delete(
     };
 
     match salt.delete_key(salt_token, &info.state, &info.id).await {
-        Ok(()) => Ok(web::Json({})),
+        Ok(()) => Ok(web::Json(())),
         Err(e) => {
             error!("{:?}", e);
             Err(api_error_internal_error())

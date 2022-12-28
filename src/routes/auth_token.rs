@@ -56,10 +56,10 @@ pub async fn route_auth_token_post(
             let perms: Result<Value, serde_json::Error> = serde_json::from_str(&user.perms);
 
             match perms {
-                Ok(perms) => return Ok(HttpResponse::Ok().json(perms)),
+                Ok(perms) => Ok(HttpResponse::Ok().json(perms)),
                 Err(e) => {
                     error!("Error parsing permissions: {:?}", e);
-                    return Err(api_error_internal_error());
+                    Err(api_error_internal_error())
                 }
             }
         }

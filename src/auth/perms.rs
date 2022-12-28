@@ -72,12 +72,10 @@ pub fn evalute_resalt_permission(permissions: &Value, permission: &str) -> bool 
     // Assume there can be multiple @resalt sections, from ugly merge.
     let resalt_permissions: Vec<&Value> = permissions
         .iter()
-        .filter(|p| p.get("@resalt").is_some())
-        .map(|p| p.get("@resalt").unwrap())
+        .filter_map(|p| p.get("@resalt"))
         .filter(|p| p.is_array())
         // merge array of arrays
-        .map(|p| p.as_array().unwrap())
-        .flatten()
+        .flat_map(|p| p.as_array().unwrap())
         .collect();
 
     // If the permission we are looking for is admin.group.create,
@@ -115,7 +113,7 @@ pub fn evalute_resalt_permission(permissions: &Value, permission: &str) -> bool 
             }
         }
     }
-    return false;
+    false
 }
 
 pub fn update_user_permissions_from_groups(
