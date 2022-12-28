@@ -7,8 +7,8 @@ const production = process.env.NODE_ENV === 'production';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-	optimizeDeps:{
-		exclude:['svelte-routing', 'svelte-navigator']
+	optimizeDeps: {
+		exclude: ['svelte-routing', 'svelte-navigator'],
 	},
 	build: {
 		outDir: 'build',
@@ -19,12 +19,10 @@ export default defineConfig({
 				sourceMap: !production,
 				scss: {
 					includePaths: ['src/layout/include'],
-					prependData: '@use \'src/styles/include/_include.scss\';',
+					prependData: "@use 'src/styles/include/_include.scss';",
 				},
 				postcss: {
-					plugins: [
-						autoprefixer(),
-					],
+					plugins: [autoprefixer()],
 				},
 			}),
 			compilerOptions: {
@@ -34,4 +32,4 @@ export default defineConfig({
 			emitCss: true,
 		}),
 	],
-})
+});

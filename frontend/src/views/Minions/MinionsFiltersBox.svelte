@@ -117,7 +117,8 @@
 				}
 
 				// Add an event listener to the picker
-				picker.subscribe(Namespace.events.change, (_e) => {
+				// eslint-disable-next-line @typescript-eslint/no-unused-vars
+				picker.subscribe(Namespace.events.change, (e) => {
 					// Update the filter's value to the picker's date
 					filters.update((f) => {
 						f[index].value = picker.dates.picked[0]

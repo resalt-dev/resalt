@@ -7,30 +7,30 @@ module.exports = {
 	ignorePatterns: ['*.cjs'],
 	overrides: [{ files: ['*.svelte'], processor: 'svelte3/svelte3' }],
 	settings: {
-		'svelte3/typescript': () => require('typescript')
+		'svelte3/typescript': () => require('typescript'),
 	},
 	parserOptions: {
 		sourceType: 'module',
-		ecmaVersion: 2020
+		ecmaVersion: 2020,
 	},
 	env: {
 		browser: true,
 		es2021: true,
-		node: true
+		node: true,
 	},
 	rules: {
-		'camelcase': 'error',
-		// Indent switches
-		'indent': ['error', 'tab', { SwitchCase: 1 }],
-        'no-console': 'off',
-        'import/no-extraneous-dependencies': 'error',
-        'import/no-unresolved': 'off',
-        'import/extensions': ['error', 'never'],
-        'no-param-reassign': 'error',
-        'implicit-arrow-linebreak': 'off',
-        'function-paren-newline': 'off',
-        'operator-linebreak': ['error', 'after'],
-        'no-restricted-syntax': ['error', 'LabeledStatement', 'WithStatement'],
+		camelcase: 'error',
+		// Indent switches and nested ? : with tabs
+		indent: ['error', 'tab', { SwitchCase: 1, ignoredNodes: ['ConditionalExpression'] }],
+		'no-console': 'off',
+		'import/no-extraneous-dependencies': 'error',
+		'import/no-unresolved': 'off',
+		'import/extensions': ['error', 'never'],
+		'no-param-reassign': 'error',
+		'implicit-arrow-linebreak': 'off',
+		'function-paren-newline': 'off',
+		'operator-linebreak': ['error', 'after'],
+		'no-restricted-syntax': ['error', 'LabeledStatement', 'WithStatement'],
 
 		// Always enforce types
 		'@typescript-eslint/no-inferrable-types': 'off',
@@ -41,5 +41,5 @@ module.exports = {
 
 		// Disable operator-linebreak because Pretter doesn't format it
 		'operator-linebreak': 'off',
-	}
+	},
 };

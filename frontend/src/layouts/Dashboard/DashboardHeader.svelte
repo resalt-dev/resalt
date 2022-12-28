@@ -6,6 +6,7 @@
 	import Icon from '../../components/Icon.svelte';
 	import { logout } from '../../api';
 	import { MessageType } from '../../models/MessageType';
+	import Clickable from '../../components/Clickable.svelte';
 
 	const navigate = useNavigate();
 	const location = useLocation();
@@ -91,9 +92,8 @@
 	<Col xs="auto">
 		<div class="vr sep" />
 	</Col>
-	<div
-		class="col-auto px-3 text-reset text-decoration-none mouse-pointer"
-		on:click={() => {
+	<Clickable
+		event={() => {
 			logout()
 				.then(() => {
 					toasts.add(
@@ -107,10 +107,11 @@
 					toasts.add(MessageType.ERROR, 'Logout Error', err);
 				});
 		}}
+		class="col-auto px-3 text-reset text-decoration-none mouse-pointer"
 	>
 		<Icon name="log-out" size="1.5" class="pe-1" />
 		Logout
-	</div>
+	</Clickable>
 </Row>
 
 <style lang="scss">
