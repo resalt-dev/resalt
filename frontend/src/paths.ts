@@ -1,87 +1,117 @@
-import { P_ADMIN_USER, P_MINION_LIST, P_RUN_APPROVAL_LIST, P_RUN_APPROVAL_SUBMIT, P_RUN_LIVE, P_RUN_TEMPLATE_GLOBAL, P_RUN_TEMPLATE_LIST, P_RUN_TEMPLATE_LOCAL, hasResaltPermission } from "./perms";
+import {
+	P_ADMIN_USER,
+	P_MINION_LIST,
+	P_RUN_APPROVAL_LIST,
+	P_RUN_APPROVAL_SUBMIT,
+	P_RUN_LIVE,
+	P_RUN_TEMPLATE_GLOBAL,
+	P_RUN_TEMPLATE_LIST,
+	P_RUN_TEMPLATE_LOCAL,
+	hasResaltPermission,
+} from './perms';
 
 export class Path {
-    order: number;
+	order: number;
 
-    name: string;
+	name: string;
 
-    private path: string;
+	private path: string;
 
-    label: string;
+	label: string;
 
-    icon: string;
+	icon: string;
 
-    hasParams: boolean;
+	hasParams: boolean;
 
-    showInNav: boolean;
+	showInNav: boolean;
 
-    private perms?: string[] | null;
+	private perms?: string[] | null;
 
-    constructor(order: number, name: string, path: string, label: string, icon: string | null, perms: string[] | null) {
-        this.order = order;
-        this.name = name;
-        this.path = path;
-        this.label = label;
-        this.icon = icon || '';
-        this.showInNav = icon !== null;
-    }
+	constructor(
+		order: number,
+		name: string,
+		path: string,
+		label: string,
+		icon: string | null,
+		perms: string[] | null,
+	) {
+		this.order = order;
+		this.name = name;
+		this.path = path;
+		this.label = label;
+		this.icon = icon || '';
+		this.showInNav = icon !== null;
+	}
 
-    getPath(...args: string[]): string {
-        let { path } = this;
+	getPath(...args: string[]): string {
+		let { path } = this;
 
-        // Substitute url arguments (.e.g ":id" or ":group") with args
-        // eslint-disable-next-line no-unused-vars
-        path = path.replace(/:([^/]+)/g, (_match, _p1) => args.shift() || '');
+		// Substitute url arguments (.e.g ":id" or ":group") with args
+		// eslint-disable-next-line no-unused-vars
+		path = path.replace(/:([^/]+)/g, (_match, _p1) => args.shift() || '');
 
-        // Trim trailing slashes
-        return path.replace(/\/+$/, '');
-    }
+		// Trim trailing slashes
+		return path.replace(/\/+$/, '');
+	}
 
-    hasPermission(userPermissions: any[]): boolean {
-        if (this.perms === undefined || this.perms === null || this.perms.length === 0) {
-            return true;
-        }
+	hasPermission(userPermissions: any[]): boolean {
+		if (this.perms === undefined || this.perms === null || this.perms.length === 0) {
+			return true;
+		}
 
-        for (const perm of this.perms) {
-            if (hasResaltPermission(userPermissions, perm)) {
-                return true;
-            }
-        }
+		for (const perm of this.perms) {
+			if (hasResaltPermission(userPermissions, perm)) {
+				return true;
+			}
+		}
 
-        return false;
-    }
-
+		return false;
+	}
 }
 
 const paths = {
-    login: new Path(0, 'login', '/auth/login', 'Login', null, null),
+	login: new Path(0, 'login', '/auth/login', 'Login', null, null),
 
-    dashboard: new Path(10, 'dashboard', '/dashboard/:subPage', 'Dashboard', 'home', null),
+	dashboard: new Path(10, 'dashboard', '/dashboard/:subPage', 'Dashboard', 'home', null),
 
-    run: new Path(21, 'run', '/run/:subPage', 'Run', 'play', [P_RUN_LIVE, P_RUN_APPROVAL_LIST, P_RUN_APPROVAL_SUBMIT, P_RUN_TEMPLATE_LIST, P_RUN_TEMPLATE_LOCAL, P_RUN_TEMPLATE_GLOBAL]),
+	run: new Path(21, 'run', '/run/:subPage', 'Run', 'play', [
+		P_RUN_LIVE,
+		P_RUN_APPROVAL_LIST,
+		P_RUN_APPROVAL_SUBMIT,
+		P_RUN_TEMPLATE_LIST,
+		P_RUN_TEMPLATE_LOCAL,
+		P_RUN_TEMPLATE_GLOBAL,
+	]),
 
-    minion: new Path(30, 'minion', '/minion/:minionId/:subPage', 'Minion', null, [P_MINION_LIST]),
-    minions: new Path(31, 'minions', '/minions/:subPage', 'Minions', 'server', [P_MINION_LIST]),
+	minion: new Path(30, 'minion', '/minion/:minionId/:subPage', 'Minion', null, [P_MINION_LIST]),
+	minions: new Path(31, 'minions', '/minions/:subPage', 'Minions', 'server', [P_MINION_LIST]),
 
-    job: new Path(40, 'job', '/job/:jobId', 'Job', null, []),
-    jobs: new Path(41, 'jobs', '/jobs', 'Jobs', 'briefcase', []),
+	job: new Path(40, 'job', '/job/:jobId', 'Job', null, []),
+	jobs: new Path(41, 'jobs', '/jobs', 'Jobs', 'briefcase', []),
 
-    events: new Path(50, 'events', '/events', 'Events', 'list-ul', []),
+	events: new Path(50, 'events', '/events', 'Events', 'list-ul', []),
 
-    keys: new Path(60, 'keys', '/keys', 'Keys', 'lock', []),
+	keys: new Path(60, 'keys', '/keys', 'Keys', 'lock', []),
 
-    // -----
+	// -----
 
-    user: new Path(100, 'user', '/user/:userId', 'User', null, [P_ADMIN_USER]),
-    users: new Path(101, 'users', '/users/:usersPage', 'Users', 'user-circle', [P_ADMIN_USER]),
+	user: new Path(100, 'user', '/user/:userId', 'User', null, [P_ADMIN_USER]),
+	users: new Path(101, 'users', '/users/:usersPage', 'Users', 'user-circle', [P_ADMIN_USER]),
 
-    settings: new Path(110, 'settings', '/settings/:settingsPage', 'Settings', 'cog', []),
+	settings: new Path(110, 'settings', '/settings/:settingsPage', 'Settings', 'cog', []),
 
-    preferences: new Path(120, 'preferences', '/preferences/:preferencesPage', 'Preferences', 'wrench', null),
+	preferences: new Path(
+		120,
+		'preferences',
+		'/preferences/:preferencesPage',
+		'Preferences',
+		'wrench',
+		null,
+	),
 
-    // -----
+	// -----
 
-    notFound: new Path(999, 'notFound', '/not-found', 'Not Found', null, null),
+	notFound: new Path(999, 'notFound', '/not-found', 'Not Found', null, null),
 };
 
 export default paths;

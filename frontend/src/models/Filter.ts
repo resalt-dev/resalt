@@ -2,32 +2,22 @@ import type { FilterFieldType } from './FilterFieldType';
 import type { FilterOperand } from './FilterOperand';
 
 export default class Filter {
-    static fromObject(data: any): Filter {
-        return new Filter(
-            data.fieldType,
-            data.field,
-            data.operand,
-            data.value,
-        );
-    }
+	static fromObject(data: any): Filter {
+		return new Filter(data.fieldType, data.field, data.operand, data.value);
+	}
 
-    fieldType: FilterFieldType;
+	fieldType: FilterFieldType;
 
-    field: string;
+	field: string;
 
-    operand: FilterOperand;
+	operand: FilterOperand;
 
-    value: string;
+	value: string;
 
-    constructor(
-        fieldType: FilterFieldType,
-        field: string,
-        operand: FilterOperand,
-        value: string,
-    ) {
-        this.fieldType = fieldType;
-        this.field = field;
-        this.operand = operand;
-        this.value = value;
-    }
+	constructor(fieldType: FilterFieldType, field: string, operand: FilterOperand, value: string) {
+		this.fieldType = fieldType;
+		this.field = field;
+		this.operand = operand;
+		this.value = value;
+	}
 }

@@ -1,20 +1,20 @@
 export default class SaltEvent {
-    static fromObject(item: any): SaltEvent {
-        return new SaltEvent(item.id, item.timestamp, item.tag, item.data);
-    }
+	static fromObject(item: any): SaltEvent {
+		return new SaltEvent(item.id, item.timestamp, item.tag, item.data);
+	}
 
-    id: string;
+	id: string;
 
-    timestamp: string;
+	timestamp: string;
 
-    tag: string;
+	tag: string;
 
-    data: string;
+	data: string;
 
-    constructor(id: string, timestamp: string, tag: string, data: string) {
-        this.id = id;
-        this.timestamp = timestamp;
-        this.tag = tag;
-        this.data = data;
-    }
+	constructor(id: string, timestamp: string, tag: string, data: string) {
+		this.id = id;
+		this.timestamp = timestamp;
+		this.tag = tag;
+		this.data = data;
+	}
 }

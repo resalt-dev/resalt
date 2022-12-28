@@ -1,14 +1,14 @@
 export default class MetricResultData {
-    static fromObject(data: any): MetricResultData {
-        return new MetricResultData(data.label, data.data);
-    }
+	static fromObject(data: any): MetricResultData {
+		return new MetricResultData(data.label, data.data);
+	}
 
-    label: string;
+	label: string;
 
-    data: number[];
+	data: number[];
 
-    constructor(label: string, data: number[]) {
-        this.label = label;
-        this.data = data;
-    }
+	constructor(label: string, data: number[]) {
+		this.label = label;
+		this.data = data;
+	}
 }

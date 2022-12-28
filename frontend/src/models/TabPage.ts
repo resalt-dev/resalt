@@ -1,14 +1,14 @@
 // Used by Tabs.svelte
 export default class TabPage {
-    key: string;
+	key: string;
 
-    label: string;
+	label: string;
 
-    path: string;
+	path: string;
 
-    component: any;
+	component: any;
 
-    data?: any;
+	data?: any;
 
-    hidden?: boolean;
+	hidden?: boolean;
 }

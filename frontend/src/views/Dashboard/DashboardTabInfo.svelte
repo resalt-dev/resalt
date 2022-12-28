@@ -1,91 +1,79 @@
 <script lang="ts">
-    import {
-        Card,
-        CardBody,
-        CardHeader,
-        CardTitle,
-        Col,
-        Row,
-    } from 'sveltestrap';
-    import Icon from '../../components/Icon.svelte';
-    import { theme } from '../../stores';
+	import { Card, CardBody, CardHeader, CardTitle, Col, Row } from 'sveltestrap';
+	import Icon from '../../components/Icon.svelte';
+	import { theme } from '../../stores';
 </script>
 
 <Row>
-    <Col xs="12">
-        <Card class="mb-3 {$theme.dark ? 'bg-dark' : ''}">
-            <CardBody>
-                <!-- welcome title -->
-                <h1 class="display-4">Welcome to Resalt!</h1>
-                <!-- subtitle -->
-                <p class="lead">
-                    This is the control panel for your Resalt instance.
-                </p>
-                <br />
-                <br />
-                <Row>
-                    <Col xs="12" lg="4">
-                        <h5 class="card-title">Get Started</h5>
-                    </Col>
-                    <Col xs="12" lg="4">
-                        <h5 class="card-title">Next Steps</h5>
-                        Hello!
-                    </Col>
-                    <Col xs="12" lg="4">
-                        <h5 class="card-title">More Actions</h5>
-                        Hello!
-                    </Col>
-                </Row>
-            </CardBody>
-        </Card>
-    </Col>
-    <Col xs="12" xl="4">
-        <Card class="mb-3 {$theme.dark ? 'bg-dark' : ''}">
-            <CardHeader>
-                <CardTitle class="mb-0">System Summary</CardTitle>
-            </CardHeader>
-            <CardBody>
-                <h5 class="card-title">Status</h5>
-                <p class="card-text">
-                    <Icon name="check-circle" class="text-success m-2" /> All systems
-                    are operational
-                </p>
-            </CardBody>
-        </Card>
-    </Col>
-    <Col xs="12" xl="4">
-        <Card class="mb-3 {$theme.dark ? 'bg-dark' : ''}">
-            <CardHeader>
-                <CardTitle class="mb-0">Quick Links</CardTitle>
-            </CardHeader>
-            <CardBody class="text-center">
-                <div class="mouse-pointer py-4">
-                    <Icon name="buildings" size="7" />
-                    <h5 class="card-title">Go to Documentation</h5>
-                    <p class="card-text">
-                        Find documentation, guides, and more
-                    </p>
-                </div>
+	<Col xs="12">
+		<Card class={$theme.dark ? 'bg-dark' : ''}>
+			<CardBody>
+				<!-- welcome title -->
+				<h1 class="display-4">Welcome to Resalt!</h1>
+				<!-- subtitle -->
+				<p class="lead">This is the control panel for your Resalt instance.</p>
+				<br />
+				<br />
+				<Row>
+					<Col xs="12" lg="4">
+						<h5 class="card-title">Get Started</h5>
+					</Col>
+					<Col xs="12" lg="4">
+						<h5 class="card-title">Next Steps</h5>
+						Hello!
+					</Col>
+					<Col xs="12" lg="4">
+						<h5 class="card-title">More Actions</h5>
+						Hello!
+					</Col>
+				</Row>
+			</CardBody>
+		</Card>
+	</Col>
+	<Col xs="12" xl="4" class="pb-3">
+		<Card class={$theme.dark ? 'bg-dark' : ''}>
+			<CardHeader>
+				<CardTitle class="mb-0">System Summary</CardTitle>
+			</CardHeader>
+			<CardBody>
+				<h5 class="card-title">Status</h5>
+				<p class="card-text">
+					<Icon name="check-circle" class="text-success m-2" /> All systems are operational
+				</p>
+			</CardBody>
+		</Card>
+	</Col>
+	<Col xs="12" xl="4" class="pb-3">
+		<Card class={$theme.dark ? 'bg-dark' : ''}>
+			<CardHeader>
+				<CardTitle class="mb-0">Quick Links</CardTitle>
+			</CardHeader>
+			<CardBody class="text-center">
+				<div class="mouse-pointer py-4">
+					<Icon name="buildings" size="7" class="mb-3" />
+					<h5 class="card-title">Go to Documentation</h5>
+					<p class="card-text">Find documentation, guides, and more</p>
+				</div>
 
-                <hr class="bg-light my-3" />
+				<hr class="bg-light my-3" />
 
-                <div class="mouse-pointer py-4">
-                    <Icon name="comment-dots" size="7" />
-                    <h5 class="card-title">Give Feedback</h5>
-                    <p class="card-text">Give feedback or report a bug</p>
-                </div>
-            </CardBody>
-        </Card>
-    </Col>
-    <Col xs="12" xl="4">
-        <Card class="mb-3 {$theme.dark ? 'bg-dark' : ''}">
-            <CardHeader>
-                <CardTitle class="mb-0">Latest News</CardTitle>
-            </CardHeader>
-            <CardBody>
-                <h5 class="card-title">Sort method</h5>
-                Hello!
-            </CardBody>
-        </Card>
-    </Col>
+				<div class="mouse-pointer py-4">
+					<Icon name="comment-dots" size="7" class="mb-3" />
+					<h5 class="card-title">Give Feedback</h5>
+					<p class="card-text">Give feedback or report a bug</p>
+				</div>
+			</CardBody>
+		</Card>
+	</Col>
+	<Col xs="12" xl="4" class="pb-3">
+		<Card class={$theme.dark ? 'bg-dark' : ''}>
+			<CardHeader>
+				<CardTitle class="mb-0">Latest News</CardTitle>
+			</CardHeader>
+			<CardBody>
+				<h5 class="card-title">Sort method</h5>
+				Hello!
+			</CardBody>
+		</Card>
+	</Col>
 </Row>

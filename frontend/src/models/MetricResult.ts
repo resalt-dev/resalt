@@ -1,32 +1,27 @@
 import MetricResultData from './MetricResultData';
 
 export default class MetricResult {
-    static fromObject(item: any): MetricResult {
-        return new MetricResult(
-            item.title,
-            item.chart,
-            item.labels,
-            item.data.map((data: any) => MetricResultData.fromObject(data)),
-        );
-    }
+	static fromObject(item: any): MetricResult {
+		return new MetricResult(
+			item.title,
+			item.chart,
+			item.labels,
+			item.data.map((data: any) => MetricResultData.fromObject(data)),
+		);
+	}
 
-    title: string;
+	title: string;
 
-    chart: string;
+	chart: string;
 
-    labels: string[];
+	labels: string[];
 
-    data: MetricResultData[];
+	data: MetricResultData[];
 
-    constructor(
-        title: string,
-        chart: string,
-        labels: string[],
-        data: MetricResultData[],
-    ) {
-        this.title = title;
-        this.chart = chart;
-        this.labels = labels;
-        this.data = data;
-    }
+	constructor(title: string, chart: string, labels: string[], data: MetricResultData[]) {
+		this.title = title;
+		this.chart = chart;
+		this.labels = labels;
+		this.data = data;
+	}
 }

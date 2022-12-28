@@ -13,167 +13,137 @@ import type Filter from './models/Filter';
 import type RunCommand from './models/RunCommand';
 
 export async function createSSESocket(): Promise<EventSource> {
-    const token = get(authStore);
-    if (!token) {
-        throw new Error('Missing API token');
-    }
+	const token = get(authStore);
+	if (!token) {
+		throw new Error('Missing API token');
+	}
 
-    const stream = new EventSource(
-        `${constants.apiUrl}/pipeline?token=${token}`,
-    );
-    return stream;
+	const stream = new EventSource(`${constants.apiUrl}/pipeline?token=${token}`);
+	return stream;
 }
 
-async function sendAuthenticatedRequest(
-    method: string,
-    path: string,
-    body?: any,
-): Promise<any> {
-    const token = get(authStore);
-    if (!token) {
-        throw new Error('Missing API token');
-    }
+async function sendAuthenticatedRequest(method: string, path: string, body?: any): Promise<any> {
+	const token = get(authStore);
+	if (!token) {
+		throw new Error('Missing API token');
+	}
 
-    const res = await fetch(constants.apiUrl + path, {
-        method,
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-        },
-        body: body ? JSON.stringify(body) : undefined,
-    });
+	const res = await fetch(constants.apiUrl + path, {
+		method,
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${token}`,
+		},
+		body: body ? JSON.stringify(body) : undefined,
+	});
 
-    if (res.status !== 200) {
-        throw new Error(await res.text());
-    }
+	if (res.status !== 200) {
+		throw new Error(await res.text());
+	}
 
-    return res.json();
+	return res.json();
 }
 
-async function sendUnauthenticatedRequest(
-    method: string,
-    path: string,
-    body?: any,
-): Promise<any> {
-    const res = await fetch(constants.apiUrl + path, {
-        method,
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: body ? JSON.stringify(body) : undefined,
-    });
+async function sendUnauthenticatedRequest(method: string, path: string, body?: any): Promise<any> {
+	const res = await fetch(constants.apiUrl + path, {
+		method,
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: body ? JSON.stringify(body) : undefined,
+	});
 
-    if (res.status !== 200) {
-        throw new Error(await res.text());
-    }
+	if (res.status !== 200) {
+		throw new Error(await res.text());
+	}
 
-    return res.json();
+	return res.json();
 }
 
 ///
 /// Auth
 ///
 
-export async function login(
-    username: string,
-    password: string,
-): Promise<string> {
-    const { token } = await sendUnauthenticatedRequest('POST', '/auth/login', {
-        username,
-        password,
-    });
-    authStore.set(token);
-    return token;
+export async function login(username: string, password: string): Promise<string> {
+	const { token } = await sendUnauthenticatedRequest('POST', '/auth/login', {
+		username,
+		password,
+	});
+	authStore.set(token);
+	return token;
 }
 
 export async function getConfig(): Promise<Config> {
-    return sendUnauthenticatedRequest('GET', '/config').then((data: any) =>
-        Config.fromObject(data),
-    );
+	return sendUnauthenticatedRequest('GET', '/config').then((data: any) =>
+		Config.fromObject(data),
+	);
 }
 
 export async function getCurrentUser(): Promise<User> {
-    return sendAuthenticatedRequest('GET', '/auth/user').then((data) =>
-        User.fromObject(data),
-    );
+	return sendAuthenticatedRequest('GET', '/auth/user').then((data) => User.fromObject(data));
 }
 
 export async function logout(): Promise<void> {
-    // No remote function call for this yet.
-    currentUserStore.set(null);
-    authStore.set(null);
+	// No remote function call for this yet.
+	currentUserStore.set(null);
+	authStore.set(null);
 }
 
 ///
 /// Users
 ///
 
-export async function getUsers(
-    limit?: number,
-    offset?: number,
-): Promise<Array<User>> {
-    const args = new URLSearchParams();
+export async function getUsers(limit?: number, offset?: number): Promise<Array<User>> {
+	const args = new URLSearchParams();
 
-    if (limit) args.append('limit', limit.toString());
-    if (offset) args.append('offset', offset.toString());
+	if (limit) args.append('limit', limit.toString());
+	if (offset) args.append('offset', offset.toString());
 
-    return sendAuthenticatedRequest('GET', `/users?${args.toString()}`).then(
-        (data: any[]) => data.map((item) => User.fromObject(item)),
-    );
+	return sendAuthenticatedRequest('GET', `/users?${args.toString()}`).then((data: any[]) =>
+		data.map((item) => User.fromObject(item)),
+	);
 }
 
 export async function createUser(
-    username: string,
-    email: string | null,
-    ldapSync: string | null,
+	username: string,
+	email: string | null,
+	ldapSync: string | null,
 ): Promise<User> {
-    return sendAuthenticatedRequest('POST', '/users', {
-        username,
-        email,
-        ldapSync,
-    }).then((data: any) => User.fromObject(data));
+	return sendAuthenticatedRequest('POST', '/users', {
+		username,
+		email,
+		ldapSync,
+	}).then((data: any) => User.fromObject(data));
 }
 
 export async function getUserById(userId: string): Promise<User> {
-    return sendAuthenticatedRequest('GET', `/users/${userId}`).then(
-        (data: any) => User.fromObject(data),
-    );
+	return sendAuthenticatedRequest('GET', `/users/${userId}`).then((data: any) =>
+		User.fromObject(data),
+	);
 }
 
 export async function deleteUser(userId: string): Promise<void> {
-    return sendAuthenticatedRequest('DELETE', `/users/${userId}`);
+	return sendAuthenticatedRequest('DELETE', `/users/${userId}`);
 }
 
-export async function updateUserPassword(
-    userId: string,
-    password: string,
-): Promise<void> {
-    return sendAuthenticatedRequest(
-        'POST',
-        `/users/${userId}/password`,
+export async function updateUserPassword(userId: string, password: string): Promise<void> {
+	return sendAuthenticatedRequest(
+		'POST',
+		`/users/${userId}/password`,
 
-        { password },
-    );
+		{ password },
+	);
 }
 
-export async function addUserToPermissionGroup(
-    userId: string,
-    groupId: string,
-): Promise<void> {
-    return sendAuthenticatedRequest(
-        'POST',
-        `/users/${userId}/permissions/${groupId}`,
-    );
+export async function addUserToPermissionGroup(userId: string, groupId: string): Promise<void> {
+	return sendAuthenticatedRequest('POST', `/users/${userId}/permissions/${groupId}`);
 }
 
 export async function removeUserFromPermissionGroup(
-    userId: string,
-    groupId: string,
+	userId: string,
+	groupId: string,
 ): Promise<void> {
-    return sendAuthenticatedRequest(
-        'DELETE',
-        `/users/${userId}/permissions/${groupId}`,
-    );
+	return sendAuthenticatedRequest('DELETE', `/users/${userId}/permissions/${groupId}`);
 }
 
 ///
@@ -181,89 +151,81 @@ export async function removeUserFromPermissionGroup(
 ///
 
 export async function getMinions(
-    filters?: Filter[],
-    sort?: string,
-    limit?: number,
-    offset?: number,
+	filters?: Filter[],
+	sort?: string,
+	limit?: number,
+	offset?: number,
 ): Promise<Array<Minion>> {
-    const args = new URLSearchParams();
+	const args = new URLSearchParams();
 
-    if (filters && filters.length > 0) args.append('filter', encodeURIComponent(JSON.stringify(filters)));
-    if (sort) args.append('sort', sort);
-    if (limit) args.append('limit', limit.toString());
-    if (offset) args.append('offset', offset.toString());
+	if (filters && filters.length > 0)
+		args.append('filter', encodeURIComponent(JSON.stringify(filters)));
+	if (sort) args.append('sort', sort);
+	if (limit) args.append('limit', limit.toString());
+	if (offset) args.append('offset', offset.toString());
 
-    return sendAuthenticatedRequest('GET', `/minions?${args.toString()}`).then(
-        (data: any[]) => data.map((item) => Minion.fromObject(item)),
-    );
+	return sendAuthenticatedRequest('GET', `/minions?${args.toString()}`).then((data: any[]) =>
+		data.map((item) => Minion.fromObject(item)),
+	);
 }
 
 export async function getMinionById(minionId: string): Promise<Minion> {
-    return sendAuthenticatedRequest('GET', `/minions/${minionId}`).then(
-        (data: any) => Minion.fromObject(data),
-    );
+	return sendAuthenticatedRequest('GET', `/minions/${minionId}`).then((data: any) =>
+		Minion.fromObject(data),
+	);
 }
 
 export async function refreshMinion(minionId: string): Promise<void> {
-    await sendAuthenticatedRequest('POST', `/minions/${minionId}/refresh`);
+	await sendAuthenticatedRequest('POST', `/minions/${minionId}/refresh`);
 }
 
 ///
 /// Events
 ///
 
-export async function getEvents(
-    limit?: number,
-    offset?: number,
-): Promise<Array<SaltEvent>> {
-    const args = new URLSearchParams();
+export async function getEvents(limit?: number, offset?: number): Promise<Array<SaltEvent>> {
+	const args = new URLSearchParams();
 
-    if (limit) args.append('limit', limit.toString());
-    if (offset) args.append('offset', offset.toString());
+	if (limit) args.append('limit', limit.toString());
+	if (offset) args.append('offset', offset.toString());
 
-    return sendAuthenticatedRequest('GET', `/events?${args.toString()}`).then(
-        (data: any[]) => data.map((item) => SaltEvent.fromObject(item)),
-    );
+	return sendAuthenticatedRequest('GET', `/events?${args.toString()}`).then((data: any[]) =>
+		data.map((item) => SaltEvent.fromObject(item)),
+	);
 }
 
 ///
 /// Jobs
 ///
 
-export async function getJobs(
-    sort?: string,
-    limit?: number,
-    offset?: number,
-): Promise<Array<Job>> {
-    const args = new URLSearchParams();
+export async function getJobs(sort?: string, limit?: number, offset?: number): Promise<Array<Job>> {
+	const args = new URLSearchParams();
 
-    if (sort) args.append('sort', sort);
-    if (limit) args.append('limit', limit.toString());
-    if (offset) args.append('offset', offset.toString());
+	if (sort) args.append('sort', sort);
+	if (limit) args.append('limit', limit.toString());
+	if (offset) args.append('offset', offset.toString());
 
-    return sendAuthenticatedRequest('GET', `/jobs?${args.toString()}`).then(
-        (data: any[]) => data.map((item) => Job.fromObject(item)),
-    );
+	return sendAuthenticatedRequest('GET', `/jobs?${args.toString()}`).then((data: any[]) =>
+		data.map((item) => Job.fromObject(item)),
+	);
 }
 
-export async function runJob(
-    command: RunCommand,
-): Promise<any> {
-    return sendAuthenticatedRequest('POST', '/jobs', {
-        client: command.client,
-        tgtType: command.targetType,
-        tgt: command.target,
-        fun: command.fun,
-        arg: command.arg,
-        kwarg: command.kwarg,
-        batchSize: command.batchSize,
-    });
+export async function runJob(command: RunCommand): Promise<any> {
+	return sendAuthenticatedRequest('POST', '/jobs', {
+		client: command.client,
+		tgtType: command.targetType,
+		tgt: command.target,
+		fun: command.fun,
+		arg: command.arg,
+		kwarg: command.kwarg,
+		batchSize: command.batchSize,
+	});
 }
 
 export async function getJobById(jobId: string): Promise<Job> {
-    return sendAuthenticatedRequest('GET', `/jobs/${jobId}`).then((data: any) =>
-        Job.fromObject(data),
-    );
+	return sendAuthenticatedRequest('GET', `/jobs/${jobId}`).then((data: any) =>
+		Job.fromObject(data),
+	);
 }
 
 ///
@@ -271,30 +233,21 @@ export async function getJobById(jobId: string): Promise<Job> {
 ///
 
 export async function getKeys(): Promise<Array<Key>> {
-    return sendAuthenticatedRequest('GET', '/keys').then((data: any[]) =>
-        data.map((item) => Key.fromObject(item)),
-    );
+	return sendAuthenticatedRequest('GET', '/keys').then((data: any[]) =>
+		data.map((item) => Key.fromObject(item)),
+	);
 }
 
 export async function acceptKey(key: Key): Promise<void> {
-    await sendAuthenticatedRequest(
-        'PUT',
-        `/keys/${key.state}/${key.id}/accept`,
-    );
+	await sendAuthenticatedRequest('PUT', `/keys/${key.state}/${key.id}/accept`);
 }
 
 export async function rejectKey(key: Key): Promise<void> {
-    await sendAuthenticatedRequest(
-        'PUT',
-        `/keys/${key.state}/${key.id}/reject`,
-    );
+	await sendAuthenticatedRequest('PUT', `/keys/${key.state}/${key.id}/reject`);
 }
 
 export async function deleteKey(key: Key): Promise<void> {
-    await sendAuthenticatedRequest(
-        'DELETE',
-        `/keys/${key.state}/${key.id}/delete`,
-    );
+	await sendAuthenticatedRequest('DELETE', `/keys/${key.state}/${key.id}/delete`);
 }
 
 ///
@@ -302,9 +255,9 @@ export async function deleteKey(key: Key): Promise<void> {
 ///
 
 export async function getMetricResults(): Promise<Array<MetricResult>> {
-    return sendAuthenticatedRequest('GET', '/metrics').then((data: any[]) =>
-        data.map((item) => MetricResult.fromObject(item)),
-    );
+	return sendAuthenticatedRequest('GET', '/metrics').then((data: any[]) =>
+		data.map((item) => MetricResult.fromObject(item)),
+	);
 }
 
 ///
@@ -312,49 +265,44 @@ export async function getMetricResults(): Promise<Array<MetricResult>> {
 ///
 
 export async function getPermissionGroups(
-    limit?: number,
-    offset?: number,
+	limit?: number,
+	offset?: number,
 ): Promise<Array<PermissionGroup>> {
-    const args = new URLSearchParams();
+	const args = new URLSearchParams();
 
-    if (limit) args.append('limit', limit.toString());
-    if (offset) args.append('offset', offset.toString());
+	if (limit) args.append('limit', limit.toString());
+	if (offset) args.append('offset', offset.toString());
 
-    return sendAuthenticatedRequest(
-        'GET',
-        `/permissions?${args.toString()}`,
-    ).then((data: any[]) =>
-        data.map((item) => PermissionGroup.fromObject(item)),
-    );
+	return sendAuthenticatedRequest('GET', `/permissions?${args.toString()}`).then((data: any[]) =>
+		data.map((item) => PermissionGroup.fromObject(item)),
+	);
 }
 
 export async function getPermissionGroup(id: string): Promise<PermissionGroup> {
-    return sendAuthenticatedRequest('GET', `/permissions/${id}`).then(
-        (data: any) => PermissionGroup.fromObject(data),
-    );
+	return sendAuthenticatedRequest('GET', `/permissions/${id}`).then((data: any) =>
+		PermissionGroup.fromObject(data),
+	);
 }
 
-export async function createPermissionGroup(
-    name: string,
-): Promise<PermissionGroup> {
-    return sendAuthenticatedRequest('POST', '/permissions', {
-        name,
-    }).then((data: any) => PermissionGroup.fromObject(data));
+export async function createPermissionGroup(name: string): Promise<PermissionGroup> {
+	return sendAuthenticatedRequest('POST', '/permissions', {
+		name,
+	}).then((data: any) => PermissionGroup.fromObject(data));
 }
 
 export async function deletePermissionGroup(id: string): Promise<void> {
-    await sendAuthenticatedRequest('DELETE', `/permissions/${id}`);
+	await sendAuthenticatedRequest('DELETE', `/permissions/${id}`);
 }
 
 export async function updatePermissionGroup(
-    id: string,
-    name: string,
-    perms: any[],
-    ldapSync: string | null,
+	id: string,
+	name: string,
+	perms: any[],
+	ldapSync: string | null,
 ): Promise<void> {
-    return sendAuthenticatedRequest('PUT', `/permissions/${id}`, {
-        name,
-        perms: JSON.stringify(perms),
-        ldapSync,
-    });
+	return sendAuthenticatedRequest('PUT', `/permissions/${id}`, {
+		name,
+		perms: JSON.stringify(perms),
+		ldapSync,
+	});
 }

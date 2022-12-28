@@ -1,19 +1,15 @@
 import type RunCommand from './RunCommand';
 
 export default class RunResult {
-    command: RunCommand;
+	command: RunCommand;
 
-    num: number;
+	num: number;
 
-    data: any;
+	data: any;
 
-    constructor(
-        command: RunCommand,
-        num: number,
-        data: any,
-    ) {
-        this.command = command;
-        this.num = num;
-        this.data = data;
-    }
+	constructor(command: RunCommand, num: number, data: any) {
+		this.command = command;
+		this.num = num;
+		this.data = data;
+	}
 }

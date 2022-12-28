@@ -1,18 +1,18 @@
 import { v4 as uuidv4 } from 'uuid';
 
 export default class Message {
-    id: string;
+	id: string;
 
-    type: string;
+	type: string;
 
-    title: string;
+	title: string;
 
-    message: string;
+	message: string;
 
-    constructor(type: string, title: string, message: string) {
-        this.id = uuidv4();
-        this.type = type;
-        this.title = title;
-        this.message = message;
-    }
+	constructor(type: string, title: string, message: string) {
+		this.id = uuidv4();
+		this.type = type;
+		this.title = title;
+		this.message = message;
+	}
 }

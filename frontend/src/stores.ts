@@ -11,69 +11,60 @@ const prefix = `${constants.appName.toLowerCase()}_`;
 // First param is the local storage key.
 // Second param is the initial value.
 
-export const sidebarCollapsed = writableLocalStorage(
-    `${prefix}sidebarCollapsed`,
-    false,
-);
+export const sidebarCollapsed = writableLocalStorage(`${prefix}sidebarCollapsed`, false);
 
-export const auth: Writable<string | null> = writableLocalStorage(
-    `${prefix}auth`,
-    null,
-);
-export const config: Writable<Config | null> = writableLocalStorage(
-    `${prefix}config`,
-    null,
-);
+export const auth: Writable<string | null> = writableLocalStorage(`${prefix}auth`, null);
+export const config: Writable<Config | null> = writableLocalStorage(`${prefix}config`, null);
 export const socket = writable({
-    connected: false,
-    last_ping: null,
+	connected: false,
+	last_ping: null,
 });
 export const theme = writableLocalStorage(`${prefix}theme`, {
-    color: null,
-    dark: false,
+	color: null,
+	dark: false,
 });
 export const currentUser: Writable<User | null> = writableLocalStorage(
-    `${prefix}currentUser`,
-    null,
+	`${prefix}currentUser`,
+	null,
 );
 
 // Custom Store for toasts (of type Message) where we can add a toast,
 // and they get automatically removed after a timeout.
 interface ToastStore extends Readable<Message[]> {
-    /**
-     * Add a toast to the store.
-     * @param {MessageType} type - The type of the toast (success, error, etc.)
-     * @param {string} title - The title of the toast, preferably short.
-     * @param {string} message - The message of the toast.
-     */
-    // eslint-disable-next-line no-unused-vars
-    add(this: void, type: MessageType, title: string, message: string): void;
-    /**
-     * Clear all toasts from the store.
-     */
-    // eslint-disable-next-line no-unused-vars
-    clear(this: void): void;
+	/**
+	 * Add a toast to the store.
+	 * @param {MessageType} type - The type of the toast (success, error, etc.)
+	 * @param {string} title - The title of the toast, preferably short.
+	 * @param {string} message - The message of the toast.
+	 */
+	// eslint-disable-next-line no-unused-vars
+	add(this: void, type: MessageType, title: string, message: string): void;
+	/**
+	 * Clear all toasts from the store.
+	 */
+	// eslint-disable-next-line no-unused-vars
+	clear(this: void): void;
 }
 function createToastStore(): ToastStore {
-    const { subscribe, set, update } = writable<Message[]>([]);
+	const { subscribe, set, update } = writable<Message[]>([]);
 
-    return {
-        subscribe,
-        add: (type: MessageType, title: string, message: string) => {
-            const newToast = new Message(type, title, message);
-            update((messages) => {
-                messages.push(newToast);
-                return messages;
-            });
-            setTimeout(() => {
-                update((messages) => {
-                    messages.shift();
-                    return messages;
-                });
-            }, 5000);
-        },
-        clear: () => set([]),
-    };
+	return {
+		subscribe,
+		add: (type: MessageType, title: string, message: string) => {
+			const newToast = new Message(type, title, message);
+			update((messages) => {
+				messages.push(newToast);
+				return messages;
+			});
+			setTimeout(() => {
+				update((messages) => {
+					messages.shift();
+					return messages;
+				});
+			}, 5000);
+		},
+		clear: () => set([]),
+	};
 }
 
 export const toasts: ToastStore = createToastStore();

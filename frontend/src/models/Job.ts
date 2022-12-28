@@ -1,23 +1,23 @@
 export default class Job {
-    static fromObject(data: any): Job {
-        return new Job(data.id, data.timestamp, data.jid, data.user, data.minions);
-    }
+	static fromObject(data: any): Job {
+		return new Job(data.id, data.timestamp, data.jid, data.user, data.minions);
+	}
 
-    id: string;
+	id: string;
 
-    timestamp: string;
+	timestamp: string;
 
-    jid: string;
+	jid: string;
 
-    user: string;
+	user: string;
 
-    minions: string[];
+	minions: string[];
 
-    constructor(id: string, timestamp: string, jid: string, user: string, minions: string[]) {
-        this.id = id;
-        this.timestamp = timestamp;
-        this.jid = jid;
-        this.user = user;
-        this.minions = minions;
-    }
+	constructor(id: string, timestamp: string, jid: string, user: string, minions: string[]) {
+		this.id = id;
+		this.timestamp = timestamp;
+		this.jid = jid;
+		this.user = user;
+		this.minions = minions;
+	}
 }

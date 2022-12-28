@@ -3,21 +3,25 @@ import type { Unlisten } from 'svelte-navigator/types/NavigatorHistory';
 import type RawLocation from 'svelte-navigator/types/RawLocation';
 
 export default class WrapperGlobalHistory implements NavigatorHistory {
-    constructor(location: RawLocation, listen: (
-		listener: ({
-			location,
-			action,
-		}: {
-			location: RawLocation;
-			action: NavigationAction;
-		}) => void,
-	) => Unlisten, navigate: NavigateFn) {
-        this.location = location;
-        this.listen = listen;
-        this.navigate = navigate;
-    }
+	constructor(
+		location: RawLocation,
+		listen: (
+			listener: ({
+				location,
+				action,
+			}: {
+				location: RawLocation;
+				action: NavigationAction;
+			}) => void,
+		) => Unlisten,
+		navigate: NavigateFn,
+	) {
+		this.location = location;
+		this.listen = listen;
+		this.navigate = navigate;
+	}
 
-    /**
+	/**
 	 * The current location
 	 */
 	readonly location: RawLocation;
