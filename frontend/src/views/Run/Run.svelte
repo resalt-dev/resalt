@@ -57,7 +57,6 @@
     <Card class="result-box mb-3">
         <Clickable
             event={() => toggleCollapsedResult(ret.num)}
-            type="button"
             class="card-header"
         >
             <span>Result : </span>
