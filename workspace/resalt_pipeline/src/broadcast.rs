@@ -25,6 +25,12 @@ pub struct Broadcaster {
     clients: Vec<(String, Sender<Bytes>)>,
 }
 
+impl Default for Broadcaster {
+    fn default() -> Self {
+        Broadcaster::new()
+    }
+}
+
 impl Broadcaster {
     pub fn create() -> Data<Mutex<Self>> {
         // Data ≃ Arc
@@ -100,7 +106,7 @@ impl Broadcaster {
                 client
                     .clone()
                     .try_send(msg.clone())
-                    .map_err(|e| BroadcasterError::SendError(e))?;
+                    .map_err(BroadcasterError::SendError)?;
                 found = true;
             }
         }

@@ -136,10 +136,10 @@ impl StorageMySQL {
     }
 
     fn create_connection(&self) -> Result<DbPooledConnection, String> {
-        return match self.pool.get() {
+        match self.pool.get() {
             Ok(conn) => Ok(conn),
             Err(e) => Err(format!("{:?}", e)),
-        };
+        }
     }
 }
 
@@ -504,7 +504,7 @@ impl StorageImpl for StorageMySQL {
         }
 
         // Sorting
-        match sort.unwrap_or(String::from("id.asc")).as_str() {
+        match sort.unwrap_or_else(|| "id.asc".to_string()).as_str() {
             "id.asc" => query = query.order(minions::id.asc()),
             "id.desc" => query = query.order(minions::id.desc()),
             "lastSeen.asc" => query = query.order(minions::last_seen.asc()),
@@ -552,7 +552,7 @@ impl StorageImpl for StorageMySQL {
             minions = minions.into_iter().skip(offset).take(limit).collect();
         }
 
-        return Ok(minions);
+        Ok(minions)
     }
 
     fn get_minion_by_id(&self, id: &str) -> Result<Option<Minion>, String> {
@@ -748,7 +748,7 @@ impl StorageImpl for StorageMySQL {
         // Filtering
 
         // Sorting
-        match sort.unwrap_or(String::from("id.asc")).as_str() {
+        match sort.unwrap_or_else(|| "id.asc".to_string()).as_str() {
             "id.asc" => query = query.order(jobs::id.asc()),
             "id.desc" => query = query.order(jobs::id.desc()),
             "timestamp.asc" => query = query.order(jobs::timestamp.asc()),
@@ -904,16 +904,16 @@ impl StorageImpl for StorageMySQL {
             let mut founds: HashMap<String, i32> = HashMap::new();
             for grain in grains.iter() {
                 let value = match grain {
-                    Some(ggg) => ggg
+                    Some(grain) => grain
                         .get(*mid)
-                        .and_then(|v| {
+                        .map(|v| {
                             if v.is_string() {
-                                Some(v.as_str().unwrap().to_string())
+                                v.as_str().unwrap().to_string()
                             } else {
-                                Some(v.to_string())
+                                v.to_string()
                             }
                         })
-                        .unwrap_or("Missing".to_string()),
+                        .unwrap_or_else(|| "Missing".to_string()),
                     None => "Unknown".to_string(),
                 };
                 let counter = founds.get(&value).unwrap_or(&0);

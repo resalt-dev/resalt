@@ -16,8 +16,8 @@ pub async fn route_frontend_get(
     // fetch file from FRONTEND_PUBLIC_DIR based on request URL
     let path = req.uri().path();
     // If path starts with /, trim it
-    let path = if path.starts_with('/') {
-        &path[1..]
+    let path = if let Some(path) = path.strip_prefix('/') {
+        path
     } else {
         path
     };

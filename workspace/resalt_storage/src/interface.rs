@@ -42,6 +42,7 @@ pub trait StorageImpl: Send {
 
     fn get_minion_by_id(&self, id: &str) -> Result<Option<Minion>, String>;
 
+    #[allow(clippy::too_many_arguments)]
     fn update_minion(
         &self,
         minion_id: String,

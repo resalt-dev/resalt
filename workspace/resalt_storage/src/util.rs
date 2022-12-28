@@ -18,7 +18,7 @@ fn value_to_simple_str(value: &Value) -> String {
     }
 }
 
-pub fn filter_minions_on_grains(minions: &mut Vec<Minion>, filters: &Vec<Filter>) {
+pub fn filter_minions_on_grains(minions: &mut Vec<Minion>, filters: &[Filter]) {
     // Map grain values to json paths
     // If filter.field does not start with "$.", prepend it.
     let json_paths: Vec<String> = filters
@@ -142,8 +142,7 @@ pub fn filter_minions_on_grains(minions: &mut Vec<Minion>, filters: &Vec<Filter>
                 }
             };
         }
-
-        return true;
+        true
     });
 }
 
@@ -233,6 +232,6 @@ pub fn filter_minions_on_packages(minions: &mut Vec<Minion>, filters: &Vec<Filte
                 }
             };
         }
-        return true;
+        true
     });
 }

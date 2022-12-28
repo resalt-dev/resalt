@@ -9,6 +9,12 @@ pub struct PipelineServer {
     broadcaster: Data<Mutex<Broadcaster>>,
 }
 
+impl Default for PipelineServer {
+    fn default() -> Self {
+        PipelineServer::new()
+    }
+}
+
 impl PipelineServer {
     pub fn new() -> Self {
         PipelineServer {

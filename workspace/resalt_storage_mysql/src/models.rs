@@ -8,7 +8,7 @@ use resalt_models::*;
 */
 
 #[derive(
-    Clone, Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset, Associations,
+    Clone, Debug, Identifiable, Insertable, PartialEq, Eq, Queryable, AsChangeset, Associations,
 )]
 #[diesel(belongs_to(SQLUser, foreign_key = user_id))]
 #[diesel(table_name = authtokens)]
@@ -41,7 +41,7 @@ impl From<SQLAuthToken> for AuthToken {
     }
 }
 
-#[derive(Clone, Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset)]
+#[derive(Clone, Debug, Identifiable, Insertable, PartialEq, Eq, Queryable, AsChangeset)]
 #[diesel(table_name = events)]
 pub struct SQLEvent {
     pub id: String,
@@ -73,7 +73,7 @@ impl From<SQLEvent> for Event {
 }
 
 #[derive(
-    Clone, Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset, Associations,
+    Clone, Debug, Identifiable, Insertable, PartialEq, Eq, Queryable, AsChangeset, Associations,
 )]
 #[diesel(belongs_to(SQLEvent, foreign_key = event_id))]
 #[diesel(table_name = jobs)]
@@ -110,7 +110,7 @@ impl From<SQLJob> for Job {
 }
 
 #[derive(
-    Clone, Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset, Associations,
+    Clone, Debug, Identifiable, Insertable, PartialEq, Eq, Queryable, AsChangeset, Associations,
 )]
 #[diesel(belongs_to(SQLJob, foreign_key = job_id))]
 #[diesel(belongs_to(SQLEvent, foreign_key = event_id))]
@@ -151,7 +151,7 @@ impl From<SQLJobReturn> for JobReturn {
     }
 }
 
-#[derive(Clone, Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset)]
+#[derive(Clone, Debug, Identifiable, Insertable, PartialEq, Eq, Queryable, AsChangeset)]
 #[diesel(table_name = minions)]
 pub struct SQLMinion {
     pub id: String,
@@ -212,7 +212,7 @@ impl From<SQLMinion> for Minion {
     }
 }
 
-#[derive(Clone, Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset)]
+#[derive(Clone, Debug, Identifiable, Insertable, PartialEq, Eq, Queryable, AsChangeset)]
 #[diesel(table_name = users)]
 pub struct SQLUser {
     pub id: String,
@@ -252,7 +252,7 @@ impl From<SQLUser> for User {
     }
 }
 
-#[derive(Clone, Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset)]
+#[derive(Clone, Debug, Identifiable, Insertable, PartialEq, Eq, Queryable, AsChangeset)]
 #[diesel(table_name = permission_groups)]
 pub struct SQLPermissionGroup {
     pub id: String,
@@ -284,7 +284,7 @@ impl From<SQLPermissionGroup> for PermissionGroup {
 }
 
 #[derive(
-    Clone, Debug, Identifiable, Insertable, PartialEq, Queryable, AsChangeset, Associations,
+    Clone, Debug, Identifiable, Insertable, PartialEq, Eq, Queryable, AsChangeset, Associations,
 )]
 #[diesel(belongs_to(SQLUser, foreign_key = user_id))]
 #[diesel(belongs_to(SQLPermissionGroup, foreign_key = group_id))]

@@ -10,6 +10,7 @@ use crate::components::*;
 
 use super::LdapHandler;
 
+#[allow(clippy::borrowed_box)]
 pub async fn update_token_salt_token(
     data: &Box<dyn StorageImpl>,
     salt: &SaltAPI,
@@ -49,6 +50,7 @@ pub async fn update_token_salt_token(
     Ok(())
 }
 
+#[allow(clippy::borrowed_box)]
 pub fn validate_auth_token(
     data: &Box<dyn StorageImpl>,
     token: &str,
