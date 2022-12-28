@@ -19,7 +19,7 @@
 		"@codemirror/language": "^6.2.1",
 		"@codemirror/state": "^6.1.1",
 		"@codemirror/view": "^6.2.3",
-		"@eonasdan/tempus-dominus": "^6.2.4",
+		"@eonasdan/tempus-dominus": "^6.2.10",
 		"@lezer/highlight": "^1.0.0",
 		"@sveltejs/adapter-auto": "^1.0.0",
 		"@sveltejs/vite-plugin-svelte": "^2.0.0",
