@@ -21,7 +21,7 @@ pub async fn route_users_get(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_ADMIN_USER)? {
+    if !has_permission(&data, &auth.user_id, P_USER_ADMIN)? {
         return Err(api_error_forbidden());
     }
 
@@ -69,7 +69,7 @@ pub async fn route_users_post(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_ADMIN_USER)? {
+    if !has_permission(&data, &auth.user_id, P_USER_ADMIN)? {
         return Err(api_error_forbidden());
     }
 
@@ -126,7 +126,7 @@ pub async fn route_user_get(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_ADMIN_USER)? {
+    if !has_permission(&data, &auth.user_id, P_USER_ADMIN)? {
         return Err(api_error_forbidden());
     }
 
@@ -164,7 +164,7 @@ pub async fn route_user_delete(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_ADMIN_USER)? {
+    if !has_permission(&data, &auth.user_id, P_USER_ADMIN)? {
         return Err(api_error_forbidden());
     }
 
@@ -199,7 +199,7 @@ pub async fn route_user_password_post(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    let permission_ok = has_permission(&data, &auth.user_id, P_ADMIN_USER)?
+    let permission_ok = has_permission(&data, &auth.user_id, P_USER_ADMIN)?
         || (auth.user_id.eq(&info.user_id)
             && has_permission(&data, &auth.user_id, P_USER_PASSWORD)?);
     if !permission_ok {

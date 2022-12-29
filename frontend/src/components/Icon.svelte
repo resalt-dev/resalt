@@ -1,6 +1,6 @@
 <script lang="ts">
 	export let type = 'regular';
-	export let name = 'bx-rocket';
+	export let name = 'rocket';
 	export let size = '2';
 	export let align: 'top' | 'middle' | 'bottom' = 'middle';
 	let cssClass = '';

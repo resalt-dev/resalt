@@ -1,5 +1,7 @@
 import {
-	P_ADMIN_USER,
+	P_EVENT_LIST,
+	P_JOB_INFO,
+	P_JOB_LIST,
 	P_MINION_LIST,
 	P_RUN_APPROVAL_LIST,
 	P_RUN_APPROVAL_SUBMIT,
@@ -7,6 +9,11 @@ import {
 	P_RUN_TEMPLATE_GLOBAL,
 	P_RUN_TEMPLATE_LIST,
 	P_RUN_TEMPLATE_LOCAL,
+	P_SALTKEY_LIST,
+	P_USER_ADMIN,
+	P_USER_EMAIL,
+	P_USER_LIST,
+	P_USER_PASSWORD,
 	hasResaltPermission,
 } from './perms';
 
@@ -86,17 +93,17 @@ const paths = {
 	minion: new Path(30, 'minion', '/minion/:minionId/:subPage', 'Minion', null, [P_MINION_LIST]),
 	minions: new Path(31, 'minions', '/minions/:subPage', 'Minions', 'server', [P_MINION_LIST]),
 
-	job: new Path(40, 'job', '/job/:jobId', 'Job', null, []),
-	jobs: new Path(41, 'jobs', '/jobs', 'Jobs', 'briefcase', []),
+	job: new Path(40, 'job', '/job/:jobId', 'Job', null, [P_JOB_LIST, P_JOB_INFO]),
+	jobs: new Path(41, 'jobs', '/jobs', 'Jobs', 'briefcase', [P_JOB_LIST]),
 
-	events: new Path(50, 'events', '/events', 'Events', 'list-ul', []),
+	events: new Path(50, 'events', '/events', 'Events', 'list-ul', [P_EVENT_LIST]),
 
-	keys: new Path(60, 'keys', '/keys', 'Keys', 'lock', []),
+	keys: new Path(60, 'keys', '/keys', 'Keys', 'lock', [P_SALTKEY_LIST]),
 
 	_1: new Path(99, '_', '/_', '', '', null),
 
-	user: new Path(100, 'user', '/user/:userId', 'User', null, [P_ADMIN_USER]),
-	users: new Path(101, 'users', '/users/:usersPage', 'Users', 'user-circle', [P_ADMIN_USER]),
+	user: new Path(100, 'user', '/user/:userId', 'User', null, [P_USER_ADMIN, P_USER_LIST, P_USER_EMAIL, P_USER_PASSWORD]),
+	users: new Path(101, 'users', '/users/:usersPage', 'Users', 'user-circle', [P_USER_ADMIN, P_USER_LIST]),
 
 	settings: new Path(110, 'settings', '/settings/:settingsPage', 'Settings', 'cog', []),
 

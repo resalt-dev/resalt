@@ -7,9 +7,6 @@ use serde_json::Value;
 
 pub const P_ADMIN_SUPERADMIN: &str = "admin.superadmin";
 pub const P_ADMIN_GROUP: &str = "admin.group";
-pub const P_ADMIN_USER: &str = "admin.user";
-
-pub const P_USER_PASSWORD: &str = "user.password";
 
 pub const P_RUN_LIVE: &str = "run.live";
 #[allow(dead_code)]
@@ -37,6 +34,37 @@ pub const P_MINION_LIST: &str = "minion.list";
 pub const P_MINION_CONFORMITY: &str = "minion.conformity";
 pub const P_MINION_PILLARS: &str = "minion.pillars";
 pub const P_MINION_PACKAGES: &str = "minion.packages";
+#[allow(dead_code)]
+pub const P_MINION_PRESETS_LIST: &str = "minion.presets.list";
+#[allow(dead_code)]
+pub const P_MINION_PRESETS_MANAGE: &str = "minion.presets.manage";
+#[allow(dead_code)]
+pub const P_MINION_GRAINEXPLORER: &str = "minion.grainexplorer";
+
+#[allow(dead_code)]
+pub const P_JOB_LIST: &str = "job.list";
+#[allow(dead_code)]
+pub const P_JOB_INFO: &str = "job.info";
+
+#[allow(dead_code)]
+pub const P_EVENT_LIST: &str = "event.list";
+
+#[allow(dead_code)]
+pub const P_SALTKEY_LIST: &str = "saltkey.list";
+#[allow(dead_code)]
+pub const P_SALTKEY_ACCEPT: &str = "saltkey.accept";
+#[allow(dead_code)]
+pub const P_SALTKEY_REJECT: &str = "saltkey.reject";
+#[allow(dead_code)]
+pub const P_SALTKEY_DELETE: &str = "saltkey.delete";
+
+#[allow(dead_code)]
+pub const P_USER_LIST: &str = "user.list";
+pub const P_USER_ADMIN: &str = "user.admin";
+#[allow(dead_code)]
+pub const P_USER_EMAIL: &str = "user.email";
+#[allow(dead_code)]
+pub const P_USER_PASSWORD: &str = "user.password";
 
 pub fn has_permission(
     data: &web::Data<Box<dyn StorageImpl>>,

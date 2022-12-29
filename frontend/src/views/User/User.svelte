@@ -17,7 +17,7 @@
 	import { MessageType } from '../../models/MessageType';
 	import JsonViewer from '../../components/JsonViewer.svelte';
 	import type User from '../../models/User';
-	import { hasResaltPermission, P_ADMIN_USER, P_USER_PASSWORD } from '../../perms';
+	import { hasResaltPermission, P_USER_ADMIN, P_USER_PASSWORD } from '../../perms';
 	import type { NavigateFn } from 'svelte-navigator';
 	import CopyButton from '../../components/CopyButton.svelte';
 
@@ -161,7 +161,7 @@
 				</ul>
 			</Card>
 		</Col>
-		{#if hasResaltPermission($currentUser.perms, P_ADMIN_USER) || ($currentUser.id === $user.id && hasResaltPermission($currentUser.perms, P_USER_PASSWORD))}
+		{#if hasResaltPermission($currentUser.perms, P_USER_ADMIN) || ($currentUser.id === $user.id && hasResaltPermission($currentUser.perms, P_USER_PASSWORD))}
 			<Col xs="12" xxl="4" class="pb-3">
 				<Card class="h-100 {$theme.dark ? 'bg-dark' : ''}">
 					<CardHeader>

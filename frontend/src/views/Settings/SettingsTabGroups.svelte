@@ -710,7 +710,10 @@
 								<tbody class="align-middle">
 									{#each resaltWebPermissions as resaltPermission}
 										<tr>
-											<td class="px-5" style="width: 0">
+											<td
+												class="px-5"
+												style="width: fit-content; padding-right: 0.25rem !important;"
+											>
 												<input
 													type="checkbox"
 													class="form-check-input form-check-input-primary fs-3 ms-0 mt-0"
@@ -720,7 +723,21 @@
 														resaltPermission.permission
 													]}
 												/>
-											</td>
+												{#if resaltPermission.danger}
+													<Icon
+														name="shield-quarter"
+														class="ms-4 text-danger"
+														size="1.75"
+													/>
+												{/if}
+												{#if resaltPermission.warning}
+													<Icon
+														name="shield-quarter"
+														class="ms-4 text-warning"
+														size="1.75"
+													/>
+												{/if}</td
+											>
 											<th class="ps-0">
 												{resaltPermission.title}
 											</th>
