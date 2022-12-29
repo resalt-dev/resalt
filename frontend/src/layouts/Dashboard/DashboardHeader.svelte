@@ -52,7 +52,7 @@
 					.toLocaleTimeString('en-US', {
 						timeZone: 'UTC',
 						timeZoneName: 'short',
-						hour12: false,
+						hourCycle: 'h23',
 					})
 					.replace(/\./g, ':')}</span
 			>
