@@ -1,6 +1,5 @@
 import {
 	P_EVENT_LIST,
-	P_JOB_INFO,
 	P_JOB_LIST,
 	P_MINION_LIST,
 	P_RUN_APPROVAL_LIST,
@@ -11,9 +10,7 @@ import {
 	P_RUN_TEMPLATE_LOCAL,
 	P_SALTKEY_LIST,
 	P_USER_ADMIN,
-	P_USER_EMAIL,
 	P_USER_LIST,
-	P_USER_PASSWORD,
 	hasResaltPermission,
 } from './perms';
 

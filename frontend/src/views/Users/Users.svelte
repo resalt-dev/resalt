@@ -7,6 +7,7 @@
 	import UsersTabList from './UsersTabList.svelte';
 	import UsersTabCreate from './UsersTabCreate.svelte';
 
+	// svelte-ignore unused-export-let
 	export let location: Location;
 	export let navigate: NavigateFn;
 	export let subPage: string = '';
