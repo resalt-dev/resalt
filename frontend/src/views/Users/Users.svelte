@@ -6,6 +6,8 @@
 
 	import UsersTabList from './UsersTabList.svelte';
 	import UsersTabCreate from './UsersTabCreate.svelte';
+	import { hasResaltPermission, P_USER_ADMIN, P_USER_LIST } from '../../perms';
+	import { currentUser } from '../../stores';
 
 	// svelte-ignore unused-export-let
 	export let location: Location;
@@ -20,6 +22,7 @@
 			path: paths.users.getPath('list'),
 			component: UsersTabList,
 			data: { navigate },
+			hidden: !hasResaltPermission($currentUser.perms, P_USER_LIST),
 		},
 		{
 			key: 'create',
@@ -27,6 +30,7 @@
 			path: paths.users.getPath('create'),
 			component: UsersTabCreate,
 			data: { navigate },
+			hidden: !hasResaltPermission($currentUser.perms, P_USER_ADMIN),
 		},
 	];
 </script>

@@ -13,7 +13,7 @@
 </script>
 
 <div class="nav bg-dark w-100 no-select">
-	{#each tabs as tab}
+	{#each tabs.filter((tab) => !tab.hidden) as tab}
 		<Link
 			to={tab.path}
 			class="nav-link px-4 py-3 fw-bold mouse-pointer {tab.key === _current
