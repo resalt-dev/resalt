@@ -118,7 +118,6 @@
 			{#if userLDAPFieldValue}
 				<Col class="mb-0" md="5" lg="5">
 					<FormGroup floating={true}>
-						<Label for="userLDAPSync">LDAP Sync DN</Label>
 						<Input
 							id="userLDAPSync"
 							type="text"
@@ -126,12 +125,12 @@
 							bind:value={userLDAPSyncFieldValue}
 							on:blur={validateUserLDAPSyncField}
 						/>
+						<Label for="userLDAPSync">LDAP Sync DN</Label>
 					</FormGroup>
 				</Col>
 			{:else}
 				<Col class="mb-0" md="5" lg="3">
 					<FormGroup floating={true}>
-						<Label for="userEmail">Email (optional)</Label>
 						<Input
 							id="userEmail"
 							type="email"
@@ -139,6 +138,7 @@
 							bind:value={userEmailFieldValue}
 							on:blur={validateUserEmailField}
 						/>
+						<Label for="userEmail">Email (optional)</Label>
 					</FormGroup>
 				</Col>
 			{/if}
