@@ -40,7 +40,7 @@
 			: 'mx-2'}"
 	>
 		{#each Object.values(paths) as path}
-			{#if path.showInNav && path.hasPermission($currentUser.perms)}
+			{#if path.showInNav && $currentUser && path.hasPermission($currentUser.perms)}
 				{#if path.name.startsWith('_')}
 					<li><hr /></li>
 				{:else}
