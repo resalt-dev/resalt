@@ -171,7 +171,7 @@ export const resaltWebPermissions: {
 	},
 	{
 		permission: P_SALTKEY_LIST,
-		title: '[SaltKey] List',
+		title: '[SaltKey] List All',
 		description: 'Allow user to list salt keys.',
 	},
 	{
