@@ -34,6 +34,13 @@ $bluegray-10: #0e1418;
 	.form-switch > input:checked {
 		background-color: var(--primary) !important;
 	}
+		// Disabled
+	.form-control:disabled,
+	.form-select:disabled,
+	.form-switch > input:disabled {
+		background-color: $bluegray-9 !important;
+		cursor: not-allowed;
+	}
 	// Double nested cards
 	.card-body {
 		.card-body {
@@ -42,10 +49,18 @@ $bluegray-10: #0e1418;
 			.form-switch > input {
 				background-color: $bluegray-7 !important;
 				border-color: $bluegray-5;
-				color: var(--light-gray);
 			}
 			.form-switch > input:checked {
 				background-color: var(--primary) !important;
+			}
+
+			// Disabled
+			.form-control:disabled,
+			.form-select:disabled,
+			.form-switch > input:disabled {
+				background-color: $bluegray-9 !important;
+				border-color: $bluegray-6;
+				cursor: not-allowed;
 			}
 		}
 	}
