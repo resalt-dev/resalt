@@ -164,9 +164,10 @@
 </script>
 
 <Row>
-	<Col class="ps-3 mb-0" md="3" lg="2">
+	<Col class="mb-0" md="3" lg="2">
 		<FormGroup floating={true}>
 			<Input
+				id="clientType"
 				type="select"
 				name="select"
 				invalid={clientTypeFieldError}
@@ -180,12 +181,13 @@
 			<Label for="clientType">Client Type</Label>
 		</FormGroup>
 	</Col>
-	<Col class="ps-3 mb-0" md="2" lg={{ size: 1, offset: 1 }}>
+	<Col class="mb-0" md="2" lg={{ size: 1, offset: 1 }}>
 		{#if !batchFieldValue}
 			<div class="clearfix" />
 			<Label for="async" class="ms-1 mb-0">Async</Label>
 			<FormGroup floating={true} class="form-switch ps-0">
 				<Input
+					id="async"
 					type="switch"
 					class="fs-3"
 					invalid={clientTypeFieldError}
@@ -195,12 +197,13 @@
 			</FormGroup>
 		{/if}
 	</Col>
-	<Col class="ps-3 mb-0" md="2" lg={{ size: 1, offset: 1 }}>
+	<Col class="mb-0" md="2" lg={{ size: 1, offset: 1 }}>
 		{#if clientTypeFieldValue === 'local'}
 			<div class="clearfix" />
 			<Label for="batch" class="ms-1 mb-0">Batch</Label>
 			<FormGroup floating={true} class="form-switch ps-0">
 				<Input
+					id="batch"
 					type="switch"
 					class="fs-3"
 					invalid={clientTypeFieldError}
@@ -210,10 +213,11 @@
 			</FormGroup>
 		{/if}
 	</Col>
-	<Col class="ps-3 mb-0" md="2" lg="2" xl="1">
+	<Col class="mb-0" md="2" lg="2" xl="1">
 		{#if clientTypeFieldValue === 'local' && batchFieldValue}
 			<FormGroup floating={true}>
 				<Input
+					id="batchSize"
 					type="text"
 					invalid={batchSizeFieldError}
 					bind:value={batchSizeFieldValue}
@@ -226,10 +230,11 @@
 </Row>
 
 <Row>
-	<Col class="ps-3 mb-0" md="3" lg="2" xl="2" xxl="1">
+	<Col class="mb-0" md="3" lg="2" xl="2" xxl="1">
 		{#if clientTypeFieldValue === 'local'}
 			<FormGroup floating={true}>
 				<Input
+					id="targetType"
 					type="select"
 					invalid={targetTypeFieldError}
 					bind:value={targetTypeFieldValue}
@@ -251,10 +256,11 @@
 			</FormGroup>
 		{/if}
 	</Col>
-	<Col class="ps-3 mb-0" md="5" lg="2">
+	<Col class="mb-0" md="5" lg="2">
 		{#if clientTypeFieldValue === 'local'}
 			<FormGroup floating={true}>
 				<Input
+					id="target"
 					type="text"
 					invalid={targetFieldError}
 					bind:value={targetFieldValue}
@@ -264,9 +270,10 @@
 			</FormGroup>
 		{/if}
 	</Col>
-	<Col class="ps-3 mb-0" md="4" lg="2">
+	<Col class="mb-0" md="4" lg="2">
 		<FormGroup floating={true}>
 			<Input
+				id="function"
 				type="text"
 				invalid={functionFieldError}
 				bind:value={functionFieldValue}
@@ -275,9 +282,10 @@
 			<Label for="function">Function</Label>
 		</FormGroup>
 	</Col>
-	<Col class="ps-3 mb-0" md="12" lg="3">
+	<Col class="mb-0" md="12" lg="3">
 		<FormGroup floating={true}>
 			<Input
+				id="arguments"
 				type="text"
 				invalid={argsFieldError}
 				bind:value={argsFieldValue}
@@ -286,9 +294,10 @@
 			<Label for="arguments">Arguments</Label>
 		</FormGroup>
 	</Col>
-	<Col class="ps-3 mb-0" md="12" lg="3" xl="3" xxl="4">
+	<Col class="mb-0" md="12" lg="3" xl="3" xxl="4">
 		<FormGroup floating={true}>
 			<Input
+				id="keywordArguments"
 				type="text"
 				invalid={kwargsFieldError}
 				bind:value={kwargsFieldValue}

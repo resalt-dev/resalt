@@ -11,8 +11,6 @@
 	import type User from '../../models/User';
 	import Clickable from '../../components/Clickable.svelte';
 
-	// svelte-ignore unused-export-let
-	export let location: Location;
 	export let navigate: NavigateFn;
 
 	let paginationSize = 20;

@@ -56,7 +56,7 @@
 	</Card>
 {/if}
 
-<Card class="mb-3">
+<Card class="mb-0">
 	<CardHeader>Dark mode</CardHeader>
 	<CardBody>
 		<Row>

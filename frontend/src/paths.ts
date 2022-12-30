@@ -42,6 +42,11 @@ export class Path {
 		icon: string | null,
 		perms: string[] | null,
 	) {
+		if (icon === null) {
+			if (perms !== null) {
+				throw new Error('A path with no icon must have no permissions');
+			}
+		}
 		this.order = order;
 		this.name = name;
 		this.path = path;
@@ -90,10 +95,10 @@ const paths = {
 		P_RUN_TEMPLATE_GLOBAL,
 	]),
 
-	minion: new Path(30, 'minion', '/minion/:minionId/:subPage', 'Minion', null, [P_MINION_LIST]),
+	minion: new Path(30, 'minion', '/minion/:minionId/:subPage', 'Minion', null, null),
 	minions: new Path(31, 'minions', '/minions/:subPage', 'Minions', 'server', [P_MINION_LIST]),
 
-	job: new Path(40, 'job', '/job/:jobId', 'Job', null, [P_JOB_LIST, P_JOB_INFO]),
+	job: new Path(40, 'job', '/job/:jobId', 'Job', null, null),
 	jobs: new Path(41, 'jobs', '/jobs', 'Jobs', 'briefcase', [P_JOB_LIST]),
 
 	events: new Path(50, 'events', '/events', 'Events', 'list-ul', [P_EVENT_LIST]),
@@ -102,12 +107,7 @@ const paths = {
 
 	_1: new Path(99, '_', '/_', '', '', null),
 
-	user: new Path(100, 'user', '/user/:userId', 'User', null, [
-		P_USER_ADMIN,
-		P_USER_LIST,
-		P_USER_EMAIL,
-		P_USER_PASSWORD,
-	]),
+	user: new Path(100, 'user', '/user/:userId', 'User', null, null),
 	users: new Path(101, 'users', '/users/:usersPage', 'Users', 'user-circle', [
 		P_USER_ADMIN,
 		P_USER_LIST,
