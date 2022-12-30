@@ -102,8 +102,16 @@ const paths = {
 
 	_1: new Path(99, '_', '/_', '', '', null),
 
-	user: new Path(100, 'user', '/user/:userId', 'User', null, [P_USER_ADMIN, P_USER_LIST, P_USER_EMAIL, P_USER_PASSWORD]),
-	users: new Path(101, 'users', '/users/:usersPage', 'Users', 'user-circle', [P_USER_ADMIN, P_USER_LIST]),
+	user: new Path(100, 'user', '/user/:userId', 'User', null, [
+		P_USER_ADMIN,
+		P_USER_LIST,
+		P_USER_EMAIL,
+		P_USER_PASSWORD,
+	]),
+	users: new Path(101, 'users', '/users/:usersPage', 'Users', 'user-circle', [
+		P_USER_ADMIN,
+		P_USER_LIST,
+	]),
 
 	settings: new Path(110, 'settings', '/settings/:settingsPage', 'Settings', 'cog', []),
 
