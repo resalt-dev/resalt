@@ -194,7 +194,7 @@ export const resaltWebPermissions: {
 	},
 	{
 		permission: P_USER_LIST,
-		title: '[User] List',
+		title: '[User] List All',
 		description: 'Allow user to list users.',
 	},
 	{
