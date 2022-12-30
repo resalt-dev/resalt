@@ -19,7 +19,9 @@
 				.filter(Boolean)
 				.map((str) => {
 					return {
-						title: str.charAt(0).toUpperCase() + str.slice(1),
+						title: str.startsWith('usr_')
+							? str
+							: str.charAt(0).toUpperCase() + str.slice(1),
 						path: paths[str.toLowerCase()]?.getPath(),
 					};
 				});
@@ -64,31 +66,17 @@
 		<div class="vr sep" />
 	</Col>
 	<Col xs="auto" class="px-3 text-reset text-decoration-none">
-		<Icon name="user" size="1.5" type="solid" class="pe-1" />
-		{$currentUser.username}
-		<!-- <ul
-            class="dropdown-menu dropdown-menu-dark bg-secondary ms-5"
-            aria-labelledby="dropdownUser1"
-        >
-            <li>
-                <Link to={paths.preferences.getPath()} class="dropdown-item"
-                    >Preferences</Link
-                >
-            </li>
-            <li><hr class="dropdown-divider" /></li>
-            <li>
-                <Link to={paths.logout.getPath()} class="dropdown-item"
-                    >Sign out</Link
-                >
-            </li>
-        </ul> -->
+		<Link to={paths.user.getPath($currentUser.id)} class="text-decoration-none text-reset">
+			<Icon name="user" size="1.5" type="solid" class="pe-1" />
+			{$currentUser.username}
+		</Link>
 	</Col>
-	<Col xs="auto">
+	<!-- <Col xs="auto">
 		<div class="vr sep" />
 	</Col>
 	<Col xs="auto" class="px-3 text-reset text-decoration-none">
 		<Icon name="bell" size="1.5" />
-	</Col>
+	</Col> -->
 	<Col xs="auto">
 		<div class="vr sep" />
 	</Col>
