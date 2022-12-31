@@ -20,7 +20,7 @@
 	class="d-flex flex-column flex-shrink-0 bg-dark h-100 no-select"
 	style="min-height: 100vh; overflow-y: auto; {$collapsed ? 'width: 4.5rem;' : 'width: 17.5rem;'}"
 >
-	<Clickable event={handleClickCollapse} class="d-flex text-decoration-none">
+	<Clickable type="div" event={handleClickCollapse} class="d-flex text-decoration-none">
 		<div
 			class="d-flex align-items-center py-4 {$collapsed ? 'mx-auto' : 'w-100'}"
 			style="height: 80px"
@@ -53,6 +53,7 @@
 	<hr class="mb-0" />
 
 	<Clickable
+		type="div"
 		event={handleClickCollapse}
 		class="btn-dark bg-dark border-0 pt-3 pb-3 px-3 fw-light d-flex align-items-center"
 	>

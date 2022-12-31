@@ -30,6 +30,7 @@
 				{#each constants.themeColors as color}
 					<Col xs="auto">
 						<Clickable
+							type="div"
 							event={() => selectColor(color)}
 							class="theme-selector-box bg-{color} mb-4 border-{$theme.dark
 								? 'secondary'
@@ -62,6 +63,7 @@
 		<Row>
 			<Col xs="auto">
 				<Clickable
+					type="div"
 					event={() => setDarkMode(false)}
 					class="theme-selector-box mb-4 border-{$theme.dark ? 'secondary' : 'light'}"
 					style="background-color: #fff;"
@@ -73,6 +75,7 @@
 			</Col>
 			<Col xs="auto">
 				<Clickable
+					type="div"
 					event={() => setDarkMode(true)}
 					class="theme-selector-box bg-dark mb-4 border-{$theme.dark
 						? 'secondary'

@@ -40,13 +40,36 @@ export async function createSSESocket(): Promise<EventSource> {
 	return stream;
 }
 
+async function sendRequest(url: string, options: any): Promise<any> {
+	const res = await fetch(url, options);
+
+	if (res.status === 200) {
+		return await res.json();
+	} else {
+		let body = await res.json();
+		// Try parse JSON
+		try {
+			// Check if body has "error"
+			if (body.error) {
+				throw new ApiError(body.error);
+			} else {
+				console.error('FAILED PARSING ERROR', body);
+				throw new Error('Failed parsing error');
+			}
+		} catch (e) {
+			// If it fails, just return the text
+			throw new Error(body);
+		}
+	}
+}
+
 async function sendAuthenticatedRequest(method: string, path: string, body?: any): Promise<any> {
 	const token = get(authStore);
 	if (!token) {
 		throw new Error('Missing API token');
 	}
 
-	const res = await fetch(constants.apiUrl + path, {
+	return await sendRequest(constants.apiUrl + path, {
 		method,
 		headers: {
 			'Content-Type': 'application/json',
@@ -54,40 +77,16 @@ async function sendAuthenticatedRequest(method: string, path: string, body?: any
 		},
 		body: body ? JSON.stringify(body) : undefined,
 	});
-
-	const code = res.status;
-
-	// Try parse JSON
-	try {
-		let body = await res.json();
-		// Check if body has "error"
-		if (body.error) {
-			throw new ApiError(body.error);
-		} else {
-			console.log("FAILED PARSING ERROR", body);
-			throw new Error("Failed parsing error");
-		}
-	} catch (e) {
-		// If it fails, just return the text
-		let text = await res.text();
-		throw new Error(text);
-	}
 }
 
 async function sendUnauthenticatedRequest(method: string, path: string, body?: any): Promise<any> {
-	const res = await fetch(constants.apiUrl + path, {
+	return await sendRequest(constants.apiUrl + path, {
 		method,
 		headers: {
 			'Content-Type': 'application/json',
 		},
 		body: body ? JSON.stringify(body) : undefined,
 	});
-
-	if (res.status !== 200) {
-		throw new Error(await res.text());
-	}
-
-	return res.json();
 }
 
 ///

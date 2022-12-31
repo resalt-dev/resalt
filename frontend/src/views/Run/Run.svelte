@@ -46,7 +46,7 @@
 
 {#each $returns as ret}
 	<Card class="result-box mb-3">
-		<Clickable event={() => toggleCollapsedResult(ret.num)} class="card-header">
+		<Clickable type="div" event={() => toggleCollapsedResult(ret.num)} class="card-header">
 			<span>Result : </span>
 			({ret.command.targetType}) {ret.command.target}
 			<small class="text-muted">
