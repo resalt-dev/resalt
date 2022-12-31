@@ -23,12 +23,12 @@ pub async fn route_auth_login_post(
     salt: web::Data<SaltAPI>,
     input: web::Json<LoginRequest>,
     req: HttpRequest,
-) -> Result<impl Responder> {
+) -> Result<impl Responder, ApiError> {
     let user: User = if SConfig::auth_forward_enabled() {
         // Use X-Forwarded-User header as username
         let username = match req.headers().get("X-Forwarded-User") {
             Some(forwarded_user) => forwarded_user.to_str().unwrap().to_string(),
-            None => return Err(api_error_unauthorized()),
+            None => return Err(ApiError::Unauthorized),
         };
 
         // Fetch user to see if they exist
@@ -36,7 +36,7 @@ pub async fn route_auth_login_post(
             Ok(user) => user,
             Err(e) => {
                 error!("{:?}", e);
-                return Err(api_error_database());
+                return Err(ApiError::DatabaseError);
             }
         };
         match user {
@@ -52,10 +52,10 @@ pub async fn route_auth_login_post(
                                 (Some(ldap_sync), username, Some(email))
                             }
                             // User was not found in LDAP,
-                            Ok(None) => return Err(api_error_unauthorized()),
+                            Ok(None) => return Err(ApiError::Unauthorized),
                             Err(e) => {
                                 error!("route_auth_login_post {:?}", e);
-                                return Err(api_error_ldap());
+                                return Err(ApiError::LdapError);
                             }
                         }
                     }
@@ -66,7 +66,7 @@ pub async fn route_auth_login_post(
                     Ok(user) => user,
                     Err(e) => {
                         error!("Failed creating user {:?}", e);
-                        return Err(api_error_database());
+                        return Err(ApiError::DatabaseError);
                     }
                 }
             }
@@ -87,7 +87,7 @@ pub async fn route_auth_login_post(
                 match auth_login_ldap(&data, &username, &password).await {
                     Ok(user) => match user {
                         Some(user) => user,
-                        None => return Err(api_error_unauthorized()),
+                        None => return Err(ApiError::Unauthorized),
                     },
                     Err(e) => return Err(e),
                 }
@@ -105,7 +105,7 @@ pub async fn route_auth_login_post(
         Ok(authtoken) => authtoken,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 
@@ -114,7 +114,7 @@ pub async fn route_auth_login_post(
         Ok(_) => {}
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 

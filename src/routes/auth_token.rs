@@ -16,7 +16,7 @@ pub struct TokenValidateRequest {
 pub async fn route_auth_token_post(
     data: web::Data<Box<dyn StorageImpl>>,
     input: web::Form<TokenValidateRequest>,
-) -> Result<impl Responder> {
+) -> Result<impl Responder, ApiError> {
     let db = data;
     let username = input.username.to_lowercase();
     let token = input.password.clone();
@@ -32,7 +32,7 @@ pub async fn route_auth_token_post(
                 "@wheel".to_string(),
             ]));
         } else {
-            return Err(api_error_unauthorized());
+            return Err(ApiError::Unauthorized);
         }
     }
 
@@ -44,12 +44,12 @@ pub async fn route_auth_token_post(
                 Ok(user) => match user {
                     Some(user) => user,
                     None => {
-                        return Err(api_error_unauthorized());
+                        return Err(ApiError::Unauthorized);
                     }
                 },
                 Err(err) => {
                     error!("Error getting user: {:?}", err);
-                    return Err(api_error_internal_error());
+                    return Err(ApiError::InternalError);
                 }
             };
 
@@ -59,17 +59,17 @@ pub async fn route_auth_token_post(
                 Ok(perms) => Ok(HttpResponse::Ok().json(perms)),
                 Err(e) => {
                     error!("Error parsing permissions: {:?}", e);
-                    Err(api_error_internal_error())
+                    Err(ApiError::InternalError)
                 }
             }
         }
         Ok(None) => {
             info!("Invalid token from Salt validation");
-            Err(api_error_unauthorized())
+            Err(ApiError::Unauthorized)
         }
         Err(e) => {
             error!("{:?}", e);
-            Err(api_error_database())
+            Err(ApiError::DatabaseError)
         }
     }
 }

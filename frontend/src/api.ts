@@ -17,7 +17,6 @@ export async function createSSESocket(): Promise<EventSource> {
 	if (!token) {
 		throw new Error('Missing API token');
 	}
-
 	const stream = new EventSource(`${constants.apiUrl}/pipeline?token=${token}`);
 	return stream;
 }
@@ -74,7 +73,7 @@ export async function login(username: string, password: string): Promise<string>
 }
 
 export async function getConfig(): Promise<Config> {
-	return sendUnauthenticatedRequest('GET', '/config').then((data: any) =>
+	return await sendUnauthenticatedRequest('GET', '/config').then((data: any) =>
 		Config.fromObject(data),
 	);
 }

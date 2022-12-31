@@ -70,7 +70,7 @@ pub fn has_permission(
     data: &web::Data<Box<dyn StorageImpl>>,
     user_id: &str,
     permission: &str,
-) -> Result<bool, actix_web::Error> {
+) -> Result<bool, ApiError> {
     let user = match data.get_user_by_id(user_id) {
         Ok(user) => match user {
             Some(user) => user,
@@ -78,14 +78,14 @@ pub fn has_permission(
         },
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
     let perms = match serde_json::from_str(&user.perms) {
         Ok(perms) => perms,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
     Ok(evalute_resalt_permission(&perms, permission))
@@ -147,12 +147,12 @@ pub fn evalute_resalt_permission(permissions: &Value, permission: &str) -> bool 
 pub fn update_user_permissions_from_groups(
     data: &web::Data<Box<dyn StorageImpl>>,
     user: &User,
-) -> Result<(), actix_web::Error> {
+) -> Result<(), ApiError> {
     let groups = match data.list_permission_groups_by_user_id(&user.id) {
         Ok(groups) => groups,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
     let mut perms: Vec<Value> = Vec::new();
@@ -162,7 +162,7 @@ pub fn update_user_permissions_from_groups(
             Ok(serdegroup) => serdegroup,
             Err(e) => {
                 error!("{:?}", e);
-                return Err(api_error_database());
+                return Err(ApiError::DatabaseError);
             }
         };
         let group_perms = match serdegroup.as_array() {
@@ -181,7 +181,7 @@ pub fn update_user_permissions_from_groups(
         Ok(_) => Ok(()),
         Err(e) => {
             error!("{:?}", e);
-            Err(api_error_database())
+            Err(ApiError::DatabaseError)
         }
     }
 }

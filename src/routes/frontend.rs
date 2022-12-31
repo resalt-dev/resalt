@@ -1,10 +1,11 @@
-use crate::components::*;
 use actix_web::{
     dev::{ServiceRequest, ServiceResponse},
     HttpResponse,
 };
 use include_dir::{include_dir, Dir};
 use log::*;
+
+use crate::components::ApiError;
 
 static FRONTEND_PUBLIC_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/frontend/build");
 
@@ -31,7 +32,7 @@ pub async fn route_frontend_get(
         Some(file) => file,
         None => {
             warn!("File not found: {}", path);
-            return Err(api_error_not_found());
+            return Err(ApiError::NotFound.into());
         }
     };
 

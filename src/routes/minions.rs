@@ -18,12 +18,12 @@ pub async fn route_minions_get(
     data: web::Data<Box<dyn StorageImpl>>,
     query: web::Query<MinionsListGetQuery>,
     req: HttpRequest,
-) -> Result<impl Responder> {
+) -> Result<impl Responder, ApiError> {
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_MINION_LIST)? {
-        return Err(api_error_forbidden());
+        return Err(ApiError::Forbidden);
     }
 
     let filter = query.filter.clone();
@@ -32,7 +32,7 @@ pub async fn route_minions_get(
             Ok(filter) => filter.to_string(),
             Err(e) => {
                 error!("Failed to decode filter: {}", e);
-                return Err(api_error_invalid_request());
+                return Err(ApiError::InvalidRequest);
             }
         }),
         None => None,
@@ -47,7 +47,7 @@ pub async fn route_minions_get(
             Ok(filters) => filters,
             Err(e) => {
                 error!("Failed to parse filter: {}", e);
-                return Err(api_error_invalid_request());
+                return Err(ApiError::InvalidRequest);
             }
         },
         None => vec![],
@@ -57,7 +57,7 @@ pub async fn route_minions_get(
         Ok(minions) => minions,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 
@@ -90,26 +90,26 @@ pub async fn route_minion_get(
     data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<MinionGetInfo>,
     req: HttpRequest,
-) -> Result<impl Responder> {
+) -> Result<impl Responder, ApiError> {
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_MINION_LIST)? {
-        return Err(api_error_forbidden());
+        return Err(ApiError::Forbidden);
     }
 
     let minion = match data.get_minion_by_id(&info.id) {
         Ok(minion) => minion,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 
     let minion = match minion {
         Some(minion) => minion,
         None => {
-            return Err(api_error_not_found());
+            return Err(ApiError::NotFound);
         }
     };
 
@@ -120,21 +120,21 @@ pub async fn route_minion_refresh_post(
     salt: web::Data<SaltAPI>,
     info: web::Path<MinionGetInfo>,
     req: HttpRequest,
-) -> Result<impl Responder> {
+) -> Result<impl Responder, ApiError> {
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     let salt_token = match &auth.salt_token {
         Some(salt_token) => salt_token,
         None => {
             error!("No salt token found");
-            return Err(api_error_unauthorized());
+            return Err(ApiError::Unauthorized);
         }
     };
     match salt.refresh_minion(salt_token, &info.id).await {
         Ok(_) => (),
         Err(e) => {
             error!("refresh_minion {:?}", e);
-            return Err(api_error_internal_error());
+            return Err(ApiError::InternalError);
         }
     };
 

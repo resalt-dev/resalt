@@ -17,12 +17,12 @@ pub async fn route_users_get(
     data: web::Data<Box<dyn StorageImpl>>,
     query: web::Query<UsersListGetQuery>,
     req: HttpRequest,
-) -> Result<impl Responder> {
+) -> Result<impl Responder, ApiError> {
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_USER_ADMIN)? {
-        return Err(api_error_forbidden());
+        return Err(ApiError::Forbidden);
     }
 
     // Pagination
@@ -33,7 +33,7 @@ pub async fn route_users_get(
         Ok(users) => users,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 
@@ -44,7 +44,7 @@ pub async fn route_users_get(
             Ok(permission_groups) => permission_groups,
             Err(e) => {
                 error!("{:?}", e);
-                return Err(api_error_database());
+                return Err(ApiError::DatabaseError);
             }
         };
         results.push(user.public(permission_groups));
@@ -65,12 +65,12 @@ pub async fn route_users_post(
     data: web::Data<Box<dyn StorageImpl>>,
     body: web::Json<UserCreateRequest>,
     req: HttpRequest,
-) -> Result<impl Responder> {
+) -> Result<impl Responder, ApiError> {
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_USER_ADMIN)? {
-        return Err(api_error_forbidden());
+        return Err(ApiError::Forbidden);
     }
 
     // Check if username is taken
@@ -78,12 +78,12 @@ pub async fn route_users_post(
         Ok(user) => user,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 
     if user.is_some() {
-        return Err(api_error_invalid_request());
+        return Err(ApiError::InvalidRequest);
     }
 
     // Create user
@@ -96,7 +96,7 @@ pub async fn route_users_post(
         Ok(user) => user,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 
@@ -105,7 +105,7 @@ pub async fn route_users_post(
         Ok(permission_groups) => permission_groups,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
     let user = user.public(permission_group);
@@ -122,25 +122,25 @@ pub async fn route_user_get(
     data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<UserGetInfo>,
     req: HttpRequest,
-) -> Result<impl Responder> {
+) -> Result<impl Responder, ApiError> {
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_USER_ADMIN)? && auth.user_id != info.user_id {
-        return Err(api_error_forbidden());
+        return Err(ApiError::Forbidden);
     }
 
     let user = match data.get_user_by_id(&info.user_id) {
         Ok(user) => user,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 
     let user = match user {
         Some(user) => user,
-        None => return Err(api_error_not_found()),
+        None => return Err(ApiError::NotFound),
     };
 
     // Map to - among other things - remove password
@@ -148,7 +148,7 @@ pub async fn route_user_get(
         Ok(permission_groups) => permission_groups,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
     let user = user.public(permission_group);
@@ -160,17 +160,17 @@ pub async fn route_user_delete(
     data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<UserGetInfo>,
     req: HttpRequest,
-) -> Result<impl Responder> {
+) -> Result<impl Responder, ApiError> {
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_USER_ADMIN)? {
-        return Err(api_error_forbidden());
+        return Err(ApiError::Forbidden);
     }
 
     // Don't allow deleting self
     if auth.user_id == info.user_id {
-        return Err(api_error_forbidden());
+        return Err(ApiError::Forbidden);
     }
 
     // Delete user
@@ -178,7 +178,7 @@ pub async fn route_user_delete(
         Ok(_) => (),
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 
@@ -195,7 +195,7 @@ pub async fn route_user_password_post(
     info: web::Path<UserGetInfo>,
     req: HttpRequest,
     body: web::Json<UserPostPasswordData>,
-) -> Result<impl Responder> {
+) -> Result<impl Responder, ApiError> {
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
@@ -203,12 +203,12 @@ pub async fn route_user_password_post(
         || (auth.user_id.eq(&info.user_id)
             && has_permission(&data, &auth.user_id, P_USER_PASSWORD)?);
     if !permission_ok {
-        return Err(api_error_forbidden());
+        return Err(ApiError::Forbidden);
     }
 
     // Minimum password check
     if body.password.len() < 8 {
-        return Err(api_error_invalid_request());
+        return Err(ApiError::InvalidRequest);
     }
 
     // Check if user exists
@@ -216,14 +216,14 @@ pub async fn route_user_password_post(
         Ok(user) => user,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 
     let mut user = match user {
         Some(user) => user,
         None => {
-            return Err(api_error_not_found());
+            return Err(ApiError::NotFound);
         }
     };
 
@@ -234,7 +234,7 @@ pub async fn route_user_password_post(
         Ok(_) => {}
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     }
 
@@ -252,12 +252,12 @@ pub async fn route_user_permissions_post(
     data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<UserPermissionInfo>,
     req: HttpRequest,
-) -> Result<impl Responder> {
+) -> Result<impl Responder, ApiError> {
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
-        return Err(api_error_forbidden());
+        return Err(ApiError::Forbidden);
     }
 
     // Check if user exists
@@ -265,14 +265,14 @@ pub async fn route_user_permissions_post(
         Ok(user) => user,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 
     let user = match user {
         Some(user) => user,
         None => {
-            return Err(api_error_not_found());
+            return Err(ApiError::NotFound);
         }
     };
 
@@ -281,14 +281,14 @@ pub async fn route_user_permissions_post(
         Ok(permission_group) => permission_group,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 
     let permission_group = match permission_group {
         Some(permission_group) => permission_group,
         None => {
-            return Err(api_error_not_found());
+            return Err(ApiError::NotFound);
         }
     };
 
@@ -297,7 +297,7 @@ pub async fn route_user_permissions_post(
         Ok(user_permission) => user_permission,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 
@@ -306,7 +306,7 @@ pub async fn route_user_permissions_post(
             Ok(_) => (),
             Err(e) => {
                 error!("{:?}", e);
-                return Err(api_error_database());
+                return Err(ApiError::DatabaseError);
             }
         }
 
@@ -322,12 +322,12 @@ pub async fn route_user_permissions_delete(
     data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<UserPermissionInfo>,
     req: HttpRequest,
-) -> Result<impl Responder> {
+) -> Result<impl Responder, ApiError> {
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
-        return Err(api_error_forbidden());
+        return Err(ApiError::Forbidden);
     }
 
     // Check if user exists
@@ -335,14 +335,14 @@ pub async fn route_user_permissions_delete(
         Ok(user) => user,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 
     let user = match user {
         Some(user) => user,
         None => {
-            return Err(api_error_not_found());
+            return Err(ApiError::NotFound);
         }
     };
 
@@ -350,14 +350,14 @@ pub async fn route_user_permissions_delete(
         Ok(permission_group) => permission_group,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 
     let permission_group = match permission_group {
         Some(permission_group) => permission_group,
         None => {
-            return Err(api_error_not_found());
+            return Err(ApiError::NotFound);
         }
     };
 
@@ -365,7 +365,7 @@ pub async fn route_user_permissions_delete(
         Ok(_) => (),
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     }
 

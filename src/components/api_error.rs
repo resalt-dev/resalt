@@ -1,35 +1,76 @@
-use serde::{Deserialize, Serialize};
+use std::fmt::Display;
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct ApiError {
-    pub code: u16,
-    pub message: String,
+use actix_web::{
+    http::{header::ContentType, StatusCode},
+    HttpResponse,
+};
+use serde_json::json;
+
+#[allow(dead_code)]
+#[derive(Clone, Debug)]
+pub enum ApiError {
+    Unauthorized,            // Missing credentials
+    Forbidden,               // Lackign permissions
+    NotFound,                // Resource not found
+    NotFoundMessage(String), // Resource not found with custom message
+    InvalidRequest,          // Invalid request
+    InternalError,           // Internal error
+    LdapError,               // LDAP error
+    DatabaseError,           // Database error
 }
 
-pub fn api_error_unauthorized() -> actix_web::Error {
-    actix_web::error::ErrorUnauthorized("Missing valid credentials".to_string())
+impl ApiError {
+    fn code(&self) -> StatusCode {
+        match self {
+            // Login and perms
+            ApiError::Unauthorized => StatusCode::UNAUTHORIZED,
+            ApiError::Forbidden => StatusCode::FORBIDDEN,
+            // Request-related
+            ApiError::NotFound | ApiError::NotFoundMessage(_) => StatusCode::NOT_FOUND,
+            ApiError::InvalidRequest => StatusCode::BAD_REQUEST,
+            // Internal server errors
+            ApiError::InternalError => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::LdapError => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::DatabaseError => StatusCode::INTERNAL_SERVER_ERROR,
+        }
+    }
+
+    pub fn message(&self) -> String {
+        match self {
+            ApiError::Unauthorized => String::from("Missing credentials"),
+            ApiError::Forbidden => String::from("Insufficient permissions"),
+            ApiError::NotFound => String::from("Resource not found"),
+            ApiError::NotFoundMessage(str) => str.clone(),
+            ApiError::InvalidRequest => String::from("Invalid request"),
+            ApiError::InternalError => String::from("Internal error"),
+            ApiError::LdapError => String::from("LDAP error"),
+            ApiError::DatabaseError => String::from("Database error"),
+        }
+    }
 }
 
-pub fn api_error_forbidden() -> actix_web::Error {
-    actix_web::error::ErrorForbidden("Missing valid credentials".to_string())
+impl Display for ApiError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let body = json! {
+            {
+                "error": {
+                    "code": self.code().as_u16(),
+                    "message": self.message(),
+                },
+            }
+        };
+        write!(f, "{}", body)
+    }
 }
 
-pub fn api_error_database() -> actix_web::Error {
-    actix_web::error::ErrorInternalServerError("Database error".to_string())
-}
+impl actix_web::error::ResponseError for ApiError {
+    fn status_code(&self) -> StatusCode {
+        self.code()
+    }
 
-pub fn api_error_internal_error() -> actix_web::Error {
-    actix_web::error::ErrorInternalServerError("Internal error".to_string())
-}
-
-pub fn api_error_ldap() -> actix_web::Error {
-    actix_web::error::ErrorInternalServerError("Internal LDAP error".to_string())
-}
-
-pub fn api_error_invalid_request() -> actix_web::Error {
-    actix_web::error::ErrorBadRequest("Invalid request".to_string())
-}
-
-pub fn api_error_not_found() -> actix_web::Error {
-    actix_web::error::ErrorNotFound("Not found".to_string())
+    fn error_response(&self) -> HttpResponse {
+        HttpResponse::build(self.status_code())
+            .insert_header(ContentType::json())
+            .body(self.to_string())
+    }
 }

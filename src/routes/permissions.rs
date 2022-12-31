@@ -9,25 +9,25 @@ use serde_json::Value;
 async fn get_group(
     data: &web::Data<Box<dyn StorageImpl>>,
     group_id: &str,
-) -> Result<impl Responder> {
+) -> Result<impl Responder, ApiError> {
     let permission_group = match data.get_permission_group_by_id(group_id) {
         Ok(permission_group) => permission_group,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 
     let permission_group = match permission_group {
         Some(permission_group) => permission_group,
-        None => return Err(api_error_not_found()),
+        None => return Err(ApiError::NotFound),
     };
 
     let users = match data.list_users_by_permission_group_id(group_id) {
         Ok(users) => users,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
     Ok(web::Json(permission_group.public(users)))
@@ -43,12 +43,12 @@ pub async fn route_permissions_get(
     data: web::Data<Box<dyn StorageImpl>>,
     query: web::Query<PermissionGroupsListGetQuery>,
     req: HttpRequest,
-) -> Result<impl Responder> {
+) -> Result<impl Responder, ApiError> {
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
-        return Err(api_error_forbidden());
+        return Err(ApiError::Forbidden);
     }
 
     // Pagination
@@ -59,7 +59,7 @@ pub async fn route_permissions_get(
         Ok(permission_groups) => permission_groups,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 
@@ -69,7 +69,7 @@ pub async fn route_permissions_get(
             Ok(users) => users,
             Err(e) => {
                 error!("{:?}", e);
-                return Err(api_error_database());
+                return Err(ApiError::DatabaseError);
             }
         };
         results.push(group.public(users));
@@ -87,29 +87,29 @@ pub async fn route_permissions_post(
     data: web::Data<Box<dyn StorageImpl>>,
     input: web::Json<PermissionGroupCreateRequest>,
     req: HttpRequest,
-) -> Result<impl Responder> {
+) -> Result<impl Responder, ApiError> {
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
-        return Err(api_error_forbidden());
+        return Err(ApiError::Forbidden);
     }
 
     let permission_group_id = match data.create_permission_group(&input.name) {
         Ok(id) => id,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
     let permission_group = match data.get_permission_group_by_id(&permission_group_id) {
         Ok(permission_group) => match permission_group {
             Some(permission_group) => permission_group,
-            None => return Err(api_error_database()),
+            None => return Err(ApiError::DatabaseError),
         },
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
     let permission_group_users = match data.list_users_by_permission_group_id(&permission_group_id)
@@ -117,7 +117,7 @@ pub async fn route_permissions_post(
         Ok(permission_group_users) => permission_group_users,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
     Ok(web::Json(permission_group.public(permission_group_users)))
@@ -132,12 +132,12 @@ pub async fn route_permission_get(
     data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<PermissionInfo>,
     req: HttpRequest,
-) -> Result<impl Responder> {
+) -> Result<impl Responder, ApiError> {
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
-        return Err(api_error_forbidden());
+        return Err(ApiError::Forbidden);
     }
 
     get_group(&data, &info.id).await
@@ -157,12 +157,12 @@ pub async fn route_permission_update(
     info: web::Path<PermissionInfo>,
     input: web::Json<PermissionGroupUpdateRequest>,
     req: HttpRequest,
-) -> Result<impl Responder> {
+) -> Result<impl Responder, ApiError> {
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
-        return Err(api_error_forbidden());
+        return Err(ApiError::Forbidden);
     }
 
     // Get permission group
@@ -170,13 +170,13 @@ pub async fn route_permission_update(
         Ok(permission_group) => permission_group,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
     let mut permission_group = match permission_group {
         Some(permission_group) => permission_group,
         None => {
-            return Err(api_error_not_found());
+            return Err(ApiError::NotFound);
         }
     };
 
@@ -189,7 +189,7 @@ pub async fn route_permission_update(
         Ok(()) => (),
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 
@@ -202,7 +202,7 @@ pub async fn route_permission_update(
         }
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 
@@ -214,12 +214,12 @@ pub async fn route_permission_delete(
     data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<PermissionInfo>,
     req: HttpRequest,
-) -> Result<impl Responder> {
+) -> Result<impl Responder, ApiError> {
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
-        return Err(api_error_forbidden());
+        return Err(ApiError::Forbidden);
     }
 
     // Get the group so we can return it as result
@@ -230,7 +230,7 @@ pub async fn route_permission_delete(
         Ok(users) => users,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 
@@ -239,7 +239,7 @@ pub async fn route_permission_delete(
         Ok(()) => (),
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 

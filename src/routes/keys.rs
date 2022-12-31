@@ -11,14 +11,14 @@ pub async fn route_keys_get(
     salt: web::Data<SaltAPI>,
     data: web::Data<Box<dyn StorageImpl>>,
     req: HttpRequest,
-) -> Result<impl Responder> {
+) -> Result<impl Responder, ApiError> {
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     let salt_token = match &auth.salt_token {
         Some(salt_token) => salt_token,
         None => {
             error!("No salt token found");
-            return Err(api_error_unauthorized());
+            return Err(ApiError::Unauthorized);
         }
     };
 
@@ -26,7 +26,7 @@ pub async fn route_keys_get(
         Ok(keys) => keys,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_internal_error());
+            return Err(ApiError::InternalError);
         }
     };
 
@@ -40,7 +40,7 @@ pub async fn route_keys_get(
         Ok(_) => (),
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_internal_error());
+            return Err(ApiError::InternalError);
         }
     };
 
@@ -57,14 +57,14 @@ pub async fn route_key_accept_put(
     salt: web::Data<SaltAPI>,
     info: web::Path<KeyInfo>,
     req: HttpRequest,
-) -> Result<impl Responder> {
+) -> Result<impl Responder, ApiError> {
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     let salt_token = match &auth.salt_token {
         Some(salt_token) => salt_token,
         None => {
             error!("No salt token found");
-            return Err(api_error_unauthorized());
+            return Err(ApiError::Unauthorized);
         }
     };
 
@@ -72,7 +72,7 @@ pub async fn route_key_accept_put(
         Ok(()) => Ok(web::Json(())),
         Err(e) => {
             error!("{:?}", e);
-            Err(api_error_internal_error())
+            Err(ApiError::InternalError)
         }
     }
 }
@@ -81,14 +81,14 @@ pub async fn route_key_reject_put(
     salt: web::Data<SaltAPI>,
     info: web::Path<KeyInfo>,
     req: HttpRequest,
-) -> Result<impl Responder> {
+) -> Result<impl Responder, ApiError> {
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     let salt_token = match &auth.salt_token {
         Some(salt_token) => salt_token,
         None => {
             error!("No salt token found");
-            return Err(api_error_unauthorized());
+            return Err(ApiError::Unauthorized);
         }
     };
 
@@ -96,7 +96,7 @@ pub async fn route_key_reject_put(
         Ok(()) => Ok(web::Json(())),
         Err(e) => {
             error!("{:?}", e);
-            Err(api_error_internal_error())
+            Err(ApiError::InternalError)
         }
     }
 }
@@ -105,14 +105,14 @@ pub async fn route_key_delete_delete(
     salt: web::Data<SaltAPI>,
     info: web::Path<KeyInfo>,
     req: HttpRequest,
-) -> Result<impl Responder> {
+) -> Result<impl Responder, ApiError> {
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     let salt_token = match &auth.salt_token {
         Some(salt_token) => salt_token,
         None => {
             error!("No salt token found");
-            return Err(api_error_unauthorized());
+            return Err(ApiError::Unauthorized);
         }
     };
 
@@ -120,7 +120,7 @@ pub async fn route_key_delete_delete(
         Ok(()) => Ok(web::Json(())),
         Err(e) => {
             error!("{:?}", e);
-            Err(api_error_internal_error())
+            Err(ApiError::InternalError)
         }
     }
 }

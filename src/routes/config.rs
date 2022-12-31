@@ -3,7 +3,7 @@ use log::error;
 use resalt_config::SConfig;
 use serde::Serialize;
 
-use crate::update;
+use crate::{components::ApiError, update};
 
 #[allow(non_snake_case)]
 #[derive(Debug, Serialize)]
@@ -16,7 +16,7 @@ struct ApiConfig {
     enableThemeSwitching: bool,
 }
 
-pub async fn route_config_get() -> Result<impl Responder> {
+pub async fn route_config_get() -> Result<impl Responder, ApiError> {
     let config = ApiConfig {
         authForwardEnabled: SConfig::auth_forward_enabled(),
         currentVersion: update::CURRENT_VERSION.to_string(),

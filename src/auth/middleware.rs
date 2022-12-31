@@ -1,4 +1,4 @@
-use crate::{auth::update_token_salt_token, components::api_error_unauthorized};
+use crate::{auth::update_token_salt_token, components::ApiError};
 use actix_web::{
     dev::{forward_ready, Service, ServiceRequest, ServiceResponse, Transform},
     web::Query,
@@ -98,7 +98,7 @@ where
                     Ok(auth_status) => auth_status,
                     Err(e) => {
                         error!("{:?}", e);
-                        return Err(e);
+                        return Err(e.into());
                     }
                 };
 
@@ -120,7 +120,7 @@ where
                                     Ok(_) => {}
                                     Err(e) => {
                                         error!("{:?}", e);
-                                        return Err(e);
+                                        return Err(e.into());
                                     }
                                 }
 
@@ -128,7 +128,7 @@ where
                                     Ok(auth_status) => auth_status,
                                     Err(e) => {
                                         error!("{:?}", e);
-                                        return Err(e);
+                                        return Err(e.into());
                                     }
                                 };
                             }
@@ -196,7 +196,7 @@ where
         Box::pin(async move {
             // Check if req has extension AuthStatus{}
             if req.extensions().get::<AuthStatus>().is_none() {
-                return Err(api_error_unauthorized());
+                return Err(ApiError::Unauthorized.into());
             }
 
             let fut = srv.call(req);

@@ -3,7 +3,7 @@ use log::*;
 use resalt_storage::StorageImpl;
 use serde::{Deserialize, Serialize};
 
-use crate::components::api_error_database;
+use crate::components::ApiError;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct EventsListGetQuery {
@@ -14,7 +14,7 @@ pub struct EventsListGetQuery {
 pub async fn route_events_get(
     data: web::Data<Box<dyn StorageImpl>>,
     query: web::Query<EventsListGetQuery>,
-) -> Result<impl Responder> {
+) -> Result<impl Responder, ApiError> {
     let limit = query.limit;
     let offset = query.offset;
 
@@ -22,7 +22,7 @@ pub async fn route_events_get(
         Ok(events) => events,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 

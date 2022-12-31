@@ -19,7 +19,7 @@ pub struct JobsListGetQuery {
 pub async fn route_jobs_get(
     data: web::Data<Box<dyn StorageImpl>>,
     query: web::Query<JobsListGetQuery>,
-) -> Result<impl Responder> {
+) -> Result<impl Responder, ApiError> {
     let sort = query.sort.clone();
     let limit = query.limit;
     let offset = query.offset;
@@ -28,7 +28,7 @@ pub async fn route_jobs_get(
         Ok(jobs) => jobs,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 
@@ -53,19 +53,19 @@ pub async fn route_jobs_post(
     data: web::Data<Box<dyn StorageImpl>>,
     input: web::Json<JobRunRequest>,
     req: HttpRequest,
-) -> Result<impl Responder> {
+) -> Result<impl Responder, ApiError> {
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_RUN_LIVE)? {
-        return Err(api_error_forbidden());
+        return Err(ApiError::Forbidden);
     }
 
     let salt_token = match &auth.salt_token {
         Some(salt_token) => salt_token,
         None => {
             error!("No salt token found");
-            return Err(api_error_unauthorized());
+            return Err(ApiError::Unauthorized);
         }
     };
 
@@ -146,7 +146,7 @@ pub async fn route_jobs_post(
         Ok(job) => Ok(web::Json(job)),
         Err(e) => {
             error!("{:?}", e);
-            Err(api_error_internal_error())
+            Err(ApiError::InternalError)
         }
     }
 }
@@ -165,19 +165,19 @@ pub struct JobGetResponse {
 pub async fn route_job_get(
     data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<JobGetInfo>,
-) -> Result<impl Responder> {
+) -> Result<impl Responder, ApiError> {
     let job = match data.get_job_by_jid(&info.jid) {
         Ok(job) => job,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 
     let job = match job {
         Some(job) => job,
         None => {
-            return Err(api_error_not_found());
+            return Err(ApiError::NotFound);
         }
     };
 
@@ -185,7 +185,7 @@ pub async fn route_job_get(
         Ok(returns) => returns,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 

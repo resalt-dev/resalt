@@ -16,16 +16,16 @@ pub async fn update_token_salt_token(
     salt: &SaltAPI,
     user_id: &str,
     token: &str,
-) -> Result<(), actix_web::Error> {
+) -> Result<(), ApiError> {
     // Fetch username of user
     let user = match data.get_user_by_id(user_id) {
         Ok(user) => match user {
             Some(user) => user,
-            None => return Err(api_error_internal_error()),
+            None => return Err(ApiError::InternalError),
         },
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 
@@ -34,7 +34,7 @@ pub async fn update_token_salt_token(
         Ok(salt_token) => salt_token,
         Err(e) => {
             error!("update_token_salt_token salt login {:?}", e);
-            return Err(api_error_internal_error());
+            return Err(ApiError::InternalError);
         }
     };
 
@@ -43,7 +43,7 @@ pub async fn update_token_salt_token(
         Ok(_) => {}
         Err(e) => {
             error!("update_token_salt_token update_salttoken {:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 
@@ -54,7 +54,7 @@ pub async fn update_token_salt_token(
 pub fn validate_auth_token(
     data: &Box<dyn StorageImpl>,
     token: &str,
-) -> Result<Option<AuthStatus>, actix_web::Error> {
+) -> Result<Option<AuthStatus>, ApiError> {
     if token.len() < 20 {
         return Ok(None);
     }
@@ -66,7 +66,7 @@ pub fn validate_auth_token(
         },
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 
@@ -85,7 +85,7 @@ pub fn validate_auth_token(
                 Ok(v) => Some(v),
                 Err(e) => {
                     error!("Failed parsing authtoken.salt_token {:?}", e);
-                    return Err(api_error_internal_error());
+                    return Err(ApiError::InternalError);
                 }
             },
             None => None,
@@ -97,7 +97,7 @@ pub fn auth_login_classic(
     data: &web::Data<Box<dyn StorageImpl>>,
     username: &str,
     password: &str,
-) -> Result<Option<User>, actix_web::Error> {
+) -> Result<Option<User>, ApiError> {
     // Fetch user
     let user = match data.get_user_by_username(username) {
         Ok(user) => match user {
@@ -106,7 +106,7 @@ pub fn auth_login_classic(
         },
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 
@@ -131,13 +131,13 @@ pub async fn auth_login_ldap(
     data: &web::Data<Box<dyn StorageImpl>>,
     username: &str,
     password: &str,
-) -> Result<Option<User>, actix_web::Error> {
+) -> Result<Option<User>, ApiError> {
     let (uid, email, user_ldap_dn) = match LdapHandler::authenticate(username, password).await {
         Ok(Some(uid)) => uid,
         Ok(None) => return Ok(None),
         Err(e) => {
             error!("auth_login_ldap {:?}", e);
-            return Err(api_error_ldap());
+            return Err(ApiError::LdapError);
         }
     };
 
@@ -146,7 +146,7 @@ pub async fn auth_login_ldap(
         Ok(user) => user,
         Err(e) => {
             error!("{:?}", e);
-            return Err(api_error_database());
+            return Err(ApiError::DatabaseError);
         }
     };
 
@@ -156,7 +156,7 @@ pub async fn auth_login_ldap(
             Ok(user) => Some(user),
             Err(e) => {
                 error!("{:?}", e);
-                return Err(api_error_database());
+                return Err(ApiError::DatabaseError);
             }
         };
     }

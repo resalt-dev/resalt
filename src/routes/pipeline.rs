@@ -4,10 +4,12 @@ use actix_web::{
 use resalt_models::AuthStatus;
 use resalt_pipeline::PipelineServer;
 
+use crate::components::ApiError;
+
 pub async fn route_pipeline_get(
     pipeline: Data<PipelineServer>,
     req: HttpRequest,
-) -> Result<impl Responder> {
+) -> Result<impl Responder, ApiError> {
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
     let rx = pipeline.new_client(auth.user_id);
 
