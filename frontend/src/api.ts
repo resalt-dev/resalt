@@ -12,6 +12,25 @@ import PermissionGroup from './models/PermissionGroup';
 import type Filter from './models/Filter';
 import type RunCommand from './models/RunCommand';
 
+export class ApiError extends Error {
+	code: number;
+	// "error" is the `"error": {}` object inside the response
+	constructor(error: any) {
+		if (typeof error !== 'object' || error === null) {
+			throw new Error('ApiError must be constructed with an object');
+		}
+		if (!error.message || typeof error.message !== 'string') {
+			throw new Error('ApiError must have a message');
+		}
+		if (!error.code || typeof error.code !== 'number') {
+			throw new Error('ApiError must have a code');
+		}
+		super(error.message);
+		this.name = 'ApiError';
+		this.code = error.code;
+	}
+}
+
 export async function createSSESocket(): Promise<EventSource> {
 	const token = get(authStore);
 	if (!token) {
@@ -36,11 +55,23 @@ async function sendAuthenticatedRequest(method: string, path: string, body?: any
 		body: body ? JSON.stringify(body) : undefined,
 	});
 
-	if (res.status !== 200) {
-		throw new Error(await res.text());
-	}
+	const code = res.status;
 
-	return res.json();
+	// Try parse JSON
+	try {
+		let body = await res.json();
+		// Check if body has "error"
+		if (body.error) {
+			throw new ApiError(body.error);
+		} else {
+			console.log("FAILED PARSING ERROR", body);
+			throw new Error("Failed parsing error");
+		}
+	} catch (e) {
+		// If it fails, just return the text
+		let text = await res.text();
+		throw new Error(text);
+	}
 }
 
 async function sendUnauthenticatedRequest(method: string, path: string, body?: any): Promise<any> {
