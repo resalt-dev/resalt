@@ -46,7 +46,7 @@ async function sendRequest(url: string, options: any): Promise<any> {
 	if (res.status === 200) {
 		return await res.json();
 	} else {
-		let body = await res.json();
+		const body = await res.json();
 		// Try parse JSON
 		try {
 			// Check if body has "error"
