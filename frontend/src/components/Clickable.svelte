@@ -1,11 +1,10 @@
 <!-- a11y <div> which duplicates on:click to on:keypress -->
 <script lang="ts">
-	type A11yType = 'div' | 'span' | 'th';
-	let event: any,
-		type: A11yType = 'div',
-		disabled: boolean = false,
-		inputProps: any;
-	$: ({ event, type, disabled, ...inputProps } = $$props);
+	type A11yType = 'div' | 'span' | 'td' | 'th' | 'button';
+	export let type: A11yType;
+	export let disabled: boolean = false;
+	let event: any, inputProps: any;
+	$: ({ event, ...inputProps } = $$props);
 	// Check if props.class contain "mouse-pointer", if not add it
 	$: if (disabled) {
 		if (!inputProps.class?.includes('no-select')) {
@@ -37,10 +36,18 @@
 	<span {...inputProps} on:click={wr(event)} on:keypress={wr(event)}>
 		<slot />
 	</span>
+{:else if type === 'td'}
+	<td {...inputProps} on:click={wr(event)} on:keypress={wr(event)}>
+		<slot />
+	</td>
 {:else if type === 'th'}
 	<th {...inputProps} on:click={wr(event)} on:keypress={wr(event)}>
 		<slot />
 	</th>
+{:else if type === 'button'}
+	<button {...inputProps} on:click={wr(event)} on:keypress={wr(event)}>
+		<slot />
+	</button>
 {:else}
 	WARNING: A11y component type not supported: {type}.
 {/if}

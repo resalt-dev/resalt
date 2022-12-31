@@ -217,6 +217,18 @@ export const resaltWebPermissions: {
 	},
 ];
 
+/**
+ * Check if a user has a Resalt permission.
+ * @param permissions The permissions of the user, e.g. `$currentUser.perms`.
+ * @param permission The permission to check for, e.g. `P_USER_ADMIN`.
+ * @returns True if the user has the permission, false otherwise.
+ * @example
+ * ```ts
+ * if (hasResaltPermission($currentUser.perms, P_USER_ADMIN)) {
+ *  // Do something
+ * }
+ * ```
+ */
 export function hasResaltPermission(permissions: any[], permission: string): boolean {
 	// Assume there can be multiple @resalt sections, from ugly merge.
 	const resaltPermissions = permissions

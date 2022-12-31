@@ -268,6 +268,7 @@
 								color="secondary"
 								size="sm"
 								style="width: 65px;"
+								class="me-2"
 								on:click={() => resync(minion.id)}
 								disabled={$refreshing.indexOf(minion.id) !== -1}
 							>

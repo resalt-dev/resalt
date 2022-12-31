@@ -29,6 +29,8 @@
 	import { theme, toasts } from '../../stores';
 	import type PermissionGroup from '../../models/PermissionGroup';
 	import ResaltProgress from '../../components/ResaltProgress.svelte';
+	import { validateLdapDN } from '../../utils';
+	import { v4 as uuidv4 } from 'uuid';
 
 	let paginationSize: number = 20;
 	let paginationPage: number = 1;
@@ -87,15 +89,6 @@
 		});
 	}
 
-	// Generate LONG random string
-	// NOT cryptographically secure, only used to identify UI nodes.
-	function randomId(): string {
-		return (
-			Math.random().toString(36).substring(2, 15) +
-			Math.random().toString(36).substring(2, 15)
-		);
-	}
-
 	function selectGroup(group: PermissionGroup): void {
 		selectedGroup.set(group);
 		groupNameFieldValue = group.name;
@@ -136,7 +129,7 @@
 						moduleArgs = moduleRaw[moduleName]['args'] ?? [];
 					}
 					targetModules.push({
-						moduleId: randomId(),
+						moduleId: uuidv4(),
 						name: moduleName,
 						args: [...moduleArgs],
 						error: false,
@@ -144,7 +137,7 @@
 				}
 			}
 			minionPerms.push({
-				targetId: randomId(),
+				targetId: uuidv4(),
 				target: targetName,
 				modules: targetModules,
 				error: false,
@@ -293,7 +286,7 @@
 	function localAddMinionTarget(): void {
 		permissionMinionsFields.update((minions) => {
 			minions.push({
-				targetId: randomId(),
+				targetId: uuidv4(),
 				target: '',
 				modules: [],
 				error: false,
@@ -309,7 +302,7 @@
 				return minions;
 			}
 			target.modules.push({
-				moduleId: randomId(),
+				moduleId: uuidv4(),
 				name: '',
 				args: [],
 				error: false,
@@ -402,11 +395,8 @@
 			groupLdapSyncFieldError = true;
 			return;
 		}
-		// https://stackoverflow.com/a/26492530/2479087
-		let regex =
-			// eslint-disable-next-line no-useless-escape
-			/^(?:[A-Za-z][\w-]*|\d+(?:\.\d+)*)=(?:#(?:[\dA-Fa-f]{2})+|(?:[^,=\+<>#;\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*|"(?:[^\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*")(?:\+(?:[A-Za-z][\w-]*|\d+(?:\.\d+)*)=(?:#(?:[\dA-Fa-f]{2})+|(?:[^,=\+<>#;\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*|"(?:[^\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*"))*(?:,(?:[A-Za-z][\w-]*|\d+(?:\.\d+)*)=(?:#(?:[\dA-Fa-f]{2})+|(?:[^,=\+<>#;\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*|"(?:[^\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*")(?:\+(?:[A-Za-z][\w-]*|\d+(?:\.\d+)*)=(?:#(?:[\dA-Fa-f]{2})+|(?:[^,=\+<>#;\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*|"(?:[^\\"]|\\[,=\+<>#;\\"]|\\[\dA-Fa-f]{2})*"))*)*$/;
-		if (!regex.test(groupLdapSyncFieldValue)) {
+
+		if (!validateLdapDN(groupLdapSyncFieldValue)) {
 			console.log('Invalid LDAP sync string', groupLdapSyncFieldValue);
 			groupLdapSyncFieldError = true;
 			return;

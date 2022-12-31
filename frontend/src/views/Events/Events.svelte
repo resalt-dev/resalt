@@ -104,7 +104,7 @@
 				{#each $events as event}
 					<tr>
 						<!-- <th>{event.id}</th> -->
-						<Clickable typ="td" event={() => toggleExpandEvent(event.uniqueIndex)}>
+						<Clickable type="td" event={() => toggleExpandEvent(event.uniqueIndex)}>
 							<Icon
 								size="1.25"
 								name={$expandedEvents.includes(event.uniqueIndex)

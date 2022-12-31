@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { theme, currentUser, toasts } from '../../stores';
-	import { getUsers } from '../../api';
+	import { deleteUser, getUsers } from '../../api';
 	import { Badge, Card, Table } from 'sveltestrap';
 	import { writable, type Writable } from 'svelte/store';
 	import TablePaginate from '../../components/TablePaginate.svelte';
@@ -10,6 +10,7 @@
 	import { MessageType } from '../../models/MessageType';
 	import type User from '../../models/User';
 	import Clickable from '../../components/Clickable.svelte';
+	import { hasResaltPermission, P_USER_ADMIN } from '../../perms';
 
 	export let navigate: NavigateFn;
 
@@ -25,6 +26,21 @@
 			})
 			.catch((err) => {
 				toasts.add(MessageType.ERROR, 'Failed fetching users', err);
+			});
+	}
+
+	function _deleteUser(userId: string): void {
+		if (!confirm('Are you sure you want to delete this user?')) {
+			return;
+		}
+
+		deleteUser(userId)
+			.then(() => {
+				toasts.add(MessageType.SUCCESS, 'User deleted', `User ${userId} deleted`);
+				updateData();
+			})
+			.catch((err) => {
+				toasts.add(MessageType.ERROR, 'Failed deleting user', err);
 			});
 	}
 
@@ -89,8 +105,19 @@ Search box here.
 						<td>
 							<Link
 								to={paths.user.getPath(user.id)}
-								class="btn btn-{$theme.color} btn-sm px-3">View</Link
+								class="btn btn-{$theme.color} btn-sm px-3 me-2"
 							>
+								View
+							</Link>
+							{#if hasResaltPermission($currentUser.perms, P_USER_ADMIN)}
+								<Clickable
+									type="button"
+									event={() => _deleteUser(user.id)}
+									class="btn btn-danger btn-sm px-3 me-2"
+								>
+									Delete
+								</Clickable>
+							{/if}
 						</td>
 					</tr>
 				{/each}

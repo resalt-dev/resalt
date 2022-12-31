@@ -81,6 +81,7 @@
 		<div class="vr sep" />
 	</Col>
 	<Clickable
+		type="div"
 		event={() => {
 			logout()
 				.then(() => {
