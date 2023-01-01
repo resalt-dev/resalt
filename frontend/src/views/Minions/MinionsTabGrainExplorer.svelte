@@ -98,9 +98,7 @@
 		<div slot="header">Grains</div>
 		<div slot="body">
 			{#if result}
-				{#each result as mg}
-					<ConsoleChangeBranch data={mg} />
-				{/each}
+				<ConsoleChangeBranch data={result} />
 			{/if}
 		</div>
 	</TerminalBox>

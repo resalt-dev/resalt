@@ -67,7 +67,7 @@ pub async fn route_grains_get(
         }
     };
 
-    let mut results: Vec<Value> = vec![];
+    let mut results: Value = json!({});
 
     let mut error = false;
     for minion in minions {
@@ -84,8 +84,8 @@ pub async fn route_grains_get(
             }
         };
 
-        let grains = match jsonpath_lib::select(&grains, &query) {
-            Ok(grains) => grains,
+        let grains: Vec<Value> = match jsonpath_lib::select(&grains, &query) {
+            Ok(grains) => grains.into_iter().map(|v| v.to_owned()).collect(),
             Err(e) => {
                 warn!("Failed to extract grains: {}", e);
                 error = true;
@@ -93,10 +93,14 @@ pub async fn route_grains_get(
             }
         };
 
-        results.push(json!({ minion.id: grains }));
+        results
+            .as_object_mut()
+            .unwrap()
+            .insert(minion.id, Value::Array(grains));
     }
 
-    if results.is_empty() && error {
+    // Check if results is empty object && error
+    if results.is_object() && results.as_object().unwrap().is_empty() && error {
         return Err(ApiError::InternalErrorMessage(
             "Failed to extract grains".to_string(),
         ));

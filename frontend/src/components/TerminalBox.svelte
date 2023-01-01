@@ -13,12 +13,19 @@
 		<Clickable type="div" event={toggleCollapse} class="card-header">
 			<slot name="header" />
 		</Clickable>
-	{/if}
-	<Collapse isOpen={show}>
+		<Collapse isOpen={show}>
+			<div class="card-body bg-dark text-light">
+				<div class="card-text">
+					<slot name="body" />
+				</div>
+			</div>
+		</Collapse>
+	{:else}
+		<!-- Without header, and with no Collapse around the Card body -->
 		<div class="card-body bg-dark text-light">
 			<div class="card-text">
 				<slot name="body" />
 			</div>
 		</div>
-	</Collapse>
+	{/if}
 </Card>
