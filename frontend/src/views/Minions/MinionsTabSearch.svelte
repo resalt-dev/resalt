@@ -82,14 +82,11 @@
 	}
 
 	onMount(() => {
-		filters.subscribe(() => {
-			updateData();
-		});
 		updateData();
 	});
 </script>
 
-<MinionsFiltersBox {filters} />
+<MinionsFiltersBox {filters} {updateData} />
 
 <hr class="bg-light" />
 

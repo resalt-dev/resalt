@@ -4,9 +4,13 @@
 	import MinionsFiltersBox from './MinionsFiltersBox.svelte';
 
 	export let filters: Writable<Filter[]>;
+
+	function updateData() {
+		// TODO: implement
+	}
 </script>
 
-<MinionsFiltersBox {filters} />
+<MinionsFiltersBox {filters} {updateData} />
 
 <hr class="bg-light" />
 

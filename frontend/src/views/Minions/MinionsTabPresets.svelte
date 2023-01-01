@@ -5,6 +5,10 @@
 	import MinionsFiltersBox from './MinionsFiltersBox.svelte';
 
 	export let filters: Writable<Filter[]>;
+
+	function updateData() {
+		// TODO: implement
+	}
 </script>
 
 <Row>
@@ -12,7 +16,7 @@
 		<h2>Presets</h2>
 	</Col>
 	<Col xs="10">
-		<MinionsFiltersBox {filters} />
+		<MinionsFiltersBox {filters} {updateData} />
 
 		<hr class="bg-light" />
 

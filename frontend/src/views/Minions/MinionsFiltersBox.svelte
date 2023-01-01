@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { afterUpdate, beforeUpdate } from 'svelte';
+	import { afterUpdate, beforeUpdate, onMount } from 'svelte';
 	import { Button, Col, Input, Label, Row } from 'sveltestrap';
 	import { FilterFieldType } from '../../models/FilterFieldType';
 	import { FilterOperand } from '../../models/FilterOperand';
@@ -10,10 +10,8 @@
 	import { theme } from '../../stores';
 	import type { Writable } from 'svelte/store';
 
-	// Enable customDateFormat plugin in Tempus Dominus (datepicker)
-	extend(customDateFormat, undefined);
-
 	export let filters: Writable<Filter[]>;
+	export let updateData: () => void;
 
 	const pickers: TempusDominus[] = [];
 
@@ -142,6 +140,12 @@
 
 	afterUpdate(() => {
 		createDateTimePickers();
+		updateData();
+	});
+
+	onMount(() => {
+		// Enable customDateFormat plugin in Tempus Dominus (datepicker)
+		extend(customDateFormat, undefined);
 	});
 </script>
 

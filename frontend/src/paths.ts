@@ -1,7 +1,9 @@
 import {
 	P_EVENT_LIST,
 	P_JOB_LIST,
+	P_MINION_GRAINEXPLORER,
 	P_MINION_LIST,
+	P_MINION_PRESETS_LIST,
 	P_RUN_APPROVAL_LIST,
 	P_RUN_APPROVAL_SUBMIT,
 	P_RUN_LIVE,
@@ -93,7 +95,11 @@ const paths = {
 	]),
 
 	minion: new Path(30, 'minion', '/minion/:minionId/:subPage', 'Minion', null, null),
-	minions: new Path(31, 'minions', '/minions/:subPage', 'Minions', 'server', [P_MINION_LIST]),
+	minions: new Path(31, 'minions', '/minions/:subPage', 'Minions', 'server', [
+		P_MINION_LIST,
+		P_MINION_PRESETS_LIST,
+		P_MINION_GRAINEXPLORER,
+	]),
 
 	job: new Path(40, 'job', '/job/:jobId', 'Job', null, null),
 	jobs: new Path(41, 'jobs', '/jobs', 'Jobs', 'briefcase', [P_JOB_LIST]),

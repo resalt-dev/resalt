@@ -11,6 +11,13 @@
 	import MinionsTabGrains from './MinionsTabGrains.svelte';
 	import MinionsTabPresets from './MinionsTabPresets.svelte';
 	import MinionsTabSearch from './MinionsTabSearch.svelte';
+	import {
+		hasResaltPermission,
+		P_MINION_GRAINEXPLORER,
+		P_MINION_LIST,
+		P_MINION_PRESETS_LIST,
+	} from '../../perms';
+	import { currentUser } from '../../stores';
 
 	// svelte-ignore unused-export-let
 	export let location: Location;
@@ -34,6 +41,7 @@
 			path: paths.minions.getPath('search'),
 			component: MinionsTabSearch,
 			data: { filters, navigate },
+			hidden: !hasResaltPermission($currentUser.perms, P_MINION_LIST),
 		},
 		{
 			key: 'presets',
@@ -41,6 +49,7 @@
 			path: paths.minions.getPath('presets'),
 			component: MinionsTabPresets,
 			data: { filters },
+			hidden: !hasResaltPermission($currentUser.perms, P_MINION_PRESETS_LIST),
 		},
 		{
 			key: 'grains',
@@ -48,6 +57,7 @@
 			path: paths.minions.getPath('grains'),
 			component: MinionsTabGrains,
 			data: { filters },
+			hidden: !hasResaltPermission($currentUser.perms, P_MINION_GRAINEXPLORER),
 		},
 	];
 </script>
