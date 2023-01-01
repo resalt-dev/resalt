@@ -10,6 +10,7 @@
 	import RunTabLive from './RunTabLive.svelte';
 	import type RunResult from '../../models/RunResult';
 	import Clickable from '../../components/Clickable.svelte';
+	import { theme } from '../../stores';
 
 	// svelte-ignore unused-export-let
 	export let location: Location;
@@ -47,11 +48,9 @@
 {#each $returns as ret}
 	<Card class="result-box mb-3">
 		<Clickable type="div" event={() => toggleCollapsedResult(ret.num)} class="card-header">
-			<span>Result : </span>
-			({ret.command.targetType}) {ret.command.target}
-			<small class="text-muted">
-				({ret.command.toCommandLine({ forceWheel: true })})
-			</small>
+			<code class="fw-bold {$theme.dark ? '' : 'text-dark'}">
+				{ret.command.toCommandLine({ forceWheel: true })}
+			</code>
 			<small class="float-end text-muted pt-1">
 				# {ret.num + 1}
 			</small>
