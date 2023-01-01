@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Card } from 'sveltestrap';
-	import ConsoleChangeBranch from '../../components/ConsoleChangeBranch.svelte';
+	import ConsoleChangeBranch from './ConsoleChangeBranch.svelte';
 
 	const SHIFT = 10;
 
@@ -37,12 +37,7 @@
 </script>
 
 <Card class="result-box mb-3 startside-{color}">
-	<div
-		type="button"
-		class="card-header"
-		data-bs-toggle="collapse"
-		data-bs-target="#conformityCollapse{num}"
-	>
+	<div class="card-header" data-bs-toggle="collapse" data-bs-target="#conformityCollapse{num}">
 		<span>{sls} : </span>
 		{stateName}
 		<small class="text-muted">({fun})</small>

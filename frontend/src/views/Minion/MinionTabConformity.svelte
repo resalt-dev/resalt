@@ -2,7 +2,7 @@
 	import type { Writable } from 'svelte/store';
 	import { Card, CardBody, CardHeader, Col, Row } from 'sveltestrap';
 	import JsonViewer from '../../components/JsonViewer.svelte';
-	import ResultBox from './ResultBox.svelte';
+	import ResultBox from '../../components/ResultBox.svelte';
 	import type Minion from '../../models/Minion';
 	import { theme } from '../../stores';
 	import ConformityTreeView from './ConformityTreeView.svelte';

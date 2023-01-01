@@ -75,10 +75,14 @@
 
 	function resync(minionId: string) {
 		refreshing.update((r) => [...r, minionId]);
-		refreshMinion(minionId).then(() => {
-			refreshing.update((r) => r.filter((id) => id !== minionId));
-			updateData();
-		});
+		refreshMinion(minionId)
+			.then(() => {
+				refreshing.update((r) => r.filter((id) => id !== minionId));
+				updateData();
+			})
+			.catch((err) => {
+				toasts.add(MessageType.ERROR, 'Failed resyncing minion', err);
+			});
 	}
 
 	onMount(() => {
