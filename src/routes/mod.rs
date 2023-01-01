@@ -1,5 +1,3 @@
-// export route_config in config
-
 mod auth_login;
 mod auth_token;
 mod auth_user;
@@ -7,6 +5,7 @@ mod config;
 mod events;
 mod fallback;
 mod frontend;
+mod grains;
 mod index;
 mod jobs;
 mod keys;
@@ -23,6 +22,7 @@ pub use auth_user::*;
 pub use events::*;
 pub use fallback::*;
 pub use frontend::*;
+pub use grains::*;
 pub use index::*;
 pub use jobs::*;
 pub use keys::*;

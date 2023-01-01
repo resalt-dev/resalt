@@ -522,8 +522,12 @@ impl StorageImpl for StorageMySQL {
 
         // Pagination
         if !has_grain_filters && !has_package_filters {
-            query = query.limit(limit);
-            query = query.offset(offset);
+            if limit > 0 {
+                query = query.limit(limit);
+            }
+            if offset > 0 {
+                query = query.offset(offset);
+            }
         }
 
         let mut minions: Vec<Minion> = query

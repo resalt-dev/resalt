@@ -34,7 +34,7 @@ services:
     depends_on:
       - master
     deploy:
-      replicas: 1
+      replicas: 3
 
   frontend:
     user: "${UID:-1000}:${GID:-1000}"

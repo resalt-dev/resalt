@@ -8,7 +8,7 @@
 	import type { NavigateFn } from 'svelte-navigator';
 	import { FilterFieldType } from '../../models/FilterFieldType';
 	import { FilterOperand } from '../../models/FilterOperand';
-	import MinionsTabGrains from './MinionsTabGrains.svelte';
+	import MinionsTabGrains from './MinionsTabGrainExplorer.svelte';
 	import MinionsTabPresets from './MinionsTabPresets.svelte';
 	import MinionsTabSearch from './MinionsTabSearch.svelte';
 	import {

@@ -46,12 +46,13 @@ async function sendRequest(url: string, options: any): Promise<any> {
 	if (res.status === 200) {
 		return await res.json();
 	} else {
-		const body = await res.json();
+		const body = await res.text();
 		// Try parse JSON
 		try {
+			const parsed = JSON.parse(body);
 			// Check if body has "error"
-			if (body.error) {
-				throw new ApiError(body.error);
+			if (parsed.error) {
+				throw new ApiError(parsed.error);
 			} else {
 				console.error('FAILED PARSING ERROR', body);
 				throw new Error('Failed parsing error');
@@ -206,6 +207,16 @@ export async function getMinionById(minionId: string): Promise<Minion> {
 
 export async function refreshMinion(minionId: string): Promise<void> {
 	await sendAuthenticatedRequest('POST', `/minions/${minionId}/refresh`);
+}
+
+export async function searchGrains(query: string, filters?: Filter[]): Promise<any[]> {
+	const args = new URLSearchParams();
+
+	if (query) args.append('query', encodeURIComponent(query));
+	if (filters && filters.length > 0)
+		args.append('filter', encodeURIComponent(JSON.stringify(filters)));
+
+	return sendAuthenticatedRequest('GET', `/grains?${args.toString()}`);
 }
 
 ///

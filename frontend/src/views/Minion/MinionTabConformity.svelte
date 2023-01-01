@@ -2,9 +2,9 @@
 	import type { Writable } from 'svelte/store';
 	import { Card, CardBody, CardHeader, Col, Row } from 'sveltestrap';
 	import JsonViewer from '../../components/JsonViewer.svelte';
-	import ResultBox from '../../components/ResultBox.svelte';
 	import type Minion from '../../models/Minion';
 	import { theme } from '../../stores';
+	import ConformityResultBox from './ConformityResultBox.svelte';
 	import ConformityTreeView from './ConformityTreeView.svelte';
 	import type { ConformData, Conform, ConformTreeNode } from './ConformityTypes';
 
@@ -275,7 +275,7 @@
 								? 'd-none'
 								: ''}"
 						>
-							<ResultBox
+							<ConformityResultBox
 								color={conform.color}
 								num={conform.data.__run_num__}
 								sls={conform.data.__sls__}

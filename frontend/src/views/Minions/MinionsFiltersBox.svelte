@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { afterUpdate, beforeUpdate, onMount } from 'svelte';
+	import { afterUpdate, beforeUpdate, onDestroy, onMount } from 'svelte';
 	import { Button, Col, Input, Label, Row } from 'sveltestrap';
 	import { FilterFieldType } from '../../models/FilterFieldType';
 	import { FilterOperand } from '../../models/FilterOperand';
@@ -8,14 +8,16 @@
 	import Icon from '../../components/Icon.svelte';
 	import type Filter from '../../models/Filter';
 	import { theme } from '../../stores';
-	import type { Writable } from 'svelte/store';
+	import type { Unsubscriber, Writable } from 'svelte/store';
 
 	export let filters: Writable<Filter[]>;
 	export let updateData: () => void;
 
 	const pickers: TempusDominus[] = [];
+	let unsub: Unsubscriber | null;
+	let hasRendered: boolean = false;
 
-	function addFilter() {
+	function addFilter(): void {
 		filters.update((f) => [
 			...f,
 			{
@@ -27,11 +29,11 @@
 		]);
 	}
 
-	function removeFilterByIndex(index: number) {
+	function removeFilterByIndex(index: number): void {
 		filters.update((f) => f.filter((_, i) => i !== index));
 	}
 
-	function resetFilterByIndex(index: number) {
+	function resetFilterByIndex(index: number): void {
 		filters.update((f) => {
 			f[index] = {
 				fieldType: FilterFieldType.NONE,
@@ -140,12 +142,23 @@
 
 	afterUpdate(() => {
 		createDateTimePickers();
-		updateData();
+		hasRendered = true;
 	});
 
 	onMount(() => {
 		// Enable customDateFormat plugin in Tempus Dominus (datepicker)
 		extend(customDateFormat, undefined);
+		unsub = filters.subscribe(() => {
+			if (hasRendered) {
+				updateData();
+			}
+		});
+	});
+
+	onDestroy(() => {
+		if (unsub) {
+			unsub();
+		}
 	});
 </script>
 

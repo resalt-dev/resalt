@@ -1,0 +1,96 @@
+<script lang="ts">
+	import { writable, type Writable } from 'svelte/store';
+	import { Col, Input, Label, Row } from 'sveltestrap';
+	import { searchGrains } from '../../api';
+	import ConsoleChangeBranch from '../../components/ConsoleChangeBranch.svelte';
+	import TerminalBox from '../../components/TerminalBox.svelte';
+	import type Filter from '../../models/Filter';
+	import { FilterFieldType } from '../../models/FilterFieldType';
+	import { MessageType } from '../../models/MessageType';
+	import { toasts } from '../../stores';
+	import MinionsFiltersBox from './MinionsFiltersBox.svelte';
+
+	const loading: Writable<boolean> = writable<boolean>(false);
+	const result: Writable<any[] | null> = writable<any[] | null>(null);
+
+	export let filters: Writable<Filter[]>;
+
+	let grainQueryFieldValue: string = '';
+	let grainQueryFieldError: boolean = false;
+
+	function updateData() {
+		console.log('updateData!');
+		if (!_validate()) {
+			return;
+		}
+
+		loading.set(true);
+		searchGrains(
+			grainQueryFieldValue,
+			$filters
+				.filter((f) => f.fieldType !== FilterFieldType.NONE)
+				.filter((f) => f.field !== '')
+				// Filter out where field is 'last_seen' and value is empty
+				.filter((f) => !(f.field === 'last_seen' && f.value === '')),
+		)
+			.then((data) => {
+				result.set(data);
+				loading.set(false);
+			})
+			.catch((error) => {
+				toasts.add(MessageType.ERROR, 'Failed fetching grains', error);
+				loading.set(false);
+			});
+	}
+
+	/*
+    // VALIDATION
+    */
+
+	function _validate(): boolean {
+		validateGrainQueryField();
+
+		return !grainQueryFieldError;
+	}
+
+	function validateGrainQueryField(): void {
+		if (grainQueryFieldValue === '') {
+			grainQueryFieldError = true;
+			return;
+		}
+
+		grainQueryFieldError = false;
+	}
+</script>
+
+<MinionsFiltersBox {filters} {updateData} />
+
+<hr class="bg-light" />
+
+<Row>
+	<Col xs="12" lg="6" xl="5">
+		<div class="form-floating mb-0">
+			<Input
+				id="grainQuery"
+				type="text"
+				invalid={grainQueryFieldError}
+				bind:value={grainQueryFieldValue}
+				on:blur={updateData}
+			/>
+			<Label for="grainQuery">Grain Query (JSONPath)</Label>
+		</div>
+	</Col>
+</Row>
+
+<hr class="bg-light" />
+
+<TerminalBox show={$result !== null} class="mb-0">
+	<div slot="header">Grains</div>
+	<div slot="body">
+		{#if $result}
+			{#each $result as mg}
+				<ConsoleChangeBranch data={mg} />
+			{/each}
+		{/if}
+	</div>
+</TerminalBox>

@@ -21,7 +21,7 @@
 	export let navigate: NavigateFn;
 	export let filters: Writable<Filter[]>;
 
-	const loading = writable<boolean>(true);
+	const loading: Writable<boolean> = writable<boolean>(true);
 	const minions: Writable<Minion[] | null> = writable(null);
 	const refreshing: Writable<string[]> = writable([]);
 
@@ -49,6 +49,7 @@
 			})
 			.catch((err) => {
 				toasts.add(MessageType.ERROR, 'Failed fetching minions', err);
+				loading.set(false);
 			});
 	}
 

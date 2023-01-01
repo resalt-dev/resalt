@@ -9,14 +9,15 @@ use serde_json::json;
 #[allow(dead_code)]
 #[derive(Clone, Debug)]
 pub enum ApiError {
-    Unauthorized,            // Missing credentials
-    Forbidden,               // Lackign permissions
-    NotFound,                // Resource not found
-    NotFoundMessage(String), // Resource not found with custom message
-    InvalidRequest,          // Invalid request
-    InternalError,           // Internal error
-    LdapError,               // LDAP error
-    DatabaseError,           // Database error
+    Unauthorized,                 // Missing credentials
+    Forbidden,                    // Lackign permissions
+    NotFound,                     // Resource not found
+    NotFoundMessage(String),      // Resource not found with custom message
+    InvalidRequest,               // Invalid request
+    InternalError,                // Internal error
+    InternalErrorMessage(String), // Internal error with custom message
+    LdapError,                    // LDAP error
+    DatabaseError,                // Database error
 }
 
 impl ApiError {
@@ -26,10 +27,12 @@ impl ApiError {
             ApiError::Unauthorized => StatusCode::UNAUTHORIZED,
             ApiError::Forbidden => StatusCode::FORBIDDEN,
             // Request-related
-            ApiError::NotFound | ApiError::NotFoundMessage(_) => StatusCode::NOT_FOUND,
+            ApiError::NotFound => StatusCode::NOT_FOUND,
+            ApiError::NotFoundMessage(_) => StatusCode::NOT_FOUND,
             ApiError::InvalidRequest => StatusCode::BAD_REQUEST,
             // Internal server errors
             ApiError::InternalError => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::InternalErrorMessage(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::LdapError => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::DatabaseError => StatusCode::INTERNAL_SERVER_ERROR,
         }
@@ -43,6 +46,7 @@ impl ApiError {
             ApiError::NotFoundMessage(str) => str.clone(),
             ApiError::InvalidRequest => String::from("Invalid request"),
             ApiError::InternalError => String::from("Internal error"),
+            ApiError::InternalErrorMessage(str) => str.clone(),
             ApiError::LdapError => String::from("LDAP error"),
             ApiError::DatabaseError => String::from("Database error"),
         }

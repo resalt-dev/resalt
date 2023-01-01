@@ -11,6 +11,7 @@
 	import type RunResult from '../../models/RunResult';
 	import Clickable from '../../components/Clickable.svelte';
 	import { theme } from '../../stores';
+	import TerminalBox from '../../components/TerminalBox.svelte';
 
 	// svelte-ignore unused-export-let
 	export let location: Location;
@@ -18,8 +19,8 @@
 	export let navigate: NavigateFn;
 	export let subPage: string = '';
 
-	let returns: Writable<RunResult[]> = writable([]);
-	let collapsed: Writable<number[]> = writable([]);
+	const returns: Writable<RunResult[]> = writable([]);
+	const collapsed: Writable<number[]> = writable([]);
 
 	let tabs: TabPage[] = [];
 	$: tabs = [
@@ -46,23 +47,22 @@
 <Tabs {tabs} current={subPage} />
 
 {#each $returns as ret}
-	<Card class="result-box mb-3">
-		<Clickable type="div" event={() => toggleCollapsedResult(ret.num)} class="card-header">
+	<TerminalBox
+		toggleCollapse={() => toggleCollapsedResult(ret.num)}
+		show={!$collapsed.includes(ret.num)}
+	>
+		<div slot="header">
 			<code class="fw-bold {$theme.dark ? '' : 'text-dark'}">
 				{ret.command.toCommandLine({ forceWheel: true })}
 			</code>
 			<small class="float-end text-muted pt-1">
 				# {ret.num + 1}
 			</small>
-		</Clickable>
-		<Collapse isOpen={!$collapsed.includes(ret.num)}>
-			<div class="card-body bg-dark text-light">
-				<div class="card-text">
-					{#if Object.keys(ret.data).length != 0}
-						<ConsoleChangeBranch data={ret.data} />
-					{/if}
-				</div>
-			</div>
-		</Collapse>
-	</Card>
+		</div>
+		<div slot="body">
+			{#if Object.keys(ret.data).length != 0}
+				<ConsoleChangeBranch data={ret.data} />
+			{/if}
+		</div>
+	</TerminalBox>
 {/each}

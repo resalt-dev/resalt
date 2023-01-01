@@ -9,8 +9,10 @@
 	import { writable } from 'svelte/store';
 	import { Toast, ToastBody, ToastHeader } from 'sveltestrap';
 	import WrapperGlobalHistory from './models/WrapperGlobalHistory';
+	import { MessageType } from './models/MessageType';
 
 	const isPortalView = writable<boolean>(window.location.pathname.startsWith('/auth'));
+	let errorLoadingConfig = false;
 
 	function onUrlChange() {
 		let result = window.location.pathname.startsWith('/auth');
@@ -58,14 +60,26 @@
 			})
 			.catch((err) => {
 				console.error(err);
-				alert('Critical API error');
+
+				config.set(null);
+				errorLoadingConfig = true;
+
+				toasts.add(
+					MessageType.ERROR,
+					'Critical API error',
+					'Failed to load config from server. Please try again later.',
+				);
 			});
 	});
 </script>
 
 <main class={$theme.dark ? 'theme-dark' : ''}>
 	{#if $config === null || $theme.color === null}
-		<p>Loading....</p>
+		{#if errorLoadingConfig}
+			<p>Failed to load config from server. Please try again later.</p>
+		{:else}
+			<p>Loading....</p>
+		{/if}
 	{:else if $isPortalView}
 		<PortalLayout history={wrapperGlobalHistory} />
 	{:else}

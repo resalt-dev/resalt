@@ -20,12 +20,12 @@ fn value_to_simple_str(value: &Value) -> String {
 
 pub fn filter_minions_on_grains(minions: &mut Vec<Minion>, filters: &[Filter]) {
     // Map grain values to json paths
-    // If filter.field does not start with "$.", prepend it.
+    // If filter.field does not start with "$", prepend it.
     let json_paths: Vec<String> = filters
         .iter()
         .map(|f| {
             f.field
-                .starts_with("$.")
+                .starts_with('$')
                 .then(|| f.field.clone())
                 .unwrap_or(format!("$.{}", f.field))
         })
@@ -52,7 +52,7 @@ pub fn filter_minions_on_grains(minions: &mut Vec<Minion>, filters: &[Filter]) {
                 }
             };
 
-            log::info!("Selected: {:?}", selected);
+            // log::debug!("Selected: {:?}", selected);
 
             // Convert the selected JSON value to a string. "selected" is always a JSON array.
             // If it is empty, return an empty string.
@@ -73,7 +73,7 @@ pub fn filter_minions_on_grains(minions: &mut Vec<Minion>, filters: &[Filter]) {
                     .join(", "),
             };
 
-            log::debug!("Selected stringified: {}", selected_str);
+            // log::debug!("Selected stringified: {}", selected_str);
 
             match filter.operand {
                 FilterOperand::Contains => {
