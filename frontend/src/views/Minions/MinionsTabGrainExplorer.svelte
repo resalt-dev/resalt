@@ -22,7 +22,6 @@
 	let grainQueryFieldError: boolean = false;
 
 	function updateData() {
-		console.log('updateData!');
 		if (!_validate()) {
 			return;
 		}
