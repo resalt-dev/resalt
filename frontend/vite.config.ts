@@ -13,6 +13,11 @@ export default defineConfig({
 	build: {
 		outDir: 'build',
 	},
+	server: {
+		hmr: production ? false : {
+			port: 5555,
+		},
+	},
 	plugins: [
 		svelte({
 			preprocess: sveltePreprocess({
