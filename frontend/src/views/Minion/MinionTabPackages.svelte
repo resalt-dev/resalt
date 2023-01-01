@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Writable } from 'svelte/store';
 	import { Card, Table } from 'sveltestrap';
+	import FloatingRightButton from '../../components/FloatingRightButton.svelte';
 	import JsonViewer from '../../components/JsonViewer.svelte';
 	import type Minion from '../../models/Minion';
 
@@ -13,13 +14,10 @@
 {#if !$minion.pkgs}
 	<div class="p-3">No packages data. Please refresh minion.</div>
 {:else}
-	<button
-		class="btn btn-light float-end border border-1 rounded-none"
-		style="margin-top: -1rem;z-index: 4;position: absolute;right: 0;"
-		on:click={() => (rawData = !rawData)}
-	>
-		{rawData ? 'View List' : 'View JSON'}
-	</button>
+	<FloatingRightButton
+		onclick={() => (rawData = !rawData)}
+		label={rawData ? 'View List' : 'View JSON'}
+	/>
 	{#if rawData}
 		<JsonViewer data={JSON.parse($minion.pkgs)} />
 	{:else}

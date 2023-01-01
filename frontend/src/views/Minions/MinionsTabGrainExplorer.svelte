@@ -1,8 +1,10 @@
 <script lang="ts">
-	import { writable, type Writable } from 'svelte/store';
+	import type { Writable } from 'svelte/store';
 	import { Col, Input, Label, Row } from 'sveltestrap';
 	import { searchGrains } from '../../api';
 	import ConsoleChangeBranch from '../../components/ConsoleChangeBranch.svelte';
+	import FloatingRightButton from '../../components/FloatingRightButton.svelte';
+	import JsonViewer from '../../components/JsonViewer.svelte';
 	import TerminalBox from '../../components/TerminalBox.svelte';
 	import type Filter from '../../models/Filter';
 	import { FilterFieldType } from '../../models/FilterFieldType';
@@ -10,10 +12,11 @@
 	import { toasts } from '../../stores';
 	import MinionsFiltersBox from './MinionsFiltersBox.svelte';
 
-	const loading: Writable<boolean> = writable<boolean>(false);
-	const result: Writable<any[] | null> = writable<any[] | null>(null);
-
 	export let filters: Writable<Filter[]>;
+
+	let result: any[] | null = null;
+	let loading: boolean = false;
+	let rawData = false;
 
 	let grainQueryFieldValue: string = '';
 	let grainQueryFieldError: boolean = false;
@@ -24,7 +27,7 @@
 			return;
 		}
 
-		loading.set(true);
+		loading = true;
 		searchGrains(
 			grainQueryFieldValue,
 			$filters
@@ -34,12 +37,12 @@
 				.filter((f) => !(f.field === 'last_seen' && f.value === '')),
 		)
 			.then((data) => {
-				result.set(data);
-				loading.set(false);
+				result = data;
+				loading = false;
 			})
 			.catch((error) => {
 				toasts.add(MessageType.ERROR, 'Failed fetching grains', error);
-				loading.set(false);
+				loading = false;
 			});
 	}
 
@@ -84,13 +87,22 @@
 
 <hr class="bg-light" />
 
-<TerminalBox show={$result !== null} class="mb-0">
-	<div slot="header">Grains</div>
-	<div slot="body">
-		{#if $result}
-			{#each $result as mg}
-				<ConsoleChangeBranch data={mg} />
-			{/each}
-		{/if}
-	</div>
-</TerminalBox>
+<FloatingRightButton
+	onclick={() => (rawData = !rawData)}
+	label={rawData ? 'View List' : 'View JSON'}
+/>
+
+{#if rawData}
+	<JsonViewer data={result} />
+{:else}
+	<TerminalBox show={result !== null} class="mb-0">
+		<div slot="header">Grains</div>
+		<div slot="body">
+			{#if result}
+				{#each result as mg}
+					<ConsoleChangeBranch data={mg} />
+				{/each}
+			{/if}
+		</div>
+	</TerminalBox>
+{/if}

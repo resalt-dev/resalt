@@ -16,7 +16,13 @@
 
 	$: {
 		if (cm) {
-			if (!(data instanceof Array) && JSON.stringify(data).includes('cpu_flags')) {
+			createJSONView();
+
+			if (
+				data !== undefined &&
+				!(data instanceof Array) &&
+				JSON.stringify(data).includes('cpu_flags')
+			) {
 				foldAll(cm);
 			}
 		}
@@ -43,7 +49,7 @@
 
 	function createJSONView() {
 		let state = EditorState.create({
-			doc: JSON.stringify(sort ? sortJSON(data) : data, null, 2),
+			doc: JSON.stringify(sort ? sortJSON(data ?? undefined) : data ?? undefined, null, 2),
 			extensions: [
 				basicSetup,
 				$theme.dark ? resaltDark : resaltLight,
@@ -64,6 +70,7 @@
 
 	let unsub = null;
 	onMount(() => {
+		// Theme listener
 		if (unsub != null) {
 			unsub();
 			unsub = null;
@@ -72,10 +79,20 @@
 	});
 
 	onDestroy(() => {
-		unsub();
+		// Theme listener
+		if (unsub != null) {
+			unsub();
+			unsub = null;
+		}
+
+		// Cleanup
 		editorElement.replaceChildren();
 		cm = undefined;
 	});
 </script>
 
+<div class="d-none">
+	<!-- This MUST be here to force Svelte to re-render on changes -->
+	{data}
+</div>
 <div bind:this={editorElement} />
