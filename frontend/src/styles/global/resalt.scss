@@ -188,59 +188,60 @@ $bluegray-10: #0e1418;
  * Startside (used for e.g. displaying conformity)
  */
 
+$startsideWidth: 5px;
 .startside-red {
-	border-left: 0.5rem solid var(--red) !important;
+	border-left: $startsideWidth solid var(--red) !important;
 }
 .startside-volcano {
-	border-left: 0.5rem solid var(--volcano) !important;
+	border-left: $startsideWidth solid var(--volcano) !important;
 }
 .startside-orange {
-	border-left: 0.5rem solid var(--orange) !important;
+	border-left: $startsideWidth solid var(--orange) !important;
 }
 .startside-gold {
-	border-left: 0.5rem solid var(--gold) !important;
+	border-left: $startsideWidth solid var(--gold) !important;
 }
 .startside-yellow {
-	border-left: 0.5rem solid var(--yellow) !important;
+	border-left: $startsideWidth solid var(--yellow) !important;
 }
 .startside-green {
-	border-left: 0.5rem solid var(--green) !important;
+	border-left: $startsideWidth solid var(--green) !important;
 }
 .startside-cyan {
-	border-left: 0.5rem solid var(--cyan) !important;
+	border-left: $startsideWidth solid var(--cyan) !important;
 }
 .startside-blue {
-	border-left: 0.5rem solid var(--blue) !important;
+	border-left: $startsideWidth solid var(--blue) !important;
 }
 .startside-purple {
-	border-left: 0.5rem solid var(--purple) !important;
+	border-left: $startsideWidth solid var(--purple) !important;
 }
 .startside-magenta {
-	border-left: 0.5rem solid var(--magenta) !important;
+	border-left: $startsideWidth solid var(--magenta) !important;
 }
 .startside-primary {
-	border-left: 0.5rem solid var(--primary) !important;
+	border-left: $startsideWidth solid var(--primary) !important;
 }
 .startside-secondary {
-	border-left: 0.5rem solid var(--secondary) !important;
+	border-left: $startsideWidth solid var(--secondary) !important;
 }
 .startside-success {
-	border-left: 0.5rem solid var(--success) !important;
+	border-left: $startsideWidth solid var(--success) !important;
 }
 .startside-info {
-	border-left: 0.5rem solid var(--info) !important;
+	border-left: $startsideWidth solid var(--info) !important;
 }
 .startside-warning {
-	border-left: 0.5rem solid var(--warning) !important;
+	border-left: $startsideWidth solid var(--warning) !important;
 }
 .startside-danger {
-	border-left: 0.5rem solid var(--danger) !important;
+	border-left: $startsideWidth solid var(--danger) !important;
 }
 .startside-light {
-	border-left: 0.5rem solid var(--light-gray) !important;
+	border-left: $startsideWidth solid var(--light-gray) !important;
 }
 .startside-dark {
-	border-left: 0.5rem solid var(--dark-gray) !important;
+	border-left: $startsideWidth solid var(--dark-gray) !important;
 }
 
 /*
