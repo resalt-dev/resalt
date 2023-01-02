@@ -10,7 +10,7 @@
 	function selectColor(color: string): void {
 		console.log('selectColor', color);
 		if (color === 'reset') {
-			$theme.color = $config.defaultThemeColor;
+			$theme.color = $config.themeDefaultColor;
 		} else {
 			$theme.color = color;
 		}
@@ -22,7 +22,7 @@
 	}
 </script>
 
-{#if $config.enableThemeSwitching}
+{#if $config.themeEnableSwitching}
 	<Card class="mb-3">
 		<CardHeader>Color</CardHeader>
 		<CardBody>
@@ -91,7 +91,7 @@
 		<Button
 			color={null}
 			class="btn-{$theme.color}"
-			on:click={() => setDarkMode($config.defaultThemeDark)}
+			on:click={() => setDarkMode($config.themeDefaultDark)}
 		>
 			Reset
 		</Button>

@@ -5,9 +5,9 @@ export default class Config {
 			data.currentVersion,
 			data.latestVersion,
 			data.latestNews,
-			data.defaultThemeColor,
-			data.defaultThemeDark,
-			data.enableThemeSwitching,
+			data.themeDefaultColor,
+			data.themeDefaultDark,
+			data.themeEnableSwitching,
 		);
 	}
 
@@ -19,27 +19,27 @@ export default class Config {
 
 	latestNews: string[];
 
-	defaultThemeColor: string;
+	themeDefaultColor: string;
 
-	defaultThemeDark: boolean;
+	themeDefaultDark: boolean;
 
-	enableThemeSwitching: boolean;
+	themeEnableSwitching: boolean;
 
 	constructor(
 		authForwardEnabled: boolean,
 		currentVersion: string,
 		latestVersion: string,
 		latestNews: string[],
-		defaultThemeColor: string,
-		defaultThemeDark: boolean,
-		enableThemeSwitching: boolean,
+		themeDefaultColor: string,
+		themeDefaultDark: boolean,
+		themeEnableSwitching: boolean,
 	) {
 		this.authForwardEnabled = authForwardEnabled;
 		this.currentVersion = currentVersion;
-		this.latestVersion = latestVersion;
 		this.latestNews = latestNews;
-		this.defaultThemeColor = defaultThemeColor;
-		this.defaultThemeDark = defaultThemeDark;
-		this.enableThemeSwitching = enableThemeSwitching;
+		this.latestVersion = latestVersion;
+		this.themeDefaultColor = themeDefaultColor;
+		this.themeDefaultDark = themeDefaultDark;
+		this.themeEnableSwitching = themeEnableSwitching;
 	}
 }

@@ -50,12 +50,12 @@
 				config.set(data);
 				// set default color if theme.color is null
 				if (!$theme.color) {
-					$theme.color = data.defaultThemeColor;
-					$theme.dark = data.defaultThemeDark;
+					$theme.color = data.themeDefaultColor;
+					$theme.dark = data.themeDefaultDark;
 				}
 				// reset color if switching is disabled
-				if (!data.enableThemeSwitching) {
-					$theme.color = data.defaultThemeColor;
+				if (!data.themeEnableSwitching) {
+					$theme.color = data.themeDefaultColor;
 				}
 			})
 			.catch((err) => {
