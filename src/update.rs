@@ -6,7 +6,7 @@ use cargo_toml::Manifest;
 use lazy_static::lazy_static;
 use log::*;
 
-const UPDATE_URL: &str = "https://raw.githubusercontent.com/Foorack/resalt/main/Cargo.toml";
+const UPDATE_URL: &str = "https://secure.resalt.dev/Cargo.toml";
 
 #[derive(Debug, Clone)]
 pub struct UpdateInfo {
@@ -68,7 +68,7 @@ async fn fetch_remote_info() -> Result<UpdateInfo, String> {
         }
     };
 
-    // Get news (package.metadata.resalt.news
+    // Get news (package.metadata.resalt.news)
     let metadata = match package.metadata {
         Some(metadata) => metadata,
         None => return Err("Error parsing TOML: no metadata".to_string()),

@@ -134,7 +134,7 @@
 				<br />
 				<br />
 				Double-check that the Resalt container is able to access
-				<code>raw.githubusercontent.com</code> and without a proxy. Please contact your administrator,
+				<code>secure.resalt.dev</code> and without a proxy. Please contact your administrator,
 				or the Resalt development team, if this issue persists.
 			{:else}
 				<h1>
