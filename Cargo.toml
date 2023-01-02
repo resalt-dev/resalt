@@ -61,5 +61,5 @@ jsonpath_lib = "0.3.0"
 
 [package.metadata.resalt]
 news = [
-    "Resalt 0.1.6 Released§Resalt 0.1.6 is now available. This release includes large UI updates, implementation of permission system, GrainExplorer, and a lot of bug fixes.",
+    "Resalt 0.1.6 released§Resalt 0.1.6 is now available. This release includes large UI updates, continued implementation of the permission system, the ability to see grains of offline minions, dependency updates, accessibility updates, enforcement of code linting, a severe improvement of compilation times for the frontend, and a lot of bug fixes.",
 ]
