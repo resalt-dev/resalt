@@ -49,19 +49,29 @@
 				<CardTitle class="mb-0">Quick Links</CardTitle>
 			</CardHeader>
 			<CardBody class="text-center">
-				<div class="mouse-pointer py-4">
+				<a
+					href="https://resalt.dev/"
+					class="text-reset text-decoration-none py-4"
+					target="_blank"
+					rel="noopener noreferrer"
+				>
 					<Icon name="buildings" size="7" class="mb-3" />
 					<h5 class="card-title">Go to Documentation</h5>
 					<p class="card-text">Find documentation, guides, and more</p>
-				</div>
+				</a>
 
 				<hr class="bg-light" />
 
-				<div class="mouse-pointer py-4">
+				<a
+					href="https://discord.resalt.dev/"
+					class="text-reset text-decoration-none py-4"
+					target="_blank"
+					rel="noopener noreferrer"
+				>
 					<Icon name="comment-dots" size="7" class="mb-3" />
 					<h5 class="card-title">Give Feedback</h5>
 					<p class="card-text">Give feedback or report a bug</p>
-				</div>
+				</a>
 			</CardBody>
 		</Card>
 	</Col>
