@@ -5,7 +5,7 @@ use std::{
 
 // Scheduler, and trait for .seconds(), .minutes(), etc.
 use clokwerk::TimeUnits;
-use log::{error, info};
+use log::*;
 use tokio::task;
 
 use crate::update;
@@ -22,7 +22,7 @@ impl Scheduler {
         }
     }
 
-    pub fn add_system_jobs(&mut self) {
+    pub fn register_system_jobs(&mut self) {
         // self.scheduler.lock().unwrap().every(5.minutes()).run(|| {
         //     println!("system job");
         // });
@@ -33,9 +33,7 @@ impl Scheduler {
             let ls = task::LocalSet::new();
             ls.block_on(&rt, async {
                 // run update check
-                if let Err(e) = update::get_remote_version().await {
-                    error!("{}", e);
-                }
+                update::get_update_cache().await;
             });
         });
     }

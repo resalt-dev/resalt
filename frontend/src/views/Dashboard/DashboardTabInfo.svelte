@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Card, CardBody, CardHeader, CardTitle, Col, Row } from 'sveltestrap';
 	import Icon from '../../components/Icon.svelte';
-	import { theme } from '../../stores';
+	import { config, theme } from '../../stores';
 </script>
 
 <Row>
@@ -71,8 +71,13 @@
 				<CardTitle class="mb-0">Latest News</CardTitle>
 			</CardHeader>
 			<CardBody>
-				<h5 class="card-title">Sort method</h5>
-				Hello!
+				{#each $config.latestNews as news}
+					<h5 class="card-title">{news.split('§')[0]}</h5>
+					{#if news.split('§')[1]}
+						<p class="card-text">{news.split('§')[1]}</p>
+					{/if}
+					<br />
+				{/each}
 			</CardBody>
 		</Card>
 	</Col>

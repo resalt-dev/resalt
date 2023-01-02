@@ -1,22 +1,28 @@
 use std::sync::{Arc, Mutex};
 
 use awc::Client;
+use cargo_toml::Inheritable::Set;
 use cargo_toml::Manifest;
 use lazy_static::lazy_static;
-use log::warn;
+use log::*;
 
 const UPDATE_URL: &str = "https://raw.githubusercontent.com/Foorack/resalt/main/Cargo.toml";
 
-struct UpdateCache {
-    version: Option<String>,
+#[derive(Debug, Clone)]
+pub struct UpdateInfo {
+    pub version: Option<String>,
+    pub news: Option<Vec<String>>,
 }
 
 lazy_static! {
-    static ref CACHE: Arc<Mutex<UpdateCache>> = Arc::new(Mutex::new(UpdateCache { version: None }));
+    static ref CACHE: Arc<Mutex<UpdateInfo>> = Arc::new(Mutex::new(UpdateInfo {
+        version: None,
+        news: None
+    }));
     pub static ref CURRENT_VERSION: String = env!("CARGO_PKG_VERSION").to_string();
 }
 
-async fn fetch_remote_version() -> Result<String, String> {
+async fn fetch_remote_info() -> Result<UpdateInfo, String> {
     // Use awc client
     let client = Client::new();
 
@@ -49,10 +55,44 @@ async fn fetch_remote_version() -> Result<String, String> {
     };
 
     // Get version
-    let version = match toml.package {
-        Some(package) => package.version,
+    let package = match toml.package {
+        Some(package) => package,
         None => return Err("Error parsing TOML: no package".to_string()),
     };
+    let version: String = match package.version {
+        Set(version) => version,
+        _ => {
+            return Err(
+                "Error parsing TOML: inherited version in top toml not possible".to_string(),
+            )
+        }
+    };
+
+    // Get news (package.metadata.resalt.news
+    let metadata = match package.metadata {
+        Some(metadata) => metadata,
+        None => return Err("Error parsing TOML: no metadata".to_string()),
+    };
+    let resalt = match metadata.get("resalt") {
+        Some(resalt) => resalt,
+        None => return Err("Error parsing TOML: no \"resalt\" metadata".to_string()),
+    };
+    let news = match resalt.get("news") {
+        Some(news) => news,
+        None => return Err("Error parsing TOML: no \"resalt.news\" metadata".to_string()),
+    };
+    // News is a string array
+    let news = match news.as_array() {
+        Some(news) => news,
+        None => return Err("Error parsing TOML: \"resalt.news\" is not an array".to_string()),
+    };
+    let news: Vec<String> = news
+        .iter()
+        .map(|news| match news.as_str() {
+            Some(news) => news.to_string(),
+            None => "Error parsing TOML: \"resalt.news\" is not an array of strings".to_string(),
+        })
+        .collect();
 
     if !version.eq(CURRENT_VERSION.as_str()) {
         warn!("========================================================");
@@ -65,19 +105,34 @@ async fn fetch_remote_version() -> Result<String, String> {
         warn!("========================================================");
     }
 
-    Ok(version)
+    Ok(UpdateInfo {
+        version: Some(version),
+        news: Some(news),
+    })
 }
 
-pub async fn get_remote_version() -> Result<String, String> {
+pub async fn get_update_cache() -> UpdateInfo {
     // Drop CACHE MutexGuard lock inbetween of fetching remote version and setting it in the cache
     {
-        if let Some(version) = CACHE.lock().unwrap().version.clone() {
-            return Ok(version);
+        let update_info = CACHE.lock().unwrap();
+        if update_info.version.is_some() && update_info.news.is_some() {
+            return update_info.clone();
         }
     }
-    let version = fetch_remote_version().await?;
+    let update_info = match fetch_remote_info().await {
+        Ok(update_info) => update_info,
+        Err(e) => {
+            error!("Error fetching remote version: {}", e);
+            return UpdateInfo {
+                version: None,
+                news: None,
+            };
+        }
+    };
     {
-        CACHE.lock().unwrap().version = Some(version.clone());
+        let mut cache = CACHE.lock().unwrap();
+        cache.version = update_info.version.clone();
+        cache.news = update_info.news.clone();
     }
-    Ok(version)
+    update_info
 }

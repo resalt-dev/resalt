@@ -1,5 +1,4 @@
 use actix_web::{http::header, middleware::*, web, App, HttpServer};
-use log::error;
 use resalt_config::SConfig;
 use resalt_pipeline::PipelineServer;
 use resalt_salt::{SaltAPI, SaltEventListener};
@@ -61,7 +60,7 @@ async fn main() -> std::io::Result<()> {
 
     // Scheduler
     let mut scheduler = scheduler::Scheduler::new();
-    scheduler.add_system_jobs();
+    scheduler.register_system_jobs();
     scheduler.start();
 
     let db_clone_wrapper = StorageCloneWrapper {
@@ -204,11 +203,6 @@ async fn main() -> std::io::Result<()> {
     .bind(("0.0.0.0", SConfig::http_port()))?
     .run()
     .await?;
-
-    // run update check
-    if let Err(e) = update::get_remote_version().await {
-        error!("{}", e);
-    }
 
     Ok(())
 }

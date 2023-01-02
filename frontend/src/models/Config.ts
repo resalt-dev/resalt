@@ -4,6 +4,7 @@ export default class Config {
 			data.authForwardEnabled,
 			data.currentVersion,
 			data.latestVersion,
+			data.latestNews,
 			data.defaultThemeColor,
 			data.defaultThemeDark,
 			data.enableThemeSwitching,
@@ -16,6 +17,8 @@ export default class Config {
 
 	latestVersion: string;
 
+	latestNews: string[];
+
 	defaultThemeColor: string;
 
 	defaultThemeDark: boolean;
@@ -26,6 +29,7 @@ export default class Config {
 		authForwardEnabled: boolean,
 		currentVersion: string,
 		latestVersion: string,
+		latestNews: string[],
 		defaultThemeColor: string,
 		defaultThemeDark: boolean,
 		enableThemeSwitching: boolean,
@@ -33,6 +37,7 @@ export default class Config {
 		this.authForwardEnabled = authForwardEnabled;
 		this.currentVersion = currentVersion;
 		this.latestVersion = latestVersion;
+		this.latestNews = latestNews;
 		this.defaultThemeColor = defaultThemeColor;
 		this.defaultThemeDark = defaultThemeDark;
 		this.enableThemeSwitching = enableThemeSwitching;
