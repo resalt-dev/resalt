@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { Card, Collapse } from 'sveltestrap';
 	import { writable, type Writable } from 'svelte/store';
 	import ConsoleChangeBranch from '../../components/ConsoleChangeBranch.svelte';
 	import paths from '../../paths';
@@ -9,7 +8,6 @@
 
 	import RunTabLive from './RunTabLive.svelte';
 	import type RunResult from '../../models/RunResult';
-	import Clickable from '../../components/Clickable.svelte';
 	import { theme } from '../../stores';
 	import TerminalBox from '../../components/TerminalBox.svelte';
 
