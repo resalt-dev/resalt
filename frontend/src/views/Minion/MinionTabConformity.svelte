@@ -285,9 +285,7 @@
 								startTime={conform.data.start_time}
 								duration={conform.data.duration}
 								changes={conform.data.changes}
-								show={(showSuccess && conform.data.result === true) ||
-									(showIncorrect && conform.data.result === null) ||
-									(showError && conform.data.result === false)}
+								{showCollapsed}
 							/>
 						</div>
 					{/each}

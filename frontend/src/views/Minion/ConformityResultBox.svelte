@@ -17,7 +17,7 @@
 	export let startTime: string;
 	export let duration: number;
 	export let changes: any;
-	export let show: boolean;
+	export let showCollapsed: boolean;
 
 	function leftPadToTotalLength(str: string, maxLength: number, char: string = ' ') {
 		return char.repeat(maxLength - str.length) + str;
@@ -38,50 +38,58 @@
 	}
 </script>
 
-<TerminalBox
-	class="startside-{color}"
-	toggleCollapse={() => collapsed.update((c) => !c)}
-	show={!$collapsed}
->
-	<div slot="header">
-		<span>{sls} : </span>
-		{stateName}
-		<small class="text-muted">({fun})</small>
-		<small class="float-end text-muted pt-1">
-			# {num + 1}
-		</small>
-	</div>
-	<div slot="body">
-		<pre class="text-console m-0 text-{color}">{leftPadToTotalLength(
-				'ID',
-				SHIFT,
-			)}: {stateName}</pre>
-		<pre class="text-console m-0 text-{color}">{leftPadToTotalLength(
-				'Function',
-				SHIFT,
-			)}: {fun}</pre>
-		<pre class="text-console m-0 text-{color}">{leftPadToTotalLength(
-				'Name',
-				SHIFT,
-			)}: {name}</pre>
-		<pre class="text-console m-0 text-{color}">{leftPadToTotalLength('Result', SHIFT)}: <span
-				style="text-transform:capitalize;">{result === null ? 'None' : result}</span
-			></pre>
-		<pre class="text-console m-0 text-{color}">{leftPadToTotalLength(
-				'Comment',
-				SHIFT,
-			)}: {rightShiftLinesExceptFirst(comment, SHIFT + 2)}</pre>
-		<pre class="text-console m-0 text-{color}">{leftPadToTotalLength(
-				'Started',
-				SHIFT,
-			)}: {startTime}</pre>
-		<pre class="text-console m-0 text-{color}">{leftPadToTotalLength(
-				'Duration',
-				SHIFT,
-			)}: {duration}</pre>
-		<pre class="text-console m-0 text-{color}">{leftPadToTotalLength('Changes', SHIFT)}:</pre>
-		{#if Object.keys(changes).length != 0}
-			<ConsoleChangeBranch data={changes} shift={SHIFT + 2} />
-		{/if}
-	</div>
-</TerminalBox>
+{#if !($collapsed && !showCollapsed)}
+	<TerminalBox
+		class="startside-{color}"
+		toggleCollapse={() => collapsed.update((c) => !c)}
+		collapsed={!$collapsed}
+	>
+		<div slot="header">
+			<span>{sls} : </span>
+			{stateName}
+			<small class="text-muted">({fun})</small>
+			<small class="float-end text-muted pt-1">
+				# {num + 1}
+			</small>
+		</div>
+		<div slot="body">
+			<pre class="text-console m-0 text-{color}">{leftPadToTotalLength(
+					'ID',
+					SHIFT,
+				)}: {stateName}</pre>
+			<pre class="text-console m-0 text-{color}">{leftPadToTotalLength(
+					'Function',
+					SHIFT,
+				)}: {fun}</pre>
+			<pre class="text-console m-0 text-{color}">{leftPadToTotalLength(
+					'Name',
+					SHIFT,
+				)}: {name}</pre>
+			<pre class="text-console m-0 text-{color}">{leftPadToTotalLength(
+					'Result',
+					SHIFT,
+				)}: <span style="text-transform:capitalize;"
+					>{result === null ? 'None' : result}</span
+				></pre>
+			<pre class="text-console m-0 text-{color}">{leftPadToTotalLength(
+					'Comment',
+					SHIFT,
+				)}: {rightShiftLinesExceptFirst(comment, SHIFT + 2)}</pre>
+			<pre class="text-console m-0 text-{color}">{leftPadToTotalLength(
+					'Started',
+					SHIFT,
+				)}: {startTime}</pre>
+			<pre class="text-console m-0 text-{color}">{leftPadToTotalLength(
+					'Duration',
+					SHIFT,
+				)}: {duration}</pre>
+			<pre class="text-console m-0 text-{color}">{leftPadToTotalLength(
+					'Changes',
+					SHIFT,
+				)}:</pre>
+			{#if Object.keys(changes).length != 0}
+				<ConsoleChangeBranch data={changes} shift={SHIFT + 2} />
+			{/if}
+		</div>
+	</TerminalBox>
+{/if}

@@ -94,7 +94,7 @@
 {#if rawData}
 	<JsonViewer data={result} />
 {:else}
-	<TerminalBox show={result !== null} class="mb-0">
+	<TerminalBox collapsed={result !== null} class="mb-0">
 		<div slot="header">Grains</div>
 		<div slot="body">
 			{#if result}

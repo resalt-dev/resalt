@@ -4,7 +4,7 @@
 
 	let topClass = '';
 	export { topClass as class };
-	export let show: boolean = true;
+	export let collapsed: boolean = true;
 	export let toggleCollapse: (id: string) => void = undefined;
 </script>
 
@@ -13,7 +13,7 @@
 		<Clickable type="div" event={toggleCollapse} class="card-header">
 			<slot name="header" />
 		</Clickable>
-		<Collapse isOpen={show}>
+		<Collapse isOpen={collapsed}>
 			<div class="card-body bg-dark text-light">
 				<div class="card-text">
 					<slot name="body" />
