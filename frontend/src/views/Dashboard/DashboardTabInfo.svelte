@@ -55,7 +55,7 @@
 					<p class="card-text">Find documentation, guides, and more</p>
 				</div>
 
-				<hr class="bg-light my-3" />
+				<hr class="bg-light" />
 
 				<div class="mouse-pointer py-4">
 					<Icon name="comment-dots" size="7" class="mb-3" />
@@ -71,12 +71,14 @@
 				<CardTitle class="mb-0">Latest News</CardTitle>
 			</CardHeader>
 			<CardBody>
-				{#each $config.latestNews as news}
+				{#each $config.latestNews as news, i}
+					{#if i !== 0}
+						<hr class="bg-light" />
+					{/if}
 					<h5 class="card-title">{news.split('§')[0]}</h5>
 					{#if news.split('§')[1]}
 						<p class="card-text">{news.split('§')[1]}</p>
 					{/if}
-					<br />
 				{/each}
 			</CardBody>
 		</Card>
