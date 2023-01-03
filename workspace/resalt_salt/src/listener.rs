@@ -444,29 +444,17 @@ impl SaltEventListener {
                             }
                         }
 
-                        let confirmity: String = match data.get("return") {
-                            Some(confirmity) => match confirmity.as_object() {
-                                Some(confirmity) => match serde_json::to_string(confirmity) {
-                                    Ok(confirmity) => confirmity,
-                                    Err(err) => {
-                                        error!("Failed to serialize confirmity: {:?}", err);
-                                        continue;
-                                    }
-                                },
-                                None => {
-                                    error!("Failed to get confirmity from event data");
-                                    continue;
-                                }
-                            },
-                            None => {
-                                error!("Failed to get confirmity from event data");
+                        let conformity = match serde_json::to_string(ret) {
+                            Ok(conformity) => conformity,
+                            Err(err) => {
+                                error!("Failed to serialize conformity: {:?}", err);
                                 continue;
                             }
                         };
                         match self.storage.update_minion_conformity(
                             minion_id.clone(),
                             time,
-                            confirmity,
+                            conformity,
                             success,
                             incorrect,
                             error,
