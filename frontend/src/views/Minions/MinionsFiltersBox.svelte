@@ -372,6 +372,6 @@
 		</Col>
 	</Row>
 	{#if i + 1 !== $filters.length}
-		<hr class="bg-light mt-0" />
+		<hr class="text-light mt-0" />
 	{/if}
 {/each}

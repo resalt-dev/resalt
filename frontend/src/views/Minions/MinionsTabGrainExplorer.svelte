@@ -67,7 +67,7 @@
 
 <MinionsFiltersBox {filters} {updateData} />
 
-<hr class="bg-light" />
+<hr class="text-light" />
 
 <Row>
 	<Col xs="12" lg="6" xl="5">
@@ -84,7 +84,7 @@
 	</Col>
 </Row>
 
-<hr class="bg-light" />
+<hr class="text-light" />
 
 <FloatingRightButton
 	onclick={() => (rawData = !rawData)}

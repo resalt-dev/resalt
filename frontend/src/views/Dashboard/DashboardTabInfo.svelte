@@ -60,7 +60,7 @@
 					<p class="card-text">Find documentation, guides, and more</p>
 				</a>
 
-				<hr class="bg-light" />
+				<hr class="text-light" />
 
 				<a
 					href="https://discord.resalt.dev/"
@@ -83,7 +83,7 @@
 			<CardBody>
 				{#each $config.latestNews as news, i}
 					{#if i !== 0}
-						<hr class="bg-light" />
+						<hr class="text-light" />
 					{/if}
 					<h5 class="card-title">{news.split('§')[0]}</h5>
 					{#if news.split('§')[1]}

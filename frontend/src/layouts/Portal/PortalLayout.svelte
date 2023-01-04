@@ -21,7 +21,7 @@
 							<Logo color={$theme.color} />
 						</div>
 
-						<hr class="bg-light mx-5 my-3" />
+						<hr class="text-light mx-5 my-3" />
 
 						<!-- Content -->
 						<div class="px-5 py-4" style="max-width: 54rem;">

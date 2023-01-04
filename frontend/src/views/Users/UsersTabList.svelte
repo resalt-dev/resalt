@@ -51,7 +51,7 @@
 
 Search box here.
 
-<hr class="bg-light" />
+<hr class="text-light" />
 
 <Card class="table-responsive border-bottom-0">
 	<Table hover class="b-0 mb-0">

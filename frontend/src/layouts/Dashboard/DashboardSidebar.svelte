@@ -149,7 +149,7 @@
 				By not upgrading, you risk compromising the security and integrity of your infrastructure
 				by not taking use of the latest bug fixes and security patches.
 				<br />
-				<hr class="bg-light" />
+				<hr class="text-light" />
 				You can upgrade by increasing the version number of the Docker image in your compose/stack
 				file to the latest version. If you have any questions, please reach out on GitHub:<a
 					target="_blank"
