@@ -202,7 +202,6 @@ impl SaltEventListener {
                         }
                         None => {
                             warn!("Failed to get job by jid: {}", jid);
-                            continue;
                         }
                     },
                     Err(err) => {
