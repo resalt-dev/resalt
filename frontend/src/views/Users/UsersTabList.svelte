@@ -114,6 +114,7 @@ Search box here.
 									type="button"
 									event={() => _deleteUser(user.id)}
 									class="btn btn-danger btn-sm px-3 me-2"
+									disabled={user.username === 'admin'}
 								>
 									Delete
 								</Clickable>

@@ -178,6 +178,23 @@ pub async fn route_user_delete(
         return Err(ApiError::Forbidden);
     }
 
+    // Don't allow deleting user with name "admin"
+    let user = match data.get_user_by_id(&info.user_id) {
+        Ok(user) => user,
+        Err(e) => {
+            error!("{:?}", e);
+            return Err(ApiError::DatabaseError);
+        }
+    };
+    if let Some(user) = user {
+        if user.username == "admin" {
+            error!("Tried to delete user with name \"admin\"");
+            return Err(ApiError::Forbidden);
+        }
+    } else {
+        return Err(ApiError::NotFound);
+    }
+
     // Delete user
     match data.delete_user(&info.user_id) {
         Ok(_) => (),
