@@ -21,7 +21,7 @@ pub async fn route_users_get(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_USER_ADMIN)? {
+    if !has_permission(&data, &auth.user_id, P_USER_LIST)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -126,8 +126,13 @@ pub async fn route_user_get(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_USER_ADMIN)? && auth.user_id != info.user_id {
-        return Err(ApiError::Forbidden);
+    if auth.user_id == info.user_id {
+        // Always allow fetching self
+    } else {
+        #[allow(clippy:collapsible_else_if)]
+        if !has_permission(&data, &auth.user_id, P_USER_LIST)? {
+            return Err(ApiError::Forbidden);
+        }
     }
 
     let user = match data.get_user_by_id(&info.user_id) {
@@ -199,11 +204,15 @@ pub async fn route_user_password_post(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    let permission_ok = has_permission(&data, &auth.user_id, P_USER_ADMIN)?
-        || (auth.user_id.eq(&info.user_id)
-            && has_permission(&data, &auth.user_id, P_USER_PASSWORD)?);
-    if !permission_ok {
-        return Err(ApiError::Forbidden);
+    if auth.user_id == info.user_id {
+        if !has_permission(&data, &auth.user_id, P_USER_PASSWORD)? {
+            return Err(ApiError::Forbidden);
+        }
+    } else {
+        #[allow(clippy:collapsible_else_if)]
+        if !has_permission(&data, &auth.user_id, P_USER_LIST)? {
+            return Err(ApiError::Forbidden);
+        }
     }
 
     // Minimum password check

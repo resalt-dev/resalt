@@ -92,7 +92,7 @@ where
 
         Box::pin(async move {
             {
-                let auth_status = resolve_auth_status(&data, &salt, &token).await?;
+                let auth_status = resolve_auth_status(data, salt, token).await?;
                 if let Some(auth_status) = auth_status {
                     req.extensions_mut().insert(auth_status);
                 }
@@ -106,9 +106,9 @@ where
 }
 
 async fn resolve_auth_status(
-    db: &Box<dyn StorageImpl>,
-    salt: &SaltAPI,
-    token: &str,
+    db: Box<dyn StorageImpl>,
+    salt: SaltAPI,
+    token: String,
 ) -> Result<Option<AuthStatus>, Error> {
     let data = db.clone();
 

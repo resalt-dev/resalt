@@ -5,7 +5,10 @@ use resalt_salt::{SaltAPI, SaltKeyState};
 use resalt_storage::StorageImpl;
 use serde::Deserialize;
 
-use crate::components::*;
+use crate::{
+    auth::{has_permission, P_SALTKEY_ACCEPT, P_SALTKEY_DELETE, P_SALTKEY_LIST, P_SALTKEY_REJECT},
+    components::*,
+};
 
 pub async fn route_keys_get(
     salt: web::Data<SaltAPI>,
@@ -13,6 +16,11 @@ pub async fn route_keys_get(
     req: HttpRequest,
 ) -> Result<impl Responder, ApiError> {
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
+
+    // Validate permission
+    if !has_permission(&data, &auth.user_id, P_SALTKEY_LIST)? {
+        return Err(ApiError::Forbidden);
+    }
 
     let salt_token = match &auth.salt_token {
         Some(salt_token) => salt_token,
@@ -55,10 +63,16 @@ pub struct KeyInfo {
 
 pub async fn route_key_accept_put(
     salt: web::Data<SaltAPI>,
+    data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<KeyInfo>,
     req: HttpRequest,
 ) -> Result<impl Responder, ApiError> {
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
+
+    // Validate permission
+    if !has_permission(&data, &auth.user_id, P_SALTKEY_ACCEPT)? {
+        return Err(ApiError::Forbidden);
+    }
 
     let salt_token = match &auth.salt_token {
         Some(salt_token) => salt_token,
@@ -79,10 +93,16 @@ pub async fn route_key_accept_put(
 
 pub async fn route_key_reject_put(
     salt: web::Data<SaltAPI>,
+    data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<KeyInfo>,
     req: HttpRequest,
 ) -> Result<impl Responder, ApiError> {
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
+
+    // Validate permission
+    if !has_permission(&data, &auth.user_id, P_SALTKEY_REJECT)? {
+        return Err(ApiError::Forbidden);
+    }
 
     let salt_token = match &auth.salt_token {
         Some(salt_token) => salt_token,
@@ -103,10 +123,16 @@ pub async fn route_key_reject_put(
 
 pub async fn route_key_delete_delete(
     salt: web::Data<SaltAPI>,
+    data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<KeyInfo>,
     req: HttpRequest,
 ) -> Result<impl Responder, ApiError> {
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
+
+    // Validate permission
+    if !has_permission(&data, &auth.user_id, P_SALTKEY_DELETE)? {
+        return Err(ApiError::Forbidden);
+    }
 
     let salt_token = match &auth.salt_token {
         Some(salt_token) => salt_token,

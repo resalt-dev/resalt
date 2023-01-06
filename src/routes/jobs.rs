@@ -1,7 +1,4 @@
-use crate::{
-    auth::{has_permission, P_RUN_LIVE},
-    components::*,
-};
+use crate::{auth::*, components::*};
 use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 use resalt_models::*;
@@ -19,7 +16,15 @@ pub struct JobsListGetQuery {
 pub async fn route_jobs_get(
     data: web::Data<Box<dyn StorageImpl>>,
     query: web::Query<JobsListGetQuery>,
+    req: HttpRequest,
 ) -> Result<impl Responder, ApiError> {
+    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
+
+    // Validate permission
+    if !has_permission(&data, &auth.user_id, P_JOB_LIST)? {
+        return Err(ApiError::Forbidden);
+    }
+
     let sort = query.sort.clone();
     let limit = query.limit;
     let offset = query.offset;
@@ -165,7 +170,15 @@ pub struct JobGetResponse {
 pub async fn route_job_get(
     data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<JobGetInfo>,
+    req: HttpRequest,
 ) -> Result<impl Responder, ApiError> {
+    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
+
+    // Validate permission
+    if !has_permission(&data, &auth.user_id, P_JOB_LIST)? {
+        return Err(ApiError::Forbidden);
+    }
+
     let job = match data.get_job_by_jid(&info.jid) {
         Ok(job) => job,
         Err(e) => {

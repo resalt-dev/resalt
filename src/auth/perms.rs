@@ -38,32 +38,21 @@ pub const P_MINION_PACKAGES: &str = "minion.packages";
 pub const P_MINION_PRESETS_LIST: &str = "minion.presets.list";
 #[allow(dead_code)]
 pub const P_MINION_PRESETS_MANAGE: &str = "minion.presets.manage";
-#[allow(dead_code)]
 pub const P_MINION_GRAINEXPLORER: &str = "minion.grainexplorer";
 
-#[allow(dead_code)]
 pub const P_JOB_LIST: &str = "job.list";
-#[allow(dead_code)]
-pub const P_JOB_INFO: &str = "job.info";
 
-#[allow(dead_code)]
 pub const P_EVENT_LIST: &str = "event.list";
 
-#[allow(dead_code)]
 pub const P_SALTKEY_LIST: &str = "saltkey.list";
-#[allow(dead_code)]
 pub const P_SALTKEY_ACCEPT: &str = "saltkey.accept";
-#[allow(dead_code)]
 pub const P_SALTKEY_REJECT: &str = "saltkey.reject";
-#[allow(dead_code)]
 pub const P_SALTKEY_DELETE: &str = "saltkey.delete";
 
-#[allow(dead_code)]
+pub const P_USER_ADMIN: &str = "user";
 pub const P_USER_LIST: &str = "user.list";
-pub const P_USER_ADMIN: &str = "user.admin";
 #[allow(dead_code)]
 pub const P_USER_EMAIL: &str = "user.email";
-#[allow(dead_code)]
 pub const P_USER_PASSWORD: &str = "user.password";
 
 pub fn has_permission(

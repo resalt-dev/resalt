@@ -32,8 +32,8 @@ export const P_SALTKEY_ACCEPT: string = 'saltkey.accept';
 export const P_SALTKEY_REJECT: string = 'saltkey.reject';
 export const P_SALTKEY_DELETE: string = 'saltkey.delete';
 
+export const P_USER_ADMIN: string = 'user';
 export const P_USER_LIST: string = 'user.list';
-export const P_USER_ADMIN: string = 'user.admin';
 export const P_USER_EMAIL: string = 'user.email';
 export const P_USER_PASSWORD: string = 'user.password';
 
@@ -160,11 +160,6 @@ export const resaltWebPermissions: {
 		description: 'Allow user to list jobs.',
 	},
 	{
-		permission: P_JOB_INFO,
-		title: '[Job] See Job Info',
-		description: 'Allow user to see full info about a specific job.',
-	},
-	{
 		permission: P_EVENT_LIST,
 		title: '[Event] List Events',
 		description: 'Allow user to list events.',
@@ -193,15 +188,15 @@ export const resaltWebPermissions: {
 		danger: true,
 	},
 	{
-		permission: P_USER_LIST,
-		title: '[User] List All',
-		description: 'Allow user to list users.',
-	},
-	{
 		permission: P_USER_ADMIN,
 		title: '[User] Admin',
 		description: 'Allow user to create, manage, and delete other users.',
 		danger: true,
+	},
+	{
+		permission: P_USER_LIST,
+		title: '[User] List All',
+		description: 'Allow user to list users.',
 	},
 	{
 		permission: P_USER_EMAIL,
