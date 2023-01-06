@@ -889,6 +889,10 @@ hr {
 .table-responsive {
 	background-color: transparent !important;
 }
+// Fix thead.bg-light border color
+.table > thead.bg-light:not(caption) > * > * {
+	border-color: var(--gray-6) !important;
+}
 
 /*
  * Text

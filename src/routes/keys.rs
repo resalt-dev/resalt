@@ -33,7 +33,7 @@ pub async fn route_keys_get(
     let keys = match salt.get_keys(salt_token).await {
         Ok(keys) => keys,
         Err(e) => {
-            error!("{:?}", e);
+            error!("salt.get_keys {:?}", e);
             return Err(ApiError::InternalError);
         }
     };

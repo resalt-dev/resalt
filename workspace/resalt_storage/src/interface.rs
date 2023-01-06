@@ -1,8 +1,12 @@
 use chrono::*;
 use resalt_models::*;
 
+use crate::StorageStatus;
+
 pub trait StorageImpl: Send {
     fn clone(&self) -> Box<dyn StorageImpl>;
+
+    fn get_status(&self) -> Result<StorageStatus, String>;
 
     fn create_user(
         &self,

@@ -4,12 +4,15 @@ use std::collections::HashMap;
 
 use self::diesel::prelude::*;
 use crate::{diesel_migrations::MigrationHarness, schema::*, *};
+use chrono::NaiveDateTime;
+use chrono::Utc;
 use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
 use diesel_migrations::EmbeddedMigrations;
 use log::*;
 use rand::Rng;
+use resalt_config::SConfig;
 use resalt_models::*;
-use resalt_storage::StorageImpl;
+use resalt_storage::{StorageImpl, StorageStatus};
 use serde_json::{json, Value};
 
 type DbPooledConnection = PooledConnection<ConnectionManager<MysqlConnection>>;
@@ -146,6 +149,67 @@ impl StorageMySQL {
 impl StorageImpl for StorageMySQL {
     fn clone(&self) -> Box<dyn StorageImpl> {
         Box::new(Clone::clone(self))
+    }
+
+    fn get_status(&self) -> Result<resalt_storage::StorageStatus, String> {
+        let mut connection = self.create_connection()?;
+
+        let lifespan = SConfig::auth_session_lifespan();
+        let auth_expiry: NaiveDateTime = match NaiveDateTime::from_timestamp_millis(
+            Utc::now().timestamp_millis() - (lifespan as i64),
+        ) {
+            Some(dt) => dt,
+            None => return Err("Failed to convert timestamp to NaiveDateTime: {:?}".to_string()),
+        };
+
+        let auth_tokens_total = authtokens::table
+            .count()
+            .get_result::<i64>(&mut connection)
+            .map_err(|e| format!("{:?}", e))?;
+        let auth_tokens_active = authtokens::table
+            .filter(authtokens::timestamp.ge(auth_expiry))
+            .count()
+            .get_result::<i64>(&mut connection)
+            .map_err(|e| format!("{:?}", e))?;
+        let events_total = events::table
+            .count()
+            .get_result::<i64>(&mut connection)
+            .map_err(|e| format!("{:?}", e))?;
+        let job_returns_total = job_returns::table
+            .count()
+            .get_result::<i64>(&mut connection)
+            .map_err(|e| format!("{:?}", e))?;
+        let jobs_total = jobs::table
+            .count()
+            .get_result::<i64>(&mut connection)
+            .map_err(|e| format!("{:?}", e))?;
+        let minions_total = minions::table
+            .count()
+            .get_result::<i64>(&mut connection)
+            .map_err(|e| format!("{:?}", e))?;
+        let permission_group_users_total = permission_group_users::table
+            .count()
+            .get_result::<i64>(&mut connection)
+            .map_err(|e| format!("{:?}", e))?;
+        let permission_groups_total = permission_groups::table
+            .count()
+            .get_result::<i64>(&mut connection)
+            .map_err(|e| format!("{:?}", e))?;
+        let users_total = users::table
+            .count()
+            .get_result::<i64>(&mut connection)
+            .map_err(|e| format!("{:?}", e))?;
+        Ok(StorageStatus {
+            auth_tokens_total,
+            auth_tokens_active,
+            events_total,
+            job_returns_total,
+            jobs_total,
+            minions_total,
+            permission_group_users_total,
+            permission_groups_total,
+            users_total,
+        })
     }
 
     /////////////

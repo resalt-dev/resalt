@@ -4,6 +4,19 @@ mod util;
 pub use interface::*;
 pub use util::*;
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct StorageStatus {
+    pub auth_tokens_total: i64,
+    pub auth_tokens_active: i64,
+    pub events_total: i64,
+    pub job_returns_total: i64,
+    pub jobs_total: i64,
+    pub minions_total: i64,
+    pub permission_group_users_total: i64,
+    pub permission_groups_total: i64,
+    pub users_total: i64,
+}
+
 pub struct StorageCloneWrapper {
     pub storage: Box<dyn StorageImpl>,
 }

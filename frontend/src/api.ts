@@ -12,6 +12,7 @@ import PermissionGroup from './models/PermissionGroup';
 import type Filter from './models/Filter';
 import type RunCommand from './models/RunCommand';
 import AuthToken from './models/AuthToken';
+import SystemStatus from './models/SystemStatus';
 
 export class ApiError extends Error {
 	code: number;
@@ -109,6 +110,12 @@ export async function login(username: string, password: string): Promise<AuthTok
 export async function getConfig(): Promise<Config> {
 	return await sendUnauthenticatedRequest('GET', '/config').then((data: any) =>
 		Config.fromObject(data),
+	);
+}
+
+export async function getSystemStatus(): Promise<SystemStatus> {
+	return await sendAuthenticatedRequest('GET', '/status').then((data: any) =>
+		SystemStatus.fromObject(data),
 	);
 }
 

@@ -1,3 +1,5 @@
+use std::sync::{Arc, Mutex};
+
 use super::SaltAPI;
 use chrono::NaiveDateTime;
 use futures::{pin_mut, StreamExt};
@@ -18,18 +20,28 @@ lazy_static::lazy_static! {
 
 const TIME_FMT: &str = "%Y-%m-%dT%H:%M:%S.%f";
 
+pub struct SaltEventListenerStatus {
+    pub connected: bool,
+}
+
 pub struct SaltEventListener {
     api: SaltAPI,
     pipeline: PipelineServer,
     storage: Box<dyn StorageImpl>,
+    status: Arc<Mutex<SaltEventListenerStatus>>,
 }
 
 impl SaltEventListener {
-    pub fn new(pipeline: PipelineServer, storage: Box<dyn StorageImpl>) -> Self {
+    pub fn new(
+        pipeline: PipelineServer,
+        storage: Box<dyn StorageImpl>,
+        status: Arc<Mutex<SaltEventListenerStatus>>,
+    ) -> Self {
         Self {
             api: SaltAPI::new(),
             pipeline,
             storage,
+            status,
         }
     }
 
@@ -61,6 +73,11 @@ impl SaltEventListener {
 
         let stream = self.api.listen_events(&salt_token);
         pin_mut!(stream);
+
+        {
+            // Make sure lock is released after setting status
+            self.status.lock().unwrap().connected = true;
+        }
 
         while let Some(event) = stream.next().await {
             debug!("{:?}", event);
@@ -529,6 +546,10 @@ impl SaltEventListener {
     pub async fn start(&self) {
         loop {
             self.listen().await;
+            {
+                // Make sure lock is released after setting status
+                self.status.lock().unwrap().connected = false;
+            }
             tokio::time::sleep(std::time::Duration::from_secs(1)).await;
         }
     }
