@@ -307,12 +307,17 @@ impl SaltAPI {
         let client = self.client.clone();
         stream! {
             debug!("Connecting to SSE stream: {}", &url);
-            let mut stream = client
+            let mut stream = match client
                 .get(url)
                 .insert_header(("Accept", "text/event-stream"))
                 .send()
-                .await
-                .unwrap();
+                .await {
+                Ok(stream) => stream,
+                Err(e) => {
+                    error!("Failed to connect to SSE stream: {}", e);
+                    return;
+                }
+            };
 
             // Parse ServerSideEvents
             //
@@ -427,8 +432,7 @@ impl SaltAPI {
                     }
                 }
             }
-
-            debug!("SSE stream closed");
+            debug!("SSE stream closed by ending loop");
         }
     }
 
