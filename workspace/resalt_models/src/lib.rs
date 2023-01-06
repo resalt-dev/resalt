@@ -244,10 +244,9 @@ pub struct SaltToken {
 impl SaltToken {
     pub fn expired(&self) -> bool {
         // Example: 1673048623.7256165
-        // Check if time has passed minus 1 hour
+        // Check if time has passed minus 5 seconds
         let now = chrono::Utc::now().timestamp() as f64;
-        println!("now: {}, expire: {}", now, self.expire);
-        now > self.expire - 3600.0
+        now > self.expire - 5.0
     }
 }
 
