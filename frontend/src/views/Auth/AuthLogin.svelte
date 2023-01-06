@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { login } from '../../api';
-	import { config, theme, toasts } from '../../stores';
+	import { auth, config, theme, toasts } from '../../stores';
 	import paths from '../../paths';
 	import { MessageType } from '../../models/MessageType';
 	import { FormGroup, Input, Label } from 'sveltestrap';
@@ -41,7 +41,8 @@
 		let username = usernameFieldValue;
 		let password = passwordFieldValue;
 		login(username, password)
-			.then(() => {
+			.then((token) => {
+				auth.set(token);
 				navigate(paths.dashboard.getPath());
 			})
 			.catch((err) => {

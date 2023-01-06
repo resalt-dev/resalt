@@ -11,6 +11,7 @@ import MetricResult from './models/MetricResult';
 import PermissionGroup from './models/PermissionGroup';
 import type Filter from './models/Filter';
 import type RunCommand from './models/RunCommand';
+import AuthToken from './models/AuthToken';
 
 export class ApiError extends Error {
 	code: number;
@@ -32,11 +33,15 @@ export class ApiError extends Error {
 }
 
 export async function createSSESocket(): Promise<EventSource> {
-	const token = get(authStore);
-	if (!token) {
+	const auth = get(authStore);
+	if (!auth) {
 		throw new Error('Missing API token');
 	}
-	const stream = new EventSource(`${constants.apiUrl}/pipeline?token=${token}`);
+	if (auth.expiry < (Date.now() / 1000)) {
+		throw new Error('Auth token has expired');
+	}
+
+	const stream = new EventSource(`${constants.apiUrl}/pipeline?token=${auth.token}`);
 	return stream;
 }
 
@@ -65,16 +70,19 @@ async function sendRequest(url: string, options: any): Promise<any> {
 }
 
 async function sendAuthenticatedRequest(method: string, path: string, body?: any): Promise<any> {
-	const token = get(authStore);
-	if (!token) {
+	const auth = get(authStore);
+	if (!auth) {
 		throw new Error('Missing API token');
+	}
+	if (auth.expiry < (Date.now() / 1000)) {
+		throw new Error('Auth token has expired');
 	}
 
 	return await sendRequest(constants.apiUrl + path, {
 		method,
 		headers: {
 			'Content-Type': 'application/json',
-			Authorization: `Bearer ${token}`,
+			Authorization: `Bearer ${auth.token}`,
 		},
 		body: body ? JSON.stringify(body) : undefined,
 	});
@@ -94,13 +102,11 @@ async function sendUnauthenticatedRequest(method: string, path: string, body?: a
 /// Auth
 ///
 
-export async function login(username: string, password: string): Promise<string> {
-	const { token } = await sendUnauthenticatedRequest('POST', '/auth/login', {
+export async function login(username: string, password: string): Promise<AuthToken> {
+	return await sendUnauthenticatedRequest('POST', '/auth/login', {
 		username,
 		password,
-	});
-	authStore.set(token);
-	return token;
+	}).then((data: any) => AuthToken.fromObject(data));
 }
 
 export async function getConfig(): Promise<Config> {

@@ -5,6 +5,7 @@ import type User from './models/User';
 import type Config from './models/Config';
 import Message from './models/Message';
 import type { MessageType } from './models/MessageType';
+import type AuthToken from './models/AuthToken';
 
 const prefix = `${constants.appName.toLowerCase()}_`;
 
@@ -13,7 +14,7 @@ const prefix = `${constants.appName.toLowerCase()}_`;
 
 export const sidebarCollapsed = writableLocalStorage(`${prefix}sidebarCollapsed`, false);
 
-export const auth: Writable<string | null> = writableLocalStorage(`${prefix}auth`, null);
+export const auth: Writable<AuthToken | null> = writableLocalStorage(`${prefix}auth`, null);
 export const config: Writable<Config | null> = writableLocalStorage(`${prefix}config`, null);
 export const socket = writable({
 	connected: false,

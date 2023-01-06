@@ -15,7 +15,10 @@ pub struct LoginRequest {
 
 #[derive(Serialize, Debug)]
 struct LoginResponse {
+    #[serde(rename = "userId")]
+    user_id: String,
     token: String,
+    expiry: u64,
 }
 
 pub async fn route_auth_login_post(
@@ -119,8 +122,11 @@ pub async fn route_auth_login_post(
     };
 
     // Return
+    let session_lifespan = SConfig::auth_session_lifespan();
     let response = LoginResponse {
+        user_id: user.id,
         token: authtoken.id,
+        expiry: (authtoken.timestamp.timestamp() as u64) + session_lifespan,
     };
     Ok(web::Json(response))
 }
