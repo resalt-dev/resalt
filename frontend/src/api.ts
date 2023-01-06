@@ -38,7 +38,7 @@ function getToken(): string {
 	if (!auth) {
 		throw new Error('Missing API token');
 	}
-	if (auth.expiry < (Date.now() / 1000)) {
+	if (auth.expiry < Date.now() / 1000) {
 		throw new Error('Auth token has expired');
 	}
 	return auth.token;

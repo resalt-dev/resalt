@@ -23,6 +23,7 @@ pub async fn route_status_get(
         salt = listener_status.lock().unwrap().connected;
     }
 
+    #[allow(clippy::redundant_clone)]
     let status = SystemStatus {
         // Salt
         salt,
