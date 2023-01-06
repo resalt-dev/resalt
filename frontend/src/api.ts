@@ -32,7 +32,7 @@ export class ApiError extends Error {
 	}
 }
 
-export async function createSSESocket(): Promise<EventSource> {
+function getToken(): string {
 	const auth = get(authStore);
 	if (!auth) {
 		throw new Error('Missing API token');
@@ -40,8 +40,12 @@ export async function createSSESocket(): Promise<EventSource> {
 	if (auth.expiry < (Date.now() / 1000)) {
 		throw new Error('Auth token has expired');
 	}
+	return auth.token;
+}
 
-	const stream = new EventSource(`${constants.apiUrl}/pipeline?token=${auth.token}`);
+export async function createSSESocket(): Promise<EventSource> {
+	const token = getToken();
+	const stream = new EventSource(`${constants.apiUrl}/pipeline?token=${token}`);
 	return stream;
 }
 
@@ -70,19 +74,12 @@ async function sendRequest(url: string, options: any): Promise<any> {
 }
 
 async function sendAuthenticatedRequest(method: string, path: string, body?: any): Promise<any> {
-	const auth = get(authStore);
-	if (!auth) {
-		throw new Error('Missing API token');
-	}
-	if (auth.expiry < (Date.now() / 1000)) {
-		throw new Error('Auth token has expired');
-	}
-
+	const token = getToken();
 	return await sendRequest(constants.apiUrl + path, {
 		method,
 		headers: {
 			'Content-Type': 'application/json',
-			Authorization: `Bearer ${auth.token}`,
+			Authorization: `Bearer ${token}`,
 		},
 		body: body ? JSON.stringify(body) : undefined,
 	});
