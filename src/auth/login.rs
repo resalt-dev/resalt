@@ -11,12 +11,12 @@ use crate::components::*;
 use super::LdapHandler;
 
 #[allow(clippy::borrowed_box)]
-pub async fn update_token_salt_token(
+pub async fn renew_token_salt_token(
     data: &Box<dyn StorageImpl>,
     salt: &SaltAPI,
     user_id: &str,
-    token: &str,
-) -> Result<(), ApiError> {
+    auth_token: &str,
+) -> Result<AuthStatus, ApiError> {
     // Fetch username of user
     let user = match data.get_user_by_id(user_id) {
         Ok(user) => match user {
@@ -30,7 +30,7 @@ pub async fn update_token_salt_token(
     };
 
     // Create Salt session
-    let salt_token = match salt.login(&user.username, token).await {
+    let salt_token = match salt.login(&user.username, auth_token).await {
         Ok(salt_token) => salt_token,
         Err(e) => {
             error!("update_token_salt_token salt login {:?}", e);
@@ -39,7 +39,7 @@ pub async fn update_token_salt_token(
     };
 
     // Update token with salt session
-    match data.update_authtoken_salttoken(token, &Some(salt_token)) {
+    match data.update_authtoken_salttoken(auth_token, Some(&salt_token)) {
         Ok(_) => {}
         Err(e) => {
             error!("update_token_salt_token update_salttoken {:?}", e);
@@ -47,7 +47,11 @@ pub async fn update_token_salt_token(
         }
     };
 
-    Ok(())
+    Ok(AuthStatus {
+        user_id: user_id.to_owned(),
+        auth_token: auth_token.to_owned(),
+        salt_token: Some(salt_token),
+    })
 }
 
 #[allow(clippy::borrowed_box)]
@@ -80,6 +84,7 @@ pub fn validate_auth_token(
 
     Ok(Some(AuthStatus {
         user_id: authtoken.user_id,
+        auth_token: authtoken.id,
         salt_token: match authtoken.salt_token {
             Some(v) => match serde_json::from_str::<SaltToken>(&v) {
                 Ok(v) => Some(v),

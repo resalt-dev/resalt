@@ -33,7 +33,7 @@ pub trait StorageImpl: Send {
     fn update_authtoken_salttoken(
         &self,
         auth_token: &str,
-        salt_token: &Option<SaltToken>,
+        salt_token: Option<&SaltToken>,
     ) -> Result<(), String>;
 
     fn list_minions(

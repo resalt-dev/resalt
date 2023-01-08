@@ -341,7 +341,7 @@ impl StorageImpl for StorageMySQL {
     fn update_authtoken_salttoken(
         &self,
         auth_token: &str,
-        salt_token: &Option<SaltToken>,
+        salt_token: Option<&SaltToken>,
     ) -> Result<(), String> {
         let mut connection = self.create_connection()?;
 

@@ -113,7 +113,7 @@ pub async fn route_auth_login_post(
     };
 
     // Create Salt session
-    match update_token_salt_token(&data, &salt, &user.id, &authtoken.id).await {
+    match renew_token_salt_token(&data, &salt, &user.id, &authtoken.id).await {
         Ok(_) => {}
         Err(e) => {
             error!("{:?}", e);

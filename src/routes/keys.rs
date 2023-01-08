@@ -1,12 +1,15 @@
 use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 use resalt_models::*;
-use resalt_salt::{SaltAPI, SaltKeyState};
+use resalt_salt::{SaltAPI, SaltError, SaltKeyState};
 use resalt_storage::StorageImpl;
 use serde::Deserialize;
 
 use crate::{
-    auth::{has_permission, P_SALTKEY_ACCEPT, P_SALTKEY_DELETE, P_SALTKEY_LIST, P_SALTKEY_REJECT},
+    auth::{
+        has_permission, renew_token_salt_token, P_SALTKEY_ACCEPT, P_SALTKEY_DELETE, P_SALTKEY_LIST,
+        P_SALTKEY_REJECT,
+    },
     components::*,
 };
 
@@ -15,7 +18,7 @@ pub async fn route_keys_get(
     data: web::Data<Box<dyn StorageImpl>>,
     req: HttpRequest,
 ) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
+    let mut auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_SALTKEY_LIST)? {
@@ -32,6 +35,21 @@ pub async fn route_keys_get(
 
     let keys = match salt.get_keys(salt_token).await {
         Ok(keys) => keys,
+        Err(SaltError::Unauthorized) => {
+            if !salt_token.matured() {
+                error!("Salt token unauthorized, but not matured");
+                return Err(ApiError::InternalError);
+            }
+            error!("Salt token expired, renewing and retrying");
+            auth = renew_token_salt_token(&data, &salt, &auth.user_id, &auth.auth_token).await?;
+            match salt.get_keys(&auth.salt_token.unwrap()).await {
+                Ok(keys) => keys,
+                Err(e) => {
+                    error!("salt.get_keys {:?}", e);
+                    return Err(ApiError::InternalError);
+                }
+            }
+        }
         Err(e) => {
             error!("salt.get_keys {:?}", e);
             return Err(ApiError::InternalError);
@@ -84,6 +102,25 @@ pub async fn route_key_accept_put(
 
     match salt.accept_key(salt_token, &info.state, &info.id).await {
         Ok(()) => Ok(web::Json(())),
+        Err(SaltError::Unauthorized) => {
+            if !salt_token.matured() {
+                error!("Salt token unauthorized, but not matured");
+                return Err(ApiError::InternalError);
+            }
+            error!("Salt token expired, renewing and retrying");
+            let auth =
+                renew_token_salt_token(&data, &salt, &auth.user_id, &auth.auth_token).await?;
+            match salt
+                .accept_key(&auth.salt_token.unwrap(), &info.state, &info.id)
+                .await
+            {
+                Ok(()) => Ok(web::Json(())),
+                Err(e) => {
+                    error!("{:?}", e);
+                    Err(ApiError::InternalError)
+                }
+            }
+        }
         Err(e) => {
             error!("{:?}", e);
             Err(ApiError::InternalError)
@@ -114,6 +151,25 @@ pub async fn route_key_reject_put(
 
     match salt.reject_key(salt_token, &info.state, &info.id).await {
         Ok(()) => Ok(web::Json(())),
+        Err(SaltError::Unauthorized) => {
+            if !salt_token.matured() {
+                error!("Salt token unauthorized, but not matured");
+                return Err(ApiError::InternalError);
+            }
+            error!("Salt token expired, renewing and retrying");
+            let auth =
+                renew_token_salt_token(&data, &salt, &auth.user_id, &auth.auth_token).await?;
+            match salt
+                .reject_key(&auth.salt_token.unwrap(), &info.state, &info.id)
+                .await
+            {
+                Ok(()) => Ok(web::Json(())),
+                Err(e) => {
+                    error!("{:?}", e);
+                    Err(ApiError::InternalError)
+                }
+            }
+        }
         Err(e) => {
             error!("{:?}", e);
             Err(ApiError::InternalError)
@@ -144,6 +200,25 @@ pub async fn route_key_delete_delete(
 
     match salt.delete_key(salt_token, &info.state, &info.id).await {
         Ok(()) => Ok(web::Json(())),
+        Err(SaltError::Unauthorized) => {
+            if !salt_token.matured() {
+                error!("Salt token unauthorized, but not matured");
+                return Err(ApiError::InternalError);
+            }
+            error!("Salt token expired, renewing and retrying");
+            let auth =
+                renew_token_salt_token(&data, &salt, &auth.user_id, &auth.auth_token).await?;
+            match salt
+                .delete_key(&auth.salt_token.unwrap(), &info.state, &info.id)
+                .await
+            {
+                Ok(()) => Ok(web::Json(())),
+                Err(e) => {
+                    error!("{:?}", e);
+                    Err(ApiError::InternalError)
+                }
+            }
+        }
         Err(e) => {
             error!("{:?}", e);
             Err(ApiError::InternalError)

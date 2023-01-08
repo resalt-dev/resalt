@@ -5,6 +5,7 @@ use resalt_models::*;
 use resalt_salt::*;
 use resalt_storage::StorageImpl;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
 #[derive(Deserialize)]
 pub struct JobsListGetQuery {
@@ -59,7 +60,7 @@ pub async fn route_jobs_post(
     input: web::Json<JobRunRequest>,
     req: HttpRequest,
 ) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
+    let mut auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
     if !has_permission(&data, &auth.user_id, P_RUN_LIVE)? {
@@ -74,81 +75,102 @@ pub async fn route_jobs_post(
         }
     };
 
-    let res = match input.client {
-        SaltClientType::Local => {
-            salt.run_job_local(
-                salt_token,
-                input.tgt.clone(),
-                input.fun.clone(),
-                Some(input.arg.clone().into_iter().map(SV::S).collect()),
-                Some(input.tgt_type.clone()),
-                Some(input.kwarg.clone()),
-            )
-            .await
+    async fn run(
+        salt: web::Data<SaltAPI>,
+        input: &web::Json<JobRunRequest>,
+        salt_token: &SaltToken,
+    ) -> Result<Value, SaltError> {
+        match input.client {
+            SaltClientType::Local => {
+                salt.run_job_local(
+                    salt_token,
+                    input.tgt.clone(),
+                    input.fun.clone(),
+                    Some(input.arg.clone().into_iter().map(SV::S).collect()),
+                    Some(input.tgt_type.clone()),
+                    Some(input.kwarg.clone()),
+                )
+                .await
+            }
+            SaltClientType::LocalAsync => {
+                salt.run_job_local_async(
+                    salt_token,
+                    input.tgt.clone(),
+                    input.fun.clone(),
+                    Some(input.arg.clone().into_iter().map(SV::S).collect()),
+                    Some(input.tgt_type.clone()),
+                    Some(input.kwarg.clone()),
+                )
+                .await
+            }
+            SaltClientType::LocalBatch => {
+                salt.run_job_local_batch(
+                    salt_token,
+                    input.tgt.clone(),
+                    input.fun.clone(),
+                    Some(input.arg.clone().into_iter().map(SV::S).collect()),
+                    Some(input.tgt_type.clone()),
+                    Some(input.kwarg.clone()),
+                    input.batch_size.clone(),
+                )
+                .await
+            }
+            SaltClientType::Runner => {
+                salt.run_job_runner(
+                    salt_token,
+                    input.fun.clone(),
+                    Some(input.arg.clone().into_iter().map(SV::S).collect()),
+                    Some(input.kwarg.clone()),
+                )
+                .await
+            }
+            SaltClientType::RunnerAsync => {
+                salt.run_job_runner_async(
+                    salt_token,
+                    input.fun.clone(),
+                    Some(input.arg.clone().into_iter().map(SV::S).collect()),
+                    Some(input.kwarg.clone()),
+                )
+                .await
+            }
+            SaltClientType::Wheel => {
+                salt.run_job_wheel(
+                    salt_token,
+                    input.fun.clone(),
+                    Some(input.arg.clone().into_iter().map(SV::S).collect()),
+                    Some(input.kwarg.clone()),
+                )
+                .await
+            }
+            SaltClientType::WheelAsync => {
+                salt.run_job_wheel_async(
+                    salt_token,
+                    input.fun.clone(),
+                    Some(input.arg.clone().into_iter().map(SV::S).collect()),
+                    Some(input.kwarg.clone()),
+                )
+                .await
+            }
         }
-        SaltClientType::LocalAsync => {
-            salt.run_job_local_async(
-                salt_token,
-                input.tgt.clone(),
-                input.fun.clone(),
-                Some(input.arg.clone().into_iter().map(SV::S).collect()),
-                Some(input.tgt_type.clone()),
-                Some(input.kwarg.clone()),
-            )
-            .await
-        }
-        SaltClientType::LocalBatch => {
-            salt.run_job_local_batch(
-                salt_token,
-                input.tgt.clone(),
-                input.fun.clone(),
-                Some(input.arg.clone().into_iter().map(SV::S).collect()),
-                Some(input.tgt_type.clone()),
-                Some(input.kwarg.clone()),
-                input.batch_size.clone(),
-            )
-            .await
-        }
-        SaltClientType::Runner => {
-            salt.run_job_runner(
-                salt_token,
-                input.fun.clone(),
-                Some(input.arg.clone().into_iter().map(SV::S).collect()),
-                Some(input.kwarg.clone()),
-            )
-            .await
-        }
-        SaltClientType::RunnerAsync => {
-            salt.run_job_runner_async(
-                salt_token,
-                input.fun.clone(),
-                Some(input.arg.clone().into_iter().map(SV::S).collect()),
-                Some(input.kwarg.clone()),
-            )
-            .await
-        }
-        SaltClientType::Wheel => {
-            salt.run_job_wheel(
-                salt_token,
-                input.fun.clone(),
-                Some(input.arg.clone().into_iter().map(SV::S).collect()),
-                Some(input.kwarg.clone()),
-            )
-            .await
-        }
-        SaltClientType::WheelAsync => {
-            salt.run_job_wheel_async(
-                salt_token,
-                input.fun.clone(),
-                Some(input.arg.clone().into_iter().map(SV::S).collect()),
-                Some(input.kwarg.clone()),
-            )
-            .await
-        }
-    };
+    }
 
-    match res {
+    match run(salt.clone(), &input, salt_token).await {
         Ok(job) => Ok(web::Json(job)),
+        Err(SaltError::Unauthorized) => {
+            if !salt_token.matured() {
+                error!("Salt token unauthorized, but not matured");
+                return Err(ApiError::InternalError);
+            }
+            error!("Salt token expired, renewing and retrying");
+            auth = renew_token_salt_token(&data, &salt, &auth.user_id, &auth.auth_token).await?;
+            match run(salt, &input, &auth.salt_token.unwrap()).await {
+                Ok(job) => Ok(web::Json(job)),
+                Err(e) => {
+                    error!("{:?}", e);
+                    Err(ApiError::InternalError)
+                }
+            }
+        }
         Err(e) => {
             error!("{:?}", e);
             Err(ApiError::InternalError)

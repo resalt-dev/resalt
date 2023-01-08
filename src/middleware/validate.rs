@@ -1,4 +1,4 @@
-use crate::auth::{update_token_salt_token, validate_auth_token};
+use crate::auth::{renew_token_salt_token, validate_auth_token};
 use actix_web::{
     dev::{forward_ready, Service, ServiceRequest, ServiceResponse, Transform},
     web::Query,
@@ -142,7 +142,7 @@ async fn resolve_auth_status(
                 auth_status.user_id
             );
 
-            match update_token_salt_token(&data, &salt, &auth_status.user_id, &token).await {
+            match renew_token_salt_token(&data, &salt, &auth_status.user_id, &token).await {
                 Ok(_) => {}
                 Err(e) => {
                     error!("{:?}", e);
