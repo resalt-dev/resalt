@@ -78,7 +78,7 @@
 						{/if}
 					</p>
 					<p class="card-text">
-						<Table size="sm" class="mb-0">
+						<Table class="mb-0">
 							<thead class="bg-light border-0">
 								<tr>
 									<th>Table</th>
