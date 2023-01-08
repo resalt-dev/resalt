@@ -31,6 +31,10 @@ export class ApiError extends Error {
 		this.name = 'ApiError';
 		this.code = error.code;
 	}
+
+	toString(): string {
+		return `${this.name}: ${this.message} (${this.code})`;
+	}
 }
 
 function getToken(): string {
@@ -58,18 +62,20 @@ async function sendRequest(url: string, options: any): Promise<any> {
 	} else {
 		const body = await res.text();
 		// Try parse JSON
+		let parsed = null;
 		try {
-			const parsed = JSON.parse(body);
-			// Check if body has "error"
-			if (parsed.error) {
-				throw new ApiError(parsed.error);
-			} else {
-				console.error('FAILED PARSING ERROR', body);
-				throw new Error('Failed parsing error');
-			}
+			parsed = JSON.parse(body);
 		} catch (e) {
 			// If it fails, just return the text
 			throw new Error(body);
+		}
+
+		// Check if body has value "error"
+		if (Object.prototype.hasOwnProperty.call(parsed, 'error')) {
+			throw new ApiError(parsed.error);
+		} else {
+			console.error('FAILED PARSING ERROR', body);
+			throw new Error('Failed parsing error');
 		}
 	}
 }

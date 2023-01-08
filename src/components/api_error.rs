@@ -40,15 +40,21 @@ impl ApiError {
 
     pub fn message(&self) -> String {
         match self {
-            ApiError::Unauthorized => String::from("Missing credentials"),
-            ApiError::Forbidden => String::from("Insufficient permissions"),
+            ApiError::Unauthorized => String::from("Unauthorized - Invalid credentials"),
+            ApiError::Forbidden => String::from("Forbidden - Insufficient permissions"),
             ApiError::NotFound => String::from("Resource not found"),
             ApiError::NotFoundMessage(str) => str.clone(),
             ApiError::InvalidRequest => String::from("Invalid request"),
-            ApiError::InternalError => String::from("Internal error"),
+            ApiError::InternalError => {
+                String::from("Internal error, please contact the system administrator")
+            }
             ApiError::InternalErrorMessage(str) => str.clone(),
-            ApiError::LdapError => String::from("LDAP error"),
-            ApiError::DatabaseError => String::from("Database error"),
+            ApiError::LdapError => {
+                String::from("LDAP error, please contact the system administrator")
+            }
+            ApiError::DatabaseError => {
+                String::from("Database error, please contact the system administrator")
+            }
         }
     }
 }

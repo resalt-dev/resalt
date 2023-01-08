@@ -36,10 +36,10 @@ interface ToastStore extends Readable<Message[]> {
 	 * Add a toast to the store.
 	 * @param {MessageType} type - The type of the toast (success, error, etc.)
 	 * @param {string} title - The title of the toast, preferably short.
-	 * @param {string} message - The message of the toast.
+	 * @param {any} message - The message of the toast.
 	 */
 	// eslint-disable-next-line no-unused-vars
-	add(this: void, type: MessageType, title: string, message: string): void;
+	add(this: void, type: MessageType, title: string, message: any): void;
 	/**
 	 * Clear all toasts from the store.
 	 */
@@ -51,7 +51,7 @@ function createToastStore(): ToastStore {
 
 	return {
 		subscribe,
-		add: (type: MessageType, title: string, message: string) => {
+		add: (type: MessageType, title: string, message: any) => {
 			const newToast = new Message(type, title, message);
 			update((messages) => {
 				messages.push(newToast);
