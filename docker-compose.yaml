@@ -49,7 +49,15 @@ services:
       context: ./
       dockerfile: Dockerfile-devel
     volumes:
-      - .:/usr/src/app:ro
+      - ./docker:/usr/src/app/docker:ro
+      - ./docs:/usr/src/app/docs:ro
+      - ./frontend:/usr/src/app/frontend:ro
+      - ./src:/usr/src/app/src:ro
+      - ./workspace:/usr/src/app/workspace:ro
+      - ./.env:/usr/src/app/.env:ro
+      - ./Cargo.toml:/usr/src/app/Cargo.toml:ro
+      - ./README.md:/usr/src/app/README.md:ro
+      - ./resalt.default.toml:/usr/src/app/resalt.default.toml:ro
       - /tmp/backend-target:/usr/src/app/target
     environment:
       RESALT_AUTH_FORWARD_ENABLED: ${RESALT_AUTH_FORWARD_ENABLED:-}
