@@ -109,49 +109,77 @@ fn evaluate_function(
         let re = Regex::new(&regex).unwrap();
         return re.is_match(fun);
     }
-    if let Some(fun_section) = fun_section.as_array() {
-        if fun_section.len() == 0 {
-            return true;
-        }
-        for arg in fun_section {
-            let regex = salt_wrapped_regex(arg.as_str().unwrap());
-            let re = Regex::new(&regex).unwrap();
-            if re.is_match(&args.join(" ")) {
-                return true;
-            }
-        }
+    let keys = fun_section.as_object().unwrap().keys().collect::<Vec<_>>();
+    if keys.len() != 1 {
         return false;
     }
-    if let Some(fun_section) = fun_section.as_object() {
-        if fun_section.contains_key("args") {
-            let args_section = fun_section["args"].as_array().unwrap();
-            if args_section.len() > 0 {
-                for arg in args_section {
-                    let regex = salt_wrapped_regex(arg.as_str().unwrap());
-                    let re = Regex::new(&regex).unwrap();
-                    if re.is_match(&args.join(" ")) {
-                        return true;
+    for key in keys {
+        let regex = salt_wrapped_regex(key);
+        let re = Regex::new(&regex).unwrap();
+        if re.is_match(fun) {
+            let value = &fun_section[key];
+            if let Some(_value) = value.as_str() {
+                return true;
+            }
+            if let Some(value) = value.as_array() {
+                if value.len() == 0 {
+                    if args.len() != 0 {
+                        return false;
                     }
                 }
-                return false;
-            }
-        }
-        if fun_section.contains_key("kwargs") {
-            let kwargs_section = fun_section["kwargs"].as_object().unwrap();
-            if kwargs_section.len() > 0 {
-                for key in kwargs_section.keys() {
-                    let regex = salt_wrapped_regex(kwargs_section[key].as_str().unwrap());
+                // Test each arg in the permission argainst "args"
+                let mut result = true;
+                for (i, value) in value.iter().enumerate() {
+                    let regex = salt_wrapped_regex(value.as_str().unwrap());
                     let re = Regex::new(&regex).unwrap();
-                    if re.is_match(&kwargs[key]) {
-                        return true;
+                    if !re.is_match(&args[i]) {
+                        result = false;
+                        break;
                     }
                 }
-                return false;
+                return result;
+            }
+            if let Some(value) = value.as_object() {
+                if let Some(value) = value.get("args") {
+                    if let Some(value) = value.as_array() {
+                        if value.len() == 0 {
+                            if args.len() != 0 {
+                                return false;
+                            }
+                        }
+                        // Test each arg in the permission argainst "args"
+                        for (i, value) in value.iter().enumerate() {
+                            let regex = salt_wrapped_regex(value.as_str().unwrap());
+                            let re = Regex::new(&regex).unwrap();
+                            if !re.is_match(&args[i]) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+                if let Some(value) = value.get("kwargs") {
+                    if let Some(value) = value.as_object() {
+                        let keys = value.keys().collect::<Vec<_>>();
+                        if keys.len() == 0 {
+                            if kwargs.len() != 0 {
+                                return false;
+                            }
+                        }
+                        // Test each arg in the permission argainst "kwargs"
+                        for key in keys {
+                            let regex = salt_wrapped_regex(value[key].as_str().unwrap());
+                            let re = Regex::new(&regex).unwrap();
+                            if kwargs.contains_key(key) && !re.is_match(&kwargs[key]) {
+                                return false;
+                            }
+                        }
+                    }
+                    return true;
+                }
             }
         }
-        return true;
     }
-    false
+    return false;
 }
 
 fn evaluate_target(

@@ -326,34 +326,50 @@ export function hasPermission(user: User, target: string, fun: string, args: str
 				}
 				if (Array.isArray(value)) {
 					if (value.length === 0) {
-						return true;
-					}
-					for (const arg of value) {
-						const regex = saltWrappedRegex(arg);
-						if (regex.test(args.join(' '))) {
-							return true;
+						if (args.length !== 0) {
+							return false;
 						}
 					}
-					return false;
+					// Test each arg in the permission argainst "args"
+					let result = true;
+					for (let i = 0; i < value.length; i++) {
+						const regex = saltWrappedRegex(value[i]);
+						if (!regex.test(args[i])) {
+							result = false;
+							break;
+						}
+					}
+					return result;
 				}
 				if (typeof value === 'object') {
-					if (value['args'] && value['args'].length > 0) {
-						for (const arg of value['args']) {
-							const regex = saltWrappedRegex(arg);
-							if (regex.test(args.join(' '))) {
-								return true;
+					if (value['args']) {
+						if (value['args'].length === 0) {
+							if (args.length !== 0) {
+								return false;
 							}
 						}
-						return false;
+						// Test each arg in the permission argainst "args"
+						for (let i = 0; i < value['args'].length; i++) {
+							const regex = saltWrappedRegex(value['args'][i]);
+							if (!regex.test(args[i])) {
+								return false;
+							}
+						}
 					}
-					if (value['kwargs'] && Object.keys(value['kwargs']).length > 0) {
-						for (const key of Object.keys(value['kwargs'])) {
-							const regex = saltWrappedRegex(value['kwargs'][key]);
-							if (regex.test(kwargs[key])) {
-								return true;
+					if (value['kwargs']) {
+						const keys = Object.keys(value['kwargs']);
+						if (keys.length === 0) {
+							if (Object.keys(kwargs).length !== 0) {
+								return false;
 							}
 						}
-						return false;
+						// Test each arg in the permission argainst "kwargs"
+						for (const key of keys) {
+							const regex = saltWrappedRegex(value['kwargs'][key]);
+							if (!regex.test(kwargs[key])) {
+								return false;
+							}
+						}
 					}
 					return true;
 				}
