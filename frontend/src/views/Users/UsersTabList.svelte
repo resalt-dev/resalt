@@ -109,7 +109,7 @@ Search box here.
 							>
 								View
 							</Link>
-							{#if hasResaltPermission($currentUser.perms, P_USER_ADMIN)}
+							{#if hasResaltPermission($currentUser, P_USER_ADMIN)}
 								<Clickable
 									type="button"
 									event={() => _deleteUser(user.id)}

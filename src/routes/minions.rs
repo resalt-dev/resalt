@@ -22,7 +22,7 @@ pub async fn route_minions_get(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_MINION_LIST)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_MINION_LIST)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -62,17 +62,17 @@ pub async fn route_minions_get(
     };
 
     // Validate extra permission
-    if !has_permission(&data, &auth.user_id, P_MINION_CONFORMITY)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_MINION_CONFORMITY)? {
         for minion in minions.iter_mut() {
             minion.conformity = None;
         }
     }
-    if !has_permission(&data, &auth.user_id, P_MINION_PILLARS)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_MINION_PILLARS)? {
         for minion in minions.iter_mut() {
             minion.pillars = None;
         }
     }
-    if !has_permission(&data, &auth.user_id, P_MINION_PACKAGES)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_MINION_PACKAGES)? {
         for minion in minions.iter_mut() {
             minion.pkgs = None;
         }
@@ -94,7 +94,7 @@ pub async fn route_minion_get(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_MINION_LIST)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_MINION_LIST)? {
         return Err(ApiError::Forbidden);
     }
 

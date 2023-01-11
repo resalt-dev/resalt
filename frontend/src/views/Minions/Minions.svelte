@@ -41,7 +41,7 @@
 			path: paths.minions.getPath('search'),
 			component: MinionsTabSearch,
 			data: { filters, navigate },
-			hidden: !hasResaltPermission($currentUser.perms, P_MINION_LIST),
+			hidden: !hasResaltPermission($currentUser, P_MINION_LIST),
 		},
 		{
 			key: 'presets',
@@ -49,7 +49,7 @@
 			path: paths.minions.getPath('presets'),
 			component: MinionsTabPresets,
 			data: { filters },
-			hidden: !hasResaltPermission($currentUser.perms, P_MINION_PRESETS_LIST),
+			hidden: !hasResaltPermission($currentUser, P_MINION_PRESETS_LIST),
 		},
 		{
 			key: 'grains',
@@ -57,7 +57,7 @@
 			path: paths.minions.getPath('grains'),
 			component: MinionsTabGrains,
 			data: { filters },
-			hidden: !hasResaltPermission($currentUser.perms, P_MINION_GRAINEXPLORER),
+			hidden: !hasResaltPermission($currentUser, P_MINION_GRAINEXPLORER),
 		},
 	];
 </script>

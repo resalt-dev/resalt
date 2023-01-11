@@ -1,3 +1,5 @@
+import type User from "./models/User";
+
 /* eslint-disable max-len */
 export const P_ADMIN_SUPERADMIN: string = 'admin.superadmin';
 export const P_ADMIN_GROUP: string = 'admin.group';
@@ -212,54 +214,200 @@ export const resaltWebPermissions: {
 	},
 ];
 
+function saltWrappedRegex(regex: string): RegExp {
+	return new RegExp(`^${regex}$`.replace(/([a-zA-Z0-9])\*/g, '$1.*'));
+}
+
+export function hasPermission(user: User, target: string, fun: string, args: string[] = [], kwargs: any = {}): boolean {
+	// https://docs.saltproject.io/en/latest/topics/eauth/access_control.html
+	// [
+	//   {
+	//     "@resalt": [
+	//       "minion.list"
+	//     ]
+	//   },
+	//   {
+	//     "01*": [
+	//       "grains.items"
+	//     ]
+	//   },
+	//   "test.ping",
+	//   {
+	//     "bb": [
+	//       "grains.items",
+	//       "pkg.list"
+	//     ]
+	//   },
+	//   {
+	//     "cc": [
+	//       {
+	//         "grains.items": {
+	//           "args": [
+	//             "test"
+	//           ],
+	//           "kwargs": {
+	//             "sanitize": true
+	//           }
+	//         }
+	//       }
+	//     ]
+	//   },
+	//   ".*",
+	//   {
+	//     ".*": [ //host
+	//       "grains.items", //function
+	//     ]
+	//   },
+	// ]
+	// or
+	// [
+	//   "test.version",
+	//   {
+	// 	"mongo\\*": [
+	// 	  "network.*"
+	// 	]
+	//   },
+	//   {
+	// 	"log\\*": [
+	// 	  "network.*",
+	// 	  "pkg.*"
+	// 	]
+	//   },
+	//   {
+	// 	"G@os:RedHat": [
+	// 	  "kmod.*"
+	// 	 ]
+	//   }
+	// ]
+
+	type func = string;
+	type funcSection = func | {
+		[fun: string]: string[] | {
+			args: string[],
+		} | {
+			kwargs: any,
+		} | {
+			args: string[],
+			kwargs: any,
+		}
+	};
+	// "funSection" covers:
+	// - "fun"
+	// - { "fun": [] }
+	// - { "fun": { "args": [] } }
+	// - { "fun": { "kwargs": {} } }
+	// - { "fun": { "args": [], "kwargs": {} } }
+	type targetSection = func | {
+		[host: string]: funcSection[]
+	};
+
+	let permissions: targetSection[] = [];
+	if (user && user.perms) {
+		permissions = user.perms;
+	}
+
+	// Both target and fun are REGEX, e.g "log*" or "pkg.*".
+
+	const evaluateFunction = (funSection: funcSection, fun: string, args: string[] = [], kwargs: any = {}): boolean => {
+		if (typeof funSection === 'string') {
+			const regex = saltWrappedRegex(funSection);
+			return regex.test(fun);
+		}
+		const keys = Object.keys(funSection);
+		if (keys.length !== 1) {
+			return false;
+		}
+		for (const key of keys) {
+			const regex = saltWrappedRegex(key);
+			if (regex.test(fun)) {
+				const value = funSection[key];
+				if (typeof value === 'string') {
+					return true;
+				}
+				if (Array.isArray(value)) {
+					if (value.length === 0) {
+						return true;
+					}
+					for (const arg of value) {
+						const regex = saltWrappedRegex(arg);
+						if (regex.test(args.join(' '))) {
+							return true;
+						}
+					}
+					return false;
+				}
+				if (typeof value === 'object') {
+					if (value['args'] && value['args'].length > 0) {
+						for (const arg of value['args']) {
+							const regex = saltWrappedRegex(arg);
+							if (regex.test(args.join(' '))) {
+								return true;
+							}
+						}
+						return false;
+					}
+					if (value['kwargs'] && Object.keys(value['kwargs']).length > 0) {
+						for (const key of Object.keys(value['kwargs'])) {
+							const regex = saltWrappedRegex(value['kwargs'][key]);
+							if (regex.test(kwargs[key])) {
+								return true;
+							}
+						}
+						return false;
+					}
+					return true;
+				}
+			}
+		}
+		return false;
+	};
+
+	const evaluateTarget = (targetSection: targetSection, target: string, fun: string, args: string[] = [], kwargs: any = {}): boolean => {
+		if (typeof targetSection === 'string') {
+			const regex = saltWrappedRegex(targetSection);
+			return regex.test(fun);
+		}
+		const keys = Object.keys(targetSection);
+		if (keys.length !== 1) {
+			return false;
+		}
+		for (const key of keys) {
+			const regex = saltWrappedRegex(key);
+			if (regex.test(target)) {
+				const funSections = targetSection[key];
+				for (const funSection of funSections) {
+					if (evaluateFunction(funSection, fun, args, kwargs)) {
+						return true;
+					}
+				}
+				return false;
+			}
+		}
+		return false;
+	}
+
+	for (const permission of permissions) {
+		if (evaluateTarget(permission, target, fun, args, kwargs)) {
+			return true;
+		}
+	}
+	return false;
+}
+
 /**
  * Check if a user has a Resalt permission.
- * @param permissions The permissions of the user, e.g. `$currentUser.perms`.
+ * @param user The user to validate against, e.g. `$currentUser`.
  * @param permission The permission to check for, e.g. `P_USER_ADMIN`.
  * @returns True if the user has the permission, false otherwise.
  * @example
  * ```ts
- * if (hasResaltPermission($currentUser.perms, P_USER_ADMIN)) {
+ * if (hasResaltPermission($currentUser, P_USER_ADMIN)) {
  *  // Do something
  * }
  * ```
  */
-export function hasResaltPermission(permissions: any[], permission: string): boolean {
-	// Assume there can be multiple @resalt sections, from ugly merge.
-	const resaltPermissions = permissions
-		.filter((p) => p['@resalt'] !== undefined)
-		.map((p) => p['@resalt'])
-		.filter((p) => Array.isArray(p))
-		// merge array of arrays
-		.map((p) => p as any[])
-		.reduce((acc, val) => acc.concat(val), []);
-
-	// If the permission we are looking for is admin.group.create,
-	// test both:
-	// - admin.group.create
-	// - admin.group
-	// - admin
-	//
-	// Additionally, always return true if they have admin.superadmin.
-	const testPerms = [permission];
-	for (let i = 0; i < permission.length; i += 1) {
-		if (permission[i] === '.') {
-			testPerms.push(permission.slice(0, i));
-		}
-	}
-	testPerms.push('admin.superadmin');
-
-	// console.log('testPerms', testPerms);
-	// console.log('resaltPermissions', resaltPermissions);
-
-	for (const userPermission of resaltPermissions) {
-		for (const testPerm of testPerms) {
-			if (testPerm === userPermission) {
-				return true;
-			}
-		}
-	}
-	return false;
+export function hasResaltPermission(user: User, permission: string): boolean {
+	return hasPermission(user, '@resalt', permission);
 }
 
 export default {};

@@ -14,9 +14,10 @@
 	import type Minion from '../../models/Minion';
 	import { SortOrder } from '../../models/SortOrder';
 	import paths from '../../paths';
-	import { theme, toasts } from '../../stores';
+	import { currentUser, theme, toasts } from '../../stores';
 	import MinionsFiltersBox from './MinionsFiltersBox.svelte';
 	import Clickable from '../../components/Clickable.svelte';
+	import { hasPermission } from '../../perms';
 
 	export let navigate: NavigateFn;
 	export let filters: Writable<Filter[]>;
@@ -227,7 +228,7 @@
 			{:else if $minions.length === 0 && paginationPage === 1}
 				<div class="p-3">No minions returned.</div>
 			{:else}
-				{#each $minions as minion}
+				{#each $minions as minion, mi}
 					<tr>
 						<Clickable
 							event={() => navigate(paths.minion.getPath(minion.id))}
@@ -266,20 +267,22 @@
 							>
 								View
 							</Link>
-							<Button
-								color="secondary"
-								size="sm"
-								style="width: 65px;"
-								class="me-2"
-								on:click={() => resync(minion.id)}
-								disabled={$refreshing.indexOf(minion.id) !== -1}
-							>
-								{#if $refreshing.indexOf(minion.id) !== -1}
-									<Spinner size="sm" />
-								{:else}
-									Resync
-								{/if}
-							</Button>
+							{#if hasPermission($currentUser, minion.id, 'grains.items')}
+								<Button
+									color="secondary"
+									size="sm"
+									style="width: 65px;"
+									class="me-2"
+									on:click={() => resync(minion.id)}
+									disabled={$refreshing.indexOf(minion.id) !== -1}
+								>
+									{#if $refreshing.indexOf(minion.id) !== -1}
+										<Spinner size="sm" />
+									{:else}
+										Resync
+									{/if}
+								</Button>
+							{/if}
 						</td>
 					</tr>
 				{/each}

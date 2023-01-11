@@ -47,7 +47,7 @@ pub async fn route_permissions_get(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -91,7 +91,7 @@ pub async fn route_permissions_post(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -136,7 +136,7 @@ pub async fn route_permission_get(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -161,7 +161,7 @@ pub async fn route_permission_update(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -218,7 +218,7 @@ pub async fn route_permission_delete(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
         return Err(ApiError::Forbidden);
     }
 

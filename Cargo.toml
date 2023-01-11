@@ -51,6 +51,7 @@ clokwerk = "0.4.0"
 chrono = "0.4"
 lazy_static = "1.4.0"
 include_dir = "0.7.2"
+regex = "1"
 
 # Parsing
 serde = { version = "1.0.139", features = ["derive"] }

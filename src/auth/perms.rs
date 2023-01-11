@@ -1,6 +1,9 @@
+use std::collections::HashMap;
+
 use crate::components::*;
 use actix_web::web;
 use log::*;
+use regex::Regex;
 use resalt_models::User;
 use resalt_storage::StorageImpl;
 use serde_json::Value;
@@ -55,7 +58,7 @@ pub const P_USER_LIST: &str = "user.list";
 pub const P_USER_EMAIL: &str = "user.email";
 pub const P_USER_PASSWORD: &str = "user.password";
 
-pub fn has_permission(
+pub fn has_resalt_permission(
     data: &web::Data<Box<dyn StorageImpl>>,
     user_id: &str,
     permission: &str,
@@ -77,57 +80,130 @@ pub fn has_permission(
             return Err(ApiError::DatabaseError);
         }
     };
-    Ok(evalute_resalt_permission(&perms, permission))
+    Ok(evaluate_resalt_permission(&perms, permission))
 }
 
-pub fn evalute_resalt_permission(permissions: &Value, permission: &str) -> bool {
-    let permissions = match permissions.as_array() {
-        Some(permissions) => permissions,
-        None => return false,
-    };
-
-    // Assume there can be multiple @resalt sections, from ugly merge.
-    let resalt_permissions: Vec<&Value> = permissions
-        .iter()
-        .filter_map(|p| p.get("@resalt"))
-        .filter(|p| p.is_array())
-        // merge array of arrays
-        .flat_map(|p| p.as_array().unwrap())
-        .collect();
-
-    // If the permission we are looking for is admin.group.create,
-    // test both:
-    // - admin.group.create
-    // - admin.group
-    // - admin
-    //
-    // Additionally, always return true if they have admin.superadmin.
-    let mut test_perms = vec![permission.to_string()];
-    for (i, c) in permission.char_indices() {
-        if c == '.' {
-            test_perms.push(permission[..i].to_string());
-        }
+pub fn evaluate_resalt_permission(permissions: &Value, permission: &str) -> bool {
+    let args = Vec::new();
+    let kwargs = HashMap::new();
+    let normal = evaluate_permission(permissions, "@resalt", permission, &args, &kwargs);
+    if !normal {
+        evaluate_permission(permissions, "@resalt", P_ADMIN_SUPERADMIN, &args, &kwargs)
+    } else {
+        normal
     }
-    test_perms.push(P_ADMIN_SUPERADMIN.to_string());
+}
 
-    log::debug!("resalt_permissions: {:?}", resalt_permissions);
-    log::debug!("permission: {:?}", permission);
+fn salt_wrapped_regex(regex: &str) -> String {
+    format!("^{}$", regex.replace("([a-zA-Z0-9])\\*", "$1.*"))
+}
 
-    for user_permission in resalt_permissions {
-        let user_permission = match user_permission.as_str() {
-            Some(user_permission) => user_permission,
-            None => continue,
-        };
-        for test_perm in &test_perms {
-            log::debug!(
-                "test perm: {:?} {:?} {:?}",
-                test_perm,
-                user_permission,
-                test_perm.eq(user_permission)
-            );
-            if test_perm.eq(user_permission) {
+fn evaluate_function(
+    fun_section: &Value,
+    fun: &str,
+    args: &Vec<String>,
+    kwargs: &HashMap<String, String>,
+) -> bool {
+    if let Some(fun_section) = fun_section.as_str() {
+        let regex = salt_wrapped_regex(fun_section);
+        let re = Regex::new(&regex).unwrap();
+        return re.is_match(fun);
+    }
+    if let Some(fun_section) = fun_section.as_array() {
+        if fun_section.len() == 0 {
+            return true;
+        }
+        for arg in fun_section {
+            let regex = salt_wrapped_regex(arg.as_str().unwrap());
+            let re = Regex::new(&regex).unwrap();
+            if re.is_match(&args.join(" ")) {
                 return true;
             }
+        }
+        return false;
+    }
+    if let Some(fun_section) = fun_section.as_object() {
+        if fun_section.contains_key("args") {
+            let args_section = fun_section["args"].as_array().unwrap();
+            if args_section.len() > 0 {
+                for arg in args_section {
+                    let regex = salt_wrapped_regex(arg.as_str().unwrap());
+                    let re = Regex::new(&regex).unwrap();
+                    if re.is_match(&args.join(" ")) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+        if fun_section.contains_key("kwargs") {
+            let kwargs_section = fun_section["kwargs"].as_object().unwrap();
+            if kwargs_section.len() > 0 {
+                for key in kwargs_section.keys() {
+                    let regex = salt_wrapped_regex(kwargs_section[key].as_str().unwrap());
+                    let re = Regex::new(&regex).unwrap();
+                    if re.is_match(&kwargs[key]) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+        return true;
+    }
+    false
+}
+
+fn evaluate_target(
+    target_section: &Value,
+    target: &str,
+    fun: &str,
+    args: &Vec<String>,
+    kwargs: &HashMap<String, String>,
+) -> bool {
+    if let Some(target_section) = target_section.as_str() {
+        let regex = salt_wrapped_regex(target_section);
+        let re = Regex::new(&regex).unwrap();
+        return re.is_match(fun);
+    }
+    let keys = target_section
+        .as_object()
+        .unwrap()
+        .keys()
+        .collect::<Vec<_>>();
+    if keys.len() != 1 {
+        return false;
+    }
+    for key in keys {
+        let regex = salt_wrapped_regex(key);
+        let re = Regex::new(&regex).unwrap();
+        if re.is_match(target) {
+            let fun_sections = target_section[key].as_array().unwrap();
+            for fun_section in fun_sections {
+                if evaluate_function(fun_section, fun, args, kwargs) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+    false
+}
+
+pub fn evaluate_permission(
+    permissions: &Value,
+    target: &str,
+    fun: &str,
+    args: &Vec<String>,
+    kwargs: &HashMap<String, String>,
+) -> bool {
+    let perms = match permissions.as_array() {
+        Some(perms) => perms.to_vec(),
+        None => Vec::new(),
+    };
+    for permission in perms {
+        if evaluate_target(&permission, target, fun, &args, &kwargs) {
+            return true;
         }
     }
     false
@@ -177,12 +253,42 @@ pub fn update_user_permissions_from_groups(
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
+
     use serde_json::from_str;
 
-    use crate::auth::evalute_resalt_permission;
+    use crate::auth::evaluate_permission;
+    use crate::auth::evaluate_resalt_permission;
 
     #[test]
     fn test_evalute_resalt_permission() {
+        let perms = from_str(
+            r#"[
+                {
+                  "minion\\*": [
+                    "network.*"
+                  ]
+                },
+                {
+                  "@resalt": [
+                    "admin.user.changepassword",
+                    "admin.user.delete"
+                  ]
+                }
+              ]"#,
+        )
+        .unwrap();
+        assert!(!evaluate_resalt_permission(&perms, "test.ping"));
+        assert!(evaluate_resalt_permission(
+            &perms,
+            "admin.user.changepassword"
+        ));
+        assert!(evaluate_resalt_permission(&perms, "admin.user.delete"));
+        assert!(!evaluate_resalt_permission(&perms, "admin.unicorn"));
+    }
+
+    #[test]
+    fn test_evalute_permission() {
         let perms = from_str(
             r#"[
                 "test.ping",
@@ -248,12 +354,64 @@ mod tests {
               ]"#,
         )
         .unwrap();
-        assert!(!evalute_resalt_permission(&perms, "test.ping"));
-        assert!(evalute_resalt_permission(
+        assert!(evaluate_permission(
             &perms,
-            "admin.user.changepassword"
+            "minion1",
+            "test.ping",
+            &vec![],
+            &HashMap::new()
         ));
-        assert!(evalute_resalt_permission(&perms, "admin.user.delete"));
-        assert!(!evalute_resalt_permission(&perms, "admin.unicorn"));
+        assert!(evaluate_permission(
+            &perms,
+            "minion1",
+            "my_mod.my_fun",
+            &vec!["a".to_string(), "b".to_string()],
+            &HashMap::new()
+        ));
+        assert!(evaluate_permission(
+            &perms,
+            "minion1",
+            "my_mod.my_fun",
+            &vec!["a".to_string(), "b".to_string()],
+            &vec![("kwa".to_string(), "kwa".to_string())]
+                .into_iter()
+                .collect()
+        ));
+        assert!(evaluate_permission(
+            &perms,
+            "minion1",
+            "my_mod.my_fun",
+            &vec!["a".to_string(), "b".to_string()],
+            &vec![
+                ("kwa".to_string(), "kwa".to_string()),
+                ("kwb".to_string(), "kwb".to_string())
+            ]
+            .into_iter()
+            .collect()
+        ));
+        assert!(!evaluate_permission(
+            &perms,
+            "minion1",
+            "my_mod.my_fun",
+            &vec!["a".to_string(), "b".to_string()],
+            &vec![
+                ("kwa".to_string(), "kwa".to_string()),
+                ("kwb".to_string(), "kwc".to_string())
+            ]
+            .into_iter()
+            .collect()
+        ));
+        assert!(!evaluate_permission(
+            &perms,
+            "minion1",
+            "my_mod.my_fun",
+            &vec!["a".to_string(), "b".to_string()],
+            &vec![
+                ("kwa".to_string(), "kwc".to_string()),
+                ("kwb".to_string(), "kwb".to_string())
+            ]
+            .into_iter()
+            .collect()
+        ));
     }
 }

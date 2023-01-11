@@ -22,7 +22,7 @@ pub async fn route_jobs_get(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_JOB_LIST)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_JOB_LIST)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -63,7 +63,7 @@ pub async fn route_jobs_post(
     let mut auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_RUN_LIVE)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_RUN_LIVE)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -197,7 +197,7 @@ pub async fn route_job_get(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_JOB_LIST)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_JOB_LIST)? {
         return Err(ApiError::Forbidden);
     }
 

@@ -5,7 +5,7 @@ use resalt_storage::StorageImpl;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    auth::{has_permission, P_EVENT_LIST},
+    auth::{has_resalt_permission, P_EVENT_LIST},
     components::ApiError,
 };
 
@@ -23,7 +23,7 @@ pub async fn route_events_get(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_EVENT_LIST)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_EVENT_LIST)? {
         return Err(ApiError::Forbidden);
     }
 

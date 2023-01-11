@@ -22,7 +22,7 @@
 			path: paths.users.getPath('list'),
 			component: UsersTabList,
 			data: { navigate },
-			hidden: !hasResaltPermission($currentUser.perms, P_USER_LIST),
+			hidden: !hasResaltPermission($currentUser, P_USER_LIST),
 		},
 		{
 			key: 'create',
@@ -30,7 +30,7 @@
 			path: paths.users.getPath('create'),
 			component: UsersTabCreate,
 			data: { navigate },
-			hidden: !hasResaltPermission($currentUser.perms, P_USER_ADMIN),
+			hidden: !hasResaltPermission($currentUser, P_USER_ADMIN),
 		},
 	];
 </script>

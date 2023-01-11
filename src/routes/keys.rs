@@ -7,8 +7,8 @@ use serde::Deserialize;
 
 use crate::{
     auth::{
-        has_permission, renew_token_salt_token, P_SALTKEY_ACCEPT, P_SALTKEY_DELETE, P_SALTKEY_LIST,
-        P_SALTKEY_REJECT,
+        has_resalt_permission, renew_token_salt_token, P_SALTKEY_ACCEPT, P_SALTKEY_DELETE,
+        P_SALTKEY_LIST, P_SALTKEY_REJECT,
     },
     components::*,
 };
@@ -21,7 +21,7 @@ pub async fn route_keys_get(
     let mut auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_SALTKEY_LIST)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_SALTKEY_LIST)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -88,7 +88,7 @@ pub async fn route_key_accept_put(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_SALTKEY_ACCEPT)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_SALTKEY_ACCEPT)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -137,7 +137,7 @@ pub async fn route_key_reject_put(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_SALTKEY_REJECT)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_SALTKEY_REJECT)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -186,7 +186,7 @@ pub async fn route_key_delete_delete(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_SALTKEY_DELETE)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_SALTKEY_DELETE)? {
         return Err(ApiError::Forbidden);
     }
 
