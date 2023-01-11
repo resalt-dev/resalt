@@ -1,4 +1,4 @@
-import type User from "./models/User";
+import type User from './models/User';
 
 /* eslint-disable max-len */
 export const P_ADMIN_SUPERADMIN: string = 'admin.superadmin';
@@ -218,7 +218,13 @@ function saltWrappedRegex(regex: string): RegExp {
 	return new RegExp(`^${regex}$`.replace(/([a-zA-Z0-9])\*/g, '$1.*'));
 }
 
-export function hasPermission(user: User, target: string, fun: string, args: string[] = [], kwargs: any = {}): boolean {
+export function hasPermission(
+	user: User,
+	target: string,
+	fun: string,
+	args: string[] = [],
+	kwargs: any = {},
+): boolean {
 	// https://docs.saltproject.io/en/latest/topics/eauth/access_control.html
 	// [
 	//   {
@@ -281,25 +287,33 @@ export function hasPermission(user: User, target: string, fun: string, args: str
 	// ]
 
 	type func = string;
-	type funcSection = func | {
-		[fun: string]: string[] | {
-			args: string[],
-		} | {
-			kwargs: any,
-		} | {
-			args: string[],
-			kwargs: any,
-		}
-	};
+	type funcSection =
+		| func
+		| {
+				[fun: string]:
+					| string[]
+					| {
+							args: string[];
+					  }
+					| {
+							kwargs: any;
+					  }
+					| {
+							args: string[];
+							kwargs: any;
+					  };
+		  };
 	// "funSection" covers:
 	// - "fun"
 	// - { "fun": [] }
 	// - { "fun": { "args": [] } }
 	// - { "fun": { "kwargs": {} } }
 	// - { "fun": { "args": [], "kwargs": {} } }
-	type targetSection = func | {
-		[host: string]: funcSection[]
-	};
+	type targetSection =
+		| func
+		| {
+				[host: string]: funcSection[];
+		  };
 
 	let permissions: targetSection[] = [];
 	if (user && user.perms) {
@@ -308,7 +322,12 @@ export function hasPermission(user: User, target: string, fun: string, args: str
 
 	// Both target and fun are REGEX, e.g "log*" or "pkg.*".
 
-	const evaluateFunction = (funSection: funcSection, fun: string, args: string[] = [], kwargs: any = {}): boolean => {
+	const evaluateFunction = (
+		funSection: funcSection,
+		fun: string,
+		args: string[] = [],
+		kwargs: any = {},
+	): boolean => {
 		if (typeof funSection === 'string') {
 			const regex = saltWrappedRegex(funSection);
 			return regex.test(fun);
@@ -378,7 +397,13 @@ export function hasPermission(user: User, target: string, fun: string, args: str
 		return false;
 	};
 
-	const evaluateTarget = (targetSection: targetSection, target: string, fun: string, args: string[] = [], kwargs: any = {}): boolean => {
+	const evaluateTarget = (
+		targetSection: targetSection,
+		target: string,
+		fun: string,
+		args: string[] = [],
+		kwargs: any = {},
+	): boolean => {
 		if (typeof targetSection === 'string') {
 			const regex = saltWrappedRegex(targetSection);
 			return regex.test(fun);
@@ -400,7 +425,7 @@ export function hasPermission(user: User, target: string, fun: string, args: str
 			}
 		}
 		return false;
-	}
+	};
 
 	for (const permission of permissions) {
 		if (evaluateTarget(permission, target, fun, args, kwargs)) {
