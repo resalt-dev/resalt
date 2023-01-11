@@ -20,6 +20,7 @@ export const P_MINION_LIST: string = 'minion.list';
 export const P_MINION_CONFORMITY: string = 'minion.conformity';
 export const P_MINION_PILLARS: string = 'minion.pillars';
 export const P_MINION_PACKAGES: string = 'minion.packages';
+export const P_MINION_REFRESH: string = 'minion.refresh';
 export const P_MINION_PRESETS_LIST: string = 'minion.presets.list';
 export const P_MINION_PRESETS_MANAGE: string = 'minion.presets.manage';
 export const P_MINION_GRAINEXPLORER: string = 'minion.grainexplorer';
@@ -139,6 +140,12 @@ export const resaltWebPermissions: {
 		permission: P_MINION_PACKAGES,
 		title: '[Minion] See Packages',
 		description: 'Allow user to see the packages of minions.',
+	},
+	{
+		permission: P_MINION_REFRESH,
+		title: '[Minion] Refresh',
+		description: 'Allow user to refresh minions. This is dependent on having minion permissions as well.',
+		warning: true,
 	},
 	{
 		permission: P_MINION_PRESETS_LIST,

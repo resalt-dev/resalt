@@ -124,6 +124,11 @@ pub async fn route_minion_refresh_post(
 ) -> Result<impl Responder, ApiError> {
     let mut auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
+    // Validate permission
+    if !has_resalt_permission(&data, &auth.user_id, P_MINION_REFRESH)? {
+        return Err(ApiError::Forbidden);
+    }
+
     let salt_token = match &auth.salt_token {
         Some(salt_token) => salt_token,
         None => {

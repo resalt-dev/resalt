@@ -37,6 +37,7 @@ pub const P_MINION_LIST: &str = "minion.list";
 pub const P_MINION_CONFORMITY: &str = "minion.conformity";
 pub const P_MINION_PILLARS: &str = "minion.pillars";
 pub const P_MINION_PACKAGES: &str = "minion.packages";
+pub const P_MINION_REFRESH: &str = "minion.refresh";
 #[allow(dead_code)]
 pub const P_MINION_PRESETS_LIST: &str = "minion.presets.list";
 #[allow(dead_code)]

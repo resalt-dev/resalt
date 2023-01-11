@@ -238,7 +238,7 @@
 		)
 			.then(() => {
 				updateData();
-				toasts.add(MessageType.SUCCESS, 'Update group', 'Updated group name!');
+				toasts.add(MessageType.SUCCESS, 'Update group', 'Updated group!');
 			})
 			.catch((err) => {
 				console.error(err);

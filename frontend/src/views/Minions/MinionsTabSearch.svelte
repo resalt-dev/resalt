@@ -17,7 +17,7 @@
 	import { currentUser, theme, toasts } from '../../stores';
 	import MinionsFiltersBox from './MinionsFiltersBox.svelte';
 	import Clickable from '../../components/Clickable.svelte';
-	import { hasPermission } from '../../perms';
+	import { hasPermission, hasResaltPermission, P_MINION_REFRESH } from '../../perms';
 
 	export let navigate: NavigateFn;
 	export let filters: Writable<Filter[]>;
@@ -267,7 +267,7 @@
 							>
 								View
 							</Link>
-							{#if hasPermission($currentUser, minion.id, 'grains.items')}
+							{#if hasResaltPermission($currentUser, P_MINION_REFRESH)}
 								<Button
 									color="secondary"
 									size="sm"
