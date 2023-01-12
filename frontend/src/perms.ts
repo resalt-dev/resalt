@@ -144,7 +144,8 @@ export const resaltWebPermissions: {
 	{
 		permission: P_MINION_REFRESH,
 		title: '[Minion] Refresh',
-		description: 'Allow user to refresh minions. This is dependent on having minion permissions as well.',
+		description:
+			'Allow user to refresh minions. This is dependent on having minion permissions as well.',
 		warning: true,
 	},
 	{
