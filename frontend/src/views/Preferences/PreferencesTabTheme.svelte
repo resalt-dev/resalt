@@ -96,7 +96,7 @@
 			Reset
 		</Button>
 
-		{#if hasResaltPermission($currentUser.perms, P_ADMIN_SUPERADMIN)}
+		{#if hasResaltPermission($currentUser, P_ADMIN_SUPERADMIN)}
 			<Button
 				color="warning"
 				on:click={() => {

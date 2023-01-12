@@ -57,7 +57,7 @@
 			path: paths.minion.getPath(minionId, 'conformity'),
 			component: MinionTabConformity,
 			data: { minion },
-			hidden: !hasResaltPermission($currentUser.perms, P_MINION_CONFORMITY),
+			hidden: !hasResaltPermission($currentUser, P_MINION_CONFORMITY),
 		},
 		{
 			key: 'grains',
@@ -72,7 +72,7 @@
 			path: paths.minion.getPath(minionId, 'pillars'),
 			component: MinionTabPillars,
 			data: { minion },
-			hidden: !hasResaltPermission($currentUser.perms, P_MINION_PILLARS),
+			hidden: !hasResaltPermission($currentUser, P_MINION_PILLARS),
 		},
 		{
 			key: 'packages',
@@ -80,7 +80,7 @@
 			path: paths.minion.getPath(minionId, 'packages'),
 			component: MinionTabPackages,
 			data: { minion },
-			hidden: !hasResaltPermission($currentUser.perms, P_MINION_PACKAGES),
+			hidden: !hasResaltPermission($currentUser, P_MINION_PACKAGES),
 		},
 	];
 </script>

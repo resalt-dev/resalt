@@ -38,7 +38,7 @@ filter = "(&(objectClass=inetOrgPerson)(uid=%s))"
 attribute = "uid"
 
 [auth.session]
-lifespan = 86400
+lifespan = 43200
 
 [database]
 type = "mysql"

@@ -18,8 +18,8 @@ $bluegray-10: #0e1418;
 		color: var(--light-gray) !important;
 	}
 
-	hr.bg-light,
-	.vr.bg-light {
+	hr.text-light,
+	.vr.text-light {
 		background-color: $bluegray-5 !important;
 		border-color: $bluegray-5 !important;
 	}
@@ -182,6 +182,10 @@ $bluegray-10: #0e1418;
 		--bs-toast-header-color: var(--light-gray);
 		--bs-toast-color: var(--light-gray);
 	}
+}
+
+.toast-body {
+	padding-top: 8px;
 }
 
 /*

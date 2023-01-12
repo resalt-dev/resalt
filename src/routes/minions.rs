@@ -2,7 +2,7 @@ use crate::{auth::*, components::*};
 use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 use resalt_models::*;
-use resalt_salt::SaltAPI;
+use resalt_salt::{SaltAPI, SaltError};
 use resalt_storage::StorageImpl;
 use serde::Deserialize;
 
@@ -22,7 +22,7 @@ pub async fn route_minions_get(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_MINION_LIST)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_MINION_LIST)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -62,17 +62,17 @@ pub async fn route_minions_get(
     };
 
     // Validate extra permission
-    if !has_permission(&data, &auth.user_id, P_MINION_CONFORMITY)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_MINION_CONFORMITY)? {
         for minion in minions.iter_mut() {
             minion.conformity = None;
         }
     }
-    if !has_permission(&data, &auth.user_id, P_MINION_PILLARS)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_MINION_PILLARS)? {
         for minion in minions.iter_mut() {
             minion.pillars = None;
         }
     }
-    if !has_permission(&data, &auth.user_id, P_MINION_PACKAGES)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_MINION_PACKAGES)? {
         for minion in minions.iter_mut() {
             minion.pkgs = None;
         }
@@ -94,7 +94,7 @@ pub async fn route_minion_get(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_MINION_LIST)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_MINION_LIST)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -118,10 +118,16 @@ pub async fn route_minion_get(
 
 pub async fn route_minion_refresh_post(
     salt: web::Data<SaltAPI>,
+    data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<MinionGetInfo>,
     req: HttpRequest,
 ) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
+    let mut auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
+
+    // Validate permission
+    if !has_resalt_permission(&data, &auth.user_id, P_MINION_REFRESH)? {
+        return Err(ApiError::Forbidden);
+    }
 
     let salt_token = match &auth.salt_token {
         Some(salt_token) => salt_token,
@@ -132,6 +138,24 @@ pub async fn route_minion_refresh_post(
     };
     match salt.refresh_minion(salt_token, &info.id).await {
         Ok(_) => (),
+        Err(SaltError::Unauthorized) => {
+            if !salt_token.matured() {
+                error!("Salt token unauthorized, but not matured");
+                return Err(ApiError::InternalError);
+            }
+            error!("Salt token expired, renewing and retrying");
+            auth = renew_token_salt_token(&data, &salt, &auth.user_id, &auth.auth_token).await?;
+            match salt
+                .refresh_minion(&auth.salt_token.unwrap(), &info.id)
+                .await
+            {
+                Ok(_) => (),
+                Err(e) => {
+                    error!("refresh_minion {:?}", e);
+                    return Err(ApiError::InternalError);
+                }
+            }
+        }
         Err(e) => {
             error!("refresh_minion {:?}", e);
             return Err(ApiError::InternalError);

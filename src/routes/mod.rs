@@ -13,6 +13,7 @@ mod metrics;
 mod minions;
 mod permissions;
 mod pipeline;
+mod status;
 mod users;
 
 pub use self::config::*;
@@ -30,4 +31,5 @@ pub use metrics::*;
 pub use minions::*;
 pub use permissions::*;
 pub use pipeline::*;
+pub use status::*;
 pub use users::*;

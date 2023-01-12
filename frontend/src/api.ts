@@ -11,6 +11,8 @@ import MetricResult from './models/MetricResult';
 import PermissionGroup from './models/PermissionGroup';
 import type Filter from './models/Filter';
 import type RunCommand from './models/RunCommand';
+import AuthToken from './models/AuthToken';
+import SystemStatus from './models/SystemStatus';
 
 export class ApiError extends Error {
 	code: number;
@@ -29,13 +31,25 @@ export class ApiError extends Error {
 		this.name = 'ApiError';
 		this.code = error.code;
 	}
+
+	toString(): string {
+		return `${this.name}: ${this.message} (${this.code})`;
+	}
+}
+
+function getToken(): string {
+	const auth = get(authStore);
+	if (!auth) {
+		throw new Error('Missing API token');
+	}
+	if (auth.expiry < Date.now() / 1000) {
+		throw new Error('Auth token has expired');
+	}
+	return auth.token;
 }
 
 export async function createSSESocket(): Promise<EventSource> {
-	const token = get(authStore);
-	if (!token) {
-		throw new Error('Missing API token');
-	}
+	const token = getToken();
 	const stream = new EventSource(`${constants.apiUrl}/pipeline?token=${token}`);
 	return stream;
 }
@@ -48,28 +62,26 @@ async function sendRequest(url: string, options: any): Promise<any> {
 	} else {
 		const body = await res.text();
 		// Try parse JSON
+		let parsed = null;
 		try {
-			const parsed = JSON.parse(body);
-			// Check if body has "error"
-			if (parsed.error) {
-				throw new ApiError(parsed.error);
-			} else {
-				console.error('FAILED PARSING ERROR', body);
-				throw new Error('Failed parsing error');
-			}
+			parsed = JSON.parse(body);
 		} catch (e) {
 			// If it fails, just return the text
 			throw new Error(body);
+		}
+
+		// Check if body has value "error"
+		if (Object.prototype.hasOwnProperty.call(parsed, 'error')) {
+			throw new ApiError(parsed.error);
+		} else {
+			console.error('FAILED PARSING ERROR', body);
+			throw new Error('Failed parsing error');
 		}
 	}
 }
 
 async function sendAuthenticatedRequest(method: string, path: string, body?: any): Promise<any> {
-	const token = get(authStore);
-	if (!token) {
-		throw new Error('Missing API token');
-	}
-
+	const token = getToken();
 	return await sendRequest(constants.apiUrl + path, {
 		method,
 		headers: {
@@ -94,18 +106,22 @@ async function sendUnauthenticatedRequest(method: string, path: string, body?: a
 /// Auth
 ///
 
-export async function login(username: string, password: string): Promise<string> {
-	const { token } = await sendUnauthenticatedRequest('POST', '/auth/login', {
+export async function login(username: string, password: string): Promise<AuthToken> {
+	return await sendUnauthenticatedRequest('POST', '/auth/login', {
 		username,
 		password,
-	});
-	authStore.set(token);
-	return token;
+	}).then((data: any) => AuthToken.fromObject(data));
 }
 
 export async function getConfig(): Promise<Config> {
 	return await sendUnauthenticatedRequest('GET', '/config').then((data: any) =>
 		Config.fromObject(data),
+	);
+}
+
+export async function getSystemStatus(): Promise<SystemStatus> {
+	return await sendAuthenticatedRequest('GET', '/status').then((data: any) =>
+		SystemStatus.fromObject(data),
 	);
 }
 

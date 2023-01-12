@@ -118,4 +118,32 @@ export default class RunResult {
 		}
 		return result;
 	}
+
+	toPermissionTarget(): string {
+		// .e.g "G@os:Debian"
+		if (this.targetType === 'glob') {
+			return this.target;
+		} else if (this.targetType === 'pcre') {
+			return `E@${this.target}`;
+		} else if (this.targetType === 'list') {
+			return `L@${this.target}`;
+		} else if (this.targetType === 'grain') {
+			return `G@${this.target}`;
+		} else if (this.targetType === 'grain_pcre') {
+			return `P@${this.target}`;
+		} else if (this.targetType === 'pillar') {
+			return `I@${this.target}`;
+		} else if (this.targetType === 'pillar_pcre') {
+			return `J@${this.target}`;
+		} else if (this.targetType === 'nodegroup') {
+			return `N@${this.target}`;
+		} else if (this.targetType === 'range') {
+			return `R@${this.target}`;
+		} else if (this.targetType === 'compound') {
+			return `C@${this.target}`;
+		} else if (this.targetType === 'ipcidr') {
+			return `S@${this.target}`;
+		}
+		return '';
+	}
 }

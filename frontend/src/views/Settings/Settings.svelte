@@ -28,7 +28,7 @@
 			label: 'Groups',
 			path: paths.settings.getPath('groups'),
 			component: SettingsTabGroups,
-			hidden: !hasResaltPermission($currentUser.perms, P_ADMIN_GROUP),
+			hidden: !hasResaltPermission($currentUser, P_ADMIN_GROUP),
 		},
 	];
 </script>

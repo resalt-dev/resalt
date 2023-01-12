@@ -1,3 +1,5 @@
+use std::sync::{Arc, Mutex};
+
 use super::SaltAPI;
 use chrono::NaiveDateTime;
 use futures::{pin_mut, StreamExt};
@@ -18,18 +20,28 @@ lazy_static::lazy_static! {
 
 const TIME_FMT: &str = "%Y-%m-%dT%H:%M:%S.%f";
 
+pub struct SaltEventListenerStatus {
+    pub connected: bool,
+}
+
 pub struct SaltEventListener {
     api: SaltAPI,
     pipeline: PipelineServer,
     storage: Box<dyn StorageImpl>,
+    status: Arc<Mutex<SaltEventListenerStatus>>,
 }
 
 impl SaltEventListener {
-    pub fn new(pipeline: PipelineServer, storage: Box<dyn StorageImpl>) -> Self {
+    pub fn new(
+        pipeline: PipelineServer,
+        storage: Box<dyn StorageImpl>,
+        status: Arc<Mutex<SaltEventListenerStatus>>,
+    ) -> Self {
         Self {
             api: SaltAPI::new(),
             pipeline,
             storage,
+            status,
         }
     }
 
@@ -61,6 +73,11 @@ impl SaltEventListener {
 
         let stream = self.api.listen_events(&salt_token);
         pin_mut!(stream);
+
+        {
+            // Make sure lock is released after setting status
+            self.status.lock().unwrap().connected = true;
+        }
 
         while let Some(event) = stream.next().await {
             debug!("{:?}", event);
@@ -202,7 +219,6 @@ impl SaltEventListener {
                         }
                         None => {
                             warn!("Failed to get job by jid: {}", jid);
-                            continue;
                         }
                     },
                     Err(err) => {
@@ -444,29 +460,17 @@ impl SaltEventListener {
                             }
                         }
 
-                        let confirmity: String = match data.get("return") {
-                            Some(confirmity) => match confirmity.as_object() {
-                                Some(confirmity) => match serde_json::to_string(confirmity) {
-                                    Ok(confirmity) => confirmity,
-                                    Err(err) => {
-                                        error!("Failed to serialize confirmity: {:?}", err);
-                                        continue;
-                                    }
-                                },
-                                None => {
-                                    error!("Failed to get confirmity from event data");
-                                    continue;
-                                }
-                            },
-                            None => {
-                                error!("Failed to get confirmity from event data");
+                        let conformity = match serde_json::to_string(ret) {
+                            Ok(conformity) => conformity,
+                            Err(err) => {
+                                error!("Failed to serialize conformity: {:?}", err);
                                 continue;
                             }
                         };
                         match self.storage.update_minion_conformity(
                             minion_id.clone(),
                             time,
-                            confirmity,
+                            conformity,
                             success,
                             incorrect,
                             error,
@@ -542,6 +546,10 @@ impl SaltEventListener {
     pub async fn start(&self) {
         loop {
             self.listen().await;
+            {
+                // Make sure lock is released after setting status
+                self.status.lock().unwrap().connected = false;
+            }
             tokio::time::sleep(std::time::Duration::from_secs(1)).await;
         }
     }

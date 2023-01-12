@@ -161,7 +161,7 @@
 				</ul>
 			</Card>
 		</Col>
-		{#if hasResaltPermission($currentUser.perms, P_USER_ADMIN) || ($currentUser.id === $user.id && hasResaltPermission($currentUser.perms, P_USER_PASSWORD))}
+		{#if hasResaltPermission($currentUser, P_USER_ADMIN) || ($currentUser.id === $user.id && hasResaltPermission($currentUser, P_USER_PASSWORD))}
 			<Col xs="12" xxl="4" class="pb-3">
 				<Card class="h-100 {$theme.dark ? 'bg-dark' : ''}">
 					<CardHeader>

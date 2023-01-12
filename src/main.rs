@@ -1,7 +1,10 @@
+use std::sync::{Arc, Mutex};
+
 use actix_web::{http::header, middleware::*, web, App, HttpServer};
+use middleware::{RequireAuth, ValidateAuth};
 use resalt_config::SConfig;
 use resalt_pipeline::PipelineServer;
-use resalt_salt::{SaltAPI, SaltEventListener};
+use resalt_salt::{SaltAPI, SaltEventListener, SaltEventListenerStatus};
 use resalt_storage::{StorageCloneWrapper, StorageImpl};
 use resalt_storage_mysql::StorageMySQL;
 use routes::*;
@@ -9,6 +12,7 @@ use tokio::task;
 
 mod auth;
 mod components;
+mod middleware;
 mod routes;
 mod scheduler;
 mod update;
@@ -47,13 +51,20 @@ async fn main() -> std::io::Result<()> {
     // Salt WebSocket
     let salt_listener_pipeline = pipeline.clone();
     let salt_listener_db = db.clone();
+    let listener_status: Arc<Mutex<SaltEventListenerStatus>> =
+        Arc::new(Mutex::new(SaltEventListenerStatus { connected: false }));
+    let salt_listener_status = listener_status.clone();
     std::thread::spawn(move || {
         let rt = tokio::runtime::Runtime::new().unwrap();
         let ls = task::LocalSet::new();
         ls.block_on(&rt, async {
             // Wait a few seconds before starting SSE, so web server gets time to start
             tokio::time::sleep(std::time::Duration::from_secs(1)).await;
-            let salt_ws = SaltEventListener::new(salt_listener_pipeline, salt_listener_db);
+            let salt_ws = SaltEventListener::new(
+                salt_listener_pipeline,
+                salt_listener_db,
+                salt_listener_status,
+            );
             salt_ws.start().await;
         });
     });
@@ -74,6 +85,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(pipeline.clone()))
             .app_data(web::Data::new(db_clone_wrapper.clone().storage))
             .app_data(web::Data::new(salt_api.clone()))
+            .app_data(web::Data::new(listener_status.clone()))
             .app_data(web::Data::new(scheduler.clone()))
             // Prevent sniffing of content type
             .wrap(DefaultHeaders::new().add((header::X_CONTENT_TYPE_OPTIONS, "nosniff")))
@@ -83,7 +95,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
             .service(
                 web::scope("/api/1")
-                    .wrap(auth::ValidateAuth::new(
+                    .wrap(ValidateAuth::new(
                         db_clone_wrapper.clone().storage,
                         salt_api,
                     ))
@@ -96,23 +108,30 @@ async fn main() -> std::io::Result<()> {
                             .route("/token", web::post().to(route_auth_token_post))
                             .service(
                                 web::scope("/user")
-                                    .wrap(auth::RequireAuth::new())
+                                    .wrap(RequireAuth::new())
                                     .route("", web::get().to(route_auth_user_get))
                                     .default_service(route_fallback_404),
                             )
                             .default_service(route_fallback_404),
                     )
+                    // status
+                    .service(
+                        web::scope("/status")
+                            .wrap(RequireAuth::new())
+                            .route("", web::get().to(route_status_get))
+                            .default_service(route_fallback_404),
+                    )
                     // metrics
                     .service(
                         web::scope("/metrics")
-                            .wrap(auth::RequireAuth::new())
+                            .wrap(RequireAuth::new())
                             .route("", web::get().to(route_metrics_get))
                             .default_service(route_fallback_404),
                     )
                     // minions
                     .service(
                         web::scope("/minions")
-                            .wrap(auth::RequireAuth::new())
+                            .wrap(RequireAuth::new())
                             .route("", web::get().to(route_minions_get))
                             .route("/{id}", web::get().to(route_minion_get))
                             .route("/{id}/refresh", web::post().to(route_minion_refresh_post))
@@ -121,14 +140,14 @@ async fn main() -> std::io::Result<()> {
                     // grains
                     .service(
                         web::scope("/grains")
-                            .wrap(auth::RequireAuth::new())
+                            .wrap(RequireAuth::new())
                             .route("", web::get().to(route_grains_get))
                             .default_service(route_fallback_404),
                     )
                     // jobs
                     .service(
                         web::scope("/jobs")
-                            .wrap(auth::RequireAuth::new())
+                            .wrap(RequireAuth::new())
                             .route("", web::get().to(route_jobs_get))
                             .route("", web::post().to(route_jobs_post))
                             .route("/{jid}", web::get().to(route_job_get))
@@ -137,21 +156,21 @@ async fn main() -> std::io::Result<()> {
                     // events
                     .service(
                         web::scope("/events")
-                            .wrap(auth::RequireAuth::new())
+                            .wrap(RequireAuth::new())
                             .route("", web::get().to(route_events_get))
                             .default_service(route_fallback_404),
                     )
                     // pipeline
                     .service(
                         web::scope("/pipeline")
-                            .wrap(auth::RequireAuth::new())
+                            .wrap(RequireAuth::new())
                             .route("", web::get().to(route_pipeline_get))
                             .default_service(route_fallback_404),
                     )
                     // users
                     .service(
                         web::scope("/users")
-                            .wrap(auth::RequireAuth::new())
+                            .wrap(RequireAuth::new())
                             .route("", web::get().to(route_users_get))
                             .route("", web::post().to(route_users_post))
                             .route("/{user_id}", web::get().to(route_user_get))
@@ -173,7 +192,7 @@ async fn main() -> std::io::Result<()> {
                     // keys
                     .service(
                         web::scope("/keys")
-                            .wrap(auth::RequireAuth::new())
+                            .wrap(RequireAuth::new())
                             .route("", web::get().to(route_keys_get))
                             .route("/{state}/{id}/accept", web::put().to(route_key_accept_put))
                             .route("/{state}/{id}/reject", web::put().to(route_key_reject_put))
@@ -186,7 +205,7 @@ async fn main() -> std::io::Result<()> {
                     // permissions
                     .service(
                         web::scope("/permissions")
-                            .wrap(auth::RequireAuth::new())
+                            .wrap(RequireAuth::new())
                             .route("", web::get().to(route_permissions_get))
                             .route("", web::post().to(route_permissions_post))
                             .route("/{id}", web::get().to(route_permission_get))

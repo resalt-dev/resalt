@@ -4,7 +4,7 @@
 	import TerminalBox from '../../components/TerminalBox.svelte';
 
 	const SHIFT = 10;
-	const collapsed: Writable<boolean> = writable(false);
+	let internalCollapsed: boolean = false;
 
 	export let color: string;
 	export let num: number;
@@ -18,6 +18,7 @@
 	export let duration: number;
 	export let changes: any;
 	export let showCollapsed: boolean;
+	export let collapsed: boolean;
 
 	function leftPadToTotalLength(str: string, maxLength: number, char: string = ' ') {
 		return char.repeat(maxLength - str.length) + str;
@@ -38,11 +39,11 @@
 	}
 </script>
 
-{#if !($collapsed && !showCollapsed)}
+{#if !((internalCollapsed || collapsed) && !showCollapsed)}
 	<TerminalBox
 		class="startside-{color}"
-		toggleCollapse={() => collapsed.update((c) => !c)}
-		collapsed={!$collapsed}
+		toggleCollapse={() => (internalCollapsed = !internalCollapsed)}
+		collapsed={internalCollapsed || collapsed}
 	>
 		<div slot="header">
 			<span>{sls} : </span>

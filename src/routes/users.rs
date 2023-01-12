@@ -21,7 +21,7 @@ pub async fn route_users_get(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_USER_ADMIN)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_USER_LIST)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -69,7 +69,7 @@ pub async fn route_users_post(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_USER_ADMIN)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_USER_ADMIN)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -126,8 +126,13 @@ pub async fn route_user_get(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_USER_ADMIN)? && auth.user_id != info.user_id {
-        return Err(ApiError::Forbidden);
+    if auth.user_id == info.user_id {
+        // Always allow fetching self
+    } else {
+        #[allow(clippy:collapsible_else_if)]
+        if !has_resalt_permission(&data, &auth.user_id, P_USER_LIST)? {
+            return Err(ApiError::Forbidden);
+        }
     }
 
     let user = match data.get_user_by_id(&info.user_id) {
@@ -164,13 +169,30 @@ pub async fn route_user_delete(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_USER_ADMIN)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_USER_ADMIN)? {
         return Err(ApiError::Forbidden);
     }
 
     // Don't allow deleting self
     if auth.user_id == info.user_id {
         return Err(ApiError::Forbidden);
+    }
+
+    // Don't allow deleting user with name "admin"
+    let user = match data.get_user_by_id(&info.user_id) {
+        Ok(user) => user,
+        Err(e) => {
+            error!("{:?}", e);
+            return Err(ApiError::DatabaseError);
+        }
+    };
+    if let Some(user) = user {
+        if user.username == "admin" {
+            error!("Tried to delete user with name \"admin\"");
+            return Err(ApiError::Forbidden);
+        }
+    } else {
+        return Err(ApiError::NotFound);
     }
 
     // Delete user
@@ -199,11 +221,15 @@ pub async fn route_user_password_post(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    let permission_ok = has_permission(&data, &auth.user_id, P_USER_ADMIN)?
-        || (auth.user_id.eq(&info.user_id)
-            && has_permission(&data, &auth.user_id, P_USER_PASSWORD)?);
-    if !permission_ok {
-        return Err(ApiError::Forbidden);
+    if auth.user_id == info.user_id {
+        if !has_resalt_permission(&data, &auth.user_id, P_USER_PASSWORD)? {
+            return Err(ApiError::Forbidden);
+        }
+    } else {
+        #[allow(clippy:collapsible_else_if)]
+        if !has_resalt_permission(&data, &auth.user_id, P_USER_LIST)? {
+            return Err(ApiError::Forbidden);
+        }
     }
 
     // Minimum password check
@@ -256,7 +282,7 @@ pub async fn route_user_permissions_post(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -326,7 +352,7 @@ pub async fn route_user_permissions_delete(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
         return Err(ApiError::Forbidden);
     }
 

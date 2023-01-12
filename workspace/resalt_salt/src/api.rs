@@ -307,12 +307,17 @@ impl SaltAPI {
         let client = self.client.clone();
         stream! {
             debug!("Connecting to SSE stream: {}", &url);
-            let mut stream = client
+            let mut stream = match client
                 .get(url)
                 .insert_header(("Accept", "text/event-stream"))
                 .send()
-                .await
-                .unwrap();
+                .await {
+                Ok(stream) => stream,
+                Err(e) => {
+                    error!("Failed to connect to SSE stream: {}", e);
+                    return;
+                }
+            };
 
             // Parse ServerSideEvents
             //
@@ -427,8 +432,7 @@ impl SaltAPI {
                     }
                 }
             }
-
-            debug!("SSE stream closed");
+            debug!("SSE stream closed by ending loop");
         }
     }
 
@@ -939,22 +943,6 @@ impl SaltAPI {
     }
 
     pub async fn refresh_minion(&self, salt_token: &SaltToken, id: &str) -> Result<(), SaltError> {
-        let mut map_test_true = HashMap::new();
-        map_test_true.insert("test".to_owned(), "True".to_owned());
-        match self
-            .run_job_local_async(
-                salt_token,
-                id,
-                "state.highstate",
-                None,
-                None,
-                Some(map_test_true),
-            )
-            .await
-        {
-            Ok(_) => (),
-            Err(e) => return Err(e),
-        };
         match self
             .run_job_local_async(salt_token, id, "grains.items", None, None, None)
             .await
@@ -977,7 +965,23 @@ impl SaltAPI {
             Err(e) => return Err(e),
         };
 
-        // TODO: sync with key-management: check non-responsive minion, and remove deleted ones
+        // Expect compliance to take the longest, so sync on that and show the UI as done whenever it returns
+        let mut map_test_true = HashMap::new();
+        map_test_true.insert("test".to_owned(), "True".to_owned());
+        match self
+            .run_job_local(
+                salt_token,
+                id,
+                "state.highstate",
+                None,
+                None,
+                Some(map_test_true),
+            )
+            .await
+        {
+            Ok(_) => (),
+            Err(e) => return Err(e),
+        };
 
         Ok(())
     }

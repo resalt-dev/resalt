@@ -51,7 +51,7 @@
 
 Search box here.
 
-<hr class="bg-light" />
+<hr class="text-light" />
 
 <Card class="table-responsive border-bottom-0">
 	<Table hover class="b-0 mb-0">
@@ -109,11 +109,12 @@ Search box here.
 							>
 								View
 							</Link>
-							{#if hasResaltPermission($currentUser.perms, P_USER_ADMIN)}
+							{#if hasResaltPermission($currentUser, P_USER_ADMIN)}
 								<Clickable
 									type="button"
 									event={() => _deleteUser(user.id)}
 									class="btn btn-danger btn-sm px-3 me-2"
+									disabled={user.username === 'admin'}
 								>
 									Delete
 								</Clickable>

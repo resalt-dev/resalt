@@ -1,9 +1,13 @@
-use actix_web::{web, Responder, Result};
+use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
+use resalt_models::AuthStatus;
 use resalt_storage::StorageImpl;
 use serde::{Deserialize, Serialize};
 
-use crate::components::ApiError;
+use crate::{
+    auth::{has_resalt_permission, P_EVENT_LIST},
+    components::ApiError,
+};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct EventsListGetQuery {
@@ -14,7 +18,15 @@ pub struct EventsListGetQuery {
 pub async fn route_events_get(
     data: web::Data<Box<dyn StorageImpl>>,
     query: web::Query<EventsListGetQuery>,
+    req: HttpRequest,
 ) -> Result<impl Responder, ApiError> {
+    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
+
+    // Validate permission
+    if !has_resalt_permission(&data, &auth.user_id, P_EVENT_LIST)? {
+        return Err(ApiError::Forbidden);
+    }
+
     let limit = query.limit;
     let offset = query.offset;
 

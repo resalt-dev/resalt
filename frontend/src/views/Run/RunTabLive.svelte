@@ -55,7 +55,7 @@
 
 <RunCommandBox bind:validate />
 
-<hr class="bg-light mt-1" />
+<hr class="text-light mt-1" />
 
 <Row>
 	<Col />

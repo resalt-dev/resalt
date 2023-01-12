@@ -1,6 +1,6 @@
 [package]
 name = "resalt"
-version = "0.1.5"
+version = "0.2.1"
 authors = ["Max Faxälv <max@foorack.com>"]
 edition = "2021"
 readme = "README.md"
@@ -36,7 +36,7 @@ actix-web = { version = "4.1.0", features=["compress-gzip"], default-features = 
 awc = { version = "3", features=["rustls", "compress-gzip"], default-features = false }
 
 # Auth
-ldap3 = { version = "0.10.5", features = ["tls-rustls"], default-features = false }
+ldap3 = { version = "0.11.1", features = ["tls-rustls"], default-features = false }
 
 # Logging
 log = { version = "0.4.17" }
@@ -51,6 +51,7 @@ clokwerk = "0.4.0"
 chrono = "0.4"
 lazy_static = "1.4.0"
 include_dir = "0.7.2"
+regex = "1"
 
 # Parsing
 serde = { version = "1.0.139", features = ["derive"] }
@@ -61,5 +62,7 @@ jsonpath_lib = "0.3.0"
 
 [package.metadata.resalt]
 news = [
+    "Resalt 0.2.1 released§Resalt 0.2.1 is now available. Minor fixes to Dashboard UI, and fixed a bug where the Salt API would reject Run requests even when a user is authenticated.",
+    "Resalt 0.2.0 released§Resalt 0.2.0 is now available. This release includes a fix where compliance data wasn't stored when triggered from minion, improved permission checking, and several UI fixes.",
     "Resalt 0.1.6 released§Resalt 0.1.6 is now available. This release includes large UI updates, continued implementation of the permission system, the ability to see grains of offline minions, dependency updates, accessibility updates, enforcement of code linting, a severe improvement of compilation times for the frontend, and a lot of bug fixes.",
 ]

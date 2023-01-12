@@ -5,6 +5,7 @@ import type User from './models/User';
 import type Config from './models/Config';
 import Message from './models/Message';
 import type { MessageType } from './models/MessageType';
+import type AuthToken from './models/AuthToken';
 
 const prefix = `${constants.appName.toLowerCase()}_`;
 
@@ -13,7 +14,7 @@ const prefix = `${constants.appName.toLowerCase()}_`;
 
 export const sidebarCollapsed = writableLocalStorage(`${prefix}sidebarCollapsed`, false);
 
-export const auth: Writable<string | null> = writableLocalStorage(`${prefix}auth`, null);
+export const auth: Writable<AuthToken | null> = writableLocalStorage(`${prefix}auth`, null);
 export const config: Writable<Config | null> = writableLocalStorage(`${prefix}config`, null);
 export const socket = writable({
 	connected: false,
@@ -35,10 +36,10 @@ interface ToastStore extends Readable<Message[]> {
 	 * Add a toast to the store.
 	 * @param {MessageType} type - The type of the toast (success, error, etc.)
 	 * @param {string} title - The title of the toast, preferably short.
-	 * @param {string} message - The message of the toast.
+	 * @param {any} message - The message of the toast.
 	 */
 	// eslint-disable-next-line no-unused-vars
-	add(this: void, type: MessageType, title: string, message: string): void;
+	add(this: void, type: MessageType, title: string, message: any): void;
 	/**
 	 * Clear all toasts from the store.
 	 */
@@ -50,7 +51,7 @@ function createToastStore(): ToastStore {
 
 	return {
 		subscribe,
-		add: (type: MessageType, title: string, message: string) => {
+		add: (type: MessageType, title: string, message: any) => {
 			const newToast = new Message(type, title, message);
 			update((messages) => {
 				messages.push(newToast);

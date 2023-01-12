@@ -20,7 +20,7 @@ pub async fn route_grains_get(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_permission(&data, &auth.user_id, P_MINION_LIST)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_MINION_GRAINEXPLORER)? {
         return Err(ApiError::Forbidden);
     }
 

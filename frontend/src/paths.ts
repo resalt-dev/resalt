@@ -1,3 +1,4 @@
+import type User from './models/User';
 import {
 	P_EVENT_LIST,
 	P_JOB_LIST,
@@ -65,13 +66,13 @@ export class Path {
 		return path.replace(/\/+$/, '');
 	}
 
-	hasPermission(userPermissions: any[]): boolean {
+	hasPermission(user: User): boolean {
 		if (this.perms === undefined || this.perms === null || this.perms.length === 0) {
 			return true;
 		}
 
 		for (const perm of this.perms) {
-			if (hasResaltPermission(userPermissions, perm)) {
+			if (hasResaltPermission(user, perm)) {
 				return true;
 			}
 		}

@@ -1,8 +1,12 @@
 use chrono::*;
 use resalt_models::*;
 
+use crate::StorageStatus;
+
 pub trait StorageImpl: Send {
     fn clone(&self) -> Box<dyn StorageImpl>;
+
+    fn get_status(&self) -> Result<StorageStatus, String>;
 
     fn create_user(
         &self,
@@ -29,7 +33,7 @@ pub trait StorageImpl: Send {
     fn update_authtoken_salttoken(
         &self,
         auth_token: &str,
-        salt_token: &Option<SaltToken>,
+        salt_token: Option<&SaltToken>,
     ) -> Result<(), String>;
 
     fn list_minions(

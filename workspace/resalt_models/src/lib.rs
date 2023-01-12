@@ -243,13 +243,24 @@ pub struct SaltToken {
 
 impl SaltToken {
     pub fn expired(&self) -> bool {
-        self.expire < chrono::Utc::now().timestamp() as f64
+        // Example: 1673048623.7256165
+        // Check if time has passed minus 5 seconds
+        let now = chrono::Utc::now().timestamp() as f64;
+        now > self.expire - 5.0
+    }
+
+    pub fn matured(&self) -> bool {
+        // Example: 1673048623.7256165
+        // Check if time since issued is greater than 10 minutes
+        let now = chrono::Utc::now().timestamp() as f64;
+        now > self.start + 600.0
     }
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct AuthStatus {
     pub user_id: String,
+    pub auth_token: String,
     pub salt_token: Option<SaltToken>,
 }
 
@@ -313,4 +324,28 @@ pub enum FilterOperand {
     GreaterThanOrEqual,
     #[serde(rename = "lte")]
     LessThanOrEqual,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SystemStatus {
+    pub salt: bool,
+    pub db: bool,
+    #[serde(rename = "dbAuthTokensTotal")]
+    pub db_auth_tokens_total: Option<i64>,
+    #[serde(rename = "dbAuthTokensActive")]
+    pub db_auth_tokens_active: Option<i64>,
+    #[serde(rename = "dbEventsTotal")]
+    pub db_events_total: Option<i64>,
+    #[serde(rename = "dbJobReturnsTotal")]
+    pub db_job_returns_total: Option<i64>,
+    #[serde(rename = "dbJobsTotal")]
+    pub db_jobs_total: Option<i64>,
+    #[serde(rename = "dbMinionsTotal")]
+    pub db_minions_total: Option<i64>,
+    #[serde(rename = "dbPermissionGroupUsersTotal")]
+    pub db_permission_group_users_total: Option<i64>,
+    #[serde(rename = "dbPermissionGroupsTotal")]
+    pub db_permission_groups_total: Option<i64>,
+    #[serde(rename = "dbUsersTotal")]
+    pub db_users_total: Option<i64>,
 }

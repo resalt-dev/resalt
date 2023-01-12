@@ -238,7 +238,7 @@
 		)
 			.then(() => {
 				updateData();
-				toasts.add(MessageType.SUCCESS, 'Update group', 'Updated group name!');
+				toasts.add(MessageType.SUCCESS, 'Update group', 'Updated group!');
 			})
 			.catch((err) => {
 				console.error(err);
@@ -807,7 +807,7 @@
 											<td style="width: 12rem;">
 												{#each minionTarget.modules as minionModule, mi}
 													{#if mi > 0}
-														<hr class="bg-light my-2" />
+														<hr class="text-light my-2" />
 													{/if}
 													<div class="input-group flex-nowrap">
 														<div class="form-floating">
@@ -848,7 +848,7 @@
 											<td>
 												{#each minionTarget.modules as minionModule, mi}
 													{#if mi > 0}
-														<hr class="bg-light my-2" />
+														<hr class="text-light my-2" />
 													{/if}
 													<div
 														class="input-group flex-nowrap width-fit-content"

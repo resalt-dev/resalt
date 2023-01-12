@@ -12,6 +12,7 @@ diesel = { version = "2.0.0", features = ["mysql", "chrono", "r2d2"] }
 diesel_migrations = "2.0.0"
 log = { version = "0.4.17" }
 rand = "0.8.5"
+resalt_config = { path = "../resalt_config" }
 resalt_models = { path = "../resalt_models" }
 resalt_security = { path = "../resalt_security" }
 resalt_storage = { path = "../resalt_storage" }

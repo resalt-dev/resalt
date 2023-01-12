@@ -18,7 +18,7 @@
 	<Col xs="10">
 		<MinionsFiltersBox {filters} {updateData} />
 
-		<hr class="bg-light" />
+		<hr class="text-light" />
 
 		<div>
 			<br />

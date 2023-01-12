@@ -1,7 +1,7 @@
 <script lang="ts">
 	import DashboardLayout from './layouts/Dashboard/DashboardLayout.svelte';
 	import PortalLayout from './layouts/Portal/PortalLayout.svelte';
-	import { getConfig } from './api';
+	import { ApiError, getConfig } from './api';
 	import { onMount } from 'svelte';
 	import { config, theme, toasts } from './stores';
 	import type Config from './models/Config';
@@ -64,11 +64,7 @@
 				config.set(null);
 				errorLoadingConfig = true;
 
-				toasts.add(
-					MessageType.ERROR,
-					'Critical API error',
-					'Failed to load config from server. Please try again later.',
-				);
+				toasts.add(MessageType.ERROR, 'Failed to load API Config', err);
 			});
 	});
 </script>
@@ -91,7 +87,14 @@
 		{#each $toasts as toast}
 			<Toast class="{'toast-' + toast.type} mb-2">
 				<ToastHeader>{toast.title}</ToastHeader>
-				<ToastBody>{toast.message}</ToastBody>
+				{#if toast.message instanceof ApiError}
+					<ToastBody>
+						<strong>Code: </strong>{toast.message.code}<br />
+						<strong>Data: </strong>{toast.message.message}
+					</ToastBody>
+				{:else}
+					<ToastBody>{toast.message}</ToastBody>
+				{/if}
 			</Toast>
 		{/each}
 	</div>

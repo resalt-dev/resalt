@@ -32,6 +32,9 @@
 	}
 
 	function fakePaginate() {
+		if ($keys === null) {
+			return;
+		}
 		keysView = $keys.slice(
 			paginationSize * (paginationPage - 1),
 			paginationSize * paginationPage,
