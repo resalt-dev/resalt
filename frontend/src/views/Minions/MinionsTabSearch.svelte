@@ -17,7 +17,7 @@
 	import { currentUser, theme, toasts } from '../../stores';
 	import MinionsFiltersBox from './MinionsFiltersBox.svelte';
 	import Clickable from '../../components/Clickable.svelte';
-	import { hasPermission, hasResaltPermission, P_MINION_REFRESH } from '../../perms';
+	import { hasResaltPermission, P_MINION_REFRESH } from '../../perms';
 
 	export let navigate: NavigateFn;
 	export let filters: Writable<Filter[]>;

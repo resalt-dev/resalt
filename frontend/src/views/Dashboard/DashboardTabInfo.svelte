@@ -33,7 +33,9 @@
 				<!-- welcome title -->
 				<h1 class="display-4">Welcome to Resalt!</h1>
 				<!-- subtitle -->
-				<p class="lead mb-0">This is the control panel for your Resalt instance.</p>
+				<p class="lead mb-0">
+					This is the control panel for your SaltStack infrastructure.
+				</p>
 				<!-- <br />
 				<br />
 				<Row>

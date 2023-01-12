@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { Button, Modal, ModalBody, ModalHeader, Table } from 'sveltestrap';
+	import { Alert, Button, Modal, ModalBody, ModalHeader, Table } from 'sveltestrap';
 	import CopyButton from '../../components/CopyButton.svelte';
 	import RunClientType from '../../models/RunClientType';
 	import type RunCommand from '../../models/RunCommand';
-	import { theme } from '../../stores';
+	import { currentUser, theme } from '../../stores';
+	import { hasPermission } from '../../perms';
 
 	export let command: RunCommand;
 	export let close: () => void;
@@ -88,7 +89,15 @@
 
 		<br />
 		<br />
-		<br />
+
+		{#if !hasPermission($currentUser, command.toPermissionTarget(), command.fun, command.arg, command.kwarg)}
+			<Alert color="warning" dismissible={false} fade={false}>
+				<strong>Warning!</strong> You likely don't have sufficient permissions to execute this
+				command. Please verify the target group and function name before proceeding. Please contact
+				a system administrator if unsure.
+			</Alert>
+			<br />
+		{/if}
 
 		<div class="text-center">
 			<Button color="warning" on:click={close}>Cancel</Button>

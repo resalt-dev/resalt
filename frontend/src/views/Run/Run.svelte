@@ -47,7 +47,7 @@
 {#each $returns as ret}
 	<TerminalBox
 		toggleCollapse={() => toggleCollapsedResult(ret.num)}
-		collapsed={!$collapsed.includes(ret.num)}
+		collapsed={$collapsed.includes(ret.num)}
 	>
 		<div slot="header">
 			<code class="fw-bold {$theme.dark ? '' : 'text-dark'}">
