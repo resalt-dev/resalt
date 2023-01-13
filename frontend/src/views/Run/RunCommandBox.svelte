@@ -4,24 +4,26 @@
 	import RunCommand from '../../models/RunCommand';
 	import { quoteSplit } from '../../utils';
 
+	const urlParams = new URLSearchParams(window.location.search);
+
 	export const validate = _validate;
 
 	type clientType = 'local' | 'runner' | 'wheel';
-	let clientTypeFieldValue: clientType = 'local';
+	let clientTypeFieldValue: clientType = (urlParams.get('client_type') as clientType) || 'local';
 	let clientTypeFieldError: boolean = false;
-	let targetTypeFieldValue: string = 'glob';
+	let targetTypeFieldValue: string = urlParams.get('target_type') || 'glob';
 	let targetTypeFieldError: boolean = false;
-	let targetFieldValue: string = '';
+	let targetFieldValue: string = urlParams.get('target') || '';
 	let targetFieldError: boolean = false;
-	let functionFieldValue: string = '';
+	let functionFieldValue: string = urlParams.get('fun') || '';
 	let functionFieldError: boolean = false;
-	let argsFieldValue: string = '';
+	let argsFieldValue: string = urlParams.get('arg') || '';
 	let argsFieldError: boolean = false;
-	let kwargsFieldValue: string = '';
+	let kwargsFieldValue: string = urlParams.get('kwarg') || '';
 	let kwargsFieldError: boolean = false;
-	let asyncFieldValue = false;
-	let batchFieldValue = false;
-	let batchSizeFieldValue: string = '';
+	let asyncFieldValue: boolean = urlParams.get('async') === 'true';
+	let batchFieldValue: boolean = urlParams.get('batch') === 'true';
+	let batchSizeFieldValue: string = urlParams.get('batch_size') || '';
 	let batchSizeFieldError: boolean = false;
 
 	function formToCommand(): RunCommand {

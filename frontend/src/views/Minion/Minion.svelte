@@ -25,7 +25,6 @@
 
 	// svelte-ignore unused-export-let
 	export let location: Location;
-	// svelte-ignore unused-export-let
 	export let navigate: NavigateFn;
 	export let minionId: string;
 	export let subPage: string = '';
@@ -49,7 +48,7 @@
 			label: 'General',
 			path: paths.minion.getPath(minionId),
 			component: MinionTabInfo,
-			data: { minion },
+			data: { minion, navigate },
 		},
 		{
 			key: 'grains',

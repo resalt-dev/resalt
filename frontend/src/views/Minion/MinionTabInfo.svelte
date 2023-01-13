@@ -1,9 +1,15 @@
 <script lang="ts">
+	import { Link, type NavigateFn } from 'svelte-navigator';
 	import type { Writable } from 'svelte/store';
-	import { Card, CardBody, CardHeader, Col, Row, Table } from 'sveltestrap';
+	import { Button, Card, CardBody, CardHeader, Col, Row, Table } from 'sveltestrap';
 	import CopyButton from '../../components/CopyButton.svelte';
+	import Icon from '../../components/Icon.svelte';
 	import type Minion from '../../models/Minion';
+	import paths from '../../paths';
+	import { hasResaltPermission, P_RUN_LIVE } from '../../perms';
+	import { currentUser, theme } from '../../stores';
 
+	export let navigate: NavigateFn;
 	export let minion: Writable<Minion>;
 
 	$: grains = JSON.parse($minion.grains ?? '{}');
@@ -28,7 +34,25 @@
 				<li class="list-group-item">
 					<strong class="align-middle">ID</strong>
 					<span class="float-end">
-						<span class="align-middle">{$minion.id}</span>
+						<span class="align-middle">
+							{$minion.id}
+						</span>{#if hasResaltPermission($currentUser, P_RUN_LIVE)}
+							<Link to={paths.run.getPath('live?target=' + $minion.id)}>
+								<Button
+									color={$theme.color}
+									size="sm"
+									class="ms-2"
+									style="margin-bottom: -0.15rem;margin-top: -0.15rem;"
+								>
+									<Icon
+										name="play"
+										size="1"
+										align="top"
+										style="padding-top: 0.15rem;"
+									/>
+								</Button>
+							</Link>
+						{/if}
 						<CopyButton name="Minion ID" value={$minion.id} />
 					</span>
 				</li>
@@ -66,9 +90,7 @@
 					<strong class="align-middle">Serial Number</strong>
 					<span class="float-end">
 						{#if grains.serialnumber}
-							<span class="align-middle">
-								{grains.serialnumber}
-							</span>
+							<span class="align-middle">{grains.serialnumber}</span>
 							<CopyButton name="Serial Number" value={grains.serialnumber} />
 						{:else}
 							<em>Unknown</em>

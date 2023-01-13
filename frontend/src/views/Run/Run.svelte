@@ -8,8 +8,9 @@
 
 	import RunTabLive from './RunTabLive.svelte';
 	import type RunResult from '../../models/RunResult';
-	import { theme } from '../../stores';
+	import { currentUser, theme } from '../../stores';
 	import TerminalBox from '../../components/TerminalBox.svelte';
+	import { hasResaltPermission, P_RUN_LIVE } from '../../perms';
 
 	// svelte-ignore unused-export-let
 	export let location: Location;
@@ -25,9 +26,10 @@
 		{
 			key: 'live',
 			label: 'Live Run',
-			path: paths.run.getPath(),
+			path: paths.run.getPath('live'),
 			component: RunTabLive,
 			data: { returns },
+			hidden: !hasResaltPermission($currentUser, P_RUN_LIVE),
 		},
 	];
 
