@@ -52,19 +52,19 @@
 			data: { minion },
 		},
 		{
+			key: 'grains',
+			label: 'Grains',
+			path: paths.minion.getPath(minionId, 'grains'),
+			component: MinionTabGrains,
+			data: { minion },
+		},
+		{
 			key: 'conformity',
 			label: 'Conformity',
 			path: paths.minion.getPath(minionId, 'conformity'),
 			component: MinionTabConformity,
 			data: { minion },
 			hidden: !hasResaltPermission($currentUser, P_MINION_CONFORMITY),
-		},
-		{
-			key: 'grains',
-			label: 'Grains',
-			path: paths.minion.getPath(minionId, 'grains'),
-			component: MinionTabGrains,
-			data: { minion },
 		},
 		{
 			key: 'pillars',
