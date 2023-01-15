@@ -5,6 +5,7 @@
 	export let page: number;
 	export let last: boolean;
 	export let updateData: () => void;
+	export let resizeable: boolean = true;
 
 	function paginateIncrement(): void {
 		if (last) {
@@ -53,32 +54,34 @@
 	>
 		&gt;
 	</div>
-	<div class="nav-item dropdown ms-3">
-		<span
-			class="nav-link text-white mouse-pointer"
-			id="dropdownPaginatePageSize"
-			role="button"
-			data-bs-toggle="dropdown"
-			aria-expanded="false"
-		>
-			Page size ({size})
-			<Icon name="caret-down" size="1.125" />
-		</span>
-		<ul
-			class="dropdown-menu dropdown-menu-dark ms-5 bg-secondary"
-			aria-labelledby="dropdownPaginatePageSize"
-		>
-			{#each [20, 50, 100, 250] as s}
-				<li>
-					<span
-						aria-hidden="true"
-						class="dropdown-item mouse-pointer {size === s ? 'fw-bold' : ''}"
-						on:click={() => setSize(s)}>{s}</span
-					>
-				</li>
-			{/each}
-		</ul>
-	</div>
+	{#if resizeable}
+		<div class="nav-item dropdown ms-3">
+			<span
+				class="nav-link text-white mouse-pointer"
+				id="dropdownPaginatePageSize"
+				role="button"
+				data-bs-toggle="dropdown"
+				aria-expanded="false"
+			>
+				Page size ({size})
+				<Icon name="caret-down" size="1.125" />
+			</span>
+			<ul
+				class="dropdown-menu dropdown-menu-dark ms-5 bg-secondary"
+				aria-labelledby="dropdownPaginatePageSize"
+			>
+				{#each [20, 50, 100, 250] as s}
+					<li>
+						<span
+							aria-hidden="true"
+							class="dropdown-item mouse-pointer {size === s ? 'fw-bold' : ''}"
+							on:click={() => setSize(s)}>{s}</span
+						>
+					</li>
+				{/each}
+			</ul>
+		</div>
+	{/if}
 	<div class="nav-link text-muted">
 		<small>
 			Showing page {page}

@@ -1159,4 +1159,72 @@ impl StorageImpl for StorageMySQL {
             .map_err(|e| format!("{:?}", e))?;
         Ok(())
     }
+
+    //////////////////////
+    /// Minion Presets ///
+    //////////////////////
+
+    fn insert_minion_preset(&self, name: &str, filter: &str) -> Result<String, String> {
+        let mut connection = self.create_connection()?;
+        let id = format!("pre_{}", uuid::Uuid::new_v4());
+        let minion_preset: SQLMinionPreset = MinionPreset {
+            id: id.clone(),
+            name: name.to_string(),
+            filter: filter.to_string(),
+        }
+        .into();
+        diesel::insert_into(minion_presets::table)
+            .values(&minion_preset)
+            .execute(&mut connection)
+            .map_err(|e| format!("{:?}", e))?;
+        Ok(id)
+    }
+
+    fn list_minion_presets(
+        &self,
+        search: Option<String>,
+        limit: Option<i64>,
+        offset: Option<i64>,
+    ) -> Result<Vec<MinionPreset>, String> {
+        let mut connection = self.create_connection()?;
+        let mut query = minion_presets::table.into_boxed();
+        if let Some(search) = search {
+            query = query.filter(minion_presets::name.like(format!("%{}%", search)));
+        }
+        query
+            .limit(limit.unwrap_or(100))
+            .offset(offset.unwrap_or(0))
+            .load::<SQLMinionPreset>(&mut connection)
+            .map_err(|e| format!("{:?}", e))
+            .map(|v| v.into_iter().map(|v| v.into()).collect())
+    }
+
+    fn get_minion_preset_by_id(&self, id: &str) -> Result<Option<MinionPreset>, String> {
+        let mut connection = self.create_connection()?;
+        minion_presets::table
+            .filter(minion_presets::id.eq(id))
+            .first::<SQLMinionPreset>(&mut connection)
+            .optional()
+            .map_err(|e| format!("{:?}", e))
+            .map(|v| v.map(|v| v.into()))
+    }
+
+    fn update_minion_preset(&self, minion_preset: &MinionPreset) -> Result<(), String> {
+        let mut connection = self.create_connection()?;
+        let minion_preset: SQLMinionPreset = minion_preset.clone().into();
+        diesel::update(minion_presets::table)
+            .set(&minion_preset)
+            .execute(&mut connection)
+            .map_err(|e| format!("{:?}", e))?;
+        Ok(())
+    }
+
+    fn delete_minion_preset(&self, id: &str) -> Result<(), String> {
+        let mut connection = self.create_connection()?;
+        diesel::delete(minion_presets::table)
+            .filter(minion_presets::id.eq(id))
+            .execute(&mut connection)
+            .map_err(|e| format!("{:?}", e))?;
+        Ok(())
+    }
 }

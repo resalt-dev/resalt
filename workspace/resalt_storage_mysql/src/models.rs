@@ -314,3 +314,31 @@ impl From<SQLPermissionGroupUser> for PermissionGroupUser {
         }
     }
 }
+
+#[derive(Clone, Debug, Identifiable, Insertable, PartialEq, Eq, Queryable, AsChangeset)]
+#[diesel(table_name = minion_presets)]
+pub struct SQLMinionPreset {
+    pub id: String,
+    pub name: String,
+    pub filter: String,
+}
+
+impl From<MinionPreset> for SQLMinionPreset {
+    fn from(minion_preset: MinionPreset) -> Self {
+        SQLMinionPreset {
+            id: minion_preset.id,
+            name: minion_preset.name,
+            filter: minion_preset.filter,
+        }
+    }
+}
+
+impl From<SQLMinionPreset> for MinionPreset {
+    fn from(sql_minion_preset: SQLMinionPreset) -> Self {
+        MinionPreset {
+            id: sql_minion_preset.id,
+            name: sql_minion_preset.name,
+            filter: sql_minion_preset.filter,
+        }
+    }
+}

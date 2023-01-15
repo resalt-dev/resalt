@@ -23,6 +23,7 @@
 	export let location: Location;
 	export let navigate: NavigateFn;
 	export let subPage: string = '';
+	export let selected: string = '';
 
 	const filters: Writable<Filter[]> = writable([
 		{
@@ -48,7 +49,7 @@
 			label: 'Presets',
 			path: paths.minions.getPath('presets'),
 			component: MinionsTabPresets,
-			data: { filters },
+			data: { filters, navigate, selected },
 			hidden: !hasResaltPermission($currentUser, P_MINION_PRESETS_LIST),
 		},
 		{

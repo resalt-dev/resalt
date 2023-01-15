@@ -232,3 +232,16 @@ pub struct MinionPreset {
     pub name: String,
     pub filter: String,
 }
+
+impl Serialize for MinionPreset {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut state = serializer.serialize_struct("MinionPreset", 3)?;
+        state.serialize_field("id", &self.id)?;
+        state.serialize_field("name", &self.name)?;
+        state.serialize_field("filter", &self.filter)?;
+        state.end()
+    }
+}

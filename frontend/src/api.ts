@@ -13,6 +13,7 @@ import type Filter from './models/Filter';
 import type RunCommand from './models/RunCommand';
 import AuthToken from './models/AuthToken';
 import SystemStatus from './models/SystemStatus';
+import MinionPreset from './models/MinionPreset';
 
 export class ApiError extends Error {
 	code: number;
@@ -233,6 +234,57 @@ export async function searchGrains(query: string, filters?: Filter[]): Promise<a
 		args.append('filter', encodeURIComponent(JSON.stringify(filters)));
 
 	return sendAuthenticatedRequest('GET', `/grains?${args.toString()}`);
+}
+
+///
+/// Minion Presets
+///
+
+export async function getMinionPresets(
+	search?: string,
+	limit?: number,
+	offset?: number,
+): Promise<Array<MinionPreset>> {
+	const args = new URLSearchParams();
+
+	if (search && search.length > 0) args.append('search', search);
+	if (limit) args.append('limit', limit.toString());
+	if (offset) args.append('offset', offset.toString());
+
+	return sendAuthenticatedRequest('GET', `/presets?${args.toString()}`).then(
+		(data: any[]) => data.map((item) => MinionPreset.fromObject(item)),
+	);
+}
+
+export async function createMinionPreset(
+	name: string,
+	filter: string,
+): Promise<MinionPreset> {
+	return sendAuthenticatedRequest('POST', '/presets', {
+		name,
+		filter,
+	}).then((data: any) => MinionPreset.fromObject(data));
+}
+
+export async function getMinionPresetById(id: string): Promise<MinionPreset> {
+	return sendAuthenticatedRequest('GET', `/presets/${id}`).then((data: any) =>
+		MinionPreset.fromObject(data),
+	);
+}
+
+export async function updateMinionPreset(
+	id: string,
+	name: string,
+	filter: string,
+): Promise<MinionPreset> {
+	return sendAuthenticatedRequest('PUT', `/presets/${id}`, {
+		name,
+		filter,
+	}).then((data: any) => MinionPreset.fromObject(data));
+}
+
+export async function deleteMinionPreset(id: string): Promise<void> {
+	return sendAuthenticatedRequest('DELETE', `/presets/${id}`);
 }
 
 ///

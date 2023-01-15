@@ -40,6 +40,14 @@ diesel::table! {
 }
 
 diesel::table! {
+    minion_presets (id) {
+        id -> Varchar,
+        name -> Varchar,
+        filter -> Varchar,
+    }
+}
+
+diesel::table! {
     minions (id) {
         id -> Varchar,
         last_seen -> Timestamp,
@@ -95,6 +103,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     events,
     job_returns,
     jobs,
+    minion_presets,
     minions,
     permission_group_users,
     permission_groups,

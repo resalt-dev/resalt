@@ -1,19 +1,3 @@
-/* eslint-disable camelcase */
-/* {
-    "id": Math.floor(Math.random() * 1000000) + "",
-    "lastSeen": new Date().toISOString().slice(0, 19),
-    "grains": null,
-    "pillars": null,
-    "pkgs": null,
-    "lastUpdated_grains": null,
-    "lastUpdatedPillars": null,
-    "lastUpdatedPkgs": null,
-    "conformity": null,
-    "conformitySuccess": 0,
-    "conformityIncorrect": 0,
-    "conformityError": 0,
-    "lastUpdatedConformity": null,
-} */
 export default class Minion {
 	static fromObject(data: any): Minion {
 		return new Minion(

@@ -96,7 +96,7 @@ const paths = {
 	]),
 
 	minion: new Path(30, 'minion', '/minion/:minionId/:subPage', 'Minion', null, null),
-	minions: new Path(31, 'minions', '/minions/:subPage', 'Minions', 'server', [
+	minions: new Path(31, 'minions', '/minions/:subPage/:selected', 'Minions', 'server', [
 		P_MINION_LIST,
 		P_MINION_PRESETS_LIST,
 		P_MINION_GRAINEXPLORER,

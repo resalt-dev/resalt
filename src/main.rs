@@ -136,6 +136,17 @@ async fn main() -> std::io::Result<()> {
                             .route("/{id}/refresh", web::post().to(route_minion_refresh_post))
                             .default_service(route_fallback_404),
                     )
+                    // presets
+                    .service(
+                        web::scope("/presets")
+                            .wrap(RequireAuth::new())
+                            .route("", web::get().to(route_presets_get))
+                            .route("", web::post().to(route_presets_post))
+                            .route("/{id}", web::get().to(route_preset_get))
+                            .route("/{id}", web::put().to(route_preset_put))
+                            .route("/{id}", web::delete().to(route_preset_delete))
+                            .default_service(route_fallback_404),
+                    )
                     // grains
                     .service(
                         web::scope("/grains")
