@@ -122,10 +122,8 @@ fn evaluate_function(
                 return true;
             }
             if let Some(value) = value.as_array() {
-                if value.len() == 0 {
-                    if args.len() != 0 {
-                        return false;
-                    }
+                if value.is_empty() && !args.is_empty() {
+                    return false;
                 }
                 // Test each arg in the permission argainst "args"
                 let mut result = true;
@@ -142,10 +140,8 @@ fn evaluate_function(
             if let Some(value) = value.as_object() {
                 if let Some(value) = value.get("args") {
                     if let Some(value) = value.as_array() {
-                        if value.len() == 0 {
-                            if args.len() != 0 {
-                                return false;
-                            }
+                        if value.is_empty() && !args.is_empty() {
+                            return false;
                         }
                         // Test each arg in the permission argainst "args"
                         for (i, value) in value.iter().enumerate() {
@@ -160,10 +156,8 @@ fn evaluate_function(
                 if let Some(value) = value.get("kwargs") {
                     if let Some(value) = value.as_object() {
                         let keys = value.keys().collect::<Vec<_>>();
-                        if keys.len() == 0 {
-                            if kwargs.len() != 0 {
-                                return false;
-                            }
+                        if keys.is_empty() && !kwargs.is_empty() {
+                            return false;
                         }
                         // Test each arg in the permission argainst "kwargs"
                         for key in keys {
@@ -179,7 +173,7 @@ fn evaluate_function(
             }
         }
     }
-    return false;
+    false
 }
 
 fn evaluate_target(
@@ -230,7 +224,7 @@ pub fn evaluate_permission(
         None => Vec::new(),
     };
     for permission in perms {
-        if evaluate_target(&permission, target, fun, &args, &kwargs) {
+        if evaluate_target(&permission, target, fun, args, kwargs) {
             return true;
         }
     }
