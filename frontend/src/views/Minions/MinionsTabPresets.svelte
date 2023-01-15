@@ -38,7 +38,6 @@
 
 <Row>
 	<Col xs="3">
-		<h2>Presets</h2>
 		<div class="table-responsive border-bottom-0 mb-3">
 			<Table class="b-0 mb-0">
 				<thead class="bg-dark border-0 text-white">
