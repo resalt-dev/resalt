@@ -1,10 +1,9 @@
 use std::collections::HashMap;
 
-use crate::components::*;
 use actix_web::web;
 use log::*;
 use regex::Regex;
-use resalt_models::User;
+use resalt_models::{ApiError, User};
 use resalt_storage::StorageImpl;
 use serde_json::Value;
 

@@ -1,10 +1,8 @@
 use actix_web::{
     http::header, web::Data, HttpMessage, HttpRequest, HttpResponse, Responder, Result,
 };
-use resalt_models::AuthStatus;
+use resalt_models::{ApiError, AuthStatus};
 use resalt_pipeline::PipelineServer;
-
-use crate::components::ApiError;
 
 pub async fn route_pipeline_get(
     pipeline: Data<PipelineServer>,

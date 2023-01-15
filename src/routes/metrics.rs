@@ -1,6 +1,6 @@
-use crate::components::*;
 use actix_web::{web, Responder, Result};
 use log::*;
+use resalt_models::ApiError;
 use resalt_storage::StorageImpl;
 
 pub async fn route_metrics_get(

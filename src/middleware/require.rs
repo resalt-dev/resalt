@@ -1,11 +1,10 @@
-use crate::components::ApiError;
 use actix_web::{
     dev::{forward_ready, Service, ServiceRequest, ServiceResponse, Transform},
     Error, HttpMessage,
 };
 use futures::future::{ok, Future, Ready};
 
-use resalt_models::AuthStatus;
+use resalt_models::{ApiError, AuthStatus};
 use std::pin::Pin;
 use std::rc::Rc;
 

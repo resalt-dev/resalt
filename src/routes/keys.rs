@@ -5,12 +5,9 @@ use resalt_salt::{SaltAPI, SaltError, SaltKeyState};
 use resalt_storage::StorageImpl;
 use serde::Deserialize;
 
-use crate::{
-    auth::{
-        has_resalt_permission, renew_token_salt_token, P_SALTKEY_ACCEPT, P_SALTKEY_DELETE,
-        P_SALTKEY_LIST, P_SALTKEY_REJECT,
-    },
-    components::*,
+use crate::auth::{
+    has_resalt_permission, renew_token_salt_token, P_SALTKEY_ACCEPT, P_SALTKEY_DELETE,
+    P_SALTKEY_LIST, P_SALTKEY_REJECT,
 };
 
 pub async fn route_keys_get(

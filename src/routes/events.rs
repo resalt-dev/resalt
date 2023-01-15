@@ -1,13 +1,10 @@
 use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
-use resalt_models::AuthStatus;
+use resalt_models::{ApiError, AuthStatus};
 use resalt_storage::StorageImpl;
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    auth::{has_resalt_permission, P_EVENT_LIST},
-    components::ApiError,
-};
+use crate::auth::{has_resalt_permission, P_EVENT_LIST};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct EventsListGetQuery {

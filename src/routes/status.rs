@@ -1,6 +1,5 @@
 use std::sync::{Arc, Mutex};
 
-use crate::components::*;
 use actix_web::{web, Responder, Result};
 use resalt_models::*;
 use resalt_salt::SaltEventListenerStatus;

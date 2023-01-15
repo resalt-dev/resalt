@@ -1,9 +1,10 @@
 use actix_web::{web, Responder, Result};
 use log::error;
 use resalt_config::SConfig;
+use resalt_models::ApiError;
 use serde::Serialize;
 
-use crate::{components::ApiError, update};
+use crate::update;
 
 #[allow(non_snake_case)]
 #[derive(Debug, Serialize)]

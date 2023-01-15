@@ -11,7 +11,6 @@ use routes::*;
 use tokio::task;
 
 mod auth;
-mod components;
 mod middleware;
 mod routes;
 mod scheduler;

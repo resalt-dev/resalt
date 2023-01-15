@@ -1,4 +1,4 @@
-use crate::{auth::*, components::*};
+use crate::auth::*;
 use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 use resalt_models::*;

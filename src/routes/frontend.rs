@@ -4,8 +4,7 @@ use actix_web::{
 };
 use include_dir::{include_dir, Dir};
 use log::*;
-
-use crate::components::ApiError;
+use resalt_models::ApiError;
 
 static FRONTEND_PUBLIC_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/frontend/build");
 

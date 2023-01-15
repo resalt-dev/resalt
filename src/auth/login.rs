@@ -6,8 +6,6 @@ use resalt_salt::SaltAPI;
 use resalt_security::verify_password;
 use resalt_storage::StorageImpl;
 
-use crate::components::*;
-
 use super::LdapHandler;
 
 #[allow(clippy::borrowed_box)]
