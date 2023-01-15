@@ -151,7 +151,7 @@
 				<hr class="text-light mt-5 mb-0" />
 
 				<a
-					href="https://discord.resalt.dev/"
+					href="https://resalt.dev/contribute#Feedback"
 					class="text-reset text-decoration-none"
 					target="_blank"
 					rel="noopener noreferrer"
