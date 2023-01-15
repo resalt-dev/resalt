@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { acceptKey, deleteKey, getKeys, rejectKey } from '../../api';
-	import { toasts } from '../../stores';
+	import { currentUser, toasts } from '../../stores';
 	import { Badge, Button, Card, Table } from 'sveltestrap';
 	import { writable, type Writable } from 'svelte/store';
 	import TablePaginate from '../../components/TablePaginate.svelte';
@@ -9,6 +9,12 @@
 	import type Key from '../../models/Key';
 	import { MessageType } from '../../models/MessageType';
 	import type { NavigateFn } from 'svelte-navigator';
+	import {
+		hasResaltPermission,
+		P_SALTKEY_ACCEPT,
+		P_SALTKEY_DELETE,
+		P_SALTKEY_REJECT,
+	} from '../../perms';
 
 	// svelte-ignore unused-export-let
 	export let location: Location;
@@ -131,45 +137,70 @@
 						<td>{key.finger}</td>
 						<td>
 							{#if key.state === 'minions'}
+								{#if hasResaltPermission($currentUser, P_SALTKEY_REJECT)}
+									<Button
+										color="warning"
+										size="sm"
+										class="key-btn me-1"
+										on:click={() => {
+											onClickReject(key);
+										}}
+									>
+										Reject
+									</Button>
+								{/if}
+							{:else if key.state === 'minions_pre'}
+								{#if hasResaltPermission($currentUser, P_SALTKEY_ACCEPT)}
+									<Button
+										color="success"
+										size="sm"
+										class="key-btn me-1"
+										on:click={() => {
+											onClickAccept(key);
+										}}
+									>
+										Accept
+									</Button>
+								{/if}
+							{:else if key.state === 'minions_rejected'}
+								{#if hasResaltPermission($currentUser, P_SALTKEY_ACCEPT)}
+									<Button
+										color="success"
+										size="sm"
+										class="key-btn me-1"
+										on:click={() => {
+											onClickAccept(key);
+										}}
+									>
+										Accept
+									</Button>
+								{/if}
+							{:else if key.state === 'minions_denied'}
+								{#if hasResaltPermission($currentUser, P_SALTKEY_ACCEPT)}
+									<Button
+										color="success"
+										size="sm"
+										class="key-btn me-1"
+										on:click={() => {
+											onClickAccept(key);
+										}}
+									>
+										Accept
+									</Button>
+								{/if}
+							{/if}
+							{#if hasResaltPermission($currentUser, P_SALTKEY_DELETE)}
 								<Button
-									color="warning"
+									color="danger"
 									size="sm"
-									class="key-btn me-1"
+									class="key-btn"
 									on:click={() => {
-										onClickReject(key);
-									}}>Reject</Button
-								>{:else if key.state === 'minions_pre'}
-								<Button
-									color="success"
-									size="sm"
-									class="key-btn me-1"
-									on:click={() => {
-										onClickAccept(key);
-									}}>Accept</Button
-								>{:else if key.state === 'minions_rejected'}
-								<Button
-									color="success"
-									size="sm"
-									class="key-btn me-1"
-									on:click={() => {
-										onClickAccept(key);
-									}}>Accept</Button
-								>{:else if key.state === 'minions_denied'}
-								<Button
-									color="success"
-									size="sm"
-									class="key-btn me-1"
-									on:click={() => {
-										onClickAccept(key);
-									}}>Accept</Button
-								>{/if}<Button
-								color="danger"
-								size="sm"
-								class="key-btn"
-								on:click={() => {
-									onClickDelete(key);
-								}}>Delete</Button
-							>
+										onClickDelete(key);
+									}}
+								>
+									Delete
+								</Button>
+							{/if}
 						</td>
 					</tr>
 				{/each}
