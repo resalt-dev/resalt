@@ -70,7 +70,8 @@ async function sendRequest(url: string, options: any): Promise<any> {
 	const res = await fetch(url, options);
 
 	if (res.status === 200) {
-		return await res.json();
+		const text = await res.text();
+		return JSON.parse(text);
 	} else {
 		const body = await res.text();
 		// Try parse JSON
