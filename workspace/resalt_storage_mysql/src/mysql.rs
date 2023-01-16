@@ -1214,6 +1214,7 @@ impl StorageImpl for StorageMySQL {
         let mut connection = self.create_connection()?;
         let minion_preset: SQLMinionPreset = minion_preset.clone().into();
         diesel::update(minion_presets::table)
+            .filter(minion_presets::id.eq(&minion_preset.id))
             .set(&minion_preset)
             .execute(&mut connection)
             .map_err(|e| format!("{:?}", e))?;

@@ -19,7 +19,7 @@
 	export let navigate: NavigateFn;
 	export let filters: Filter[];
 
-	let lastFilters: Filter[] = [];
+	let lastFilters: string = '[]';
 
 	let loading: boolean = true;
 	let minions: Minion[] | null = null;
@@ -33,10 +33,11 @@
 	$: updateData(filters);
 
 	function updateData(filters: Filter[]): void {
-		if (JSON.stringify(filters) === JSON.stringify(lastFilters)) {
+		const parsedFilters = JSON.stringify(filters);
+		if (lastFilters === parsedFilters) {
 			return;
 		}
-		lastFilters = filters;
+		lastFilters = parsedFilters;
 
 		loading = true;
 		getMinions(

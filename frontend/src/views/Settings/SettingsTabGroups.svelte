@@ -512,6 +512,8 @@
 									class={$selectedGroup?.id === group.id
 										? 'bg-' +
 										  $theme.color +
+										  ' border-' +
+										  $theme.color +
 										  ' text-' +
 										  ($theme.color === 'yellow' ? 'black' : 'white')
 										: ''}
@@ -521,6 +523,8 @@
 								<td
 									class={$selectedGroup?.id === group.id
 										? 'bg-' +
+										  $theme.color +
+										  ' border-' +
 										  $theme.color +
 										  ' text-' +
 										  ($theme.color === 'yellow' ? 'black' : 'white')

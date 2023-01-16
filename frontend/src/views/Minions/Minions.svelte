@@ -18,6 +18,7 @@
 		P_MINION_PRESETS_LIST,
 	} from '../../perms';
 	import { currentUser } from '../../stores';
+	import { onMount } from 'svelte';
 
 	// svelte-ignore unused-export-let
 	export let location: Location;
@@ -61,6 +62,20 @@
 			hidden: !hasResaltPermission($currentUser, P_MINION_GRAINEXPLORER),
 		},
 	];
+
+	onMount(() => {
+		filters.subscribe((filters) => {
+			console.log('filters', filters);
+			if (filters.length === 0) {
+				filters.push({
+					fieldType: FilterFieldType.NONE,
+					field: '',
+					operand: FilterOperand.CONTAINS,
+					value: '',
+				});
+			}
+		});
+	});
 </script>
 
 <Tabs {tabs} current={subPage} />
