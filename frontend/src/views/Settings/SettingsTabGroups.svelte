@@ -510,14 +510,20 @@
 							>
 								<th
 									class={$selectedGroup?.id === group.id
-										? 'bg-' + $theme.color + ' border-' + $theme.color
+										? 'bg-' +
+										  $theme.color +
+										  ' text-' +
+										  ($theme.color === 'yellow' ? 'black' : 'white')
 										: ''}
 								>
 									{group.name}
 								</th>
 								<td
 									class={$selectedGroup?.id === group.id
-										? 'bg-' + $theme.color + ' border-' + $theme.color
+										? 'bg-' +
+										  $theme.color +
+										  ' text-' +
+										  ($theme.color === 'yellow' ? 'black' : 'white')
 										: ''}
 								>
 									{group.users.length}
@@ -718,6 +724,7 @@
 														name="shield-quarter"
 														class="ms-4 text-danger"
 														size="1.75"
+														tooltip="This is a DANGEROUS permission and may cause SEVERE damage if abused."
 													/>
 												{/if}
 												{#if resaltPermission.warning}
@@ -725,6 +732,7 @@
 														name="shield-quarter"
 														class="ms-4 text-warning"
 														size="1.75"
+														tooltip="This is a WARNING permission and may cause MEDIUM damage if abused."
 													/>
 												{/if}</td
 											>

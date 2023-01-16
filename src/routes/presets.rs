@@ -4,7 +4,7 @@ use resalt_models::{ApiError, AuthStatus, MinionPreset};
 use resalt_storage::StorageImpl;
 use serde::{Deserialize, Serialize};
 
-use crate::auth::{has_resalt_permission, P_MINION_PRESETS_LIST};
+use crate::auth::{has_resalt_permission, P_MINION_PRESETS_LIST, P_MINION_PRESETS_MANAGE};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct PresetsListQuery {
@@ -54,7 +54,7 @@ pub async fn route_presets_post(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_resalt_permission(&data, &auth.user_id, P_MINION_PRESETS_LIST)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_MINION_PRESETS_MANAGE)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -65,12 +65,18 @@ pub async fn route_presets_post(
         return Err(ApiError::InvalidRequest);
     }
 
-    let preset = match data.insert_minion_preset(&name, &filter) {
+    let preset_id = match data.insert_minion_preset(&name, &filter) {
         Ok(preset) => preset,
         Err(e) => {
             error!("{:?}", e);
             return Err(ApiError::DatabaseError);
         }
+    };
+
+    let preset = MinionPreset {
+        id: preset_id,
+        name,
+        filter,
     };
 
     Ok(web::Json(preset))
@@ -124,7 +130,7 @@ pub async fn route_preset_put(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_resalt_permission(&data, &auth.user_id, P_MINION_PRESETS_LIST)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_MINION_PRESETS_MANAGE)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -171,7 +177,7 @@ pub async fn route_preset_delete(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_resalt_permission(&data, &auth.user_id, P_MINION_PRESETS_LIST)? {
+    if !has_resalt_permission(&data, &auth.user_id, P_MINION_PRESETS_MANAGE)? {
         return Err(ApiError::Forbidden);
     }
 

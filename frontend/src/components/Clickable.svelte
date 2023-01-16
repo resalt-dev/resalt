@@ -1,6 +1,6 @@
 <!-- a11y <div> which duplicates on:click to on:keypress -->
 <script lang="ts">
-	type A11yType = 'div' | 'span' | 'td' | 'th' | 'button';
+	type A11yType = 'div' | 'span' | 'tr' | 'td' | 'th' | 'button';
 	export let type: A11yType;
 	export let disabled: boolean = false;
 	let event: any, inputProps: any;
@@ -36,6 +36,10 @@
 	<span {...inputProps} on:click={wr(event)} on:keypress={wr(event)}>
 		<slot />
 	</span>
+{:else if type === 'tr'}
+	<tr {...inputProps} on:click={wr(event)} on:keypress={wr(event)}>
+		<slot />
+	</tr>
 {:else if type === 'td'}
 	<td {...inputProps} on:click={wr(event)} on:keypress={wr(event)}>
 		<slot />

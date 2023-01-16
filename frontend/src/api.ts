@@ -14,6 +14,7 @@ import type RunCommand from './models/RunCommand';
 import AuthToken from './models/AuthToken';
 import SystemStatus from './models/SystemStatus';
 import MinionPreset from './models/MinionPreset';
+import { FilterFieldType } from './models/FilterFieldType';
 
 export class ApiError extends Error {
 	code: number;
@@ -36,6 +37,16 @@ export class ApiError extends Error {
 	toString(): string {
 		return `${this.name}: ${this.message} (${this.code})`;
 	}
+}
+
+function filterFilters(filters: Filter[]): Filter[] {
+	return (
+		filters
+			.filter((f) => f.fieldType !== FilterFieldType.NONE)
+			.filter((f) => f.field !== '')
+			// Filter out where field is 'last_seen' and value is empty
+			.filter((f) => !(f.field === 'last_seen' && f.value === ''))
+	);
 }
 
 function getToken(): string {
@@ -198,15 +209,16 @@ export async function removeUserFromPermissionGroup(
 ///
 
 export async function getMinions(
-	filters?: Filter[],
+	filters: Filter[],
 	sort?: string,
 	limit?: number,
 	offset?: number,
 ): Promise<Array<Minion>> {
+	const filteredFilters = filterFilters(filters);
 	const args = new URLSearchParams();
 
-	if (filters && filters.length > 0)
-		args.append('filter', encodeURIComponent(JSON.stringify(filters)));
+	if (filteredFilters && filteredFilters.length > 0)
+		args.append('filter', encodeURIComponent(JSON.stringify(filteredFilters)));
 	if (sort) args.append('sort', sort);
 	if (limit) args.append('limit', limit.toString());
 	if (offset) args.append('offset', offset.toString());
@@ -226,12 +238,13 @@ export async function refreshMinion(minionId: string): Promise<void> {
 	await sendAuthenticatedRequest('POST', `/minions/${minionId}/refresh`);
 }
 
-export async function searchGrains(query: string, filters?: Filter[]): Promise<any[]> {
+export async function searchGrains(query: string, filters: Filter[]): Promise<any[]> {
+	const filteredFilters = filterFilters(filters);
 	const args = new URLSearchParams();
 
 	if (query) args.append('query', encodeURIComponent(query));
-	if (filters && filters.length > 0)
-		args.append('filter', encodeURIComponent(JSON.stringify(filters)));
+	if (filteredFilters && filteredFilters.length > 0)
+		args.append('filter', encodeURIComponent(JSON.stringify(filteredFilters)));
 
 	return sendAuthenticatedRequest('GET', `/grains?${args.toString()}`);
 }
@@ -256,14 +269,17 @@ export async function getMinionPresets(
 	);
 }
 
-export async function createMinionPreset(name: string, filter: string): Promise<MinionPreset> {
+export async function createMinionPreset(name: string, filters: Filter[]): Promise<MinionPreset> {
+	const filteredFilters = filterFilters(filters);
 	return sendAuthenticatedRequest('POST', '/presets', {
 		name,
-		filter,
+		filter: JSON.stringify(filteredFilters),
 	}).then((data: any) => MinionPreset.fromObject(data));
 }
 
 export async function getMinionPresetById(id: string): Promise<MinionPreset> {
+	if (!id) return Promise.reject('Invalid preset ID');
+	if (id.length === 0) return Promise.reject('Invalid preset ID');
 	return sendAuthenticatedRequest('GET', `/presets/${id}`).then((data: any) =>
 		MinionPreset.fromObject(data),
 	);
@@ -272,11 +288,12 @@ export async function getMinionPresetById(id: string): Promise<MinionPreset> {
 export async function updateMinionPreset(
 	id: string,
 	name: string,
-	filter: string,
+	filters: Filter[],
 ): Promise<MinionPreset> {
+	const filteredFilters = filterFilters(filters);
 	return sendAuthenticatedRequest('PUT', `/presets/${id}`, {
 		name,
-		filter,
+		filter: JSON.stringify(filteredFilters),
 	}).then((data: any) => MinionPreset.fromObject(data));
 }
 

@@ -19,9 +19,10 @@
 				.filter(Boolean)
 				.map((str) => {
 					return {
-						title: str.startsWith('usr_')
-							? str
-							: str.charAt(0).toUpperCase() + str.slice(1),
+						title:
+							str.indexOf('_') != -1
+								? str
+								: str.charAt(0).toUpperCase() + str.slice(1),
 						path: paths[str.toLowerCase()]?.getPath(),
 					};
 				});

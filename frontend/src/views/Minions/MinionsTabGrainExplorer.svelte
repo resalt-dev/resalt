@@ -9,9 +9,8 @@
 	import ResaltProgress from '../../components/ResaltProgress.svelte';
 	import TerminalBox from '../../components/TerminalBox.svelte';
 	import type Filter from '../../models/Filter';
-	import { FilterFieldType } from '../../models/FilterFieldType';
 	import { MessageType } from '../../models/MessageType';
-	import { toasts } from '../../stores';
+	import { theme, toasts } from '../../stores';
 	import MinionsFiltersBox from './MinionsFiltersBox.svelte';
 
 	export let filters: Writable<Filter[]>;
@@ -29,14 +28,7 @@
 		}
 
 		loading = true;
-		searchGrains(
-			grainQueryFieldValue,
-			$filters
-				.filter((f) => f.fieldType !== FilterFieldType.NONE)
-				.filter((f) => f.field !== '')
-				// Filter out where field is 'last_seen' and value is empty
-				.filter((f) => !(f.field === 'last_seen' && f.value === '')),
-		)
+		searchGrains(grainQueryFieldValue, $filters)
 			.then((data) => {
 				result = data;
 				loading = false;
@@ -85,8 +77,13 @@
 			</div>
 		</Col>
 		<Col xs="1" lg="6" xl="7">
-			<Button color="primary" class="py-3" on:click={updateData} disabled={loading}>
-				<Icon name="search" class="mx-2" size="1.5" />
+			<Button
+				color={null}
+				class="btn-{$theme.color} py-2"
+				on:click={updateData}
+				disabled={loading}
+			>
+				<Icon name="search" class="mx-1 mt-1 pt-2 pb-1" size="1.5" />
 			</Button>
 		</Col>
 	</Row>

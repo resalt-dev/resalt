@@ -6,9 +6,9 @@
 
 	export let tabs: TabPage[] = [];
 	export let current: string;
-	$: _current = current.length > 0 ? current : tabs[0].key;
-	$: _currentTab = tabs.findIndex(
-		(tab) => current.length === 0 || tab.key.toLowerCase() === current,
+	$: _currentTabKey = current.length > 0 ? current.split('/')[0] : tabs[0].key;
+	$: _currentTabIndex = tabs.findIndex(
+		(tab) => _currentTabKey.length === 0 || tab.key.toLowerCase() === _currentTabKey,
 	);
 </script>
 
@@ -16,9 +16,9 @@
 	{#each tabs.filter((tab) => !tab.hidden) as tab}
 		<Link
 			to={tab.path}
-			class="nav-link px-4 py-3 fw-bold mouse-pointer {tab.key === _current
+			class="nav-link px-4 py-3 fw-bold mouse-pointer {tab.key === _currentTabKey
 				? 'bg-' + $theme.color
-				: ''} {$theme.color === 'yellow' && tab.key === _current
+				: ''} {$theme.color === 'yellow' && tab.key === _currentTabKey
 				? 'text-dark'
 				: 'text-white'}"
 		>
@@ -29,7 +29,7 @@
 
 <Card class="mb-3 border border-4 border-{$theme.color} rounded-none bg-none">
 	<CardBody>
-		{#if _currentTab === -1 || tabs[_currentTab].hidden}
+		{#if _currentTabIndex === -1 || tabs[_currentTabIndex].hidden}
 			<!-- Either disled or no permissions. -->
 			<Alert color="warning" class="mb-0" fade={false}>
 				<h4 class="alert-heading">Unavailable</h4>
@@ -39,7 +39,10 @@
 				<Link to="/" class="link-dark">Return to home.</Link>
 			</Alert>
 		{:else}
-			<svelte:component this={tabs[_currentTab].component} {...tabs[_currentTab].data} />
+			<svelte:component
+				this={tabs[_currentTabIndex].component}
+				{...tabs[_currentTabIndex].data}
+			/>
 		{/if}
 	</CardBody>
 </Card>

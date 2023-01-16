@@ -40,7 +40,8 @@
 				<div class="px-4 py-3">
 					<Route path="dashboard/*subPage" component={Home} />
 					<Route path="minion/:minionId/*subPage" component={Minion} />
-					<Route path="minions/*subPage" component={Minions} />
+					<Route path="minions/:subPage/*selected" component={Minions} />
+					<Route path="minions" component={Minions} />
 					<Route path="run/*subPage" component={Run} />
 					<Route path="job/:jobId" component={Job} />
 					<Route path="jobs" component={Jobs} />

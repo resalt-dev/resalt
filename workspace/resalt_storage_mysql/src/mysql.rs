@@ -1192,6 +1192,7 @@ impl StorageImpl for StorageMySQL {
             query = query.filter(minion_presets::name.like(format!("%{}%", search)));
         }
         query
+            .order(minion_presets::name.asc())
             .limit(limit.unwrap_or(100))
             .offset(offset.unwrap_or(0))
             .load::<SQLMinionPreset>(&mut connection)

@@ -19,6 +19,8 @@
 	export let navigate: NavigateFn;
 	export let filters: Filter[];
 
+	let lastFilters: Filter[] = [];
+
 	let loading: boolean = true;
 	let minions: Minion[] | null = null;
 	let refreshing: string[] = [];
@@ -31,13 +33,14 @@
 	$: updateData(filters);
 
 	function updateData(filters: Filter[]): void {
+		if (JSON.stringify(filters) === JSON.stringify(lastFilters)) {
+			return;
+		}
+		lastFilters = filters;
+
 		loading = true;
 		getMinions(
-			filters
-				.filter((f) => f.fieldType !== FilterFieldType.NONE)
-				.filter((f) => f.field !== '')
-				// Filter out where field is 'last_seen' and value is empty
-				.filter((f) => !(f.field === 'last_seen' && f.value === '')),
+			filters,
 			sortField === null ? null : sortField + '.' + sortOrder,
 			paginationSize,
 			(paginationPage - 1) * paginationSize,
