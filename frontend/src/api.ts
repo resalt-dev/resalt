@@ -251,15 +251,12 @@ export async function getMinionPresets(
 	if (limit) args.append('limit', limit.toString());
 	if (offset) args.append('offset', offset.toString());
 
-	return sendAuthenticatedRequest('GET', `/presets?${args.toString()}`).then(
-		(data: any[]) => data.map((item) => MinionPreset.fromObject(item)),
+	return sendAuthenticatedRequest('GET', `/presets?${args.toString()}`).then((data: any[]) =>
+		data.map((item) => MinionPreset.fromObject(item)),
 	);
 }
 
-export async function createMinionPreset(
-	name: string,
-	filter: string,
-): Promise<MinionPreset> {
+export async function createMinionPreset(name: string, filter: string): Promise<MinionPreset> {
 	return sendAuthenticatedRequest('POST', '/presets', {
 		name,
 		filter,
