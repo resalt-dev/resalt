@@ -1,4 +1,4 @@
-import Filter from "./Filter";
+import Filter from './Filter';
 
 export default class MinionPreset {
 	static fromObject(data: any): MinionPreset {
@@ -11,11 +11,11 @@ export default class MinionPreset {
 					filters.push(Filter.fromObject(f));
 				}
 			} else {
-				console.warn("Invalid filter data, expected array");
+				console.warn('Invalid filter data, expected array');
 				invalidData = true;
 			}
 		} catch (e) {
-			console.warn("Failed to parse filter data:", e);
+			console.warn('Failed to parse filter data:', e);
 			invalidData = true;
 		}
 		return new MinionPreset(data.id, data.name, filters, invalidData);
