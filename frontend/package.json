@@ -16,7 +16,7 @@
 	},
 	"devDependencies": {
 		"@codemirror/lang-json": "^6.0.0",
-		"@codemirror/language": "^6.2.1",
+		"@codemirror/language": "^6.4.0",
 		"@codemirror/state": "^6.1.1",
 		"@codemirror/view": "^6.2.3",
 		"@eonasdan/tempus-dominus": "^6.2.10",
