@@ -19,7 +19,7 @@ struct ApiConfig {
 }
 
 pub async fn route_config_get() -> Result<impl Responder, ApiError> {
-    let update_info = update::get_update_cache().await;
+    let update_info = update::get_update_cache(false).await;
     let config = ApiConfig {
         authForwardEnabled: SConfig::auth_forward_enabled(),
         currentVersion: update::CURRENT_VERSION.to_string(),

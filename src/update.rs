@@ -12,12 +12,14 @@ const UPDATE_URL: &str = "https://secure.resalt.dev/Cargo.toml";
 pub struct UpdateInfo {
     pub version: Option<String>,
     pub news: Option<Vec<String>>,
+    fetch_time: i64,
 }
 
 lazy_static! {
     static ref CACHE: Arc<Mutex<UpdateInfo>> = Arc::new(Mutex::new(UpdateInfo {
         version: None,
-        news: None
+        news: None,
+        fetch_time: 0,
     }));
     pub static ref CURRENT_VERSION: String = env!("CARGO_PKG_VERSION").to_string();
 }
@@ -108,14 +110,19 @@ async fn fetch_remote_info() -> Result<UpdateInfo, String> {
     Ok(UpdateInfo {
         version: Some(version),
         news: Some(news),
+        // current timestamp
+        fetch_time: chrono::Utc::now().timestamp(),
     })
 }
 
-pub async fn get_update_cache() -> UpdateInfo {
+pub async fn get_update_cache(force: bool) -> UpdateInfo {
     // Drop CACHE MutexGuard lock inbetween of fetching remote version and setting it in the cache
-    {
+    if !force {
         let update_info = CACHE.lock().unwrap();
-        if update_info.version.is_some() && update_info.news.is_some() {
+        let current_time = chrono::Utc::now().timestamp();
+        let time_diff = current_time - update_info.fetch_time;
+        // Check if 1 hour + 5 minutes has passed
+        if update_info.version.is_some() && update_info.news.is_some() && time_diff < 3900 {
             return update_info.clone();
         }
     }
@@ -126,6 +133,7 @@ pub async fn get_update_cache() -> UpdateInfo {
             return UpdateInfo {
                 version: None,
                 news: None,
+                fetch_time: 0,
             };
         }
     };

@@ -33,7 +33,7 @@ impl Scheduler {
             let ls = task::LocalSet::new();
             ls.block_on(&rt, async {
                 // run update check
-                update::get_update_cache().await;
+                update::get_update_cache(true).await;
             });
         });
     }
