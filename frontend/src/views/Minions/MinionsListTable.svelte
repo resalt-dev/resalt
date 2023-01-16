@@ -29,11 +29,11 @@
 	let paginationSize: number = 20;
 	let paginationPage: number = 1;
 	$: active = sortField + ':' + sortOrder;
-	$: updateData(filters);
+	$: updateData(filters, false);
 
-	function updateData(filters: Filter[]): void {
+	function updateData(filters: Filter[], force: boolean): void {
 		const parsedFilters = JSON.stringify(filters);
-		if (lastFilters === parsedFilters) {
+		if (lastFilters === parsedFilters && !force) {
 			return;
 		}
 		lastFilters = parsedFilters;
@@ -72,7 +72,7 @@
 
 		console.log('toggleSort', field, order, sortField, sortOrder);
 
-		updateData(filters);
+		updateData(filters, true);
 	}
 
 	function resync(minionId: string) {
@@ -80,7 +80,7 @@
 		refreshMinion(minionId)
 			.then(() => {
 				refreshing = refreshing.filter((id) => id !== minionId);
-				updateData(filters);
+				updateData(filters, true);
 			})
 			.catch((err) => {
 				toasts.add(MessageType.ERROR, 'Failed resyncing minion', err);
@@ -206,7 +206,7 @@
 								name="refresh"
 								class="float-end hover-icon mouse-pointer"
 								on:click={() => {
-									updateData(filters);
+									updateData(filters, true);
 								}}
 							/>
 						</div>
@@ -314,7 +314,7 @@
 	bind:size={paginationSize}
 	bind:page={paginationPage}
 	last={minions === null || minions.length < paginationSize}
-	updateData={() => updateData(filters)}
+	updateData={() => updateData(filters, true)}
 />
 
 {#if loading}
