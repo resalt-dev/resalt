@@ -11,6 +11,7 @@
 	import paths from '../../paths';
 	import { theme } from '../../stores';
 	import MinionsFiltersBox from './MinionsFiltersBox.svelte';
+	import MinionsListTable from './MinionsListTable.svelte';
 
 	export let navigate: NavigateFn;
 	export let filters: Writable<Filter[]>;
@@ -85,15 +86,10 @@
 		</div>
 	</Col>
 	<Col xs="9">
-		<MinionsFiltersBox {filters} {updateData} />
+		<MinionsFiltersBox {filters} />
 
 		<hr class="text-light" />
 
-		<div>
-			<br />
-			Implementation in progress. "Presets" will allow you to save collections of filters for quicker
-			access. Presets can be used as a target for scheduling and running jobs.
-			<br /><br />
-		</div>
+		<MinionsListTable {navigate} filters={$filters} />
 	</Col>
 </Row>

@@ -8,14 +8,11 @@
 	import Icon from '../../components/Icon.svelte';
 	import type Filter from '../../models/Filter';
 	import { theme } from '../../stores';
-	import type { Unsubscriber, Writable } from 'svelte/store';
+	import type { Writable } from 'svelte/store';
 
 	export let filters: Writable<Filter[]>;
-	export let updateData: () => void;
 
 	const pickers: TempusDominus[] = [];
-	let unsub: Unsubscriber | null;
-	let hasRendered: boolean = false;
 
 	function addFilter(): void {
 		filters.update((f) => [
@@ -142,23 +139,11 @@
 
 	afterUpdate(() => {
 		createDateTimePickers();
-		hasRendered = true;
 	});
 
 	onMount(() => {
 		// Enable customDateFormat plugin in Tempus Dominus (datepicker)
 		extend(customDateFormat, undefined);
-		unsub = filters.subscribe(() => {
-			if (hasRendered) {
-				updateData();
-			}
-		});
-	});
-
-	onDestroy(() => {
-		if (unsub) {
-			unsub();
-		}
 	});
 </script>
 

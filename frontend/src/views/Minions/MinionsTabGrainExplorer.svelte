@@ -65,7 +65,7 @@
 	}
 </script>
 
-<MinionsFiltersBox {filters} {updateData} />
+<MinionsFiltersBox {filters} />
 
 <hr class="text-light" />
 
