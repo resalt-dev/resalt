@@ -61,7 +61,7 @@ pub async fn route_presets_post(
     let name = body.name.clone();
     let filter = body.filter.clone();
 
-    if name.len() == 0 || filter.len() == 0 || name.len() > 100 || filter.len() > 65535 {
+    if name.is_empty() || filter.is_empty() || name.len() > 100 || filter.len() > 65535 {
         return Err(ApiError::InvalidRequest);
     }
 
@@ -132,7 +132,7 @@ pub async fn route_preset_put(
     let name = body.name.clone();
     let filter = body.filter.clone();
 
-    if name.len() == 0 || filter.len() == 0 || name.len() > 100 || filter.len() > 65535 {
+    if name.is_empty() || filter.is_empty() || name.len() > 100 || filter.len() > 65535 {
         return Err(ApiError::InvalidRequest);
     }
 
@@ -150,11 +150,7 @@ pub async fn route_preset_put(
         None => return Err(ApiError::NotFound),
     }
 
-    let preset = MinionPreset {
-        id: id.clone(),
-        name: name.clone(),
-        filter: filter.clone(),
-    };
+    let preset = MinionPreset { id, name, filter };
 
     match data.update_minion_preset(&preset) {
         Ok(_) => {}
