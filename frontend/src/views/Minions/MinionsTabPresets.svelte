@@ -38,6 +38,9 @@
 
 	function loadPreset(presetId: string): void {
 		if (!presetId || presetId.length === 0) {
+			if (!presets || presets.length === 0) {
+				updateData();
+			}
 			return;
 		}
 
