@@ -1,10 +1,12 @@
 <script lang="ts">
 	import type { Writable } from 'svelte/store';
-	import { Col, Input, Label, Row } from 'sveltestrap';
+	import { Button, Col, Input, Label, Row } from 'sveltestrap';
 	import { searchGrains } from '../../api';
 	import ConsoleChangeBranch from '../../components/ConsoleChangeBranch.svelte';
 	import FloatingRightButton from '../../components/FloatingRightButton.svelte';
+	import Icon from '../../components/Icon.svelte';
 	import JsonViewer from '../../components/JsonViewer.svelte';
+	import ResaltProgress from '../../components/ResaltProgress.svelte';
 	import TerminalBox from '../../components/TerminalBox.svelte';
 	import type Filter from '../../models/Filter';
 	import { FilterFieldType } from '../../models/FilterFieldType';
@@ -69,22 +71,32 @@
 
 <hr class="text-light" />
 
-<Row>
-	<Col xs="12" lg="6" xl="5">
-		<div class="form-floating mb-0">
-			<Input
-				id="grainQuery"
-				type="text"
-				invalid={grainQueryFieldError}
-				bind:value={grainQueryFieldValue}
-				on:blur={updateData}
-			/>
-			<Label for="grainQuery">Grain Query (JSONPath)</Label>
-		</div>
-	</Col>
-</Row>
+<form action="javascript:void(0);" autocomplete="true">
+	<Row>
+		<Col xs="11" lg="6" xl="5">
+			<div class="form-floating mb-0">
+				<Input
+					id="grainQuery"
+					type="text"
+					invalid={grainQueryFieldError}
+					bind:value={grainQueryFieldValue}
+				/>
+				<Label for="grainQuery">Grain Query (JSONPath)</Label>
+			</div>
+		</Col>
+		<Col xs="1" lg="6" xl="7">
+			<Button color="primary" class="py-3" on:click={updateData} disabled={loading}>
+				<Icon name="search" class="mx-2" size="1.5" />
+			</Button>
+		</Col>
+	</Row>
+</form>
 
 <hr class="text-light" />
+
+{#if loading}
+	<ResaltProgress />
+{/if}
 
 <FloatingRightButton
 	onclick={() => (rawData = !rawData)}
