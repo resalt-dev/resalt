@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { writable, type Writable } from 'svelte/store';
 	import ConsoleChangeBranch from '../../components/ConsoleChangeBranch.svelte';
 	import TerminalBox from '../../components/TerminalBox.svelte';
 

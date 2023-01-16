@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Link, type NavigateFn } from 'svelte-navigator';
+	import { Link } from 'svelte-navigator';
 	import type { Writable } from 'svelte/store';
 	import { Button, Card, CardBody, CardHeader, Col, Row, Table } from 'sveltestrap';
 	import CopyButton from '../../components/CopyButton.svelte';
@@ -9,7 +9,6 @@
 	import { hasResaltPermission, P_RUN_LIVE } from '../../perms';
 	import { currentUser, theme } from '../../stores';
 
-	export let navigate: NavigateFn;
 	export let minion: Writable<Minion>;
 
 	$: grains = JSON.parse($minion.grains ?? '{}');

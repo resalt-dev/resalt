@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { afterUpdate, beforeUpdate, onDestroy, onMount } from 'svelte';
+	import { afterUpdate, beforeUpdate, onMount } from 'svelte';
 	import { Button, Col, Input, Label, Row } from 'sveltestrap';
 	import { FilterFieldType } from '../../models/FilterFieldType';
 	import { FilterOperand } from '../../models/FilterOperand';

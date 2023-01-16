@@ -8,7 +8,6 @@
 	import SortIcon from '../../components/SortIcon.svelte';
 	import TablePaginate from '../../components/TablePaginate.svelte';
 	import type Filter from '../../models/Filter';
-	import { FilterFieldType } from '../../models/FilterFieldType';
 	import { MessageType } from '../../models/MessageType';
 	import type Minion from '../../models/Minion';
 	import { SortOrder } from '../../models/SortOrder';
