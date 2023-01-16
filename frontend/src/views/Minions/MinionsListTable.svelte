@@ -13,7 +13,7 @@
 	import type Minion from '../../models/Minion';
 	import { SortOrder } from '../../models/SortOrder';
 	import paths from '../../paths';
-	import { hasResaltPermission, P_MINION_REFRESH } from '../../perms';
+	import { hasResaltPermission, P_MINION_CONFORMITY, P_MINION_REFRESH } from '../../perms';
 	import { currentUser, theme, toasts } from '../../stores';
 
 	export let navigate: NavigateFn;
@@ -240,17 +240,44 @@
 							{#if minion.lastUpdatedConformity === null}
 								<span class="badge bg-purple"> Unknown </span>
 							{:else}
-								<span class="badge bg-success">
+								<Clickable
+									type="span"
+									event={() =>
+										navigate(paths.minion.getPath(minion.id, 'conformity'))}
+									disabled={!hasResaltPermission(
+										$currentUser,
+										P_MINION_CONFORMITY,
+									)}
+									class="badge bg-success"
+								>
 									{minion.conformitySuccess ?? '?'}
-								</span>
+								</Clickable>
 								/
-								<span class="badge bg-warning">
+								<Clickable
+									type="span"
+									event={() =>
+										navigate(paths.minion.getPath(minion.id, 'conformity'))}
+									disabled={!hasResaltPermission(
+										$currentUser,
+										P_MINION_CONFORMITY,
+									)}
+									class="badge bg-warning"
+								>
 									{minion.conformityIncorrect ?? '?'}
-								</span>
+								</Clickable>
 								/
-								<span class="badge bg-danger">
+								<Clickable
+									type="span"
+									event={() =>
+										navigate(paths.minion.getPath(minion.id, 'conformity'))}
+									disabled={!hasResaltPermission(
+										$currentUser,
+										P_MINION_CONFORMITY,
+									)}
+									class="badge bg-danger"
+								>
 									{minion.conformityError ?? '?'}
-								</span>
+								</Clickable>
 							{/if}
 						</td>
 						<td>
