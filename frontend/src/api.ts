@@ -93,15 +93,18 @@ async function sendRequest(url: string, options: any): Promise<any> {
 	}
 }
 
-async function sendAuthenticatedRequest(method: string, path: string, body?: any): Promise<any> {
+async function sendAuthenticatedRequest(method: string, path: string, data?: any): Promise<any> {
 	const token = getToken();
+	console.log('Sending authenticated request', method, path, data);
+	let body = data ? JSON.stringify(data) : undefined;
+	console.log('Sending body', body);
 	return await sendRequest(constants.apiUrl + path, {
 		method,
 		headers: {
 			'Content-Type': 'application/json',
 			Authorization: `Bearer ${token}`,
 		},
-		body: body ? JSON.stringify(body) : undefined,
+		body,
 	});
 }
 
@@ -334,13 +337,14 @@ export async function getJobs(sort?: string, limit?: number, offset?: number): P
 }
 
 export async function runJob(command: RunCommand): Promise<any> {
+	console.log(command);
 	return sendAuthenticatedRequest('POST', '/jobs', {
 		client: command.client,
 		tgtType: command.targetType,
 		tgt: command.target,
 		fun: command.fun,
 		arg: command.arg,
-		kwarg: command.kwarg,
+		kwarg: Object.fromEntries(command.kwarg), // Map<>'s are invisible to JSON.stringify
 		batchSize: command.batchSize,
 	});
 }
