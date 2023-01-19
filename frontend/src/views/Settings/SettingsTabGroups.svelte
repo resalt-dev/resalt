@@ -449,10 +449,24 @@
 				changed = true;
 			}
 
+			// Check if value is '*', which should be '.*'
+			if (minion.target === '*') {
+				permissionMinionsFieldsError = true;
+				minion.error = true;
+				changed = true;
+			}
+
 			// Loop over all modules
 			for (let minionModule of minion.modules) {
 				// Check if length is 0
-				if (minionModule.moduleId.length === 0) {
+				if (minionModule.name.length === 0) {
+					permissionMinionsFieldsError = true;
+					minionModule.error = true;
+					changed = true;
+				}
+
+				// Check if value is '*', which should be '.*'
+				if (minionModule.name === '*') {
 					permissionMinionsFieldsError = true;
 					minionModule.error = true;
 					changed = true;
@@ -829,7 +843,9 @@
 																style="height: 2.5rem;"
 																disabled={$selectedGroup.name ===
 																	'$superadmins'}
+																invalid={minionModule.error}
 																bind:value={minionModule.name}
+																on:blur={validatePermissionMinionTargetsFields}
 															/>
 															<Label style="padding-top: 0.4rem;">
 																Module
@@ -874,6 +890,7 @@
 																	disabled={$selectedGroup.name ===
 																		'$superadmins'}
 																	bind:value={arg}
+																	on:blur={validatePermissionMinionTargetsFields}
 																/>
 																<Label style="padding-top: 0.4rem;">
 																	Arg {ai}
@@ -962,9 +979,40 @@
 									<code>".*"</code> to match all minions.
 								</Alert>
 							{/if}
+							<!-- Display warning if any has "*" as module, instead of ".*" -->
+							{#if $permissionMinionsFields.some( (mt) => mt.modules.some((mtm) => mtm.name === '*'), )}
+								<Alert
+									color="warning"
+									dismissible={false}
+									fade={false}
+									class="mt-3"
+								>
+									<strong>Warning!</strong> One or more minion targets have a
+									module of <code>"*"</code> instead of <code>".*"</code>.
+									<br />
+									This will not match any modules. Please change the module to
+									<code>".*"</code> to match all modules.
+								</Alert>
+							{/if}
 						</Col>
 						<Col class="ps-3 mb-0" xs="12">
 							<h3>Actions</h3>
+							{#if groupNameFieldError}
+								<Alert color="danger">
+									<strong>Invalid group name.</strong>
+								</Alert>
+							{/if}
+							{#if groupLdapSyncFieldError}
+								<Alert color="danger">
+									<strong>Invalid LDAP sync DN.</strong>
+								</Alert>
+							{/if}
+							{#if permissionMinionsFieldsError}
+								<Alert color="danger">
+									<strong>Invalid minion permissions.</strong>
+								</Alert>
+							{/if}
+
 							<Button
 								color="primary"
 								disabled={$selectedGroup.name === '$superadmins'}
