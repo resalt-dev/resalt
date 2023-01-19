@@ -22,7 +22,7 @@ members = [
 ]
 
 [dependencies]
-# Own Modules
+# Own modules
 resalt_config = { path = "workspace/resalt_config" }
 resalt_models = { path = "workspace/resalt_models" }
 resalt_pipeline = { path = "workspace/resalt_pipeline" }
