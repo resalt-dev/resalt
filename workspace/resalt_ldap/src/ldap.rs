@@ -62,16 +62,10 @@ impl LdapHandler {
         Ok(ldap)
     }
 
-    /**
-     * Find the DN of a user in LDAP.
-     * @param query The username to search for.
-     * @returns The user's LdapUser object if found, None otherwise.
-     */
-    pub async fn lookup_user_by_username(query: &str) -> Result<Option<LdapUser>, LdapError> {
+    async fn lookup_user(user_filter: String) -> Result<Option<LdapUser>, LdapError> {
         let mut service_ldap = LdapHandler::create_system_connection().await?;
 
         let base_dn = SConfig::auth_ldap_base_dn();
-        let user_filter = SConfig::auth_ldap_user_filter().replace("%s", query);
         let user_attribute = SConfig::auth_ldap_user_attribute();
         let email_attribute = String::from("mail"); // Same in both OpenLDAP and Active Directory
         let group_attribute = String::from("memberOf"); // Same in both OpenLDAP and Active Directory
@@ -120,13 +114,19 @@ impl LdapHandler {
         }))
     }
 
-    /**
-     * Authenticate a user with LDAP.
-     *
-     * @param username The username of the user.
-     * @param password The password of the user.
-     * @returns The user's LdapUser object if authentication was successful, None otherwise.
-     */
+    /// Lookup a user by their username
+    pub async fn lookup_user_by_username(query: &str) -> Result<Option<LdapUser>, LdapError> {
+        let user_filter = SConfig::auth_ldap_user_filter().replace("%s", query);
+        LdapHandler::lookup_user(user_filter).await
+    }
+
+    /// Lookup a user by their DN
+    pub async fn lookup_user_by_dn(query: &str) -> Result<Option<LdapUser>, LdapError> {
+        let user_filter = format!("(distinguishedName={})", query);
+        LdapHandler::lookup_user(user_filter).await
+    }
+
+    /// Authenticate a user by their username and password
     pub async fn authenticate(
         username: &str,
         password: &str,

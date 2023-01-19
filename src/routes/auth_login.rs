@@ -40,17 +40,12 @@ pub async fn route_auth_login_post(
         };
 
         // Fetch user to see if they exist
-        let user = match data.get_user_by_username(&username) {
-            Ok(user) => user,
-            Err(e) => {
-                error!("{:?}", e);
-                return Err(ApiError::DatabaseError);
-            }
-        };
-        match user {
-            Some(user) => user,
-            None => {
-                // Create user
+        match data.get_user_by_username(&username) {
+            // User EXISTS
+            Ok(Some(user)) => user,
+            // User DOES NOT exist, but we are in AuthForward, so create user
+            Ok(None) => {
+                // Check if we are in LDAP or not
                 let (username, email, ldap_sync) = match SConfig::auth_ldap_enabled() {
                     true => {
                         // Fetch user from LDAP
@@ -65,9 +60,11 @@ pub async fn route_auth_login_post(
                             }
                         }
                     }
+                    // We are not in LDAP, so just return username and empty on the others
                     false => (username, None, None),
                 };
 
+                // Create user
                 match data.create_user(username, None, email, ldap_sync) {
                     Ok(user) => user,
                     Err(e) => {
@@ -75,6 +72,11 @@ pub async fn route_auth_login_post(
                         return Err(ApiError::DatabaseError);
                     }
                 }
+            }
+            // ERROR from Database, which is critical, so return error
+            Err(e) => {
+                error!("{:?}", e);
+                return Err(ApiError::DatabaseError);
             }
         }
     } else {
