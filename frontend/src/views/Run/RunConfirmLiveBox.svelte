@@ -100,7 +100,7 @@
 		{/if}
 
 		<div class="text-center">
-			<Button color="warning" on:click={close}>Cancel</Button>
+			<Button color="warning" on:click={close} class="me-2">Cancel</Button>
 			<Button color="danger" on:click={execute}>Execute</Button>
 		</div>
 	</ModalBody>
