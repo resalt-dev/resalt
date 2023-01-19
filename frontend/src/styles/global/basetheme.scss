@@ -604,6 +604,11 @@ samp {
 	border-color: var(--black);
 	color: var(--white);
 }
+.alert-red, .alert-danger {
+	code {
+		color: var(--dark);
+	}
+}
 
 .bg-red {
 	background-color: var(--red) !important;
