@@ -34,7 +34,8 @@
 
 	function sortJSON(o: any): any {
 		if (Array.isArray(o)) {
-			return o.sort().map(sortJSON);
+			// Do NOT sort arrays
+			return o;
 		} else if (isObject(o)) {
 			return Object.keys(o)
 				.sort()
@@ -48,8 +49,12 @@
 	}
 
 	function createJSONView() {
+		let clone = data ? JSON.parse(JSON.stringify(data)) : undefined;
+		if (clone && sort) {
+			clone = sortJSON(clone);
+		}
 		let state = EditorState.create({
-			doc: JSON.stringify(sort ? sortJSON(data ?? undefined) : data ?? undefined, null, 2),
+			doc: JSON.stringify(clone, null, 2),
 			extensions: [
 				basicSetup,
 				$theme.dark ? resaltDark : resaltLight,
