@@ -604,7 +604,8 @@ samp {
 	border-color: var(--black);
 	color: var(--white);
 }
-.alert-red, .alert-danger {
+.alert-red,
+.alert-danger {
 	code {
 		color: var(--dark);
 	}
