@@ -1,11 +1,16 @@
-use crate::auth::*;
 use actix_web::{web, HttpRequest, Responder, Result};
 use log::*;
 use resalt_config::SConfig;
+use resalt_ldap::LdapHandler;
 use resalt_models::{ApiError, User};
 use resalt_salt::SaltAPI;
 use resalt_storage::StorageImpl;
 use serde::{Deserialize, Serialize};
+
+use crate::auth::auth_login_classic;
+use crate::auth::auth_login_ldap;
+use crate::auth::renew_token_salt_token;
+use crate::auth::update_user_permissions_from_groups;
 
 #[derive(Deserialize, Debug)]
 pub struct LoginRequest {
@@ -45,16 +50,14 @@ pub async fn route_auth_login_post(
         match user {
             Some(user) => user,
             None => {
-                // Create User
-                let (ldap_sync, username, email) = match SConfig::auth_ldap_enabled() {
+                // Create user
+                let (username, email, ldap_sync) = match SConfig::auth_ldap_enabled() {
                     true => {
-                        // Create user
-                        match LdapHandler::find_dn(&username).await {
+                        // Fetch user from LDAP
+                        match LdapHandler::lookup_user_by_username(&username).await {
                             // User was found in LDAP, lets link
-                            Ok(Some((ldap_sync, username, email))) => {
-                                (Some(ldap_sync), username, Some(email))
-                            }
-                            // User was not found in LDAP,
+                            Ok(Some(user)) => (user.username, Some(user.email), Some(user.dn)),
+                            // User was NOT found in LDAP,
                             Ok(None) => return Err(ApiError::Unauthorized),
                             Err(e) => {
                                 error!("route_auth_login_post {:?}", e);
@@ -62,7 +65,7 @@ pub async fn route_auth_login_post(
                             }
                         }
                     }
-                    false => (None, username, None),
+                    false => (username, None, None),
                 };
 
                 match data.create_user(username, None, email, ldap_sync) {

@@ -1,12 +1,11 @@
 use actix_web::{web, Result};
 use log::*;
 use resalt_config::SConfig;
+use resalt_ldap::LdapHandler;
 use resalt_models::*;
 use resalt_salt::SaltAPI;
 use resalt_security::verify_password;
 use resalt_storage::StorageImpl;
-
-use super::LdapHandler;
 
 #[allow(clippy::borrowed_box)]
 pub async fn renew_token_salt_token(
@@ -135,8 +134,8 @@ pub async fn auth_login_ldap(
     username: &str,
     password: &str,
 ) -> Result<Option<User>, ApiError> {
-    let (uid, email, user_ldap_dn) = match LdapHandler::authenticate(username, password).await {
-        Ok(Some(uid)) => uid,
+    let ldap_user = match LdapHandler::authenticate(username, password).await {
+        Ok(Some(user)) => user,
         Ok(None) => return Ok(None),
         Err(e) => {
             error!("auth_login_ldap {:?}", e);
@@ -144,25 +143,29 @@ pub async fn auth_login_ldap(
         }
     };
 
-    // Fetch user
-    let mut user = match data.get_user_by_username(&uid) {
-        Ok(user) => user,
+    // Fetch user in Database
+    let user = match data.get_user_by_username(&ldap_user.username) {
+        Ok(Some(user)) => Some(user),
+        Ok(None) => {
+            // Create user if doesn't exist in DB, as LDAP auth was successful.
+            match data.create_user(
+                ldap_user.username,
+                None,
+                Some(ldap_user.email),
+                Some(ldap_user.dn),
+            ) {
+                Ok(user) => Some(user),
+                Err(e) => {
+                    error!("{:?}", e);
+                    return Err(ApiError::DatabaseError);
+                }
+            }
+        }
         Err(e) => {
             error!("{:?}", e);
             return Err(ApiError::DatabaseError);
         }
     };
-
-    // Create user if doesn't exist, as LDAP passed.
-    if user.is_none() {
-        user = match data.create_user(uid, None, Some(email), Some(user_ldap_dn)) {
-            Ok(user) => Some(user),
-            Err(e) => {
-                error!("{:?}", e);
-                return Err(ApiError::DatabaseError);
-            }
-        };
-    }
 
     Ok(user)
 }
