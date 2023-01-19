@@ -62,6 +62,12 @@ $bluegray-10: #0e1418;
 				border-color: $bluegray-6;
 				cursor: not-allowed;
 			}
+
+			// Error handling
+			.form-control.is-invalid,
+			.form-select.is-invalid {
+				border-color: var(--red);
+			}
 		}
 	}
 	// Error handling
