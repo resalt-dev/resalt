@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Link, type NavigateFn } from 'svelte-navigator';
+	import { writable, type Writable } from 'svelte/store';
 	import { Button, Card, Spinner, Table } from 'sveltestrap';
 	import { getMinions, refreshMinion } from '../../api';
 	import Clickable from '../../components/Clickable.svelte';
@@ -22,7 +23,7 @@
 
 	let loading: boolean = true;
 	let minions: Minion[] | null = null;
-	let refreshing: string[] = [];
+	const refreshing: Writable<string[]> = writable([]);
 
 	let sortField: string | null = null;
 	let sortOrder: SortOrder = SortOrder.Down;
@@ -76,10 +77,10 @@
 	}
 
 	function resync(minionId: string) {
-		refreshing.push(minionId);
+		refreshing.update((ids) => [...ids, minionId]);
 		refreshMinion(minionId)
 			.then(() => {
-				refreshing = refreshing.filter((id) => id !== minionId);
+				refreshing.update((ids) => ids.filter((id) => id !== minionId));
 				updateData(filters, true);
 			})
 			.catch((err) => {
@@ -293,9 +294,9 @@
 									style="width: 65px;"
 									class="me-2"
 									on:click={() => resync(minion.id)}
-									disabled={refreshing.indexOf(minion.id) !== -1}
+									disabled={$refreshing.indexOf(minion.id) !== -1}
 								>
-									{#if refreshing.indexOf(minion.id) !== -1}
+									{#if $refreshing.indexOf(minion.id) !== -1}
 										<Spinner size="sm" />
 									{:else}
 										Resync
