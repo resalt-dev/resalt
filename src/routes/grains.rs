@@ -1,7 +1,7 @@
-use crate::auth::*;
 use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 use resalt_models::*;
+use resalt_security::*;
 use resalt_storage::StorageImpl;
 use serde::Deserialize;
 use serde_json::{json, Value};

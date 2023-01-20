@@ -2,15 +2,17 @@ use actix_web::{web, HttpRequest, Responder, Result};
 use log::*;
 use resalt_config::SConfig;
 use resalt_ldap::LdapHandler;
+use resalt_ldap::LdapUser;
 use resalt_models::{ApiError, User};
 use resalt_salt::SaltAPI;
+use resalt_security::refresh_user_permissions;
+use resalt_security::sync_ldap_groups;
 use resalt_storage::StorageImpl;
 use serde::{Deserialize, Serialize};
 
 use crate::auth::auth_login_classic;
 use crate::auth::auth_login_ldap;
 use crate::auth::renew_token_salt_token;
-use crate::auth::update_user_permissions_from_groups;
 
 #[derive(Deserialize, Debug)]
 pub struct LoginRequest {
@@ -34,7 +36,7 @@ pub async fn route_auth_login_post(
 ) -> Result<impl Responder, ApiError> {
     let user: User = if SConfig::auth_forward_enabled() {
         // Use X-Forwarded-User header as username
-        let username = match req.headers().get("X-Forwarded-User") {
+        let mut username = match req.headers().get("X-Forwarded-User") {
             Some(forwarded_user) => forwarded_user.to_str().unwrap().to_string(),
             None => return Err(ApiError::Unauthorized),
         };
@@ -46,32 +48,42 @@ pub async fn route_auth_login_post(
             // User DOES NOT exist, but we are in AuthForward, so create user
             Ok(None) => {
                 // Check if we are in LDAP or not
-                let (username, email, ldap_sync) = match SConfig::auth_ldap_enabled() {
-                    true => {
-                        // Fetch user from LDAP
-                        match LdapHandler::lookup_user_by_username(&username).await {
-                            // User was found in LDAP, lets link
-                            Ok(Some(user)) => (user.username, Some(user.email), Some(user.dn)),
-                            // User was NOT found in LDAP,
-                            Ok(None) => return Err(ApiError::Unauthorized),
-                            Err(e) => {
-                                error!("route_auth_login_post {:?}", e);
-                                return Err(ApiError::LdapError);
-                            }
+                let mut ldap_user: Option<LdapUser> = None;
+                let mut email: Option<String> = None;
+                let mut ldap_sync: Option<String> = None;
+                if SConfig::auth_ldap_enabled() {
+                    // Fetch user from LDAP
+                    ldap_user = match LdapHandler::lookup_user_by_username(&username).await {
+                        // User was found in LDAP, lets link
+                        Ok(Some(ldap_user)) => {
+                            username = ldap_user.username.clone();
+                            email = Some(ldap_user.email.clone());
+                            ldap_sync = Some(ldap_user.dn.clone());
+                            Some(ldap_user)
                         }
-                    }
-                    // We are not in LDAP, so just return username and empty on the others
-                    false => (username, None, None),
-                };
+                        // User was NOT found in LDAP,
+                        Ok(None) => return Err(ApiError::Unauthorized),
+                        Err(e) => {
+                            error!("route_auth_login_post {:?}", e);
+                            return Err(ApiError::LdapError);
+                        }
+                    };
+                }
 
                 // Create user
-                match data.create_user(username, None, email, ldap_sync) {
+                let user = match data.create_user(username, None, email, ldap_sync) {
                     Ok(user) => user,
                     Err(e) => {
                         error!("Failed creating user {:?}", e);
                         return Err(ApiError::DatabaseError);
                     }
+                };
+
+                if let Some(ldap_user) = ldap_user {
+                    sync_ldap_groups(&data, &user, Some(&ldap_user))?;
                 }
+
+                user
             }
             // ERROR from Database, which is critical, so return error
             Err(e) => {
@@ -106,7 +118,7 @@ pub async fn route_auth_login_post(
     debug!("User {} found, generating token", &user.username);
 
     // Refresh their user-cached permissions before doing anything else
-    update_user_permissions_from_groups(&data, &user)?;
+    refresh_user_permissions(&data, &user)?;
 
     // Create token
     let authtoken = match data.create_authtoken(user.id.clone()) {

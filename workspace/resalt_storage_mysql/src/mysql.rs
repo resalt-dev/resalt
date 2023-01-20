@@ -1074,6 +1074,19 @@ impl StorageImpl for StorageMySQL {
             .map(|v| v.map(|v| v.into()))
     }
 
+    fn get_permission_group_by_ldap_sync(
+        &self,
+        ldap_sync: &str,
+    ) -> Result<Option<PermissionGroup>, String> {
+        let mut connection = self.create_connection()?;
+        permission_groups::table
+            .filter(permission_groups::ldap_sync.eq(ldap_sync))
+            .first::<SQLPermissionGroup>(&mut connection)
+            .optional()
+            .map_err(|e| format!("{:?}", e))
+            .map(|v| v.map(|v| v.into()))
+    }
+
     fn is_user_member_of_group(&self, user_id: &str, group_id: &str) -> Result<bool, String> {
         let mut connection = self.create_connection()?;
         permission_group_users::table

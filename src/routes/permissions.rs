@@ -1,7 +1,7 @@
-use crate::auth::*;
 use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 use resalt_models::*;
+use resalt_security::*;
 use resalt_storage::StorageImpl;
 use serde::{Deserialize, Deserializer};
 use serde_json::Value;
@@ -197,7 +197,7 @@ pub async fn route_permission_update(
     match data.list_users_by_permission_group_id(&info.id) {
         Ok(users) => {
             for user in users {
-                update_user_permissions_from_groups(&data, &user)?;
+                refresh_user_permissions(&data, &user)?;
             }
         }
         Err(e) => {
@@ -245,7 +245,7 @@ pub async fn route_permission_delete(
 
     // Update ex-members
     for user in users {
-        update_user_permissions_from_groups(&data, &user)?;
+        refresh_user_permissions(&data, &user)?;
     }
 
     Ok(group)

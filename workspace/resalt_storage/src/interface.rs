@@ -200,6 +200,11 @@ pub trait StorageImpl: Send {
 
     fn get_permission_group_by_name(&self, name: &str) -> Result<Option<PermissionGroup>, String>;
 
+    fn get_permission_group_by_ldap_sync(
+        &self,
+        ldap_sync: &str,
+    ) -> Result<Option<PermissionGroup>, String>;
+
     fn is_user_member_of_group(&self, user_id: &str, group_id: &str) -> Result<bool, String>;
 
     fn update_permission_group(&self, permission_group: &PermissionGroup) -> Result<(), String>;

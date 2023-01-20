@@ -62,7 +62,7 @@ impl LdapHandler {
         Ok(ldap)
     }
 
-    async fn lookup_user(user_filter: String) -> Result<Option<LdapUser>, LdapError> {
+    async fn lookup_user(user_filter: Vec<String>) -> Result<Vec<LdapUser>, LdapError> {
         let mut service_ldap = LdapHandler::create_system_connection().await?;
 
         let base_dn = SConfig::auth_ldap_base_dn();
@@ -70,60 +70,80 @@ impl LdapHandler {
         let email_attribute = String::from("mail"); // Same in both OpenLDAP and Active Directory
         let group_attribute = String::from("memberOf"); // Same in both OpenLDAP and Active Directory
 
-        debug!("Searching LDAP for user with filter {}", &user_filter);
-        let (rs, _res) = service_ldap
-            .search(
-                &base_dn,
-                Scope::Subtree,
-                &user_filter,
-                vec![&user_attribute, &email_attribute, &group_attribute],
-            )
-            .await?
-            .success()?;
+        let mut users = Vec::new();
 
-        if rs.is_empty() {
-            return Ok(None);
+        for filter in user_filter {
+            debug!("Searching LDAP for user with filter {}", &filter);
+            let (rs, _res) = service_ldap
+                .search(
+                    &base_dn,
+                    Scope::Subtree,
+                    &filter,
+                    vec![&user_attribute, &email_attribute, &group_attribute],
+                )
+                .await?
+                .success()?;
+
+            if rs.is_empty() {
+                continue;
+            }
+            let entry = rs.get(0).unwrap().clone();
+            let entry = SearchEntry::construct(entry);
+            let dn = (&entry.dn).to_string();
+            let username = entry
+                .attrs
+                .get(&user_attribute)
+                .unwrap()
+                .get(0)
+                .unwrap()
+                .clone();
+            let email = entry
+                .attrs
+                .get(&email_attribute)
+                .unwrap()
+                .get(0)
+                .unwrap()
+                .clone();
+            let groups = entry.attrs.get(&group_attribute).unwrap().clone();
+
+            users.push(LdapUser {
+                dn,
+                username,
+                email,
+                groups,
+            });
         }
-        let entry = rs.get(0).unwrap().clone();
-        let entry = SearchEntry::construct(entry);
-        let dn = (&entry.dn).to_string();
-        let username = entry
-            .attrs
-            .get(&user_attribute)
-            .unwrap()
-            .get(0)
-            .unwrap()
-            .clone();
-        let email = entry
-            .attrs
-            .get(&email_attribute)
-            .unwrap()
-            .get(0)
-            .unwrap()
-            .clone();
-        let groups = entry.attrs.get(&group_attribute).unwrap().clone();
 
         // Close Service connection
         service_ldap.unbind().await?;
 
-        Ok(Some(LdapUser {
-            dn,
-            username,
-            email,
-            groups,
-        }))
+        Ok(users)
     }
 
     /// Lookup a user by their username
-    pub async fn lookup_user_by_username(query: &str) -> Result<Option<LdapUser>, LdapError> {
-        let user_filter = SConfig::auth_ldap_user_filter().replace("%s", query);
-        LdapHandler::lookup_user(user_filter).await
+    pub async fn lookup_user_by_username(username: &str) -> Result<Option<LdapUser>, LdapError> {
+        let user_filter = SConfig::auth_ldap_user_filter().replace("%s", username);
+        let users = LdapHandler::lookup_user(vec![user_filter]).await?;
+        let user: Option<LdapUser> = users.into_iter().next();
+        Ok(user)
     }
 
     /// Lookup a user by their DN
-    pub async fn lookup_user_by_dn(query: &str) -> Result<Option<LdapUser>, LdapError> {
-        let user_filter = format!("(distinguishedName={})", query);
-        LdapHandler::lookup_user(user_filter).await
+    pub async fn lookup_user_by_dn(dn: &str) -> Result<Option<LdapUser>, LdapError> {
+        let user_filter = format!("(distinguishedName={})", dn);
+        let users = LdapHandler::lookup_user(vec![user_filter]).await?;
+        let user: Option<LdapUser> = users.into_iter().next();
+        Ok(user)
+    }
+
+    /// Lookup a list of users by their DN
+    pub async fn lookup_users_by_dn(dns: Vec<String>) -> Result<Vec<LdapUser>, LdapError> {
+        let mut user_filter = Vec::new();
+        for dn in dns {
+            user_filter.push(format!("(distinguishedName={})", dn));
+        }
+        let users = LdapHandler::lookup_user(user_filter).await?;
+        Ok(users)
     }
 
     /// Authenticate a user by their username and password

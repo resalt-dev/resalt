@@ -46,6 +46,9 @@ async fn main() -> std::io::Result<()> {
 
     // Database
     let db: Box<dyn StorageImpl> = init_db().await;
+    let db_clone_wrapper = StorageCloneWrapper {
+        storage: db.clone(),
+    };
 
     // Salt WebSocket
     let salt_listener_pipeline = pipeline.clone();
@@ -69,13 +72,10 @@ async fn main() -> std::io::Result<()> {
     });
 
     // Scheduler
-    let mut scheduler = scheduler::Scheduler::new();
+    let mut scheduler = scheduler::Scheduler::new(db_clone_wrapper.clone());
     scheduler.register_system_jobs();
     scheduler.start();
 
-    let db_clone_wrapper = StorageCloneWrapper {
-        storage: db.clone(),
-    };
     HttpServer::new(move || {
         // Salt API
         let salt_api = SaltAPI::new();

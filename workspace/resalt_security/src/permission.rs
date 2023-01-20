@@ -1,9 +1,8 @@
 use std::collections::HashMap;
 
-use actix_web::web;
 use log::*;
 use regex::Regex;
-use resalt_models::{ApiError, User};
+use resalt_models::ApiError;
 use resalt_storage::StorageImpl;
 use serde_json::Value;
 
@@ -59,7 +58,7 @@ pub const P_USER_EMAIL: &str = "user.email";
 pub const P_USER_PASSWORD: &str = "user.password";
 
 pub fn has_resalt_permission(
-    data: &web::Data<Box<dyn StorageImpl>>,
+    data: &Box<dyn StorageImpl>,
     user_id: &str,
     permission: &str,
 ) -> Result<bool, ApiError> {
@@ -231,56 +230,13 @@ pub fn evaluate_permission(
     false
 }
 
-pub fn update_user_permissions_from_groups(
-    data: &web::Data<Box<dyn StorageImpl>>,
-    user: &User,
-) -> Result<(), ApiError> {
-    let groups = match data.list_permission_groups_by_user_id(&user.id) {
-        Ok(groups) => groups,
-        Err(e) => {
-            error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
-        }
-    };
-    let mut perms: Vec<Value> = Vec::new();
-    for group in groups {
-        // Parse group.perms as json array
-        let serdegroup: serde_json::Value = match serde_json::from_str(&group.perms) {
-            Ok(serdegroup) => serdegroup,
-            Err(e) => {
-                error!("{:?}", e);
-                return Err(ApiError::DatabaseError);
-            }
-        };
-        let group_perms = match serdegroup.as_array() {
-            Some(group_perms) => group_perms,
-            None => continue,
-        };
-        for group_perm in group_perms {
-            perms.push(group_perm.clone());
-        }
-    }
-    let perms = Value::Array(perms);
-    let perms = serde_json::to_string(&perms).unwrap();
-    let mut user: User = user.clone();
-    user.perms = perms;
-    match data.update_user(&user) {
-        Ok(_) => Ok(()),
-        Err(e) => {
-            error!("{:?}", e);
-            Err(ApiError::DatabaseError)
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
 
     use serde_json::from_str;
 
-    use crate::auth::evaluate_permission;
-    use crate::auth::evaluate_resalt_permission;
+    use crate::{evaluate_permission, evaluate_resalt_permission};
 
     #[test]
     fn test_evalute_resalt_permission() {

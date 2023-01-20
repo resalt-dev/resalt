@@ -181,15 +181,6 @@ impl User {
 
         })
     }
-
-    // pub fn has_permission(&self, perm: &str) -> bool {
-    //     let perms: Value = match serde_json::from_str(&self.perms) {
-    //         Ok(perms) => perms,
-    //         Err(_) => return false,
-    //     };
-    //     evalute_resalt_permission(&perms, perm)
-    //         || evalute_resalt_permission(&perms, "admin.superadmin")
-    // }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
