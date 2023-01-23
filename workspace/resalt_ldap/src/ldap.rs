@@ -118,7 +118,7 @@ impl LdapHandler {
             }
             let entry = rs.get(0).unwrap().clone();
             let entry = SearchEntry::construct(entry);
-            let dn = (&entry.dn).to_string();
+            let dn = entry.dn.to_string();
             let username = entry
                 .attrs
                 .get(&user_attribute)

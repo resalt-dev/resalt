@@ -57,6 +57,7 @@ pub const P_USER_LIST: &str = "user.list";
 pub const P_USER_EMAIL: &str = "user.email";
 pub const P_USER_PASSWORD: &str = "user.password";
 
+#[allow(clippy::borrowed_box)]
 pub fn has_resalt_permission(
     data: &Box<dyn StorageImpl>,
     user_id: &str,

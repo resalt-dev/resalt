@@ -169,7 +169,7 @@ pub async fn auth_login_ldap(
 
     if let Some(user) = &user {
         // Sync LDAP groups
-        sync_ldap_groups(&data, user, Some(&ldap_user))?;
+        sync_ldap_groups(data, user, Some(&ldap_user))?;
     }
 
     Ok(user)

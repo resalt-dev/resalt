@@ -65,9 +65,7 @@ impl Scheduler {
                     // Fetch users from LDAP
                     let dns = db_users
                         .iter()
-                        .map(|user| user.ldap_sync.clone())
-                        // filter where dn.is_some and map to String
-                        .filter_map(|sync| sync)
+                        .filter_map(|user| user.ldap_sync.clone())
                         .collect::<Vec<String>>();
                     let ldap_users = match LdapHandler::lookup_users_by_dn(dns).await {
                         Ok(users) => users,

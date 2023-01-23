@@ -4,6 +4,7 @@ use resalt_models::{ApiError, User};
 use resalt_storage::StorageImpl;
 use serde_json::Value;
 
+#[allow(clippy::borrowed_box)]
 pub fn refresh_user_permissions(data: &Box<dyn StorageImpl>, user: &User) -> Result<(), ApiError> {
     let groups = match data.list_permission_groups_by_user_id(&user.id) {
         Ok(groups) => groups,
@@ -43,6 +44,7 @@ pub fn refresh_user_permissions(data: &Box<dyn StorageImpl>, user: &User) -> Res
     }
 }
 
+#[allow(clippy::borrowed_box)]
 pub fn sync_ldap_groups(
     data: &Box<dyn StorageImpl>,
     user: &User,
@@ -143,7 +145,7 @@ pub fn sync_ldap_groups(
 
     if changed {
         // Update user-cached permissions
-        match refresh_user_permissions(&data, &user) {
+        match refresh_user_permissions(data, user) {
             Ok(_) => {}
             Err(e) => {
                 error!(
@@ -155,5 +157,5 @@ pub fn sync_ldap_groups(
         }
     }
 
-    return Ok(());
+    Ok(())
 }
