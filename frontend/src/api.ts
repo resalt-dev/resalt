@@ -95,9 +95,9 @@ async function sendRequest(url: string, options: any): Promise<any> {
 
 async function sendAuthenticatedRequest(method: string, path: string, data?: any): Promise<any> {
 	const token = getToken();
-	console.log('Sending authenticated request', method, path, data);
-	let body = data ? JSON.stringify(data) : undefined;
-	console.log('Sending body', body);
+	// console.log('Sending authenticated request', method, path, data);
+	const body = data ? JSON.stringify(data) : undefined;
+	// console.log('Sending body', body);
 	return await sendRequest(constants.apiUrl + path, {
 		method,
 		headers: {
@@ -337,7 +337,6 @@ export async function getJobs(sort?: string, limit?: number, offset?: number): P
 }
 
 export async function runJob(command: RunCommand): Promise<any> {
-	console.log(command);
 	return sendAuthenticatedRequest('POST', '/jobs', {
 		client: command.client,
 		tgtType: command.targetType,
