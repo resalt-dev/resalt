@@ -169,7 +169,7 @@
 			<CardHeader>
 				<CardTitle class="mb-0">Latest News</CardTitle>
 			</CardHeader>
-			<CardBody style="max-height: 800px; overflow-y: auto;">
+			<CardBody style="max-height: 700px; overflow-y: auto;">
 				{#each $config.latestNews as news, i}
 					{#if i !== 0}
 						<hr class="text-light" />
