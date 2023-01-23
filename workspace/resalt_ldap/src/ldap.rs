@@ -1,12 +1,46 @@
+use std::sync::Arc;
+
 use ldap3::{Ldap, LdapConnAsync, LdapConnSettings, LdapError, Scope, SearchEntry};
 use log::*;
 use resalt_config::SConfig;
+use rustls::ClientConfig;
+use rustls_native_certs::load_native_certs;
 
 pub struct LdapUser {
     pub dn: String,
     pub username: String,
     pub email: String,
     pub groups: Vec<String>,
+}
+
+lazy_static::lazy_static! {
+    static ref LDAP_TLS_CONFIG: ClientConfig = {
+        let certs = load_native_certs().unwrap();
+
+        // Convert Vec<rustls_native_certs::Certificate> to RootCertStore
+        let mut root_store = rustls::RootCertStore::empty();
+        for cert in certs {
+            root_store.add(&rustls::Certificate(cert.0)).unwrap();
+        }
+
+        let mut config = ClientConfig::builder()
+            .with_safe_defaults()
+            .with_root_certificates(root_store)
+            .with_no_client_auth();
+
+        if SConfig::auth_ldap_skip_tls_verify() {
+            config
+                .dangerous()
+                .set_certificate_verifier(Arc::new(resalt_config::danger::NoCertificateVerification));
+        }
+
+        config
+    };
+
+    static ref LDAP_SETTINGS: LdapConnSettings = LdapConnSettings::new()
+        .set_starttls(SConfig::auth_ldap_start_tls())
+        .set_no_tls_verify(SConfig::auth_ldap_skip_tls_verify())
+        .set_config(Arc::new(LDAP_TLS_CONFIG.to_owned()));
 }
 
 pub struct LdapHandler {}
@@ -18,14 +52,9 @@ impl LdapHandler {
 
     async fn create_connection() -> Result<Ldap, LdapError> {
         let ldap_url = SConfig::auth_ldap_url();
-        let ldap_start_tls = SConfig::auth_ldap_start_tls();
-        let ldap_skip_tls_verify = SConfig::auth_ldap_skip_tls_verify();
-
-        let settings: LdapConnSettings = LdapConnSettings::new()
-            .set_starttls(ldap_start_tls)
-            .set_no_tls_verify(ldap_skip_tls_verify);
-
-        let (conn, ldap) = LdapConnAsync::with_settings(settings, &ldap_url).await?;
+        warn!("Connecting to LDAP server: {}", ldap_url);
+        let (conn, ldap) =
+            LdapConnAsync::with_settings(LDAP_SETTINGS.to_owned(), &ldap_url).await?;
         ldap3::drive!(conn);
 
         Ok(ldap)

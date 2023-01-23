@@ -91,6 +91,23 @@ impl Scheduler {
 
                     // Update users
                     for (user, ldap_user) in users {
+                        // Update email
+                        let mut user = user;
+                        if let Some(ldap_user) = ldap_user {
+                            user.email = Some(ldap_user.email.clone());
+                            match wrapper.storage.update_user(&user) {
+                                Ok(_) => {}
+                                Err(e) => {
+                                    error!(
+                                        "Failed to update user {} from LDAP: {:?}",
+                                        user.username, e
+                                    );
+                                    continue;
+                                }
+                            }
+                        }
+
+                        // Update groups
                         match sync_ldap_groups(&wrapper.storage, &user, ldap_user) {
                             Ok(_) => {}
                             Err(e) => {

@@ -166,17 +166,12 @@ pub async fn route_permission_update(
     }
 
     // Get permission group
-    let permission_group = match data.get_permission_group_by_id(&info.id) {
-        Ok(permission_group) => permission_group,
+    let mut permission_group = match data.get_permission_group_by_id(&info.id) {
+        Ok(Some(permission_group)) => permission_group,
+        Ok(None) => return Err(ApiError::NotFound),
         Err(e) => {
             error!("{:?}", e);
             return Err(ApiError::DatabaseError);
-        }
-    };
-    let mut permission_group = match permission_group {
-        Some(permission_group) => permission_group,
-        None => {
-            return Err(ApiError::NotFound);
         }
     };
 

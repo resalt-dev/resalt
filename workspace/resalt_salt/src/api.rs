@@ -183,7 +183,7 @@ lazy_static::lazy_static! {
         if SConfig::salt_api_tls_skipverify() {
             config
                 .dangerous()
-                .set_certificate_verifier(Arc::new(danger::NoCertificateVerification));
+                .set_certificate_verifier(Arc::new(resalt_config::danger::NoCertificateVerification));
         }
 
         config
@@ -984,26 +984,5 @@ impl SaltAPI {
         };
 
         Ok(())
-    }
-}
-
-mod danger {
-    use rustls::client::*;
-    use std::time::SystemTime;
-
-    pub struct NoCertificateVerification;
-
-    impl ServerCertVerifier for NoCertificateVerification {
-        fn verify_server_cert(
-            &self,
-            _end_entity: &rustls::Certificate,
-            _intermediates: &[rustls::Certificate],
-            _server_name: &ServerName,
-            _scts: &mut dyn Iterator<Item = &[u8]>,
-            _ocsp_response: &[u8],
-            _now: SystemTime,
-        ) -> Result<ServerCertVerified, rustls::Error> {
-            Ok(ServerCertVerified::assertion())
-        }
     }
 }

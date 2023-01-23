@@ -103,7 +103,7 @@ pub async fn route_auth_login_post(
         match user {
             Some(user) => user,
             None => {
-                debug!("User not found, testing LDAP");
+                debug!("Classic user not found, testing LDAP");
                 match auth_login_ldap(&data, &username, &password).await {
                     Ok(user) => match user {
                         Some(user) => user,
