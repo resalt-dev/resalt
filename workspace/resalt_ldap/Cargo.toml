@@ -7,6 +7,9 @@ publish = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+lazy_static = "1.4.0"
 ldap3 = { version = "0.11.1", features = ["tls-rustls"], default-features = false }
 log = { version = "0.4.17" }
 resalt_config = { path = "../resalt_config" }
+rustls = { version = "0.20.8", features = ["dangerous_configuration"] }
+rustls-native-certs = "0.6.2"
