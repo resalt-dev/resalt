@@ -1,10 +1,9 @@
 use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 use resalt_models::{ApiError, AuthStatus, MinionPreset};
+use resalt_security::*;
 use resalt_storage::StorageImpl;
 use serde::{Deserialize, Serialize};
-
-use crate::auth::{has_resalt_permission, P_MINION_PRESETS_LIST, P_MINION_PRESETS_MANAGE};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct PresetsListQuery {

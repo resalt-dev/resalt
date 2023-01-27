@@ -8,3 +8,9 @@ publish = false
 
 [dependencies]
 argon2 = "0.4.1"
+log = { version = "0.4.17" }
+regex = "1"
+resalt_ldap = { path = "../resalt_ldap" }
+resalt_models = { path = "../resalt_models" }
+resalt_storage = { path = "../resalt_storage" }
+serde_json = "1.0.82"

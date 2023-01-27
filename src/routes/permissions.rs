@@ -1,7 +1,7 @@
-use crate::auth::*;
 use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 use resalt_models::*;
+use resalt_security::*;
 use resalt_storage::StorageImpl;
 use serde::{Deserialize, Deserializer};
 use serde_json::Value;
@@ -166,17 +166,12 @@ pub async fn route_permission_update(
     }
 
     // Get permission group
-    let permission_group = match data.get_permission_group_by_id(&info.id) {
-        Ok(permission_group) => permission_group,
+    let mut permission_group = match data.get_permission_group_by_id(&info.id) {
+        Ok(Some(permission_group)) => permission_group,
+        Ok(None) => return Err(ApiError::NotFound),
         Err(e) => {
             error!("{:?}", e);
             return Err(ApiError::DatabaseError);
-        }
-    };
-    let mut permission_group = match permission_group {
-        Some(permission_group) => permission_group,
-        None => {
-            return Err(ApiError::NotFound);
         }
     };
 
@@ -197,7 +192,7 @@ pub async fn route_permission_update(
     match data.list_users_by_permission_group_id(&info.id) {
         Ok(users) => {
             for user in users {
-                update_user_permissions_from_groups(&data, &user)?;
+                refresh_user_permissions(&data, &user)?;
             }
         }
         Err(e) => {
@@ -245,7 +240,7 @@ pub async fn route_permission_delete(
 
     // Update ex-members
     for user in users {
-        update_user_permissions_from_groups(&data, &user)?;
+        refresh_user_permissions(&data, &user)?;
     }
 
     Ok(group)
