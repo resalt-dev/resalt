@@ -1,6 +1,6 @@
 [package]
 name = "resalt"
-version = "0.4.0"
+version = "0.4.1"
 authors = ["Max Faxälv <max@foorack.com>"]
 edition = "2021"
 readme = "README.md"
@@ -59,6 +59,7 @@ jsonpath_lib = "0.3.0"
 
 [package.metadata.resalt]
 news = [
+    "Resalt 0.4.1 released§Resalt 0.4.1 is now available. Removed legacy graph system, and implemented optional Prometheus metrics export endpoint.",
     "Resalt 0.4.0 released§Resalt 0.4.0 is now available. Implemented LDAP syncing of groups and email, and several UI and UX improvements.",
     "Resalt 0.3.1 released§Resalt 0.3.1 is now available. Fixed minor issue where Minion List would not paginate.",
     "Resalt 0.3.0 released§Resalt 0.3.0 is now available. Implemented the ability to store custom filters as \"Presets\". Additionally several minor UI and permission fixes.",
