@@ -11,3 +11,4 @@ config = { version = "0.13.1", features = ["toml"],  default-features = false }
 lazy_static = "1.4.0"
 log = { version = "0.4.17" }
 rand = "0.8.5"
+rustls = { version = "0.20.8", features = ["dangerous_configuration"] }

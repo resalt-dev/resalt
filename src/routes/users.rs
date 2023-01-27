@@ -1,8 +1,7 @@
-use crate::auth::*;
 use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 use resalt_models::{ApiError, AuthStatus};
-use resalt_security::hash_password;
+use resalt_security::*;
 use resalt_storage::StorageImpl;
 use serde::Deserialize;
 use serde_json::Value;
@@ -337,7 +336,7 @@ pub async fn route_user_permissions_post(
         }
 
         // Update user-cached permissions
-        update_user_permissions_from_groups(&data, &user)?;
+        refresh_user_permissions(&data, &user)?;
     }
 
     Ok(web::Json(()))
@@ -396,7 +395,7 @@ pub async fn route_user_permissions_delete(
     }
 
     // Update user-cached permissions
-    update_user_permissions_from_groups(&data, &user)?;
+    refresh_user_permissions(&data, &user)?;
 
     Ok(web::Json(()))
 }

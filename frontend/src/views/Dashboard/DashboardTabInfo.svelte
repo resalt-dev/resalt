@@ -80,8 +80,8 @@
 						{/if}
 					</p>
 					<p class="card-text">
-						<Table class="mb-0">
-							<thead class="bg-light border-0">
+						<Table hover class="b-0 mb-0">
+							<thead class="bg-dark border-0 text-white">
 								<tr>
 									<th>Table</th>
 									<th>Count</th>
@@ -169,7 +169,7 @@
 			<CardHeader>
 				<CardTitle class="mb-0">Latest News</CardTitle>
 			</CardHeader>
-			<CardBody>
+			<CardBody style="max-height: 700px; overflow-y: auto;">
 				{#each $config.latestNews as news, i}
 					{#if i !== 0}
 						<hr class="text-light" />

@@ -186,8 +186,6 @@ pub trait StorageImpl: Send {
 
     fn get_job_returns_by_job(&self, job: &Job) -> Result<Vec<Event>, String>;
 
-    fn get_metric_results(&self) -> Result<Vec<MetricResult>, String>;
-
     fn create_permission_group(&self, name: &str) -> Result<String, String>;
 
     fn list_permission_groups(
@@ -199,6 +197,11 @@ pub trait StorageImpl: Send {
     fn get_permission_group_by_id(&self, id: &str) -> Result<Option<PermissionGroup>, String>;
 
     fn get_permission_group_by_name(&self, name: &str) -> Result<Option<PermissionGroup>, String>;
+
+    fn get_permission_group_by_ldap_sync(
+        &self,
+        ldap_sync: &str,
+    ) -> Result<Option<PermissionGroup>, String>;
 
     fn is_user_member_of_group(&self, user_id: &str, group_id: &str) -> Result<bool, String>;
 
