@@ -7,7 +7,6 @@ import Job from './models/Job';
 import User from './models/User';
 import Key from './models/Key';
 import Config from './models/Config';
-import MetricResult from './models/MetricResult';
 import PermissionGroup from './models/PermissionGroup';
 import type Filter from './models/Filter';
 import type RunCommand from './models/RunCommand';
