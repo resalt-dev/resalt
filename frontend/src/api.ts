@@ -377,16 +377,6 @@ export async function deleteKey(key: Key): Promise<void> {
 }
 
 ///
-/// Metrics
-///
-
-export async function getMetricResults(): Promise<Array<MetricResult>> {
-	return sendAuthenticatedRequest('GET', '/metrics').then((data: any[]) =>
-		data.map((item) => MetricResult.fromObject(item)),
-	);
-}
-
-///
 /// Permission Groups
 ///
 

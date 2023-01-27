@@ -100,6 +100,7 @@ async fn main() -> std::io::Result<()> {
                     ))
                     .route("/", web::get().to(route_index_get))
                     .route("/config", web::get().to(route_config_get))
+                    .route("/metrics", web::get().to(route_metrics_get))
                     // auth
                     .service(
                         web::scope("/auth")
@@ -118,13 +119,6 @@ async fn main() -> std::io::Result<()> {
                         web::scope("/status")
                             .wrap(RequireAuth::new())
                             .route("", web::get().to(route_status_get))
-                            .default_service(route_fallback_404),
-                    )
-                    // metrics
-                    .service(
-                        web::scope("/metrics")
-                            .wrap(RequireAuth::new())
-                            .route("", web::get().to(route_metrics_get))
                             .default_service(route_fallback_404),
                     )
                     // minions

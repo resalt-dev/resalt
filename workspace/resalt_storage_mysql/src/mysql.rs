@@ -1,7 +1,5 @@
 extern crate diesel;
 
-use std::collections::HashMap;
-
 use self::diesel::prelude::*;
 use crate::{diesel_migrations::MigrationHarness, schema::*, *};
 use chrono::NaiveDateTime;
@@ -183,10 +181,35 @@ impl StorageImpl for StorageMySQL {
             .count()
             .get_result::<i64>(&mut connection)
             .map_err(|e| format!("{:?}", e))?;
-        let minions_total = minions::table
+
+        // last_updated_conformity != null, and conformity_error = 0 and conformity_incorrect = 0
+        let minions_success = minions::table
+            .filter(minions::last_updated_conformity.is_not_null())
+            .filter(minions::conformity_error.eq(0))
+            .filter(minions::conformity_incorrect.eq(0))
             .count()
             .get_result::<i64>(&mut connection)
             .map_err(|e| format!("{:?}", e))?;
+        let minions_incorrect = minions::table
+            .filter(minions::last_updated_conformity.is_not_null())
+            .filter(minions::conformity_error.eq(0))
+            .filter(minions::conformity_incorrect.ne(0))
+            .count()
+            .get_result::<i64>(&mut connection)
+            .map_err(|e| format!("{:?}", e))?;
+        let minions_error = minions::table
+            .filter(minions::last_updated_conformity.is_not_null())
+            .filter(minions::conformity_error.ne(0))
+            .count()
+            .get_result::<i64>(&mut connection)
+            .map_err(|e| format!("{:?}", e))?;
+        let minions_unknown = minions::table
+            .filter(minions::last_updated_conformity.is_null())
+            .count()
+            .get_result::<i64>(&mut connection)
+            .map_err(|e| format!("{:?}", e))?;
+        let minions_total = minions_success + minions_incorrect + minions_error + minions_unknown;
+
         let permission_group_users_total = permission_group_users::table
             .count()
             .get_result::<i64>(&mut connection)
@@ -206,6 +229,10 @@ impl StorageImpl for StorageMySQL {
             job_returns_total,
             jobs_total,
             minions_total,
+            minions_success,
+            minions_incorrect,
+            minions_error,
+            minions_unknown,
             permission_group_users_total,
             permission_groups_total,
             users_total,
@@ -887,128 +914,6 @@ impl StorageImpl for StorageMySQL {
             .load::<(SQLEvent, SQLJobReturn)>(&mut connection)
             .map(|v: Vec<(SQLEvent, SQLJobReturn)>| v.into_iter().map(|(e, _)| e.into()).collect())
             .map_err(|e| format!("{:?}", e))
-    }
-
-    ///////////////
-    /// Metrics ///
-    ///////////////
-
-    fn get_metric_results(&self) -> Result<Vec<MetricResult>, String> {
-        let mut connection = self.create_connection()?;
-        let mut results: Vec<MetricResult> = Vec::new();
-
-        //
-        // Gather data
-        //
-        let mut custom_grains_metrics: Vec<(&str, &str)> = vec![
-            ("osfinger", "Operating System"),
-            ("efi-secure-boot", "EFI Secure Boot"),
-        ];
-        let minions = minions::table
-            .load::<SQLMinion>(&mut connection)
-            .map_err(|e| format!("{:?}", e))?;
-
-        let mut minions_success = 0;
-        let mut minions_incorrect = 0;
-        let mut minions_error = 0;
-        let mut minions_unknown = 0;
-        let mut grains: Vec<Option<Value>> = Vec::new();
-        for minion in minions {
-            // Minion compliance
-            if minion.conformity_success.is_none() {
-                minions_unknown += 1;
-            } else {
-                let conf_incorrect = minion.conformity_incorrect.unwrap_or(0);
-                let conf_error = minion.conformity_error.unwrap_or(0);
-
-                if conf_error > 0 {
-                    minions_error += 1;
-                } else if conf_incorrect > 0 {
-                    minions_incorrect += 1;
-                } else {
-                    minions_success += 1;
-                }
-            }
-
-            // Grains
-            grains.push(match minion.grains {
-                Some(ref grains) => match serde_json::from_str(grains) {
-                    Ok(grains) => Some(grains),
-                    Err(e) => {
-                        error!(
-                            "Failed to deserialize grains for minion {}: {}",
-                            minion.id, e
-                        );
-                        None
-                    }
-                },
-                None => None,
-            });
-        }
-        results.push(MetricResult {
-            title: "Conformity".to_string(),
-            chart: "pie".to_string(),
-            labels: vec![
-                "Correct".to_string(),
-                "Incorrect".to_string(),
-                "Error".to_string(),
-                "Unknown".to_string(),
-            ],
-            data: vec![MetricResultData {
-                label: String::new(), // this label is unused on pie charts
-                data: vec![
-                    minions_success,
-                    minions_incorrect,
-                    minions_error,
-                    minions_unknown,
-                ],
-            }],
-        });
-
-        //
-        // Custom grain metrics
-        //
-        for (mid, mname) in &mut custom_grains_metrics {
-            let mut founds: HashMap<String, i32> = HashMap::new();
-            for grain in grains.iter() {
-                let value = match grain {
-                    Some(grain) => grain
-                        .get(*mid)
-                        .map(|v| {
-                            if v.is_string() {
-                                v.as_str().unwrap().to_string()
-                            } else {
-                                v.to_string()
-                            }
-                        })
-                        .unwrap_or_else(|| "Missing".to_string()),
-                    None => "Unknown".to_string(),
-                };
-                let counter = founds.get(&value).unwrap_or(&0);
-                founds.insert(value, counter + 1);
-            }
-
-            // Insert final metric
-            let mut founds: Vec<(String, i32)> = founds.into_iter().collect();
-            founds.sort_by(|a, b| b.1.cmp(&a.1));
-            let mut labels: Vec<String> = Vec::new();
-            let mut data: Vec<i32> = Vec::new();
-            for (label, value) in founds {
-                labels.push(label);
-                data.push(value);
-            }
-            results.push(MetricResult {
-                title: mname.to_string(),
-                chart: "pie".to_string(),
-                labels,
-                data: vec![MetricResultData {
-                    label: String::new(), // this label is unused on pie charts
-                    data,
-                }],
-            });
-        }
-
-        Ok(results)
     }
 
     /////////////////////////

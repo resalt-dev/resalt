@@ -186,8 +186,6 @@ pub trait StorageImpl: Send {
 
     fn get_job_returns_by_job(&self, job: &Job) -> Result<Vec<Event>, String>;
 
-    fn get_metric_results(&self) -> Result<Vec<MetricResult>, String>;
-
     fn create_permission_group(&self, name: &str) -> Result<String, String>;
 
     fn list_permission_groups(
