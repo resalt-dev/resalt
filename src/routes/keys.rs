@@ -2,13 +2,11 @@ use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 use resalt_models::*;
 use resalt_salt::{SaltAPI, SaltError, SaltKeyState};
+use resalt_security::*;
 use resalt_storage::StorageImpl;
 use serde::Deserialize;
 
-use crate::auth::{
-    has_resalt_permission, renew_token_salt_token, P_SALTKEY_ACCEPT, P_SALTKEY_DELETE,
-    P_SALTKEY_LIST, P_SALTKEY_REJECT,
-};
+use crate::auth::renew_token_salt_token;
 
 pub async fn route_keys_get(
     salt: web::Data<SaltAPI>,

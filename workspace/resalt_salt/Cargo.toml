@@ -20,7 +20,7 @@ resalt_config = { path = "../resalt_config" }
 resalt_models = { path = "../resalt_models" }
 resalt_pipeline = { path = "../resalt_pipeline" }
 resalt_storage = { path = "../resalt_storage" }
-rustls = "0.20.6"
+rustls = { version = "0.20.8", features = ["dangerous_configuration"] }
 rustls-native-certs = "0.6.2"
 serde = { version = "1.0.139", features = ["derive"] }
 serde_json = "1.0.82"

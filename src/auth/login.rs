@@ -4,7 +4,7 @@ use resalt_config::SConfig;
 use resalt_ldap::LdapHandler;
 use resalt_models::*;
 use resalt_salt::SaltAPI;
-use resalt_security::verify_password;
+use resalt_security::{sync_ldap_groups, verify_password};
 use resalt_storage::StorageImpl;
 
 #[allow(clippy::borrowed_box)]
@@ -149,10 +149,10 @@ pub async fn auth_login_ldap(
         Ok(None) => {
             // Create user if doesn't exist in DB, as LDAP auth was successful.
             match data.create_user(
-                ldap_user.username,
+                ldap_user.username.clone(),
                 None,
-                Some(ldap_user.email),
-                Some(ldap_user.dn),
+                Some(ldap_user.email.clone()),
+                Some(ldap_user.dn.clone()),
             ) {
                 Ok(user) => Some(user),
                 Err(e) => {
@@ -166,6 +166,11 @@ pub async fn auth_login_ldap(
             return Err(ApiError::DatabaseError);
         }
     };
+
+    if let Some(user) = &user {
+        // Sync LDAP groups
+        sync_ldap_groups(data, user, Some(&ldap_user))?;
+    }
 
     Ok(user)
 }

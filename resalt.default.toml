@@ -49,6 +49,9 @@ host = "db"
 port = "3306"
 database = "resalt"
 
+[metrics]
+enabled = false
+
 [salt.api]
 url = "https://master:8080"
 # head /dev/urandom | tr -dc A-Za-z0-9 | head -c512; echo

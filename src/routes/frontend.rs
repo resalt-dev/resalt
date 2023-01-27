@@ -23,7 +23,7 @@ pub async fn route_frontend_get(
     };
 
     // fetch using FRONTEND_PUBLIC_DIR.get_file
-    let mut file = FRONTEND_PUBLIC_DIR.get_file(&path);
+    let mut file = FRONTEND_PUBLIC_DIR.get_file(path);
     if file.is_none() {
         file = FRONTEND_PUBLIC_DIR.get_file("index.html");
     }

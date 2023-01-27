@@ -82,6 +82,8 @@ lazy_static::lazy_static! {
     static ref DATABASE_PORT: u16 = conf!("database.port").parse().unwrap();
     static ref DATABASE_DATABASE: String = conf!("database.database");
 
+    static ref METRICS_ENABLED: bool = conf!("metrics.enabled").parse().unwrap();
+
     static ref SALT_API_URL: String = conf!("salt.api.url");
     static ref SALT_API_TLS_SKIPVERIFY: bool = conf!("salt.api.tls.skipverify").parse().unwrap();
     // salt.api.token
@@ -169,6 +171,10 @@ impl SConfig {
         DATABASE_DATABASE.clone()
     }
 
+    pub fn metrics_enabled() -> bool {
+        *METRICS_ENABLED
+    }
+
     pub fn salt_api_url() -> String {
         SALT_API_URL.clone()
     }
@@ -223,6 +229,7 @@ mod tests {
         SConfig::database_host();
         SConfig::database_port();
         SConfig::database_database();
+        SConfig::metrics_enabled();
         SConfig::salt_api_url();
         SConfig::salt_api_tls_skipverify();
         SConfig::salt_api_system_service_token();
@@ -230,5 +237,26 @@ mod tests {
         SConfig::http_frontend_theme_enabled();
         SConfig::http_frontend_theme_color();
         SConfig::http_frontend_theme_dark();
+    }
+}
+
+pub mod danger {
+    use rustls::client::*;
+    use std::time::SystemTime;
+
+    pub struct NoCertificateVerification;
+
+    impl ServerCertVerifier for NoCertificateVerification {
+        fn verify_server_cert(
+            &self,
+            _end_entity: &rustls::Certificate,
+            _intermediates: &[rustls::Certificate],
+            _server_name: &ServerName,
+            _scts: &mut dyn Iterator<Item = &[u8]>,
+            _ocsp_response: &[u8],
+            _now: SystemTime,
+        ) -> Result<ServerCertVerified, rustls::Error> {
+            Ok(ServerCertVerified::assertion())
+        }
     }
 }
