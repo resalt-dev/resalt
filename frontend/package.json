@@ -21,7 +21,7 @@
 		"@codemirror/view": "^6.2.3",
 		"@eonasdan/tempus-dominus": "^6.2.10",
 		"@lezer/highlight": "^1.0.0",
-		"@sveltejs/adapter-auto": "^1.0.0",
+		"@sveltejs/adapter-auto": "^1.0.2",
 		"@sveltejs/vite-plugin-svelte": "^2.0.0",
 		"@tsconfig/svelte": "^3.0.0",
 		"@types/uuid": "^9.0.0",
