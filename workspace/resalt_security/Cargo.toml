@@ -7,7 +7,7 @@ publish = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-argon2 = "0.4.1"
+argon2 = "0.5.0"
 log = { version = "0.4.17" }
 regex = "1"
 resalt_ldap = { path = "../resalt_ldap" }
