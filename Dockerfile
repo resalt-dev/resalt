@@ -1,5 +1,5 @@
 # BUILD ENVIRONMENT
-FROM rust:1.63-slim as build
+FROM rust:1.69-slim as build
 
 # Upgrade System and Install dependencies
 RUN apt-get update && \
