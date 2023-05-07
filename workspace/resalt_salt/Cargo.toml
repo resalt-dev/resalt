@@ -9,8 +9,8 @@ publish = false
 [dependencies]
 actix-web = { version = "4.1.0", features=["compress-gzip"], default-features = false }
 async-stream = "0.3.3"
-awc = { version = "3", features=["rustls", "compress-gzip"], default-features = false }
-chrono = "0.4"
+awc = { version = "3.1.1", features=["rustls", "compress-gzip"], default-features = false }
+chrono = "0.4.24"
 futures = "0.3.21"
 futures-core = "0.3.21"
 lazy_static = "1.4.0"

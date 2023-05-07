@@ -34,7 +34,7 @@ resalt_storage_mysql = { path = "workspace/resalt_storage_mysql" }
 
 # Web
 actix-web = { version = "4.1.0", features=["compress-gzip"], default-features = false }
-awc = { version = "3", features=["rustls", "compress-gzip"], default-features = false }
+awc = { version = "3.1.1", features=["rustls", "compress-gzip"], default-features = false }
 
 # Logging
 log = { version = "0.4.17" }
@@ -46,7 +46,7 @@ futures = "0.3.21"
 clokwerk = "0.4.0"
 
 # Utils
-chrono = "0.4"
+chrono = "0.4.24"
 lazy_static = "1.4.0"
 include_dir = "0.7.2"
 
