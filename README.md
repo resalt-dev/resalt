@@ -17,6 +17,23 @@ Resalt is a free, open-source, self-hosted, web-based administration and monitor
 
 Easiest is to use the Docker container image [UNDER CONSTRUCTION].
 
+Additional needed config in `/etc/salt/master`:
+
+```
+external_auth:
+  rest:
+    ^url: http://resalt:8000/api/1/auth/token
+keep_acl_in_token: True
+netapi_enable_clients:
+  - local
+  - local_async
+  - local_batch
+  - runner
+  - runner_async
+  - wheel
+  - wheel_async
+```
+
 ## 💖 Contributing
 
 Setup development system:

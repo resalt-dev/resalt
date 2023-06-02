@@ -14,20 +14,19 @@ services:
       - "3306:3306"
 
   master:
-    image: saltstack/salt:3005.1
+    image: saltstack/salt:3006.1
     hostname: master
     volumes:
       - ./docker/saltconfig/etc/master:/etc/salt/master:ro
       - ./docker/saltconfig/pillar:/srv/pillar:ro
       - ./docker/saltconfig/salt:/srv/salt:ro
-      - ./docker/saltconfig/rest_cherrypy_app.py:/usr/local/lib/python3.7/site-packages/salt/netapi/rest_cherrypy/app.py:ro
     environment:
       - PYTHONUNBUFFERED=true
       - SALT_API_CONFIG={}
     ports:
       - "8080:8080"
   minion:
-    image: saltstack/salt:3005.1
+    image: saltstack/salt:3006.1
     command: salt-minion -l info
     volumes:
       - ./docker/saltconfig/etc/minion:/etc/salt/minion:ro

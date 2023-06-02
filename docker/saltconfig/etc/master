@@ -405,7 +405,14 @@ external_auth:
   rest:
     ^url: http://backend:8000/api/1/auth/token
 keep_acl_in_token: True
-
+netapi_enable_clients:
+  - local
+  - local_async
+  - local_batch
+  - runner
+  - runner_async
+  - wheel
+  - wheel_async
 
 #
 # Time (in seconds) for a newly generated token to live. Default: 12 hours
