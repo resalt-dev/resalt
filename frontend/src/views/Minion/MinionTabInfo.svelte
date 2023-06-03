@@ -75,7 +75,7 @@
 						{/if}
 					</span>
 				</li>
-				<li class="list-group-item ">
+				<li class="list-group-item">
 					<strong>OS Version</strong>
 					<span class="float-end">
 						{#if grains.osrelease}
