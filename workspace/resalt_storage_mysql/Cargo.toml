@@ -8,8 +8,8 @@ publish = false
 
 [dependencies]
 chrono = "0.4.24"
-diesel = { version = "2.0.0", features = ["mysql", "chrono", "r2d2"] }
-diesel_migrations = "2.0.0"
+diesel = { version = "2.1.0", features = ["mysql", "chrono", "r2d2"] }
+diesel_migrations = "2.1.0"
 log = { version = "0.4.17" }
 rand = "0.8.5"
 resalt_config = { path = "../resalt_config" }
