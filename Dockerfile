@@ -9,7 +9,7 @@ RUN npm install && npm run build
 #
 # BUILD BACKEND
 #
-FROM rust:1.70-slim as build_backend
+FROM rust:1.69-slim as build_backend
 WORKDIR /usr/src/app
 RUN apt-get update && \
   apt-get upgrade -y -o DPkg::Options::=--force-confold && \
