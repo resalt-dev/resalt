@@ -49,32 +49,22 @@ jobs:
     name: Build
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
       - name: 'Cache node_modules'
         uses: actions/cache@v3
         with:
           path: ./frontend/node_modules
           key: ${{ runner.os }}-node-v18-${{ hashFiles('./frontend/package-lock.json') }}
 
-      - name: "cd into /frontend and build"
-        run: |
-          cd frontend
-          npm install
-          npm run build
-
       - name: Read version number
         run: |
           echo "spec_version=$(grep "version = " Cargo.toml | head -n 1  | cut -d '"' -f 2)" >> $GITHUB_ENV
       - name: Print version number
         run: echo ${{ env.spec_version }}
+      - name: Build Docker image
+        run: docker build . -t ghcr.io/resalt-dev/resalt:${{ env.spec_version }}
 
       # Below only happens if tag is created
 
-      - name: Build Docker image
-        if: ${{ startsWith(github.ref, 'refs/tags/') }}
-        run: docker build . -t ghcr.io/resalt-dev/resalt:${{ env.spec_version }}
       - name: Log in to Github Registry
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
         run: |

@@ -36,10 +36,16 @@ services:
       replicas: 3
 
   frontend:
-    user: "${UID:-1000}:${GID:-1000}"
-    image: node:18-alpine
+    image: node:20-alpine
     volumes:
-      - ./frontend:/usr/src/app
+      - ./frontend/assets:/usr/src/app/assets:ro
+      - ./frontend/build:/usr/src/app/build
+      - ./frontend/src:/usr/src/app/src:ro
+      - ./frontend/index.html:/usr/src/app/index.html:ro
+      - ./frontend/package.json:/usr/src/app/package.json:ro
+      - ./frontend/tsconfig.json:/usr/src/app/tsconfig.json:ro
+      - ./frontend/tsconfig.node.json:/usr/src/app/tsconfig.node.json:ro
+      - ./frontend/vite.config.ts:/usr/src/app/vite.config.ts:ro
     command: /bin/sh -c "cd /usr/src/app && npm install && npm run dev"
     ports:
       - "5555:5555"
@@ -49,13 +55,11 @@ services:
       dockerfile: Dockerfile-devel
     volumes:
       - ./docker:/usr/src/app/docker:ro
-      - ./docs:/usr/src/app/docs:ro
       - ./frontend:/usr/src/app/frontend:ro
       - ./src:/usr/src/app/src:ro
       - ./workspace:/usr/src/app/workspace:ro
       - ./.env:/usr/src/app/.env:ro
       - ./Cargo.toml:/usr/src/app/Cargo.toml:ro
-      - ./README.md:/usr/src/app/README.md:ro
       - ./resalt.default.toml:/usr/src/app/resalt.default.toml:ro
       - /tmp/backend-target:/usr/src/app/target
     environment:
