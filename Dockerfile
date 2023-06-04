@@ -15,6 +15,7 @@ RUN apt-get update && \
   apt-get upgrade -y -o DPkg::Options::=--force-confold && \
   apt-get install -y -o DPkg::Options::=--force-confold build-essential pkg-config libssl-dev mariadb-client libmariadb-dev default-libmysqlclient-dev
 COPY . .
+COPY --from=build_frontend /usr/src/app/frontend/build /usr/src/app/frontend/build
 RUN cargo build --release
 
 
