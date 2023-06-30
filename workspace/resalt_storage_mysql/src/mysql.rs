@@ -498,7 +498,12 @@ impl StorageImpl for StorageMySQL {
                         }
                     }
                     "conformity_success" => {
-                        let number = filter.value.parse::<i32>().map_err(|e| {
+                        let number: &str = if filter.value.is_empty() {
+                            "0"
+                        } else {
+                            &filter.value
+                        };
+                        let number = number.parse::<i32>().map_err(|e| {
                             format!("Invalid OBJECT conformity_success filter value: {:?}", e)
                         })?;
 
@@ -527,7 +532,12 @@ impl StorageImpl for StorageMySQL {
                         }
                     }
                     "conformity_incorrect" => {
-                        let number = filter.value.parse::<i32>().map_err(|e| {
+                        let number: &str = if filter.value.is_empty() {
+                            "0"
+                        } else {
+                            &filter.value
+                        };
+                        let number = number.parse::<i32>().map_err(|e| {
                             format!("Invalid OBJECT conformity_incorrect filter value: {:?}", e)
                         })?;
 
@@ -555,7 +565,12 @@ impl StorageImpl for StorageMySQL {
                         }
                     }
                     "conformity_error" => {
-                        let number = filter.value.parse::<i32>().map_err(|e| {
+                        let number: &str = if filter.value.is_empty() {
+                            "0"
+                        } else {
+                            &filter.value
+                        };
+                        let number = number.parse::<i32>().map_err(|e| {
                             format!("Invalid OBJECT conformity_error filter value: {:?}", e)
                         })?;
 

@@ -58,7 +58,13 @@
 
 		// Check if fieldType OBJECT and field "last_seen", then set operand to FilterOperand.GREATER_THAN_OR_EQUAL
 		filters.update((f) => {
-			if (f[index].fieldType === FilterFieldType.OBJECT && newField === 'last_seen') {
+			if (
+				f[index].fieldType === FilterFieldType.OBJECT &&
+				(newField === 'last_seen' ||
+					newField === 'conformity_success' ||
+					newField === 'conformity_incorrect' ||
+					newField === 'conformity_error')
+			) {
 				f[index].operand = FilterOperand.GREATER_THAN_OR_EQUAL;
 			}
 			return f;
@@ -291,16 +297,7 @@
 					</div>
 				{:else}
 					<div class="form-floating {i + 1 === $filters.length ? 'mb-0' : 'mb-3'}">
-						<Input
-							type={filter.fieldType === FilterFieldType.OBJECT &&
-							(filter.field === 'conformity_success' ||
-								filter.field === 'conformity_incorrect' ||
-								filter.field === 'conformity_error')
-								? 'number'
-								: 'text'}
-							bind:value={filter.value}
-							required
-						/>
+						<Input type="text" bind:value={filter.value} required />
 						{#if filter.fieldType === FilterFieldType.PACKAGE}
 							<Label>Version</Label>
 						{:else}
