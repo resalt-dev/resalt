@@ -1,3 +1,4 @@
+use actix_tls::connect::openssl::reexports::{SslConnector, SslMethod};
 use actix_web::http::StatusCode;
 use async_stream::stream;
 use awc::{
@@ -6,10 +7,9 @@ use awc::{
 };
 use futures::StreamExt;
 use log::*;
+use openssl::ssl::SslVerifyMode;
 use resalt_config::SConfig;
 use resalt_models::*;
-use rustls::ClientConfig;
-use rustls_native_certs::load_native_certs;
 use serde::Deserialize;
 use serde_json::{json, Value};
 use std::{collections::HashMap, sync::Arc, time::Duration};
@@ -166,27 +166,14 @@ impl SV {
 pub type Dictionary = HashMap<String, String>;
 
 lazy_static::lazy_static! {
-    static ref AWC_CONFIG: ClientConfig = {
-        let certs = load_native_certs().unwrap();
-
-        // Convert Vec<rustls_native_certs::Certificate> to RootCertStore
-        let mut root_store = rustls::RootCertStore::empty();
-        for cert in certs {
-            root_store.add(&rustls::Certificate(cert.0)).unwrap();
-        }
-
-        let mut config = ClientConfig::builder()
-            .with_safe_defaults()
-            .with_root_certificates(root_store)
-            .with_no_client_auth();
+    static ref AWC_CONFIG: SslConnector = {
+        let mut config = SslConnector::builder(SslMethod::tls_client()).unwrap();
 
         if SConfig::salt_api_tls_skipverify() {
-            config
-                .dangerous()
-                .set_certificate_verifier(Arc::new(resalt_config::danger::NoCertificateVerification));
+            config.set_verify(SslVerifyMode::NONE);
         }
 
-        config
+        config.build()
     };
 }
 
@@ -194,7 +181,7 @@ pub fn create_awc_client() -> awc::Client {
     awc::Client::builder()
         .connector(
             Connector::new()
-                .rustls(Arc::new(AWC_CONFIG.to_owned()))
+                .openssl(AWC_CONFIG.to_owned())
                 .timeout(Duration::from_secs(3)), // Connector timeout, 3 seconds
         )
         .timeout(Duration::from_secs(60 * 20)) // Request timeout, 20 minutes

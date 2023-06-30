@@ -8,8 +8,10 @@ publish = false
 
 [dependencies]
 actix-web = { version = "4.1.0", features=["compress-gzip"], default-features = false }
+actix-tls = { version = "3.0.3", features=["openssl"], default-features = false }
+openssl = "0.10.55"
 async-stream = "0.3.3"
-awc = { version = "3.1.1", features=["rustls", "compress-gzip"], default-features = false }
+awc = { version = "3.1.1", features=["openssl", "compress-gzip"], default-features = false }
 chrono = "0.4.24"
 futures = "0.3.21"
 futures-core = "0.3.21"
@@ -20,8 +22,6 @@ resalt_config = { path = "../resalt_config" }
 resalt_models = { path = "../resalt_models" }
 resalt_pipeline = { path = "../resalt_pipeline" }
 resalt_storage = { path = "../resalt_storage" }
-rustls = { version = "0.20.8", features = ["dangerous_configuration"] }
-rustls-native-certs = "0.6.2"
 serde = { version = "1.0.139", features = ["derive"] }
 serde_json = "1.0.82"
 tokio = { version = "1.20.0", features = ["rt-multi-thread"], default-features = false }
