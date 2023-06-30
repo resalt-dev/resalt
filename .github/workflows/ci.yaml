@@ -24,7 +24,7 @@ jobs:
       - name: "cd into /frontend and lint"
         run: |
           cd frontend
-          npm install
+          npm install --legacy-peer-deps
           npm run lint
 
   backend-lint:
