@@ -1,12 +1,10 @@
 # BUILD ENVIRONMENT
-FROM rust:1.69-slim
+FROM rust:1.70-slim
 
 # Upgrade System and Install dependencies
 RUN apt-get update && \
   apt-get upgrade -y -o DPkg::Options::=--force-confold && \
   apt-get install -y -o DPkg::Options::=--force-confold build-essential pkg-config libssl-dev mariadb-client libmariadb-dev default-libmysqlclient-dev
-
-RUN rustup update nightly
 
 RUN cargo install cargo-watch
 RUN cargo install diesel_cli --no-default-features --features "mysql"
@@ -21,4 +19,4 @@ EXPOSE 8000
 WORKDIR /usr/src/app
 
 # Remember to mount source code to the container as volume!
-CMD cargo watch --poll -w src -w workspace -x "+nightly -Z sparse-registry run"
+CMD cargo watch --poll -w src -w workspace -x run
