@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
-	import { Alert, Button, CardBody, CardHeader, Col, FormGroup, Input, Table } from 'sveltestrap';
+	import { Alert, Button, CardBody, CardHeader, Col, FormGroup, Input } from 'sveltestrap';
 	import Icon from '../../components/Icon.svelte';
 	import TablePaginate from '../../components/TablePaginate.svelte';
 	import {
@@ -484,7 +484,7 @@
 <div class="row">
 	<Col xs="12" md="4">
 		<div class="table-responsive border-bottom-0 mb-3">
-			<Table class="b-0 mb-0">
+			<table class="table b-0 mb-0">
 				<thead class="bg-dark border-0 text-white">
 					<tr>
 						<th class="border-secondary">
@@ -538,7 +538,7 @@
 						{/each}
 					{/if}
 				</tbody>
-			</Table>
+			</table>
 			<TablePaginate
 				bind:size={paginationSize}
 				bind:page={paginationPage}
@@ -631,7 +631,7 @@
 						</Col>
 						<Col class="ps-3 mb-0" xs="12">
 							<h3>Members</h3>
-							<Table class="b-0 mb-3">
+							<table class="table b-0 mb-3">
 								<thead class="bg-dark border-0 text-white">
 									<tr>
 										<th class="border-secondary"> User ID </th>
@@ -666,7 +666,7 @@
 										</tr>
 									{/each}
 								</tbody>
-							</Table>
+							</table>
 						</Col>
 						<Col class="ps-3 mb-0" xs="12">
 							<div class="input-group flex-nowrap">
@@ -715,7 +715,7 @@
 						<Col class="ps-3 mb-0" xs="12">
 							<h3>Permissions</h3>
 							<h5>Web Dashboard</h5>
-							<Table class="b-0 mb-3">
+							<table class="table b-0 mb-3">
 								<thead class="bg-dark border-0 text-white">
 									<tr>
 										<th class="border-secondary" />
@@ -767,9 +767,9 @@
 										</tr>
 									{/each}
 								</tbody>
-							</Table>
+							</table>
 							<h5>Minion Targets</h5>
-							<Table class="b-0 mb-3">
+							<table class="table b-0 mb-3">
 								<thead class="bg-dark border-0 text-white">
 									<tr>
 										<th class="border-secondary ps-3"> Target </th>
@@ -980,7 +980,7 @@
 										</tr>
 									{/each}
 								</tbody>
-							</Table>
+							</table>
 							<!-- Display warning if any has "*" as target, instead of ".*" -->
 							{#if $permissionMinionsFields.some((mt) => mt.target === '*')}
 								<Alert

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Writable } from 'svelte/store';
-	import { Table } from 'sveltestrap';
 	import FloatingRightButton from '../../components/FloatingRightButton.svelte';
 	import JsonViewer from '../../components/JsonViewer.svelte';
 	import type Minion from '../../models/Minion';
@@ -22,7 +21,7 @@
 		<JsonViewer data={JSON.parse($minion.pkgs)} />
 	{:else}
 		<div class="card table-responsive border-bottom-0">
-			<Table hover class="b-0 mb-0">
+			<table class="table table-hover b-0 mb-0">
 				<thead class="bg-dark border-0 text-white">
 					<tr>
 						<th class="border-secondary"> Package </th>
@@ -39,7 +38,7 @@
 						</tr>
 					{/each}
 				</tbody>
-			</Table>
+			</table>
 		</div>
 	{/if}
 {/if}
