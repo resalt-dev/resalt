@@ -7,10 +7,13 @@
 	import { hasPermission } from '../../perms';
 	import Clickable from '../../components/Clickable.svelte';
 	import { Modal } from '../../../assets/js/bootstrap.esm-5.3.0.min.js';
+	import { v4 as uuidv4 } from 'uuid';
 
 	export let command: RunCommand;
 	export let close: () => void;
 	export let execute: () => void;
+
+	const randomId = uuidv4();
 
 	let commandLine: string;
 	$: commandLine = command !== null ? command.toCommandLine({}) : '';
@@ -34,7 +37,7 @@
 
 	function showDialog(): void {
 		// Show dialog BS5
-		const modalWidget = document.querySelector('.modal');
+		const modalWidget = document.getElementById(randomId);
 		if (modalWidget !== null) {
 			const modal = new Modal(modalWidget);
 			modal.show();
@@ -43,7 +46,7 @@
 
 	function hideDialog(): void {
 		// Hide dialog BS5
-		const modalWidget = document.querySelector('.modal');
+		const modalWidget = document.getElementById(randomId);
 		if (modalWidget !== null) {
 			const modal = Modal.getInstance(modalWidget);
 			if (modal !== null) {
@@ -54,7 +57,7 @@
 </script>
 
 <!-- isOpen={command !== null} -->
-<div class="modal {$theme.dark ? 'theme-dark' : ''}">
+<div class="modal {$theme.dark ? 'theme-dark' : ''}" tabindex="-1" role="dialog" id={randomId}>
 	<div class="modal-dialog">
 		<div class="modal-content {$theme.dark ? 'bg-secondary text-white' : ''}">
 			<Clickable type="div" event={close} class="modal-header bg-warning text-dark">

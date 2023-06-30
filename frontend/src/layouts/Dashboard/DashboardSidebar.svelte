@@ -5,15 +5,35 @@
 	import Logo from '../../components/Logo.svelte';
 	import SidebarItem from './DashboardSidebarItem.svelte';
 	import constants from '../../constants';
-	import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'sveltestrap';
 	import Clickable from '../../components/Clickable.svelte';
+	import { Modal } from '../../../assets/js/bootstrap.esm-5.3.0.min.js';
+	import { v4 as uuidv4 } from 'uuid';
+
+	const randomId = uuidv4();
 
 	function handleClickCollapse(): void {
 		collapsed.update((n) => !n);
 	}
 
-	let openUpdate = false;
-	const toggleUpdate = () => (openUpdate = !openUpdate);
+	function showDialog(): void {
+		// Show dialog BS5
+		const modalWidget = document.getElementById(randomId);
+		if (modalWidget !== null) {
+			const modal = new Modal(modalWidget);
+			modal.show();
+		}
+	}
+
+	function hideDialog(): void {
+		// Hide dialog BS5
+		const modalWidget = document.getElementById(randomId);
+		if (modalWidget !== null) {
+			const modal = Modal.getInstance(modalWidget);
+			if (modal !== null) {
+				modal.hide();
+			}
+		}
+	}
 </script>
 
 <div
@@ -73,7 +93,7 @@
 	{#if $config.latestVersion === 'unknown'}
 		<Clickable
 			type="span"
-			event={toggleUpdate}
+			event={showDialog}
 			class="text-center link-danger text-decoration-underline"
 		>
 			{#if $collapsed}
@@ -87,7 +107,7 @@
 	{:else if $config.currentVersion !== $config.latestVersion}
 		<Clickable
 			type="span"
-			event={toggleUpdate}
+			event={showDialog}
 			class="text-center link-warning text-decoration-underline"
 		>
 			{#if $collapsed}
@@ -110,60 +130,70 @@
 </div>
 
 <div>
-	<Modal isOpen={openUpdate} toggle={toggleUpdate} class={$theme.dark ? 'theme-dark' : ''}>
-		<ModalHeader
-			toggle={toggleUpdate}
-			class={$config.latestVersion === 'unknown' ? 'bg-danger' : 'bg-warning text-dark'}
-		>
-			{#if $config.latestVersion === 'unknown'}
-				Update Error!
-			{:else}
-				Update Warning
-			{/if}
-		</ModalHeader>
-		<ModalBody>
-			{#if $config.latestVersion === 'unknown'}
-				<h1>
-					<span class="update-label">Current: </span>
-					<span class="badge bg-{$theme.color}">{$config.currentVersion}</span>
-				</h1>
-				<br />
-				There was a critical error while trying to check for updates. Especially in a software
-				that interracts with SaltStack, it is
-				<b>CRITICAL</b> to run the latest version for security reasons.
-				<br />
-				<br />
-				Double-check that the Resalt container is able to access
-				<code>secure.resalt.dev</code> and without a proxy. Please contact your administrator,
-				or the Resalt development team, if this issue persists.
-			{:else}
-				<h1>
-					<span class="update-label">Current: </span>
-					<span class="badge bg-{$theme.color}">{$config.currentVersion}</span>
-				</h1>
-				<h1>
-					<span class="update-label">Latest: </span>
-					<span class="badge bg-{$theme.color}">{$config.latestVersion}</span>
-				</h1>
-				<br />
-				By not upgrading, you risk compromising the security and integrity of your infrastructure
-				by not taking use of the latest bug fixes and security patches.
-				<br />
-				<hr class="text-light" />
-				You can upgrade by increasing the version number of the Docker image in your compose/stack
-				file to the latest version. If you have any questions, please reach out on GitHub:<a
-					target="_blank"
-					href={constants.githubUrl}
-					rel="noreferrer"
+	<div class="modal {$theme.dark ? 'theme-dark' : ''}" tabindex="-1" role="dialog" id={randomId}>
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<Clickable
+					type="div"
+					event={hideDialog}
+					class="modal-header {$config.latestVersion === 'unknown'
+						? 'bg-danger'
+						: 'bg-warning text-dark'} text-dark"
 				>
-					{constants.githubUrl}</a
-				>
-			{/if}
-		</ModalBody>
-		<ModalFooter>
-			<Button color="secondary" on:click={toggleUpdate}>Close</Button>
-		</ModalFooter>
-	</Modal>
+					{#if $config.latestVersion === 'unknown'}
+						Update Error!
+					{:else}
+						Update Warning
+					{/if}
+				</Clickable>
+				<div class="modal-body">
+					{#if $config.latestVersion === 'unknown'}
+						<h1>
+							<span class="update-label">Current: </span>
+							<span class="badge bg-{$theme.color}">{$config.currentVersion}</span>
+						</h1>
+						<br />
+						There was a critical error while trying to check for updates. Especially in a
+						software that interracts with SaltStack, it is
+						<b>CRITICAL</b> to run the latest version for security reasons.
+						<br />
+						<br />
+						Double-check that the Resalt container is able to access
+						<code>secure.resalt.dev</code> and without a proxy. Please contact your administrator,
+						or the Resalt development team, if this issue persists.
+					{:else}
+						<h1>
+							<span class="update-label">Current: </span>
+							<span class="badge bg-{$theme.color}">{$config.currentVersion}</span>
+						</h1>
+						<h1>
+							<span class="update-label">Latest: </span>
+							<span class="badge bg-{$theme.color}">{$config.latestVersion}</span>
+						</h1>
+						<br />
+						By not upgrading, you risk compromising the security and integrity of your infrastructure
+						by not taking use of the latest bug fixes and security patches.
+						<br />
+						<hr class="text-light" />
+						You can upgrade by increasing the version number of the Docker image in your
+						compose/stack file to the latest version. If you have any questions, please reach
+						out on GitHub:<a
+							target="_blank"
+							href={constants.githubUrl}
+							rel="noreferrer"
+						>
+							{constants.githubUrl}</a
+						>
+					{/if}
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" on:click={hideDialog}>
+						Close
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
 <style lang="scss">
