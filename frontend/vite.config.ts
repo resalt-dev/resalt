@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import autoprefixer from 'autoprefixer';
 import sveltePreprocess from 'svelte-preprocess';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 const tagsRegex1 = /(>)[\s]*([<{])/g;
 const tagsRegex2 = /({[/:][a-z]+})[\s]*([<{])/g;
@@ -50,5 +51,12 @@ export default defineConfig({
 			},
 			emitCss: true,
 		}),
+		// add .gitkeep
+		viteStaticCopy({
+			targets: [
+				{ src: '.gitkeep', dest: '' },
+			],
+		})
+
 	],
 });
