@@ -29,11 +29,11 @@
 </script>
 
 {#if type === 'div' || type === undefined}
-	<div {...inputProps} on:click={wr(event)} on:keypress={wr(event)}>
+	<div {...inputProps} on:click={wr(event)} on:keypress={wr(event)} role="button" tabindex="0">
 		<slot />
 	</div>
 {:else if type === 'span'}
-	<span {...inputProps} on:click={wr(event)} on:keypress={wr(event)}>
+	<span {...inputProps} on:click={wr(event)} on:keypress={wr(event)} role="button" tabindex="0">
 		<slot />
 	</span>
 {:else if type === 'tr'}

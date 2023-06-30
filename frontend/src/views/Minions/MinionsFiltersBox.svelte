@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { afterUpdate, beforeUpdate, onMount } from 'svelte';
+	import { afterUpdate, beforeUpdate } from 'svelte';
 	import { Button, Col, Input, Label, Row } from 'sveltestrap';
 	import { FilterFieldType } from '../../models/FilterFieldType';
 	import { FilterOperand } from '../../models/FilterOperand';
-	import { TempusDominus, Namespace, extend } from '@eonasdan/tempus-dominus';
+	import { TempusDominus, Namespace } from '@eonasdan/tempus-dominus';
 	import Icon from '../../components/Icon.svelte';
 	import type Filter from '../../models/Filter';
 	import { theme } from '../../stores';
