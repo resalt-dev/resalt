@@ -4,7 +4,6 @@
 	import { FilterFieldType } from '../../models/FilterFieldType';
 	import { FilterOperand } from '../../models/FilterOperand';
 	import { TempusDominus, Namespace, extend } from '@eonasdan/tempus-dominus';
-	import customDateFormat from '@eonasdan/tempus-dominus/dist/plugins/customDateFormat';
 	import Icon from '../../components/Icon.svelte';
 	import type Filter from '../../models/Filter';
 	import { theme } from '../../stores';
@@ -139,11 +138,6 @@
 
 	afterUpdate(() => {
 		createDateTimePickers();
-	});
-
-	onMount(() => {
-		// Enable customDateFormat plugin in Tempus Dominus (datepicker)
-		extend(customDateFormat, undefined);
 	});
 </script>
 
