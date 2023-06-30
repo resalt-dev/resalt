@@ -239,24 +239,3 @@ mod tests {
         SConfig::http_frontend_theme_dark();
     }
 }
-
-pub mod danger {
-    use rustls::client::*;
-    use std::time::SystemTime;
-
-    pub struct NoCertificateVerification;
-
-    impl ServerCertVerifier for NoCertificateVerification {
-        fn verify_server_cert(
-            &self,
-            _end_entity: &rustls::Certificate,
-            _intermediates: &[rustls::Certificate],
-            _server_name: &ServerName,
-            _scts: &mut dyn Iterator<Item = &[u8]>,
-            _ocsp_response: &[u8],
-            _now: SystemTime,
-        ) -> Result<ServerCertVerified, rustls::Error> {
-            Ok(ServerCertVerified::assertion())
-        }
-    }
-}
