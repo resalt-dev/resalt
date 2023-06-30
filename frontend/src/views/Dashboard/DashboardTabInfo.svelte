@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
-	import { Card, CardBody, CardHeader, CardTitle, Col, Row, Table } from 'sveltestrap';
+	import { CardBody, CardHeader, CardTitle, Col, Row, Table } from 'sveltestrap';
 	import { getSystemStatus } from '../../api';
 	import Icon from '../../components/Icon.svelte';
 	import ResaltProgress from '../../components/ResaltProgress.svelte';
@@ -28,7 +28,7 @@
 
 <Row>
 	<Col xs="12" class="pb-3">
-		<Card class={$theme.dark ? 'bg-dark' : ''}>
+		<div class="card {$theme.dark ? 'bg-dark' : ''}">
 			<CardBody>
 				<!-- welcome title -->
 				<h1 class="display-4">Welcome to Resalt</h1>
@@ -52,10 +52,10 @@
 					</Col>
 				</Row> -->
 			</CardBody>
-		</Card>
+		</div>
 	</Col>
 	<Col xs="12" xl="4" class="pb-3">
-		<Card class={$theme.dark ? 'bg-dark' : ''}>
+		<div class="card {$theme.dark ? 'bg-dark' : ''}">
 			<CardHeader>
 				<CardTitle class="mb-0">System Summary</CardTitle>
 			</CardHeader>
@@ -129,10 +129,10 @@
 					</p>
 				</CardBody>
 			{/if}
-		</Card>
+		</div>
 	</Col>
 	<Col xs="12" xl="4" class="pb-3">
-		<Card class={$theme.dark ? 'bg-dark' : ''}>
+		<div class="card {$theme.dark ? 'bg-dark' : ''}">
 			<CardHeader>
 				<CardTitle class="mb-0">Quick Links</CardTitle>
 			</CardHeader>
@@ -162,10 +162,10 @@
 					<br />
 				</a>
 			</CardBody>
-		</Card>
+		</div>
 	</Col>
 	<Col xs="12" xl="4" class="pb-3">
-		<Card class={$theme.dark ? 'bg-dark' : ''}>
+		<div class="card {$theme.dark ? 'bg-dark' : ''}">
 			<CardHeader>
 				<CardTitle class="mb-0">Latest News</CardTitle>
 			</CardHeader>
@@ -180,6 +180,6 @@
 					{/if}
 				{/each}
 			</CardBody>
-		</Card>
+		</div>
 	</Col>
 </Row>

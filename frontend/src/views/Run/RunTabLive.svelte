@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { Button, Col, Row } from 'sveltestrap';
 	import { toasts } from '../../stores';
 	import { runJob } from '../../api';
 	import RunResult from '../../models/RunResult';
@@ -57,17 +56,17 @@
 
 <hr class="text-light mt-1" />
 
-<Row>
-	<Col />
-	<Col xs="auto">
-		<Button class="me-3" color="success" on:click={formSaveTemplate} disabled>
+<div class="row">
+	<div class="col" />
+	<div class="col-auto">
+		<button type="button" class="btn btn-success me-3" on:click={formSaveTemplate} disabled>
 			Save as Template
-		</Button>
-		<Button class="me-3" color="primary" on:click={formApproval} disabled>
+		</button>
+		<button type="button" class="btn btn-primary me-3" on:click={formApproval} disabled>
 			Submit for Approval
-		</Button>
-		<Button class="me-1" color="warning" on:click={formRunNow}>Run Now</Button>
-	</Col>
-</Row>
+		</button>
+		<button type="button" class="btn btn-warning me-1" on:click={formRunNow}>Run Now</button>
+	</div>
+</div>
 
 <RunConfirmLiveBox {command} close={closeRunNowDialog} execute={_runNow} />

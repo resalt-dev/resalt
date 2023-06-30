@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { Card, Table } from 'sveltestrap';
 	import Icon from '../../components/Icon.svelte';
 	import { getEvents } from '../../api';
 	import { toasts } from '../../stores';
@@ -64,8 +63,8 @@
 	});
 </script>
 
-<Card class="table-responsive border-bottom-0">
-	<Table hover class="b-0 mb-0">
+<div class="card table-responsive border-bottom-0">
+	<table class="table table-hover b-0 mb-0">
 		<thead class="bg-dark border-0 text-white">
 			<tr>
 				<th class="border-secondary">
@@ -128,8 +127,8 @@
 				{/each}
 			{/if}
 		</tbody>
-	</Table>
-</Card>
+	</table>
+</div>
 
 <TablePaginate
 	bind:size={paginationSize}

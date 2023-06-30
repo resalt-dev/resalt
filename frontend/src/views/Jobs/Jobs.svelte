@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { getJobs } from '../../api';
 	import { toasts } from '../../stores';
-	import { Card, Table, Tooltip } from 'sveltestrap';
+	import { Table, Tooltip } from 'sveltestrap';
 	import Icon from '../../components/Icon.svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import TablePaginate from '../../components/TablePaginate.svelte';
@@ -44,7 +44,7 @@
 	let jobIdTooltipElement;
 </script>
 
-<Card class="table-responsive border-bottom-0">
+<div class="card table-responsive border-bottom-0">
 	<Table hover class="b-0 mb-0">
 		<thead class="bg-dark border-0 text-white">
 			<tr>
@@ -95,7 +95,7 @@
 			{/if}
 		</tbody>
 	</Table>
-</Card>
+</div>
 
 <TablePaginate
 	bind:size={paginationSize}

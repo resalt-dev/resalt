@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { theme, currentUser, toasts } from '../../stores';
 	import { deleteUser, getUsers } from '../../api';
-	import { Badge, Card, Table } from 'sveltestrap';
+	import { Badge, Table } from 'sveltestrap';
 	import { writable, type Writable } from 'svelte/store';
 	import TablePaginate from '../../components/TablePaginate.svelte';
 	import paths from '../../paths';
@@ -53,7 +53,7 @@ Search box here.
 
 <hr class="text-light" />
 
-<Card class="table-responsive border-bottom-0">
+<div class="card table-responsive border-bottom-0">
 	<Table hover class="b-0 mb-0">
 		<thead class="bg-dark border-0 text-white">
 			<tr>
@@ -125,7 +125,7 @@ Search box here.
 			{/if}
 		</tbody>
 	</Table>
-</Card>
+</div>
 
 <TablePaginate
 	bind:size={paginationSize}

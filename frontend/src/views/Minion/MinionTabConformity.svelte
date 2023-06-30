@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Writable } from 'svelte/store';
-	import { Card, CardBody, CardHeader, Col, Row } from 'sveltestrap';
+	import { CardBody, CardHeader, Col, Row } from 'sveltestrap';
 	import FloatingRightButton from '../../components/FloatingRightButton.svelte';
 	import JsonViewer from '../../components/JsonViewer.svelte';
 	import type Minion from '../../models/Minion';
@@ -166,7 +166,7 @@
 	{:else}
 		<Row>
 			<Col xs="3">
-				<Card class="mb-3">
+				<div class="card mb-3">
 					<CardHeader>Options</CardHeader>
 					<CardBody>
 						<h5 class="card-title">Sort method</h5>
@@ -247,9 +247,9 @@
 							</label>
 						</div>
 					</CardBody>
-				</Card>
+				</div>
 
-				<Card class="mb-3">
+				<div class="card mb-3">
 					<CardHeader>States</CardHeader>
 					<CardBody>
 						<!-- Render Tree structure in a recursive fashion. -->
@@ -259,7 +259,7 @@
 							bind:collapseList
 						/>
 					</CardBody>
-				</Card>
+				</div>
 			</Col>
 			<Col>
 				<div class="d-grid">

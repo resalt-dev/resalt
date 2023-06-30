@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Link } from 'svelte-navigator';
 	import type { Writable } from 'svelte/store';
-	import { Button, Card, CardBody, CardHeader, Col, Row, Table } from 'sveltestrap';
+	import { Button, CardBody, CardHeader, Col, Row, Table } from 'sveltestrap';
 	import CopyButton from '../../components/CopyButton.svelte';
 	import Icon from '../../components/Icon.svelte';
 	import type Minion from '../../models/Minion';
@@ -27,7 +27,7 @@
 
 <Row>
 	<Col xs="6" xxl="3">
-		<Card class="mb-3">
+		<div class="card mb-3">
 			<CardHeader>Common</CardHeader>
 			<ul class="list-group list-group-flush">
 				<li class="list-group-item">
@@ -97,11 +97,11 @@
 					</span>
 				</li>
 			</ul>
-		</Card>
+		</div>
 	</Col>
 
 	<Col xs="6" xxl="3">
-		<Card class="mb-3">
+		<div class="card mb-3">
 			<CardHeader>Hardware</CardHeader>
 			<ul class="list-group list-group-flush">
 				<li class="list-group-item">
@@ -155,11 +155,11 @@
 					</span>
 				</li>
 			</ul>
-		</Card>
+		</div>
 	</Col>
 
 	<Col xs="6" xxl="3">
-		<Card class="mb-3">
+		<div class="card mb-3">
 			<CardHeader>DNS</CardHeader>
 			<ul class="list-group list-group-flush">
 				<li class="list-group-item">
@@ -181,11 +181,11 @@
 					{/each}
 				</li>
 			</ul>
-		</Card>
+		</div>
 	</Col>
 
 	<Col xs="6" xxl="3">
-		<Card class="mb-3">
+		<div class="card mb-3">
 			<CardHeader>Timings</CardHeader>
 			<ul class="list-group list-group-flush">
 				<li class="list-group-item">
@@ -233,11 +233,11 @@
 					</span>
 				</li>
 			</ul>
-		</Card>
+		</div>
 	</Col>
 
 	<Col xs="12">
-		<Card class="mb-3">
+		<div class="card mb-3">
 			<CardHeader>Network</CardHeader>
 			<CardBody class="p-0">
 				<Table hover class="mb-0">
@@ -263,6 +263,6 @@
 					</tbody>
 				</Table>
 			</CardBody>
-		</Card>
+		</div>
 	</Col>
 </Row>

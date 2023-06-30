@@ -20,10 +20,11 @@
 			: {};
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
 <i
 	bind:this={htmlElement}
 	on:click
+	role="button"
+	tabindex="0"
 	class="bx {iconName} {cssClass.indexOf('align-') === -1 ? 'align-' + align : ''} {cssClass}"
 	style="font-size: {size}rem;{style}"
 	{...tooltipAttr}

@@ -4,7 +4,6 @@
 	import {
 		Alert,
 		Button,
-		Card,
 		CardBody,
 		CardHeader,
 		Col,
@@ -563,7 +562,7 @@
 		</div>
 	</Col>
 	<Col xs="12" md="8">
-		<Card>
+		<div class="card">
 			<CardHeader>
 				Group Details
 				<Button
@@ -1032,7 +1031,7 @@
 					</Row>
 				{/if}
 			</CardBody>
-		</Card>
+		</div>
 	</Col>
 </Row>
 

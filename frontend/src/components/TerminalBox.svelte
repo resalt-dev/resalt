@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Card, Collapse } from 'sveltestrap';
+	import { Collapse } from 'sveltestrap';
 	import Clickable from './Clickable.svelte';
 
 	let topClass = '';
@@ -8,7 +8,7 @@
 	export let toggleCollapse: (id: string) => void = undefined;
 </script>
 
-<Card class="terminal-box {topClass.indexOf('mb-') == -1 ? 'mb-3' : ''} {topClass}">
+<div class="card terminal-box {topClass.indexOf('mb-') == -1 ? 'mb-3' : ''} {topClass}">
 	{#if toggleCollapse !== undefined}
 		<Clickable type="div" event={toggleCollapse} class="card-header">
 			<slot name="header" />
@@ -28,4 +28,4 @@
 			</div>
 		</div>
 	{/if}
-</Card>
+</div>

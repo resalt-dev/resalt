@@ -4,7 +4,6 @@
 	import { writable, type Writable } from 'svelte/store';
 	import { onMount } from 'svelte';
 	import {
-		Card,
 		CardBody,
 		CardHeader,
 		CardTitle,
@@ -112,7 +111,7 @@
 
 	<Row>
 		<Col xs="12" xxl="4" class="pb-3">
-			<Card class="h-100 {$theme.dark ? 'bg-dark' : ''}">
+			<div class="card h-100 {$theme.dark ? 'bg-dark' : ''}">
 				<CardHeader>
 					<CardTitle class="mb-0">General</CardTitle>
 				</CardHeader>
@@ -159,11 +158,11 @@
 						</span>
 					</li>
 				</ul>
-			</Card>
+			</div>
 		</Col>
 		{#if hasResaltPermission($currentUser, P_USER_ADMIN) || ($currentUser.id === $user.id && hasResaltPermission($currentUser, P_USER_PASSWORD))}
 			<Col xs="12" xxl="4" class="pb-3">
-				<Card class="h-100 {$theme.dark ? 'bg-dark' : ''}">
+				<div class="card h-100 {$theme.dark ? 'bg-dark' : ''}">
 					<CardHeader>
 						<CardTitle class="mb-0">Password</CardTitle>
 					</CardHeader>
@@ -209,16 +208,16 @@
 							on:click={updatePassword}>Update</button
 						>
 					</CardBody>
-				</Card>
+				</div>
 			</Col>
 		{/if}
 		<Col xs="12" xxl="4" class="pb-3">
-			<Card class="h-100 {$theme.dark ? 'bg-dark' : ''}">
+			<div class="card h-100 {$theme.dark ? 'bg-dark' : ''}">
 				<CardHeader>
 					<CardTitle class="mb-0">Permissions</CardTitle>
 				</CardHeader>
 				<JsonViewer data={$user.perms} sort={false} />
-			</Card>
+			</div>
 		</Col>
 	</Row>
 {/if}

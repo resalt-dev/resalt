@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { Progress } from 'sveltestrap';
 	import { theme } from '../stores';
 </script>
 
-<Progress animated color={null} barClassName={'bg-' + $theme.color} value={100}>
-	Loading...
-</Progress>
+<div class="progress" role="progressbar" aria-label="Loading" aria-valuenow={100}>
+	<div class="progress-bar progress-bar-animated bg-{$theme.color}" style="width: 100%">
+		Loading...
+	</div>
+</div>

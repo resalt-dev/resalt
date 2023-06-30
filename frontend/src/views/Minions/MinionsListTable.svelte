@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Link, type NavigateFn } from 'svelte-navigator';
 	import { writable, type Writable } from 'svelte/store';
-	import { Button, Card, Spinner, Table } from 'sveltestrap';
+	import { Button, Spinner, Table } from 'sveltestrap';
 	import { getMinions, refreshMinion } from '../../api';
 	import Clickable from '../../components/Clickable.svelte';
 	import Icon from '../../components/Icon.svelte';
@@ -89,7 +89,7 @@
 	}
 </script>
 
-<Card class="table-responsive border-bottom-0">
+<div class="card table-responsive border-bottom-0">
 	<Table hover class="b-0 mb-0">
 		<thead class="bg-dark border-0 text-white">
 			<tr>
@@ -309,7 +309,7 @@
 			{/if}
 		</tbody>
 	</Table>
-</Card>
+</div>
 
 <TablePaginate
 	bind:size={paginationSize}

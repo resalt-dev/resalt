@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Row, Col, Button, Card, CardHeader, CardBody } from 'sveltestrap';
+	import { Row, Col, Button, CardHeader, CardBody } from 'sveltestrap';
 	import Icon from '../../components/Icon.svelte';
 	import constants from '../../constants';
 	import { MessageType } from '../../models/MessageType';
@@ -23,7 +23,7 @@
 </script>
 
 {#if $config.themeEnableSwitching}
-	<Card class="mb-3">
+	<div class="card mb-3">
 		<CardHeader>Color</CardHeader>
 		<CardBody>
 			<Row>
@@ -54,10 +54,10 @@
 				Reset
 			</Button>
 		</CardBody>
-	</Card>
+	</div>
 {/if}
 
-<Card class="mb-0">
+<div class="card mb-0">
 	<CardHeader>Dark mode</CardHeader>
 	<CardBody>
 		<Row>
@@ -113,7 +113,7 @@
 			</Button>
 		{/if}
 	</CardBody>
-</Card>
+</div>
 
 <style lang="scss">
 	$theme-box-size: 75px;

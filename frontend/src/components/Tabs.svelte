@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Alert, Card, CardBody } from 'sveltestrap';
+	import { Alert, CardBody } from 'sveltestrap';
 	import { Link } from 'svelte-navigator';
 	import { theme } from '../stores';
 	import type TabPage from '../models/TabPage';
@@ -27,7 +27,7 @@
 	{/each}
 </div>
 
-<Card class="mb-3 border border-4 border-{$theme.color} rounded-none bg-none">
+<div class="card mb-3 border border-4 border-{$theme.color} rounded-none bg-none">
 	<CardBody>
 		{#if _currentTabIndex === -1 || tabs[_currentTabIndex].hidden}
 			<!-- Either disled or no permissions. -->
@@ -45,4 +45,4 @@
 			/>
 		{/if}
 	</CardBody>
-</Card>
+</div>

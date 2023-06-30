@@ -2,7 +2,6 @@
 	import { useLocation, Link, useNavigate } from 'svelte-navigator';
 	import { currentUser, socket, theme, toasts } from '../../stores';
 	import paths from '../../paths';
-	import { Col, Row } from 'sveltestrap';
 	import Icon from '../../components/Icon.svelte';
 	import { logout } from '../../api';
 	import { MessageType } from '../../models/MessageType';
@@ -28,8 +27,8 @@
 				});
 </script>
 
-<Row id="dashboard-header" class="g-0 d-flex align-items-center bg-light">
-	<Col>
+<div id="dashboard-header" class="g-0 d-flex align-items-center bg-light">
+	<div class="col">
 		<div class="btn-group me-3" role="group">
 			{#each navbar as item}
 				{#if item.path}
@@ -46,8 +45,8 @@
 				{/if}
 			{/each}
 		</div>
-	</Col>
-	<Col xs="auto" class="pe-3 d-flex align-items-center">
+	</div>
+	<div class="col-auto pe-3 d-flex align-items-center">
 		{#if $socket.connected}
 			<!-- display lastPing as hh:mm:ss -->
 			<span class="font-monospace pt-1 ps-3"
@@ -62,25 +61,25 @@
 		{:else}
 			<span class="font-monospace pt-1 text-danger">Disconnected</span>
 		{/if}
-	</Col>
-	<Col xs="auto">
+	</div>
+	<div class="col-auto">
 		<div class="vr sep" />
-	</Col>
-	<Col xs="auto" class="px-3 text-reset text-decoration-none">
+	</div>
+	<div class="col-auto px-3 text-reset text-decoration-none">
 		<Link to={paths.user.getPath($currentUser.id)} class="text-decoration-none text-reset">
 			<Icon name="user" size="1.5" type="solid" class="pe-1" />
 			{$currentUser.username}
 		</Link>
-	</Col>
-	<!-- <Col xs="auto">
+	</div>
+	<!-- <div class="col-auto">
 		<div class="vr sep" />
-	</Col>
-	<Col xs="auto" class="px-3 text-reset text-decoration-none">
+	</div>
+	<div class="col-auto px-3 text-reset text-decoration-none">
 		<Icon name="bell" size="1.5" />
-	</Col> -->
-	<Col xs="auto">
+	</div> -->
+	<div class="col-auto">
 		<div class="vr sep" />
-	</Col>
+	</div>
 	<Clickable
 		type="div"
 		event={() => {
@@ -102,7 +101,7 @@
 		<Icon name="log-out" size="1.5" class="pe-1" />
 		Logout
 	</Clickable>
-</Row>
+</div>
 
 <style lang="scss">
 	.sep {

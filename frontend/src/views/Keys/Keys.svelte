@@ -2,7 +2,6 @@
 	import { onMount } from 'svelte';
 	import { acceptKey, deleteKey, getKeys, rejectKey } from '../../api';
 	import { currentUser, toasts } from '../../stores';
-	import { Badge, Button, Card, Table } from 'sveltestrap';
 	import { writable, type Writable } from 'svelte/store';
 	import TablePaginate from '../../components/TablePaginate.svelte';
 	import paths from '../../paths';
@@ -85,8 +84,8 @@
 	});
 </script>
 
-<Card class="table-responsive border-bottom-0">
-	<Table hover class="b-0 mb-0">
+<div class="card table-responsive border-bottom-0">
+	<table class="table table-hover b-0 mb-0">
 		<thead class="bg-dark border-0 text-white">
 			<tr>
 				<th class="border-secondary">
@@ -123,91 +122,86 @@
 						</th>
 						<td>
 							{#if key.state === 'minions'}
-								<Badge color="success">Accepted</Badge>
+								<span class="badge bg-success">Accepted</span>
 							{:else if key.state === 'minions_pre'}
-								<Badge color="danger">Unaccepted</Badge>
+								<span class="badge bg-danger">Unaccepted</span>
 							{:else if key.state === 'minions_rejected'}
-								<Badge color="warning">Rejected</Badge>
+								<span class="badge bg-warning">Rejected</span>
 							{:else if key.state === 'minions_denied'}
-								<Badge color={null} class="bg-purple">Denied</Badge>
+								<span class="badge bg-purple">Denied</span>
 							{:else}
-								<Badge color={null} class="bg-secondary">Unknown</Badge>
+								<span class="badge bg-secondary">{key.state}</span>
 							{/if}
 						</td>
 						<td>{key.finger}</td>
 						<td>
 							{#if key.state === 'minions'}
 								{#if hasResaltPermission($currentUser, P_SALTKEY_REJECT)}
-									<Button
-										color="warning"
-										size="sm"
-										class="key-btn me-1"
+									<button
+										type="button"
+										class="btn btn-warning btn-sm key-btn me-1"
 										on:click={() => {
 											onClickReject(key);
 										}}
 									>
 										Reject
-									</Button>
+									</button>
 								{/if}
 							{:else if key.state === 'minions_pre'}
 								{#if hasResaltPermission($currentUser, P_SALTKEY_ACCEPT)}
-									<Button
-										color="success"
-										size="sm"
-										class="key-btn me-1"
+									<button
+										type="button"
+										class="btn btn-success btn-sm key-btn me-1"
 										on:click={() => {
 											onClickAccept(key);
 										}}
 									>
 										Accept
-									</Button>
+									</button>
 								{/if}
 							{:else if key.state === 'minions_rejected'}
 								{#if hasResaltPermission($currentUser, P_SALTKEY_ACCEPT)}
-									<Button
-										color="success"
-										size="sm"
-										class="key-btn me-1"
+									<button
+										type="button"
+										class="btn btn-success btn-sm key-btn me-1"
 										on:click={() => {
 											onClickAccept(key);
 										}}
 									>
 										Accept
-									</Button>
+									</button>
 								{/if}
 							{:else if key.state === 'minions_denied'}
 								{#if hasResaltPermission($currentUser, P_SALTKEY_ACCEPT)}
-									<Button
-										color="success"
-										size="sm"
-										class="key-btn me-1"
+									<button
+										type="button"
+										class="btn btn-success btn-sm key-btn me-1"
 										on:click={() => {
 											onClickAccept(key);
 										}}
 									>
 										Accept
-									</Button>
+									</button>
 								{/if}
 							{/if}
 							{#if hasResaltPermission($currentUser, P_SALTKEY_DELETE)}
-								<Button
-									color="danger"
-									size="sm"
-									class="key-btn"
+								<button
+									type="button"
+									class="btn btn-danger btn-sm key-btn"
 									on:click={() => {
 										onClickDelete(key);
 									}}
 								>
 									Delete
-								</Button>
+								</button>
 							{/if}
 						</td>
 					</tr>
 				{/each}
 			{/if}
 		</tbody>
-	</Table>
-</Card>
+	</table>
+</div>
 
 <TablePaginate
 	bind:size={paginationSize}
