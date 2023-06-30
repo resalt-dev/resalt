@@ -81,19 +81,20 @@ async fn main() -> std::io::Result<()> {
         let salt_api = SaltAPI::new();
 
         App::new()
-            .app_data(web::Data::new(pipeline.clone()))
-            .app_data(web::Data::new(db_clone_wrapper.clone().storage))
-            .app_data(web::Data::new(salt_api.clone()))
-            .app_data(web::Data::new(listener_status.clone()))
-            .app_data(web::Data::new(scheduler.clone()))
             // Prevent sniffing of content type
             .wrap(DefaultHeaders::new().add((header::X_CONTENT_TYPE_OPTIONS, "nosniff")))
             // Removes trailing slash in the URL to make is sowe don't need as many services
             .wrap(NormalizePath::trim())
-            // enable logger - always register Actix Web Logger middleware last
-            .wrap(Logger::default())
             .service(
                 web::scope("/api/1")
+                    .app_data(web::Data::new(pipeline.clone()))
+                    .app_data(web::Data::new(db_clone_wrapper.clone().storage))
+                    .app_data(web::Data::new(salt_api.clone()))
+                    .app_data(web::Data::new(listener_status.clone()))
+                    .app_data(web::Data::new(scheduler.clone()))
+                    // enable logger - always register Actix Web Logger middleware last
+                    .wrap(Logger::default())
+                    // validate auth
                     .wrap(ValidateAuth::new(
                         db_clone_wrapper.clone().storage,
                         salt_api,

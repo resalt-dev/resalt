@@ -55,13 +55,11 @@ services:
       dockerfile: Dockerfile-devel
     volumes:
       - ./docker:/usr/src/app/docker:ro
-      - ./frontend:/usr/src/app/frontend:ro
       - ./src:/usr/src/app/src:ro
       - ./workspace:/usr/src/app/workspace:ro
       - ./.env:/usr/src/app/.env:ro
       - ./Cargo.toml:/usr/src/app/Cargo.toml:ro
       - ./resalt.default.toml:/usr/src/app/resalt.default.toml:ro
-      - /tmp/backend-target:/usr/src/app/target
     environment:
       RESALT_AUTH_FORWARD_ENABLED: ${RESALT_AUTH_FORWARD_ENABLED:-}
       RESALT_AUTH_LDAP_ENABLED: ${RESALT_AUTH_LDAP_ENABLED:-}
