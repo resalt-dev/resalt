@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { afterUpdate, beforeUpdate } from 'svelte';
-	import { Button, Col, Input, Label, Row } from 'sveltestrap';
+	import { Button, Col, Input } from 'sveltestrap';
 	import { FilterFieldType } from '../../models/FilterFieldType';
 	import { FilterOperand } from '../../models/FilterOperand';
 	import { TempusDominus, Namespace } from '@eonasdan/tempus-dominus';
@@ -148,10 +148,11 @@
 </script>
 
 {#each $filters as filter, i}
-	<Row>
+	<div class="row">
 		<Col xs="12" lg="3" xl="2">
 			<div class="form-floating {i + 1 === $filters.length ? 'mb-0' : 'mb-3'}">
 				<Input
+					id="filterFieldType{i}"
 					type="select"
 					name="select"
 					bind:value={filter.fieldType}
@@ -176,7 +177,7 @@
 						selected={filter.fieldType === FilterFieldType.PACKAGE}>Package</option
 					>
 				</Input>
-				<Label>Filter Type</Label>
+				<label class="form-label" for="filterFieldType{i}">Filter Type</label>
 			</div>
 		</Col>
 		{#if filter.fieldType !== FilterFieldType.NONE}
@@ -184,6 +185,7 @@
 				<div class="form-floating {i + 1 === $filters.length ? 'mb-0' : 'mb-3'}">
 					{#if filter.fieldType === FilterFieldType.OBJECT}
 						<Input
+							id="filterField{i}"
 							type="select"
 							name="select"
 							bind:value={filter.field}
@@ -218,20 +220,25 @@
 							</option>
 						</Input>
 					{:else}
-						<Input type="text" bind:value={filter.field} required />
+						<Input id="filterField{i}" type="text" bind:value={filter.field} required />
 					{/if}
 					{#if filter.fieldType === FilterFieldType.PACKAGE}
-						<Label>Package</Label>
+						<label class="form-label" for="filterField{i}">Package</label>
 					{:else if filter.fieldType === FilterFieldType.GRAIN}
-						<Label>Grain (JSONPath)</Label>
+						<label class="form-label" for="filterField{i}">Grain (JSONPath)</label>
 					{:else}
-						<Label>Field</Label>
+						<label class="form-label" for="filterField{i}">Field</label>
 					{/if}
 				</div>
 			</Col>
 			<Col xs="12" lg="4" xl="2">
 				<div class="form-floating {i + 1 === $filters.length ? 'mb-0' : 'mb-3'}">
-					<Input type="select" name="select" bind:value={filter.operand}>
+					<Input
+						id="filterOperand{i}"
+						type="select"
+						name="select"
+						bind:value={filter.operand}
+					>
 						{#if !(filter.fieldType === FilterFieldType.OBJECT && (filter.field === 'last_seen' || filter.field === 'conformity_success' || filter.field === 'conformity_incorrect' || filter.field === 'conformity_error'))}
 							<option
 								value={FilterOperand.CONTAINS}
@@ -265,7 +272,7 @@
 						<option value={FilterOperand.GREATER_THAN_OR_EQUAL}> &gt;= </option>
 						<option value={FilterOperand.LESS_THAN_OR_EQUAL}> &lt;= </option>
 					</Input>
-					<Label>Operand</Label>
+					<label class="form-label" for="filterOperand{i}">Operand</label>
 				</div>
 			</Col>
 			<Col xs="12" lg="8" xl="3">
@@ -283,7 +290,7 @@
 								class="form-control"
 								data-td-target="#datetimepicker{i}"
 							/>
-							<Label>Date</Label>
+							<label class="form-label" for="datetimepicker{i}Input">Date</label>
 						</div>
 						<span
 							class="input-group-text btn-secondary {i + 1 === $filters.length
@@ -297,11 +304,11 @@
 					</div>
 				{:else}
 					<div class="form-floating {i + 1 === $filters.length ? 'mb-0' : 'mb-3'}">
-						<Input type="text" bind:value={filter.value} required />
+						<Input id="filterValue{i}" type="text" bind:value={filter.value} required />
 						{#if filter.fieldType === FilterFieldType.PACKAGE}
-							<Label>Version</Label>
+							<label class="form-label" for="filterValue{i}">Version</label>
 						{:else}
-							<Label>Value</Label>
+							<label class="form-label" for="filterValue{i}">Value</label>
 						{/if}
 					</div>
 				{/if}
@@ -346,7 +353,7 @@
 				<Icon name="plus" size="1" style="margin-top: -2px;" />
 			</Button>
 		</Col>
-	</Row>
+	</div>
 	{#if i + 1 !== $filters.length}
 		<hr class="text-light mt-0" />
 	{/if}

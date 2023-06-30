@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import type { NavigateFn } from 'svelte-navigator';
 	import type { Writable } from 'svelte/store';
-	import { Button, Col, Input, Label, Row, Table } from 'sveltestrap';
+	import { Input } from 'sveltestrap';
 	import {
 		createMinionPreset,
 		deleteMinionPreset,
@@ -166,27 +166,33 @@
 	});
 </script>
 
-<Row>
-	<Col xs="3">
+<div class="row">
+	<div class="col-3">
 		{#if hasResaltPermission($currentUser, P_MINION_PRESETS_MANAGE)}
 			<div>
-				<Button class="me-2 mb-2" color="success" on:click={saveAsNew}>Save as New</Button>
-				<Button
-					class="me-2 mb-2"
-					color="primary"
+				<button type="button" class="btn btn-success me-2 mb-2" on:click={saveAsNew}>
+					Copy as New
+				</button>
+				<button
+					type="button"
+					class="btn btn-primary me-2 mb-2"
 					on:click={updateSelected}
-					disabled={selectedPreset == null}>Update Preset</Button
+					disabled={selectedPreset == null}
 				>
-				<Button
-					class="me-2 mb-2"
-					color="danger"
+					Save Preset
+				</button>
+				<button
+					type="button"
+					class="btn btn-danger me-2 mb-2"
 					on:click={deleteSelected}
-					disabled={selectedPreset == null}>Delete Preset</Button
+					disabled={selectedPreset == null}
 				>
+					Delete Preset
+				</button>
 			</div>
 		{/if}
 		<div class="table-responsive border-bottom-0 mb-3">
-			<Table class="b-0 mb-0">
+			<table class="table b-0 mb-0">
 				<thead class="bg-dark border-0 text-white">
 					<tr>
 						<th class="border-secondary">
@@ -229,7 +235,7 @@
 						{/each}
 					{/if}
 				</tbody>
-			</Table>
+			</table>
 			<TablePaginate
 				bind:size={paginationSize}
 				bind:page={paginationPage}
@@ -241,27 +247,33 @@
 				<ResaltProgress />
 			{/if}
 		</div>
-	</Col>
-	<Col xs="9">
-		<Row>
-			<Col xs="6">
+	</div>
+	<div class="col-9">
+		<div class="row">
+			<div class="col-6">
 				<div class="form-floating mb-3">
-					<Input type="text" bind:value={name} />
-					<Label>Name</Label>
+					<Input id="presetName" type="text" bind:value={name} />
+					<label class="form-label" for="presetName">Name</label>
 				</div>
-			</Col>
-			<Col xs="6">
+			</div>
+			<div class="col-6">
 				<div class="form-floating mb-3">
-					<Input type="text" bind:value={selectedPreset.id} required disabled />
-					<Label>Selected Preset</Label>
+					<Input
+						id="presetId"
+						type="text"
+						bind:value={selectedPreset.id}
+						required
+						disabled
+					/>
+					<label class="form-label" for="presetId">Selected Preset</label>
 				</div>
-			</Col>
-		</Row>
+			</div>
+		</div>
 
 		<MinionsFiltersBox {filters} />
 
 		<hr class="text-light" />
 
 		<MinionsListTable {navigate} filters={$filters} />
-	</Col>
-</Row>
+	</div>
+</div>

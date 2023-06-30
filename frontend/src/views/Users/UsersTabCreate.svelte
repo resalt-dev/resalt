@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { NavigateFn } from 'svelte-navigator';
-	import { Button, CardBody, CardHeader, Col, FormGroup, Input, Label, Row } from 'sveltestrap';
+	import { Button, CardBody, CardHeader, Col, FormGroup, Input } from 'sveltestrap';
 	import { createUser } from '../../api';
 	import { MessageType } from '../../models/MessageType';
 	import paths from '../../paths';
@@ -75,7 +75,7 @@
 <div class="card mb-3">
 	<CardHeader>Create User</CardHeader>
 	<CardBody>
-		<Row>
+		<div class="row">
 			<Col class="mb-0" md="5" lg="2">
 				<FormGroup floating={true}>
 					<Input
@@ -85,12 +85,12 @@
 						bind:value={userUsernameFieldValue}
 						on:blur={validateUserUsernameField}
 					/>
-					<Label for="userUsername">Username</Label>
+					<label class="form-label" for="userUsername">Username</label>
 				</FormGroup>
 			</Col>
 			<Col class="mb-0" md="2" lg="1">
 				<div class="d-flex justify-content-center">
-					<Label for="userLDAP" class="mb-0 me-2">LDAP</Label>
+					<label class="form-label mb-0 me-2" for="userLDAP">LDAP</label>
 				</div>
 				<div class="clearfix" />
 				<div class="d-flex justify-content-center">
@@ -115,7 +115,7 @@
 							bind:value={userLDAPSyncFieldValue}
 							on:blur={validateUserLDAPSyncField}
 						/>
-						<Label for="userLDAPSync">LDAP Sync DN</Label>
+						<label class="form-label" for="userLDAPSync">LDAP Sync DN</label>
 					</FormGroup>
 				</Col>
 			{:else}
@@ -128,11 +128,11 @@
 							bind:value={userEmailFieldValue}
 							on:blur={validateUserEmailField}
 						/>
-						<Label for="userEmail">Email (optional)</Label>
+						<label class="form-label" for="userEmail">Email (optional)</label>
 					</FormGroup>
 				</Col>
 			{/if}
-		</Row>
+		</div>
 
 		<Button color={null} class="btn-{$theme.color}" on:click={_create}>Create User</Button>
 	</CardBody>

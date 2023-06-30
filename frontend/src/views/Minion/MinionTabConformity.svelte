@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Writable } from 'svelte/store';
-	import { CardBody, CardHeader, Col, Row } from 'sveltestrap';
+	import { CardBody, CardHeader, Col } from 'sveltestrap';
 	import FloatingRightButton from '../../components/FloatingRightButton.svelte';
 	import JsonViewer from '../../components/JsonViewer.svelte';
 	import type Minion from '../../models/Minion';
@@ -164,7 +164,7 @@
 	{#if rawData}
 		<JsonViewer data={JSON.parse($minion.conformity)} />
 	{:else}
-		<Row>
+		<div class="row">
 			<Col xs="3">
 				<div class="card mb-3">
 					<CardHeader>Options</CardHeader>
@@ -296,6 +296,6 @@
 					{/each}
 				</div>
 			</Col>
-		</Row>
+		</div>
 	{/if}
 {/if}

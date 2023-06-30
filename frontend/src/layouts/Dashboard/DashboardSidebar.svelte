@@ -6,7 +6,7 @@
 	import SidebarItem from './DashboardSidebarItem.svelte';
 	import constants from '../../constants';
 	import Clickable from '../../components/Clickable.svelte';
-	import { Modal } from '../../../assets/js/bootstrap.esm-5.3.0.min.js';
+	import { Modal } from '../../../assets/js/bootstrap.esm-5.3.0.min';
 	import { v4 as uuidv4 } from 'uuid';
 
 	const randomId = uuidv4();

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Col, FormGroup, Input, Label, Row } from 'sveltestrap';
+	import { Col, FormGroup, Input } from 'sveltestrap';
 	import RunClientType from '../../models/RunClientType';
 	import RunCommand from '../../models/RunCommand';
 	import { quoteSplit } from '../../utils';
@@ -165,7 +165,7 @@
 	}
 </script>
 
-<Row>
+<div class="row">
 	<Col class="mb-0" md="3" lg="2">
 		<FormGroup floating={true}>
 			<Input
@@ -180,13 +180,13 @@
 				<option value="runner">Runner</option>
 				<option value="wheel">Wheel</option>
 			</Input>
-			<Label for="clientType">Client Type</Label>
+			<label class="form-label" for="clientType">Client Type</label>
 		</FormGroup>
 	</Col>
 	<Col class="mb-0" md="2" lg={{ size: 1, offset: 1 }}>
 		{#if !batchFieldValue}
 			<div class="clearfix" />
-			<Label for="async" class="ms-1 mb-0">Async</Label>
+			<label class="form-label ms-1 mb-0" for="async">Async</label>
 			<FormGroup floating={true} class="form-switch ps-0">
 				<Input
 					id="async"
@@ -202,7 +202,7 @@
 	<Col class="mb-0" md="2" lg={{ size: 1, offset: 1 }}>
 		{#if clientTypeFieldValue === 'local'}
 			<div class="clearfix" />
-			<Label for="batch" class="ms-1 mb-0">Batch</Label>
+			<label class="form-label ms-1 mb-0" for="batch">Batch</label>
 			<FormGroup floating={true} class="form-switch ps-0">
 				<Input
 					id="batch"
@@ -225,13 +225,13 @@
 					bind:value={batchSizeFieldValue}
 					on:blur={validateBatchSizeField}
 				/>
-				<Label for="batchSize">Batch Size</Label>
+				<label class="form-label" for="batchSize">Batch Size</label>
 			</FormGroup>
 		{/if}
 	</Col>
-</Row>
+</div>
 
-<Row>
+<div class="row">
 	<Col class="mb-0" md="3" lg="2" xl="2" xxl="1">
 		{#if clientTypeFieldValue === 'local'}
 			<FormGroup floating={true}>
@@ -254,7 +254,7 @@
 					<option value="compound">Compound</option>
 					<option value="ipcidr">IPCIDR</option>
 				</Input>
-				<Label for="targetType">Target Type</Label>
+				<label class="form-label" for="targetType">Target Type</label>
 			</FormGroup>
 		{/if}
 	</Col>
@@ -268,7 +268,7 @@
 					bind:value={targetFieldValue}
 					on:blur={validateTargetField}
 				/>
-				<Label for="target">Target</Label>
+				<label class="form-label" for="target">Target</label>
 			</FormGroup>
 		{/if}
 	</Col>
@@ -281,7 +281,7 @@
 				bind:value={functionFieldValue}
 				on:blur={validateFunctionField}
 			/>
-			<Label for="function">Function</Label>
+			<label class="form-label" for="function">Function</label>
 		</FormGroup>
 	</Col>
 	<Col class="mb-0" md="12" lg="3">
@@ -293,7 +293,7 @@
 				bind:value={argsFieldValue}
 				on:blur={validateArgsField}
 			/>
-			<Label for="arguments">Arguments</Label>
+			<label class="form-label" for="arguments">Arguments</label>
 		</FormGroup>
 	</Col>
 	<Col class="mb-0" md="12" lg="3" xl="3" xxl="4">
@@ -305,7 +305,7 @@
 				bind:value={kwargsFieldValue}
 				on:blur={validateKwargsField}
 			/>
-			<Label for="keywordArguments">Keyword Arguments</Label>
+			<label class="form-label" for="keywordArguments">Keyword Arguments</label>
 		</FormGroup>
 	</Col>
-</Row>
+</div>

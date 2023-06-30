@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { Link } from 'svelte-navigator';
 	import type { Writable } from 'svelte/store';
-	import { Button, CardBody, CardHeader, Col, Row, Table } from 'sveltestrap';
 	import CopyButton from '../../components/CopyButton.svelte';
 	import Icon from '../../components/Icon.svelte';
 	import type Minion from '../../models/Minion';
@@ -25,10 +24,10 @@
 	}
 </script>
 
-<Row>
-	<Col xs="6" xxl="3">
+<div class="row">
+	<div class="col-6 col-xxl-3">
 		<div class="card mb-3">
-			<CardHeader>Common</CardHeader>
+			<div class="card-header">Common</div>
 			<ul class="list-group list-group-flush">
 				<li class="list-group-item">
 					<strong class="align-middle">ID</strong>
@@ -37,10 +36,9 @@
 							{$minion.id}
 						</span>{#if hasResaltPermission($currentUser, P_RUN_LIVE)}
 							<Link to={paths.run.getPath('live?target=' + $minion.id)}>
-								<Button
-									color={$theme.color}
-									size="sm"
-									class="ms-2"
+								<button
+									type="button"
+									class="btn btn-{$theme.color} btn-sm ms-2"
 									style="margin-bottom: -0.15rem;margin-top: -0.15rem;"
 								>
 									<Icon
@@ -49,7 +47,7 @@
 										align="top"
 										style="padding-top: 0.15rem;"
 									/>
-								</Button>
+								</button>
 							</Link>
 						{/if}
 						<CopyButton name="Minion ID" value={$minion.id} />
@@ -98,11 +96,11 @@
 				</li>
 			</ul>
 		</div>
-	</Col>
+	</div>
 
-	<Col xs="6" xxl="3">
+	<div class="col-6 col-xxl-3">
 		<div class="card mb-3">
-			<CardHeader>Hardware</CardHeader>
+			<div class="card-header">Hardware</div>
 			<ul class="list-group list-group-flush">
 				<li class="list-group-item">
 					<strong>CPU</strong>
@@ -156,11 +154,11 @@
 				</li>
 			</ul>
 		</div>
-	</Col>
+	</div>
 
-	<Col xs="6" xxl="3">
+	<div class="col-6 col-xxl-3">
 		<div class="card mb-3">
-			<CardHeader>DNS</CardHeader>
+			<div class="card-header">DNS</div>
 			<ul class="list-group list-group-flush">
 				<li class="list-group-item">
 					<strong>IPv4 DNS</strong>
@@ -182,11 +180,11 @@
 				</li>
 			</ul>
 		</div>
-	</Col>
+	</div>
 
-	<Col xs="6" xxl="3">
+	<div class="col-6 col-xxl-3">
 		<div class="card mb-3">
-			<CardHeader>Timings</CardHeader>
+			<div class="card-header">Timings</div>
 			<ul class="list-group list-group-flush">
 				<li class="list-group-item">
 					<strong>Last seen</strong>
@@ -234,13 +232,13 @@
 				</li>
 			</ul>
 		</div>
-	</Col>
+	</div>
 
-	<Col xs="12">
+	<div class="col-12">
 		<div class="card mb-3">
-			<CardHeader>Network</CardHeader>
-			<CardBody class="p-0">
-				<Table hover class="mb-0">
+			<div class="card-header">Network</div>
+			<div class="card-body p-0">
+				<table class="table table-hover mb-0">
 					<thead>
 						<tr>
 							<th>Interface</th>
@@ -261,8 +259,8 @@
 							</tr>
 						{/each}
 					</tbody>
-				</Table>
-			</CardBody>
+				</table>
+			</div>
 		</div>
-	</Col>
-</Row>
+	</div>
+</div>

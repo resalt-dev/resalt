@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Writable } from 'svelte/store';
-	import { Button, Col, Input, Label, Row } from 'sveltestrap';
+	import { Button, Col, Input } from 'sveltestrap';
 	import { searchGrains } from '../../api';
 	import ConsoleChangeBranch from '../../components/ConsoleChangeBranch.svelte';
 	import FloatingRightButton from '../../components/FloatingRightButton.svelte';
@@ -64,7 +64,7 @@
 <hr class="text-light" />
 
 <form action="javascript:void(0);" autocomplete="true">
-	<Row>
+	<div class="row">
 		<Col xs="11" lg="6" xl="5">
 			<div class="form-floating mb-0">
 				<Input
@@ -73,7 +73,7 @@
 					invalid={grainQueryFieldError}
 					bind:value={grainQueryFieldValue}
 				/>
-				<Label for="grainQuery">Grain Query (JSONPath)</Label>
+				<label class="form-label" for="grainQuery">Grain Query (JSONPath)</label>
 			</div>
 		</Col>
 		<Col xs="1" lg="6" xl="7">
@@ -86,7 +86,7 @@
 				<Icon name="search" class="mx-1 mt-1 pt-2 pb-1" size="1.5" />
 			</Button>
 		</Col>
-	</Row>
+	</div>
 </form>
 
 <hr class="text-light" />

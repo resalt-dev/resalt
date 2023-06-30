@@ -3,16 +3,7 @@
 	import { theme, currentUser, toasts } from '../../stores';
 	import { writable, type Writable } from 'svelte/store';
 	import { onMount } from 'svelte';
-	import {
-		CardBody,
-		CardHeader,
-		CardTitle,
-		Col,
-		FormGroup,
-		Input,
-		Label,
-		Row,
-	} from 'sveltestrap';
+	import { CardBody, CardHeader, CardTitle, Col, FormGroup, Input } from 'sveltestrap';
 	import { MessageType } from '../../models/MessageType';
 	import JsonViewer from '../../components/JsonViewer.svelte';
 	import type User from '../../models/User';
@@ -109,7 +100,7 @@
 		{/if}
 	</h1>
 
-	<Row>
+	<div class="row">
 		<Col xs="12" xxl="4" class="pb-3">
 			<div class="card h-100 {$theme.dark ? 'bg-dark' : ''}">
 				<CardHeader>
@@ -169,16 +160,18 @@
 					<CardBody>
 						<FormGroup floating={true}>
 							<Input
+								id="password1"
 								type="password"
 								disabled={$user.ldapSync !== null}
 								invalid={passwordFieldError}
 								bind:value={passwordFieldValue}
 								on:blur={validatePasswordField}
 							/>
-							<Label>New password</Label>
+							<label class="form-label" for="password1">New password</label>
 						</FormGroup>
 						<FormGroup floating={true}>
 							<Input
+								id="password2"
 								type="password"
 								disabled={$user.ldapSync !== null}
 								invalid={repeatPasswordFieldError &&
@@ -186,7 +179,7 @@
 								bind:value={repeatPasswordFieldValue}
 								on:keyup={validateRepeatPasswordField}
 							/>
-							<Label>Confirm password</Label>
+							<label class="form-label" for="password2">Confirm password</label>
 						</FormGroup>
 						{#if $user.ldapSync !== null}
 							<p class="text-muted mt-3">
@@ -219,5 +212,5 @@
 				<JsonViewer data={$user.perms} sort={false} />
 			</div>
 		</Col>
-	</Row>
+	</div>
 {/if}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Row, Col, Button, CardHeader, CardBody } from 'sveltestrap';
+	import { Col, Button, CardHeader, CardBody } from 'sveltestrap';
 	import Icon from '../../components/Icon.svelte';
 	import constants from '../../constants';
 	import { MessageType } from '../../models/MessageType';
@@ -26,7 +26,7 @@
 	<div class="card mb-3">
 		<CardHeader>Color</CardHeader>
 		<CardBody>
-			<Row>
+			<div class="row">
 				{#each constants.themeColors as color}
 					<Col xs="auto">
 						<Clickable
@@ -48,7 +48,7 @@
 						</Clickable>
 					</Col>
 				{/each}
-			</Row>
+			</div>
 
 			<Button color={null} class="btn-{$theme.color}" on:click={() => selectColor('reset')}>
 				Reset
@@ -60,7 +60,7 @@
 <div class="card mb-0">
 	<CardHeader>Dark mode</CardHeader>
 	<CardBody>
-		<Row>
+		<div class="row">
 			<Col xs="auto">
 				<Clickable
 					type="div"
@@ -86,7 +86,7 @@
 					{/if}
 				</Clickable>
 			</Col>
-		</Row>
+		</div>
 
 		<Button
 			color={null}

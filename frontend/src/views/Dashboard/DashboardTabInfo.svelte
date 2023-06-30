@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
-	import { CardBody, CardHeader, CardTitle, Col, Row, Table } from 'sveltestrap';
+	import { CardBody, CardHeader, CardTitle, Col, Table } from 'sveltestrap';
 	import { getSystemStatus } from '../../api';
 	import Icon from '../../components/Icon.svelte';
 	import ResaltProgress from '../../components/ResaltProgress.svelte';
@@ -26,7 +26,7 @@
 	});
 </script>
 
-<Row>
+<div class="row">
 	<Col xs="12" class="pb-3">
 		<div class="card {$theme.dark ? 'bg-dark' : ''}">
 			<CardBody>
@@ -38,7 +38,7 @@
 				</p>
 				<!-- <br />
 				<br />
-				<Row>
+				<div class="row">
 					<Col xs="12" lg="4">
 						<h5 class="card-title">Get Started</h5>
 					</Col>
@@ -50,7 +50,7 @@
 						<h5 class="card-title">More Actions</h5>
 						Hello!
 					</Col>
-				</Row> -->
+				</div> -->
 			</CardBody>
 		</div>
 	</Col>
@@ -182,4 +182,4 @@
 			</CardBody>
 		</div>
 	</Col>
-</Row>
+</div>

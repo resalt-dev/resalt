@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Clickable from './Clickable.svelte';
-	import { Collapse } from '../../assets/js/bootstrap.esm-5.3.0.min.js';
+	import { Collapse } from '../../assets/js/bootstrap.esm-5.3.0.min';
 	import { onMount } from 'svelte';
 	import { v4 as uuidv4 } from 'uuid';
 

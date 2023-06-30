@@ -1,18 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
-	import {
-		Alert,
-		Button,
-		CardBody,
-		CardHeader,
-		Col,
-		FormGroup,
-		Input,
-		Label,
-		Row,
-		Table,
-	} from 'sveltestrap';
+	import { Alert, Button, CardBody, CardHeader, Col, FormGroup, Input, Table } from 'sveltestrap';
 	import Icon from '../../components/Icon.svelte';
 	import TablePaginate from '../../components/TablePaginate.svelte';
 	import {
@@ -492,7 +481,7 @@
 	});
 </script>
 
-<Row>
+<div class="row">
 	<Col xs="12" md="4">
 		<div class="table-responsive border-bottom-0 mb-3">
 			<Table class="b-0 mb-0">
@@ -579,7 +568,7 @@
 				{#if $selectedGroup === null}
 					<h1>Select a group to edit</h1>
 				{:else}
-					<Row>
+					<div class="row">
 						<Col class="ps-3 mb-0" xs="12">
 							{#if $selectedGroup.name === '$superadmins'}
 								<Alert color="warning" dismissible={false} fade={false}>
@@ -592,13 +581,19 @@
 						</Col>
 						<Col class="ps-3 mb-0" xs="12">
 							<FormGroup floating={true}>
-								<Input type="text" bind:value={$selectedGroup.id} disabled />
-								<Label>Group ID</Label>
+								<Input
+									id="selectedGroupId"
+									type="text"
+									bind:value={$selectedGroup.id}
+									disabled
+								/>
+								<label class="form-label" for="selectedGroupId">Group ID</label>
 							</FormGroup>
 						</Col>
 						<Col class="ps-3 mb-0" xs="12" lg="6" xxl="5">
 							<FormGroup floating={true}>
 								<Input
+									id="selectedGroupName"
 									type="text"
 									disabled={$selectedGroup.name === '$superadmins'}
 									invalid={groupNameFieldError}
@@ -606,19 +601,22 @@
 									on:blur={validateGroupNameField}
 									required
 								/>
-								<Label>Group Name</Label>
+								<label class="form-label" for="selectedGroupName">Group Name</label>
 							</FormGroup>
 						</Col>
 						<Col class="ps-3 mb-0" xs="12" lg="6" xxl="7">
 							<FormGroup floating={true}>
 								<Input
+									id="selectedGroupLdapSync"
 									type="text"
 									disabled={$selectedGroup.name === '$superadmins'}
 									invalid={groupLdapSyncFieldError}
 									bind:value={groupLdapSyncFieldValue}
 									on:blur={validateGroupLdapSyncField}
 								/>
-								<Label>LDAP Sync DN (optional)</Label>
+								<label class="form-label" for="selectedGroupLdapSync"
+									>LDAP Sync DN (optional)</label
+								>
 							</FormGroup>
 						</Col>
 						<Col class="ps-3 mb-0" xs="12">
@@ -674,6 +672,7 @@
 							<div class="input-group flex-nowrap">
 								<div class="form-floating w-100">
 									<Input
+										id="addUserField"
 										type="text"
 										bsSize="sm"
 										style="height: 2.5rem;"
@@ -683,14 +682,18 @@
 										bind:value={addUserFieldValue}
 										on:blur={validateAddUserField}
 									/>
-									<Label style="padding-top: 0.4rem;">
+									<label
+										class="form-label"
+										for="addUserField"
+										style="padding-top: 0.4rem;"
+									>
 										{#if groupLdapSyncFieldValue.length > 0}
 											Manually managing users is disabled because LDAP Sync is
 											active.
 										{:else}
 											Add by User ID
 										{/if}
-									</Label>
+									</label>
 								</div>
 								<Button
 									color="primary"
@@ -796,6 +799,7 @@
 												<div class="input-group flex-nowrap">
 													<div class="form-floating">
 														<Input
+															id="minionTarget_{minionTarget.targetId}"
 															type="text"
 															bsSize="sm"
 															style="height: 2.5rem;"
@@ -805,9 +809,13 @@
 															bind:value={minionTarget.target}
 															on:blur={validatePermissionMinionTargetsFields}
 														/>
-														<Label style="padding-top: 0.4rem;">
+														<label
+															class="form-label"
+															for="minionTarget_{minionTarget.targetId}"
+															style="padding-top: 0.4rem;"
+														>
 															Target
-														</Label>
+														</label>
 													</div>
 													<Button
 														size="sm"
@@ -837,6 +845,7 @@
 													<div class="input-group flex-nowrap">
 														<div class="form-floating">
 															<Input
+																id="minionModule_{minionTarget.targetId}_{minionModule.moduleId}"
 																type="text"
 																bsSize="sm"
 																style="height: 2.5rem;"
@@ -846,9 +855,13 @@
 																bind:value={minionModule.name}
 																on:blur={validatePermissionMinionTargetsFields}
 															/>
-															<Label style="padding-top: 0.4rem;">
+															<label
+																class="form-label"
+																for="minionModule_{minionTarget.targetId}_{minionModule.moduleId}"
+																style="padding-top: 0.4rem;"
+															>
 																Module
-															</Label>
+															</label>
 														</div>
 														<Button
 															size="sm"
@@ -883,6 +896,7 @@
 														{#each minionModule.args as arg, ai}
 															<div class="form-floating">
 																<Input
+																	id="minionModuleArg_{minionTarget.targetId}_{minionModule.moduleId}_{ai}"
 																	type="text"
 																	bsSize="sm"
 																	style="height: 2.5rem; max-width: 7rem;"
@@ -891,9 +905,13 @@
 																	bind:value={arg}
 																	on:blur={validatePermissionMinionTargetsFields}
 																/>
-																<Label style="padding-top: 0.4rem;">
+																<label
+																	class="form-label"
+																	for="minionModuleArg_{minionTarget.targetId}_{minionModule.moduleId}_{ai}"
+																	style="padding-top: 0.4rem;"
+																>
 																	Arg {ai}
-																</Label>
+																</label>
 															</div>
 															<Icon
 																name="x"
@@ -1028,12 +1046,12 @@
 								Delete Group
 							</Button>
 						</Col>
-					</Row>
+					</div>
 				{/if}
 			</CardBody>
 		</div>
 	</Col>
-</Row>
+</div>
 
 <style lang="scss">
 	.width-fit-content {

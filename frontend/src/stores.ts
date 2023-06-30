@@ -24,10 +24,7 @@ export const theme = persisted(`${prefix}theme`, {
 	color: null,
 	dark: false,
 });
-export const currentUser: Writable<User | null> = persisted(
-	`${prefix}currentUser`,
-	null,
-);
+export const currentUser: Writable<User | null> = persisted(`${prefix}currentUser`, null);
 
 // Custom Store for toasts (of type Message) where we can add a toast,
 // and they get automatically removed after a timeout.

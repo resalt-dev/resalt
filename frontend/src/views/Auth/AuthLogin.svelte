@@ -4,7 +4,7 @@
 	import { auth, config, theme, toasts } from '../../stores';
 	import paths from '../../paths';
 	import { MessageType } from '../../models/MessageType';
-	import { FormGroup, Input, Label } from 'sveltestrap';
+	import { FormGroup, Input } from 'sveltestrap';
 	import type { NavigateFn } from 'svelte-navigator';
 	import ResaltProgress from '../../components/ResaltProgress.svelte';
 
@@ -81,22 +81,24 @@
 	<form action="javascript:void(0);" autocomplete="false">
 		<FormGroup floating={true}>
 			<Input
+				id="username"
 				type="text"
 				invalid={usernameFieldError}
 				bind:value={usernameFieldValue}
 				on:blur={validateUsernameField}
 				bind:inner={usernameField}
 			/>
-			<Label>Username</Label>
+			<label class="form-label" for="username">Username</label>
 		</FormGroup>
 		<FormGroup floating={true}>
 			<Input
+				id="password"
 				type="password"
 				invalid={passwordFieldError}
 				bind:value={passwordFieldValue}
 				on:blur={validatePasswordField}
 			/>
-			<Label>Password</Label>
+			<label class="form-label" for="password">Password</label>
 		</FormGroup>
 
 		<br />
