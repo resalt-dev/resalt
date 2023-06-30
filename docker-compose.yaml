@@ -39,7 +39,6 @@ services:
     image: node:20-alpine
     volumes:
       - ./frontend/assets:/usr/src/app/assets:ro
-      - ./frontend/build:/usr/src/app/build
       - ./frontend/src:/usr/src/app/src:ro
       - ./frontend/index.html:/usr/src/app/index.html:ro
       - ./frontend/package.json:/usr/src/app/package.json:ro
