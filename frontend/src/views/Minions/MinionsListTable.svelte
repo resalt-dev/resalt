@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { Link, type NavigateFn } from 'svelte-navigator';
 	import { writable, type Writable } from 'svelte/store';
-	import { Button, Spinner, Table } from 'sveltestrap';
 	import { getMinions, refreshMinion } from '../../api';
 	import Clickable from '../../components/Clickable.svelte';
 	import Icon from '../../components/Icon.svelte';
@@ -90,10 +89,10 @@
 </script>
 
 <div class="card table-responsive border-bottom-0">
-	<Table hover class="b-0 mb-0">
-		<thead class="bg-dark border-0 text-white">
+	<table class=" table table-hover b-0 mb-0">
+		<thead class="border-0">
 			<tr>
-				<th class="border-secondary">
+				<th class="border-secondary bg-dark text-white">
 					<div class="row g-1">
 						<div class="col-auto align-self-center ps-2">ID</div>
 						<div class="col-auto">
@@ -107,7 +106,7 @@
 						</div>
 					</div>
 				</th>
-				<th class="border-secondary">
+				<th class="border-secondary bg-dark text-white">
 					<div class="row g-1">
 						<div class="col-auto align-self-center">OS</div>
 						<div class="col-auto">
@@ -126,7 +125,7 @@
 						</div>
 					</div>
 				</th>
-				<th class="border-secondary">
+				<th class="border-secondary bg-dark text-white">
 					<div class="row g-1">
 						<div class="col-auto align-self-center">Last seen</div>
 						<div class="col-auto">
@@ -145,7 +144,7 @@
 						</div>
 					</div>
 				</th>
-				<th class="border-secondary">
+				<th class="border-secondary bg-dark text-white">
 					<div class="row g-1">
 						<div class="col-auto align-self-center">Conformity</div>
 						<div class="col-auto">
@@ -198,7 +197,7 @@
 						</div>
 					</div>
 				</th>
-				<th class="border-secondary">
+				<th class="border-secondary bg-dark text-white">
 					<div class="row g-1">
 						<div class="col-auto align-self-center">Actions</div>
 						<div class="col align-self-bottom canRotate">
@@ -288,27 +287,28 @@
 								View
 							</Link>
 							{#if hasResaltPermission($currentUser, P_MINION_REFRESH)}
-								<Button
-									color="secondary"
-									size="sm"
+								<button
+									type="button"
+									class="btn btn-secondary btn-sm me-2"
 									style="width: 65px;"
-									class="me-2"
 									on:click={() => resync(minion.id)}
 									disabled={$refreshing.indexOf(minion.id) !== -1}
 								>
 									{#if $refreshing.indexOf(minion.id) !== -1}
-										<Spinner size="sm" />
+										<div role="status" class="spinner-border-sm spinner-border">
+											<span class="visually-hidden">Loading...</span>
+										</div>
 									{:else}
 										Resync
 									{/if}
-								</Button>
+								</button>
 							{/if}
 						</td>
 					</tr>
 				{/each}
 			{/if}
 		</tbody>
-	</Table>
+	</table>
 </div>
 
 <TablePaginate
