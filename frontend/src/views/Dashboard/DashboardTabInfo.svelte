@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
-	import { CardTitle, Col, Table } from 'sveltestrap';
+	import { Table } from 'sveltestrap';
 	import { getSystemStatus } from '../../api';
 	import Icon from '../../components/Icon.svelte';
 	import ResaltProgress from '../../components/ResaltProgress.svelte';
@@ -27,7 +27,7 @@
 </script>
 
 <div class="row">
-	<Col xs="12" class="pb-3">
+	<div class="col-12 pb-3">
 		<div class="card {$theme.dark ? 'bg-dark' : ''}">
 			<div class="card-body">
 				<!-- welcome title -->
@@ -53,38 +53,38 @@
 				</div> -->
 			</div>
 		</div>
-	</Col>
-	<Col xs="12" xl="4" class="pb-3">
+	</div>
+	<div class="col-12 col-xl-4 pb-3">
 		<div class="card {$theme.dark ? 'bg-dark' : ''}">
 			<div class="card-header">
-				<CardTitle class="mb-0">System Summary</CardTitle>
+				<h5 class="card-title mb-0">System Summary</h5>
 			</div>
 			{#if $status === null}
 				<ResaltProgress />
 			{:else}
 				<div class="card-body">
 					<h5 class="card-title">Salt Event Listener</h5>
-					<p class="card-text">
+					<div class="card-text mb-3">
 						{#if $status.salt}
 							<Icon name="check-circle" class="text-success m-2" /> Connected
 						{:else}
 							<Icon name="x-circle" class="text-danger m-2" /> Disconnected
 						{/if}
-					</p>
+					</div>
 					<h5 class="card-title">Database</h5>
-					<p class="card-text">
+					<div class="card-text mb-3">
 						{#if $status.db}
 							<Icon name="check-circle" class="text-success m-2" /> Connected
 						{:else}
 							<Icon name="x-circle" class="text-danger m-2" /> Disconnected
 						{/if}
-					</p>
-					<p class="card-text">
-						<Table hover class="b-0 mb-0">
-							<thead class="bg-dark border-0 text-white">
+					</div>
+					<div class="card-text">
+						<table class="table table-hover b-0 mb-0">
+							<thead class="border-0">
 								<tr>
-									<th>Table</th>
-									<th>Count</th>
+									<th class="border-secondary bg-dark text-white">Table</th>
+									<th class="border-secondary bg-dark text-white">Count</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -125,16 +125,16 @@
 									<td>{$status.dbUsersTotal}</td>
 								</tr>
 							</tbody>
-						</Table>
-					</p>
+						</table>
+					</div>
 				</div>
 			{/if}
 		</div>
-	</Col>
-	<Col xs="12" xl="4" class="pb-3">
+	</div>
+	<div class="col-12 col-xl-4 pb-3">
 		<div class="card {$theme.dark ? 'bg-dark' : ''}">
 			<div class="card-header">
-				<CardTitle class="mb-0">Quick Links</CardTitle>
+				<h5 class="card-title mb-0">Quick Links</h5>
 			</div>
 			<div class="card-body text-center">
 				<a
@@ -163,11 +163,11 @@
 				</a>
 			</div>
 		</div>
-	</Col>
-	<Col xs="12" xl="4" class="pb-3">
+	</div>
+	<div class="col-12 col-xl-4 pb-3">
 		<div class="card {$theme.dark ? 'bg-dark' : ''}">
 			<div class="card-header">
-				<CardTitle class="mb-0">Latest News</CardTitle>
+				<h5 class="card-title mb-0">Latest News</h5>
 			</div>
 			<div class="card-body" style="max-height: 700px; overflow-y: auto;">
 				{#each $config.latestNews as news, i}
@@ -181,5 +181,5 @@
 				{/each}
 			</div>
 		</div>
-	</Col>
+	</div>
 </div>

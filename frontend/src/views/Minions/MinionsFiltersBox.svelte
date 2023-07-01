@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { afterUpdate, beforeUpdate } from 'svelte';
-	import { Button, Col, Input } from 'sveltestrap';
+	import { Input } from 'sveltestrap';
 	import { FilterFieldType } from '../../models/FilterFieldType';
 	import { FilterOperand } from '../../models/FilterOperand';
 	import { TempusDominus, Namespace } from '@eonasdan/tempus-dominus';
@@ -149,7 +149,7 @@
 
 {#each $filters as filter, i}
 	<div class="row">
-		<Col xs="12" lg="3" xl="2">
+		<div class="col-12 col-lg-3 col-xl-2">
 			<div class="form-floating {i + 1 === $filters.length ? 'mb-0' : 'mb-3'}">
 				<Input
 					id="filterFieldType{i}"
@@ -179,9 +179,9 @@
 				</Input>
 				<label class="form-label" for="filterFieldType{i}">Filter Type</label>
 			</div>
-		</Col>
+		</div>
 		{#if filter.fieldType !== FilterFieldType.NONE}
-			<Col xs="12" lg="5" xl="3">
+			<div class="col-12 col-lg-5 col-xl-3">
 				<div class="form-floating {i + 1 === $filters.length ? 'mb-0' : 'mb-3'}">
 					{#if filter.fieldType === FilterFieldType.OBJECT}
 						<Input
@@ -230,8 +230,8 @@
 						<label class="form-label" for="filterField{i}">Field</label>
 					{/if}
 				</div>
-			</Col>
-			<Col xs="12" lg="4" xl="2">
+			</div>
+			<div class="col-12 col-lg-4 col-xl-2">
 				<div class="form-floating {i + 1 === $filters.length ? 'mb-0' : 'mb-3'}">
 					<Input
 						id="filterOperand{i}"
@@ -274,8 +274,8 @@
 					</Input>
 					<label class="form-label" for="filterOperand{i}">Operand</label>
 				</div>
-			</Col>
-			<Col xs="12" lg="8" xl="3">
+			</div>
+			<div class="col-12 col-lg-8 col-xl-3">
 				{#if filter.fieldType === FilterFieldType.OBJECT && filter.field === 'last_seen'}
 					<div
 						class="input-group"
@@ -312,9 +312,9 @@
 						{/if}
 					</div>
 				{/if}
-			</Col>
+			</div>
 		{/if}
-		<Col>
+		<div class="col">
 			{#if filter.fieldType !== FilterFieldType.NONE}
 				<div style="height: calc(2px + 3.5rem);" class="float-start">
 					<Icon
@@ -328,31 +328,29 @@
 					/>
 				</div>
 			{/if}
-			<Button
-				size="sm"
-				color="secondary"
+			<button
+				type="button"
+				class="btn btn-sm btn-secondary float-end"
 				style="height: calc(2px + 3.5rem);"
-				class="float-end"
 				disabled={$filters.length === 1}
 				on:click={() => {
 					removeFilterByIndex(i);
 				}}
 			>
 				<Icon name="minus" size="1" style="margin-top: -2px;" />
-			</Button>
-			<Button
-				size="sm"
-				color="secondary"
+			</button>
+			<button
+				type="button"
+				class="btn btn-sm btn-secondary float-end me-2"
 				style="height: calc(2px + 3.5rem);"
-				class="float-end me-2"
 				disabled={$filters.length === 5}
 				on:click={() => {
 					addFilter();
 				}}
 			>
 				<Icon name="plus" size="1" style="margin-top: -2px;" />
-			</Button>
-		</Col>
+			</button>
+		</div>
 	</div>
 	{#if i + 1 !== $filters.length}
 		<hr class="text-light mt-0" />
