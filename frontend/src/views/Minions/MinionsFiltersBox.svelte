@@ -217,7 +217,13 @@
 							</option>
 						</select>
 					{:else}
-						<input id="filterField{i}" type="text" class="form-control" bind:value={filter.field} required />
+						<input
+							id="filterField{i}"
+							type="text"
+							class="form-control"
+							bind:value={filter.field}
+							required
+						/>
 					{/if}
 					{#if filter.fieldType === FilterFieldType.PACKAGE}
 						<label class="form-label" for="filterField{i}">Package</label>
@@ -230,11 +236,7 @@
 			</div>
 			<div class="col-12 col-lg-4 col-xl-2">
 				<div class="form-floating {i + 1 === $filters.length ? 'mb-0' : 'mb-3'}">
-					<select
-						id="filterOperand{i}"
-						class="form-select"
-						bind:value={filter.operand}
-					>
+					<select id="filterOperand{i}" class="form-select" bind:value={filter.operand}>
 						{#if !(filter.fieldType === FilterFieldType.OBJECT && (filter.field === 'last_seen' || filter.field === 'conformity_success' || filter.field === 'conformity_incorrect' || filter.field === 'conformity_error'))}
 							<option
 								value={FilterOperand.CONTAINS}
@@ -300,7 +302,13 @@
 					</div>
 				{:else}
 					<div class="form-floating {i + 1 === $filters.length ? 'mb-0' : 'mb-3'}">
-						<input id="filterValue{i}" type="text" class="form-control" bind:value={filter.value} required />
+						<input
+							id="filterValue{i}"
+							type="text"
+							class="form-control"
+							bind:value={filter.value}
+							required
+						/>
 						{#if filter.fieldType === FilterFieldType.PACKAGE}
 							<label class="form-label" for="filterValue{i}">Version</label>
 						{:else}

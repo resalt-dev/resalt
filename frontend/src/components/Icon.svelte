@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { Tooltip } from '../../assets/js/bootstrap.esm-5.3.0.min';
+	import { onMount } from 'svelte';
+
 	export let type = 'regular';
 	export let name = 'rocket';
 	export let size = '2';
@@ -15,9 +18,16 @@
 			? {
 					'data-bs-toggle': 'tooltip',
 					'data-bs-placement': 'top',
-					title: tooltip,
+					'data-bs-title': tooltip,
 			  }
 			: {};
+
+	onMount(() => {
+		if (htmlElement) {
+			const tooltip = new Tooltip(htmlElement);
+			tooltip.enable();
+		}
+	});
 </script>
 
 <i

@@ -2,7 +2,6 @@
 	import { onMount } from 'svelte';
 	import { getJobs } from '../../api';
 	import { toasts } from '../../stores';
-	import { Tooltip } from 'sveltestrap';
 	import Icon from '../../components/Icon.svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import TablePaginate from '../../components/TablePaginate.svelte';
@@ -40,8 +39,6 @@
 	onMount(() => {
 		updateData();
 	});
-
-	let jobIdTooltipElement: HTMLElement;
 </script>
 
 <div class="card table-responsive border-bottom-0">
@@ -51,13 +48,13 @@
 				<th class="border-secondary bg-dark text-white">
 					<div class="row g-1">
 						<div class="col-auto align-self-center ps-2">
-							JID<Icon
+							JID
+							<Icon
 								size="0.95"
 								name="help-circle"
 								class="mb-0 h3 text-muted align-top"
-								bind:htmlElement={jobIdTooltipElement}
+								tooltip="Job ID"
 							/>
-							<Tooltip target={jobIdTooltipElement}>Job ID</Tooltip>
 						</div>
 					</div>
 				</th>

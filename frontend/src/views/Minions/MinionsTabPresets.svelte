@@ -2,7 +2,6 @@
 	import { onMount } from 'svelte';
 	import type { NavigateFn } from 'svelte-navigator';
 	import type { Writable } from 'svelte/store';
-	import { Input } from 'sveltestrap';
 	import {
 		createMinionPreset,
 		deleteMinionPreset,
@@ -252,15 +251,16 @@
 		<div class="row">
 			<div class="col-6">
 				<div class="form-floating mb-3">
-					<Input id="presetName" type="text" bind:value={name} />
+					<input id="presetName" type="text" class="form-control" bind:value={name} />
 					<label class="form-label" for="presetName">Name</label>
 				</div>
 			</div>
 			<div class="col-6">
 				<div class="form-floating mb-3">
-					<Input
+					<input
 						id="presetId"
 						type="text"
+						class="form-control"
 						bind:value={selectedPreset.id}
 						required
 						disabled

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { NavigateFn } from 'svelte-navigator';
-	import { Input } from 'sveltestrap';
 	import { createUser } from '../../api';
 	import { MessageType } from '../../models/MessageType';
 	import paths from '../../paths';
@@ -78,10 +77,10 @@
 		<div class="row">
 			<div class="col col-md-5 col-lg-2 mb-0">
 				<div class="form-floating mb-3">
-					<Input
+					<input
 						id="userUsername"
 						type="text"
-						invalid={userUsernameFieldError}
+						class="form-control {userUsernameFieldError ? 'is-invalid' : ''}"
 						bind:value={userUsernameFieldValue}
 						on:blur={validateUserUsernameField}
 					/>
@@ -94,24 +93,26 @@
 				</div>
 				<div class="clearfix" />
 				<div class="d-flex justify-content-center">
-					<div class="form-floating mb-3 ps-0 form-switch">
-						<Input
-							id="userLDAP"
-							type="switch"
-							class="fs-3 mt-0"
-							bind:checked={userLDAPFieldValue}
-							on:blur={validateUserLDAPField}
-						/>
+					<div class="form-floating mb-3 ps-0">
+						<div class="fs-3 mt-0 form-check form-switch">
+							<input
+								id="userLDAP"
+								type="checkbox"
+								class="form-check-input"
+								bind:checked={userLDAPFieldValue}
+								on:blur={validateUserLDAPField}
+							/>
+						</div>
 					</div>
 				</div>
 			</div>
 			{#if userLDAPFieldValue}
 				<div class="col col-md-5 col-lg-5 mb-0">
 					<div class="form-floating mb-3">
-						<Input
+						<input
 							id="userLDAPSync"
 							type="text"
-							invalid={userLDAPSyncFieldError}
+							class="form-control {userLDAPSyncFieldError ? 'is-invalid' : ''}"
 							bind:value={userLDAPSyncFieldValue}
 							on:blur={validateUserLDAPSyncField}
 						/>
@@ -121,10 +122,10 @@
 			{:else}
 				<div class="col col-md-5 col-lg-3 mb-0">
 					<div class="form-floating mb-3">
-						<Input
+						<input
 							id="userEmail"
 							type="email"
-							invalid={userEmailFieldError}
+							class="form-control {userEmailFieldError ? 'is-invalid' : ''}"
 							bind:value={userEmailFieldValue}
 							on:blur={validateUserEmailField}
 						/>

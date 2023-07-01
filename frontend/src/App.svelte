@@ -7,7 +7,6 @@
 	import type Config from './models/Config';
 	import { globalHistory, type NavigatorHistory } from 'svelte-navigator';
 	import { writable } from 'svelte/store';
-	import { Toast, ToastBody, ToastHeader } from 'sveltestrap';
 	import WrapperGlobalHistory from './models/WrapperGlobalHistory';
 	import { MessageType } from './models/MessageType';
 
@@ -85,17 +84,24 @@
 	<!-- Toast / Alerts -->
 	<div class="position-fixed top-0 end-0 mt-5 me-5" style="z-index: 11">
 		{#each $toasts as toast}
-			<Toast class="{'toast-' + toast.type} mb-2">
-				<ToastHeader>{toast.title}</ToastHeader>
+			<div
+				class="toast {'toast-' + toast.type} mb-2"
+				role="alert"
+				aria-live="assertive"
+				aria-atomic="true"
+			>
+				<div class="toast-header">{toast.title}</div>
 				{#if toast.message instanceof ApiError}
-					<ToastBody>
+					<div class="toast-body">
 						<strong>Code: </strong>{toast.message.code}<br />
 						<strong>Data: </strong>{toast.message.message}
-					</ToastBody>
+					</div>
 				{:else}
-					<ToastBody>{toast.message}</ToastBody>
+					<div class="toast-body">
+						{toast.message}
+					</div>
 				{/if}
-			</Toast>
+			</div>
 		{/each}
 	</div>
 </main>

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { Alert } from 'sveltestrap';
 	import CopyButton from '../../components/CopyButton.svelte';
 	import RunClientType from '../../models/RunClientType';
 	import type RunCommand from '../../models/RunCommand';
@@ -125,11 +124,11 @@
 					<br />
 
 					{#if !hasPermission($currentUser, command.toPermissionTarget(), command.fun, command.arg, command.kwarg)}
-						<Alert color="warning" dismissible={false} fade={false}>
+						<div class="alert alert-warning" role="alert">
 							<strong>Warning!</strong> You likely don't have sufficient permissions to
 							execute this command. Please verify the target group and function name before
 							proceeding. Please contact a system administrator if unsure.
-						</Alert>
+						</div>
 						<br />
 					{/if}
 

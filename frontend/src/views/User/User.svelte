@@ -3,7 +3,6 @@
 	import { theme, currentUser, toasts } from '../../stores';
 	import { writable, type Writable } from 'svelte/store';
 	import { onMount } from 'svelte';
-	import { Input } from 'sveltestrap';
 	import { MessageType } from '../../models/MessageType';
 	import JsonViewer from '../../components/JsonViewer.svelte';
 	import type User from '../../models/User';
@@ -159,23 +158,25 @@
 					</div>
 					<div class="card-body">
 						<div class="form-floating mb-3">
-							<Input
+							<input
 								id="password1"
 								type="password"
+								class="form-control {passwordFieldError ? 'is-invalid' : ''}"
 								disabled={$user.ldapSync !== null}
-								invalid={passwordFieldError}
 								bind:value={passwordFieldValue}
 								on:blur={validatePasswordField}
 							/>
 							<label class="form-label" for="password1">New password</label>
 						</div>
 						<div class="form-floating mb-3">
-							<Input
+							<input
 								id="password2"
 								type="password"
+								class="form-control {repeatPasswordFieldError &&
+								repeatPasswordFieldValue.length > 0
+									? 'is-invalid'
+									: ''}"
 								disabled={$user.ldapSync !== null}
-								invalid={repeatPasswordFieldError &&
-									repeatPasswordFieldValue.length > 0}
 								bind:value={repeatPasswordFieldValue}
 								on:keyup={validateRepeatPasswordField}
 							/>

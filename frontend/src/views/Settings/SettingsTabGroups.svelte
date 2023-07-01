@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
-	import { Alert, Input } from 'sveltestrap';
 	import Icon from '../../components/Icon.svelte';
 	import TablePaginate from '../../components/TablePaginate.svelte';
 	import {
@@ -570,19 +569,20 @@
 					<div class="row">
 						<div class="col-12 ps-3 mb-0">
 							{#if $selectedGroup.name === '$superadmins'}
-								<Alert color="warning" dismissible={false} fade={false}>
+								<div class="alert alert-warning" role="alert">
 									<strong>Warning!</strong> You have selected the "<strong
 										>$superadmins</strong
 									>" group. This is a special system-protected group that cannot
 									be edited or deleted.
-								</Alert>
+								</div>
 							{/if}
 						</div>
 						<div class="col-12 ps-3 mb-0">
 							<div class="form-floating mb-3">
-								<Input
+								<input
 									id="selectedGroupId"
 									type="text"
+									class="form-control"
 									bind:value={$selectedGroup.id}
 									disabled
 								/>
@@ -591,11 +591,11 @@
 						</div>
 						<div class="col-12 col-lg-6 col-xxl-5 ps-3 mb-0">
 							<div class="form-floating mb-3">
-								<Input
+								<input
 									id="selectedGroupName"
 									type="text"
+									class="form-control {groupNameFieldError ? 'is-invalid' : ''}"
 									disabled={$selectedGroup.name === '$superadmins'}
-									invalid={groupNameFieldError}
 									bind:value={groupNameFieldValue}
 									on:blur={validateGroupNameField}
 									required
@@ -605,11 +605,13 @@
 						</div>
 						<div class="col-12 col-lg-6 col-xxl-7 ps-3 mb-0">
 							<div class="form-floating mb-3">
-								<Input
+								<input
 									id="selectedGroupLdapSync"
 									type="text"
+									class="form-control {groupLdapSyncFieldError
+										? 'is-invalid'
+										: ''}"
 									disabled={$selectedGroup.name === '$superadmins'}
-									invalid={groupLdapSyncFieldError}
 									bind:value={groupLdapSyncFieldValue}
 									on:blur={validateGroupLdapSyncField}
 								/>
@@ -667,16 +669,15 @@
 							</table>
 						</div>
 						<div class="col-12 ps-3 mb-0">
-							<div class="input-group flex-nowrap">
+							<div class="input-group input-group-sm flex-nowrap">
 								<div class="form-floating w-100">
-									<Input
+									<input
 										id="addUserField"
 										type="text"
-										bsSize="sm"
+										class="form-control {addUserFieldError ? 'is-invalid' : ''}"
 										style="height: 2.5rem;"
 										disabled={$selectedGroup.name === '$superadmins' ||
 											groupLdapSyncFieldValue.length > 0}
-										invalid={addUserFieldError}
 										bind:value={addUserFieldValue}
 										on:blur={validateAddUserField}
 									/>
@@ -794,16 +795,17 @@
 									{#each $permissionMinionsFields as minionTarget}
 										<tr>
 											<td style="width: 12rem;">
-												<div class="input-group flex-nowrap">
+												<div class="input-group input-group-sm flex-nowrap">
 													<div class="form-floating">
-														<Input
+														<input
 															id="minionTarget_{minionTarget.targetId}"
 															type="text"
-															bsSize="sm"
+															class="form-control {minionTarget.error
+																? 'is-invalid'
+																: ''}"
 															style="height: 2.5rem;"
 															disabled={$selectedGroup.name ===
 																'$superadmins'}
-															invalid={minionTarget.error}
 															bind:value={minionTarget.target}
 															on:blur={validatePermissionMinionTargetsFields}
 														/>
@@ -839,16 +841,19 @@
 													{#if mi > 0}
 														<hr class="text-light my-2" />
 													{/if}
-													<div class="input-group flex-nowrap">
+													<div
+														class="input-group input-group-sm flex-nowrap"
+													>
 														<div class="form-floating">
-															<Input
+															<input
 																id="minionModule_{minionTarget.targetId}_{minionModule.moduleId}"
 																type="text"
-																bsSize="sm"
+																class="form-control {minionModule.error
+																	? 'is-invalid'
+																	: ''}"
 																style="height: 2.5rem;"
 																disabled={$selectedGroup.name ===
 																	'$superadmins'}
-																invalid={minionModule.error}
 																bind:value={minionModule.name}
 																on:blur={validatePermissionMinionTargetsFields}
 															/>
@@ -887,14 +892,14 @@
 														<hr class="text-light my-2" />
 													{/if}
 													<div
-														class="input-group flex-nowrap width-fit-content"
+														class="input-group input-group-sm flex-nowrap width-fit-content"
 													>
 														{#each minionModule.args as arg, ai}
 															<div class="form-floating">
-																<Input
+																<input
 																	id="minionModuleArg_{minionTarget.targetId}_{minionModule.moduleId}_{ai}"
 																	type="text"
-																	bsSize="sm"
+																	class="form-control"
 																	style="height: 2.5rem; max-width: 7rem;"
 																	disabled={$selectedGroup.name ===
 																		'$superadmins'}
@@ -978,51 +983,41 @@
 							</table>
 							<!-- Display warning if any has "*" as target, instead of ".*" -->
 							{#if $permissionMinionsFields.some((mt) => mt.target === '*')}
-								<Alert
-									color="warning"
-									dismissible={false}
-									fade={false}
-									class="mt-3"
-								>
+								<div class="alert alert-warning mt-0" role="alert">
 									<strong>Warning!</strong> One or more minion targets have a
 									target of <code>"*"</code> instead of <code>".*"</code>.
 									<br />
 									This will not match any minions. Please change the target to
 									<code>".*"</code> to match all minions.
-								</Alert>
+								</div>
 							{/if}
 							<!-- Display warning if any has "*" as module, instead of ".*" -->
 							{#if $permissionMinionsFields.some( (mt) => mt.modules.some((mtm) => mtm.name === '*'), )}
-								<Alert
-									color="warning"
-									dismissible={false}
-									fade={false}
-									class="mt-3"
-								>
+								<div class="alert alert-warning mt-0" role="alert">
 									<strong>Warning!</strong> One or more minion targets have a
 									module of <code>"*"</code> instead of <code>".*"</code>.
 									<br />
 									This will not match any modules. Please change the module to
 									<code>".*"</code> to match all modules.
-								</Alert>
+								</div>
 							{/if}
 						</div>
 						<div class="col-12 ps-3 mb-0">
 							<h3>Actions</h3>
 							{#if groupNameFieldError}
-								<Alert color="danger">
+								<div class="alert alert-danger" role="alert">
 									<strong>Invalid group name.</strong>
-								</Alert>
+								</div>
 							{/if}
 							{#if groupLdapSyncFieldError}
-								<Alert color="danger">
+								<div class="alert alert-danger" role="alert">
 									<strong>Invalid LDAP sync DN.</strong>
-								</Alert>
+								</div>
 							{/if}
 							{#if permissionMinionsFieldsError}
-								<Alert color="danger">
+								<div class="alert alert-danger" role="alert">
 									<strong>Invalid minion permissions.</strong>
-								</Alert>
+								</div>
 							{/if}
 
 							<button

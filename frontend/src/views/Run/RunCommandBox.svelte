@@ -188,7 +188,7 @@
 				<div class="fs-3 form-check form-switch">
 					<input
 						id="async"
-						type="checkbox" 
+						type="checkbox"
 						class="form-check-input"
 						bind:checked={asyncFieldValue}
 						on:blur={validateClientTypeField}
@@ -205,7 +205,7 @@
 				<div class="fs-3 form-check form-switch">
 					<input
 						id="batch"
-						type="checkbox" 
+						type="checkbox"
 						class="form-check-input"
 						bind:checked={batchFieldValue}
 						on:blur={validateClientTypeField}

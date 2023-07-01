@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { Alert } from 'sveltestrap';
 	import { Link } from 'svelte-navigator';
 	import { theme } from '../stores';
 	import type TabPage from '../models/TabPage';
@@ -31,13 +30,13 @@
 	<div class="card-body">
 		{#if _currentTabIndex === -1 || tabs[_currentTabIndex].hidden}
 			<!-- Either disled or no permissions. -->
-			<Alert color="warning" class="mb-0" fade={false}>
+			<div class="alert alert-warning mb-0" role="alert">
 				<h4 class="alert-heading">Unavailable</h4>
 				You do not have permission to view this page, or it has been disabled.
 				<br />
 				<br />
 				<Link to="/" class="link-dark">Return to home.</Link>
-			</Alert>
+			</div>
 		{:else}
 			<svelte:component
 				this={tabs[_currentTabIndex].component}
