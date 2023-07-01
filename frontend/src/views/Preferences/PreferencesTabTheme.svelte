@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { Col, Button, CardHeader, CardBody } from 'sveltestrap';
 	import Icon from '../../components/Icon.svelte';
 	import constants from '../../constants';
 	import { MessageType } from '../../models/MessageType';
@@ -24,11 +23,11 @@
 
 {#if $config.themeEnableSwitching}
 	<div class="card mb-3">
-		<CardHeader>Color</CardHeader>
-		<CardBody>
+		<div class="card-header">Color</div>
+		<div class="card-body">
 			<div class="row">
 				{#each constants.themeColors as color}
-					<Col xs="auto">
+					<div class="col-auto">
 						<Clickable
 							type="div"
 							event={() => selectColor(color)}
@@ -46,22 +45,26 @@
 								/>
 							{/if}
 						</Clickable>
-					</Col>
+					</div>
 				{/each}
 			</div>
 
-			<Button color={null} class="btn-{$theme.color}" on:click={() => selectColor('reset')}>
+			<button
+				type="button"
+				class="btn btn-{$theme.color}"
+				on:click={() => selectColor('reset')}
+			>
 				Reset
-			</Button>
-		</CardBody>
+			</button>
+		</div>
 	</div>
 {/if}
 
 <div class="card mb-0">
-	<CardHeader>Dark mode</CardHeader>
-	<CardBody>
+	<div class="card-header">Dark mode</div>
+	<div class="card-body">
 		<div class="row">
-			<Col xs="auto">
+			<div class="col-auto">
 				<Clickable
 					type="div"
 					event={() => setDarkMode(false)}
@@ -72,8 +75,8 @@
 						<Icon name="check" class="text-black" size="3" />
 					{/if}
 				</Clickable>
-			</Col>
-			<Col xs="auto">
+			</div>
+			<div class="col-auto">
 				<Clickable
 					type="div"
 					event={() => setDarkMode(true)}
@@ -85,20 +88,20 @@
 						<Icon name="check" class="text-white" size="3" />
 					{/if}
 				</Clickable>
-			</Col>
+			</div>
 		</div>
 
-		<Button
-			color={null}
-			class="btn-{$theme.color}"
+		<button
+			type="button"
+			class="btn btn-{$theme.color}"
 			on:click={() => setDarkMode($config.themeDefaultDark)}
 		>
 			Reset
-		</Button>
+		</button>
 
 		{#if hasResaltPermission($currentUser, P_ADMIN_SUPERADMIN)}
-			<Button
-				color="warning"
+			<button
+				class="btn btn-warning"
 				on:click={() => {
 					toasts.add(
 						MessageType[
@@ -110,9 +113,9 @@
 				}}
 			>
 				Show toast
-			</Button>
+			</button>
 		{/if}
-	</CardBody>
+	</div>
 </div>
 
 <style lang="scss">

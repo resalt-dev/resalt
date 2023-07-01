@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { getJobs } from '../../api';
 	import { toasts } from '../../stores';
-	import { Table, Tooltip } from 'sveltestrap';
+	import { Tooltip } from 'sveltestrap';
 	import Icon from '../../components/Icon.svelte';
 	import { writable, type Writable } from 'svelte/store';
 	import TablePaginate from '../../components/TablePaginate.svelte';
@@ -45,7 +45,7 @@
 </script>
 
 <div class="card table-responsive border-bottom-0">
-	<Table hover class="b-0 mb-0">
+	<table class="table table-hover b-0 mb-0">
 		<thead class="border-0">
 			<tr>
 				<th class="border-secondary bg-dark text-white">
@@ -94,7 +94,7 @@
 				{/each}
 			{/if}
 		</tbody>
-	</Table>
+	</table>
 </div>
 
 <TablePaginate

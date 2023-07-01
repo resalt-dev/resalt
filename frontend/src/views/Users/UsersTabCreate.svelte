@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { NavigateFn } from 'svelte-navigator';
-	import { Button, CardBody, CardHeader, Col, FormGroup, Input } from 'sveltestrap';
+	import { Button, Col, FormGroup, Input } from 'sveltestrap';
 	import { createUser } from '../../api';
 	import { MessageType } from '../../models/MessageType';
 	import paths from '../../paths';
@@ -73,8 +73,8 @@
 </script>
 
 <div class="card mb-3">
-	<CardHeader>Create User</CardHeader>
-	<CardBody>
+	<div class="card-header">Create User</div>
+	<div class="card-body">
 		<div class="row">
 			<Col class="mb-0" md="5" lg="2">
 				<FormGroup floating={true}>
@@ -135,5 +135,5 @@
 		</div>
 
 		<Button color={null} class="btn-{$theme.color}" on:click={_create}>Create User</Button>
-	</CardBody>
+	</div>
 </div>

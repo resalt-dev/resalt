@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
-	import { Alert, Button, CardBody, CardHeader, Col, FormGroup, Input } from 'sveltestrap';
+	import { Alert, Button, Col, FormGroup, Input } from 'sveltestrap';
 	import Icon from '../../components/Icon.svelte';
 	import TablePaginate from '../../components/TablePaginate.svelte';
 	import {
@@ -552,7 +552,7 @@
 	</Col>
 	<Col xs="12" md="8">
 		<div class="card">
-			<CardHeader>
+			<div class="card-header">
 				Group Details
 				<Button
 					size="sm"
@@ -563,8 +563,8 @@
 				>
 					<Icon name="plus" size="1" style="margin-top: -2px;" />
 				</Button>
-			</CardHeader>
-			<CardBody>
+			</div>
+			<div class="card-body">
 				{#if $selectedGroup === null}
 					<h1>Select a group to edit</h1>
 				{:else}
@@ -1048,7 +1048,7 @@
 						</Col>
 					</div>
 				{/if}
-			</CardBody>
+			</div>
 		</div>
 	</Col>
 </div>

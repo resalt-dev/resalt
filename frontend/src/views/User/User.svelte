@@ -3,7 +3,7 @@
 	import { theme, currentUser, toasts } from '../../stores';
 	import { writable, type Writable } from 'svelte/store';
 	import { onMount } from 'svelte';
-	import { CardBody, CardHeader, CardTitle, Col, FormGroup, Input } from 'sveltestrap';
+	import { CardTitle, Col, FormGroup, Input } from 'sveltestrap';
 	import { MessageType } from '../../models/MessageType';
 	import JsonViewer from '../../components/JsonViewer.svelte';
 	import type User from '../../models/User';
@@ -103,9 +103,9 @@
 	<div class="row">
 		<Col xs="12" xxl="4" class="pb-3">
 			<div class="card h-100 {$theme.dark ? 'bg-dark' : ''}">
-				<CardHeader>
+				<div class="card-header">
 					<CardTitle class="mb-0">General</CardTitle>
-				</CardHeader>
+				</div>
 				<ul class="list-group list-group-flush">
 					<li class="list-group-item {$theme.dark ? 'bg-dark text-light' : ''}">
 						<strong>ID</strong>
@@ -154,10 +154,10 @@
 		{#if hasResaltPermission($currentUser, P_USER_ADMIN) || ($currentUser.id === $user.id && hasResaltPermission($currentUser, P_USER_PASSWORD))}
 			<Col xs="12" xxl="4" class="pb-3">
 				<div class="card h-100 {$theme.dark ? 'bg-dark' : ''}">
-					<CardHeader>
+					<div class="card-header">
 						<CardTitle class="mb-0">Password</CardTitle>
-					</CardHeader>
-					<CardBody>
+					</div>
+					<div class="card-body">
 						<FormGroup floating={true}>
 							<Input
 								id="password1"
@@ -200,15 +200,15 @@
 							class="btn btn-{$theme.color}"
 							on:click={updatePassword}>Update</button
 						>
-					</CardBody>
+					</div>
 				</div>
 			</Col>
 		{/if}
 		<Col xs="12" xxl="4" class="pb-3">
 			<div class="card h-100 {$theme.dark ? 'bg-dark' : ''}">
-				<CardHeader>
+				<div class="card-header">
 					<CardTitle class="mb-0">Permissions</CardTitle>
-				</CardHeader>
+				</div>
 				<JsonViewer data={$user.perms} sort={false} />
 			</div>
 		</Col>

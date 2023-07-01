@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Writable } from 'svelte/store';
-	import { CardBody, CardHeader, Col } from 'sveltestrap';
 	import FloatingRightButton from '../../components/FloatingRightButton.svelte';
 	import JsonViewer from '../../components/JsonViewer.svelte';
 	import type Minion from '../../models/Minion';
@@ -165,10 +164,10 @@
 		<JsonViewer data={JSON.parse($minion.conformity)} />
 	{:else}
 		<div class="row">
-			<Col xs="3">
+			<div class="col-3">
 				<div class="card mb-3">
-					<CardHeader>Options</CardHeader>
-					<CardBody>
+					<div class="card-header">Options</div>
+					<div class="card-body">
 						<h5 class="card-title">Sort method</h5>
 
 						<!-- loop through sort orders-->
@@ -246,22 +245,22 @@
 								Show Collapsed
 							</label>
 						</div>
-					</CardBody>
+					</div>
 				</div>
 
 				<div class="card mb-3">
-					<CardHeader>States</CardHeader>
-					<CardBody>
+					<div class="card-header">States</div>
+					<div class="card-body">
 						<!-- Render Tree structure in a recursive fashion. -->
 						<ConformityTreeView
 							node={conformityTree}
 							bind:filterNamespace
 							bind:collapseList
 						/>
-					</CardBody>
+					</div>
 				</div>
-			</Col>
-			<Col>
+			</div>
+			<div class="col">
 				<div class="d-grid">
 					{#each conformity.filter( (c) => c.data.__sls__.startsWith(filterNamespace), ) as conform}
 						<div
@@ -295,7 +294,7 @@
 						</div>
 					{/each}
 				</div>
-			</Col>
+			</div>
 		</div>
 	{/if}
 {/if}

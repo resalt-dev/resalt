@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
-	import { CardBody, CardHeader, CardTitle, Col, Table } from 'sveltestrap';
+	import { CardTitle, Col, Table } from 'sveltestrap';
 	import { getSystemStatus } from '../../api';
 	import Icon from '../../components/Icon.svelte';
 	import ResaltProgress from '../../components/ResaltProgress.svelte';
@@ -29,7 +29,7 @@
 <div class="row">
 	<Col xs="12" class="pb-3">
 		<div class="card {$theme.dark ? 'bg-dark' : ''}">
-			<CardBody>
+			<div class="card-body">
 				<!-- welcome title -->
 				<h1 class="display-4">Welcome to Resalt</h1>
 				<!-- subtitle -->
@@ -51,18 +51,18 @@
 						Hello!
 					</Col>
 				</div> -->
-			</CardBody>
+			</div>
 		</div>
 	</Col>
 	<Col xs="12" xl="4" class="pb-3">
 		<div class="card {$theme.dark ? 'bg-dark' : ''}">
-			<CardHeader>
+			<div class="card-header">
 				<CardTitle class="mb-0">System Summary</CardTitle>
-			</CardHeader>
+			</div>
 			{#if $status === null}
 				<ResaltProgress />
 			{:else}
-				<CardBody>
+				<div class="card-body">
 					<h5 class="card-title">Salt Event Listener</h5>
 					<p class="card-text">
 						{#if $status.salt}
@@ -127,16 +127,16 @@
 							</tbody>
 						</Table>
 					</p>
-				</CardBody>
+				</div>
 			{/if}
 		</div>
 	</Col>
 	<Col xs="12" xl="4" class="pb-3">
 		<div class="card {$theme.dark ? 'bg-dark' : ''}">
-			<CardHeader>
+			<div class="card-header">
 				<CardTitle class="mb-0">Quick Links</CardTitle>
-			</CardHeader>
-			<CardBody class="text-center">
+			</div>
+			<div class="card-body text-center">
 				<a
 					href="https://resalt.dev/"
 					class="text-reset text-decoration-none"
@@ -161,15 +161,15 @@
 					<p class="card-text">Give feedback or report a bug</p>
 					<br />
 				</a>
-			</CardBody>
+			</div>
 		</div>
 	</Col>
 	<Col xs="12" xl="4" class="pb-3">
 		<div class="card {$theme.dark ? 'bg-dark' : ''}">
-			<CardHeader>
+			<div class="card-header">
 				<CardTitle class="mb-0">Latest News</CardTitle>
-			</CardHeader>
-			<CardBody style="max-height: 700px; overflow-y: auto;">
+			</div>
+			<div class="card-body" style="max-height: 700px; overflow-y: auto;">
 				{#each $config.latestNews as news, i}
 					{#if i !== 0}
 						<hr class="text-light" />
@@ -179,7 +179,7 @@
 						<p class="card-text">{news.split('§')[1]}</p>
 					{/if}
 				{/each}
-			</CardBody>
+			</div>
 		</div>
 	</Col>
 </div>
