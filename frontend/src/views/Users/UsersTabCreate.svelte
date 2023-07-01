@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { NavigateFn } from 'svelte-navigator';
-	import { Button, Col, FormGroup, Input } from 'sveltestrap';
+	import { FormGroup, Input } from 'sveltestrap';
 	import { createUser } from '../../api';
 	import { MessageType } from '../../models/MessageType';
 	import paths from '../../paths';
@@ -76,7 +76,7 @@
 	<div class="card-header">Create User</div>
 	<div class="card-body">
 		<div class="row">
-			<Col class="mb-0" md="5" lg="2">
+			<div class="col col-md-5 col-lg-2 mb-0">
 				<FormGroup floating={true}>
 					<Input
 						id="userUsername"
@@ -87,8 +87,8 @@
 					/>
 					<label class="form-label" for="userUsername">Username</label>
 				</FormGroup>
-			</Col>
-			<Col class="mb-0" md="2" lg="1">
+			</div>
+			<div class="col col-md-2 col-lg-1 mb-0">
 				<div class="d-flex justify-content-center">
 					<label class="form-label mb-0 me-2" for="userLDAP">LDAP</label>
 				</div>
@@ -104,9 +104,9 @@
 						/>
 					</FormGroup>
 				</div>
-			</Col>
+			</div>
 			{#if userLDAPFieldValue}
-				<Col class="mb-0" md="5" lg="5">
+				<div class="col col-md-5 col-lg-5 mb-0">
 					<FormGroup floating={true}>
 						<Input
 							id="userLDAPSync"
@@ -117,9 +117,9 @@
 						/>
 						<label class="form-label" for="userLDAPSync">LDAP Sync DN</label>
 					</FormGroup>
-				</Col>
+				</div>
 			{:else}
-				<Col class="mb-0" md="5" lg="3">
+				<div class="col col-md-5 col-lg-3 mb-0">
 					<FormGroup floating={true}>
 						<Input
 							id="userEmail"
@@ -130,10 +130,10 @@
 						/>
 						<label class="form-label" for="userEmail">Email (optional)</label>
 					</FormGroup>
-				</Col>
+				</div>
 			{/if}
 		</div>
 
-		<Button color={null} class="btn-{$theme.color}" on:click={_create}>Create User</Button>
+		<button type="button" class="btn btn-{$theme.color}" on:click={_create}>Create User</button>
 	</div>
 </div>

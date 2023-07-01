@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Alert, Button, Table } from 'sveltestrap';
+	import { Alert } from 'sveltestrap';
 	import CopyButton from '../../components/CopyButton.svelte';
 	import RunClientType from '../../models/RunClientType';
 	import type RunCommand from '../../models/RunCommand';
@@ -70,7 +70,7 @@
 					<br />
 
 					<!-- Summarize what is about to be run -->
-					<Table>
+					<table class="table">
 						<tbody>
 							<tr>
 								<th style="width: 50%">Client Type</th>
@@ -112,7 +112,7 @@
 								</tr>
 							{/if}
 						</tbody>
-					</Table>
+					</table>
 
 					<br />
 					Command-line equivalent:<br />
@@ -134,8 +134,8 @@
 					{/if}
 
 					<div class="text-center">
-						<Button color="warning" on:click={close} class="me-2">Cancel</Button>
-						<Button color="danger" on:click={execute}>Execute</Button>
+						<button type="button" class="btn btn-warning me-2" on:click={close}>Cancel</button>
+						<button type="button" class="btn btn-danger" on:click={execute}>Execute</button>
 					</div>
 				</div>
 			{/if}

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
-	import { Alert, Button, Col, FormGroup, Input } from 'sveltestrap';
+	import { Alert, FormGroup, Input } from 'sveltestrap';
 	import Icon from '../../components/Icon.svelte';
 	import TablePaginate from '../../components/TablePaginate.svelte';
 	import {
@@ -482,7 +482,7 @@
 </script>
 
 <div class="row">
-	<Col xs="12" md="4">
+	<div class="col-12 col-md-4">
 		<div class="table-responsive border-bottom-0 mb-3">
 			<table class="table b-0 mb-0">
 				<thead class="bg-dark border-0 text-white">
@@ -549,27 +549,26 @@
 				<ResaltProgress />
 			{/if}
 		</div>
-	</Col>
-	<Col xs="12" md="8">
+	</div>
+	<div class="col-12 col-md-8">
 		<div class="card">
 			<div class="card-header">
 				Group Details
-				<Button
-					size="sm"
-					color="success"
-					class="float-end"
+				<button
+					type="button"
+					class="btn btn-sm btn-success float-end"
 					style="margin-top: -4px;margin-bottom: -4px;"
 					on:click={addGroup}
 				>
 					<Icon name="plus" size="1" style="margin-top: -2px;" />
-				</Button>
+				</button>
 			</div>
 			<div class="card-body">
 				{#if $selectedGroup === null}
 					<h1>Select a group to edit</h1>
 				{:else}
 					<div class="row">
-						<Col class="ps-3 mb-0" xs="12">
+						<div class="col-12 ps-3 mb-0">
 							{#if $selectedGroup.name === '$superadmins'}
 								<Alert color="warning" dismissible={false} fade={false}>
 									<strong>Warning!</strong> You have selected the "<strong
@@ -578,8 +577,8 @@
 									be edited or deleted.
 								</Alert>
 							{/if}
-						</Col>
-						<Col class="ps-3 mb-0" xs="12">
+						</div>
+						<div class="col-12 ps-3 mb-0">
 							<FormGroup floating={true}>
 								<Input
 									id="selectedGroupId"
@@ -589,8 +588,8 @@
 								/>
 								<label class="form-label" for="selectedGroupId">Group ID</label>
 							</FormGroup>
-						</Col>
-						<Col class="ps-3 mb-0" xs="12" lg="6" xxl="5">
+						</div>
+						<div class="col-12 col-lg-6 col-xxl-5 ps-3 mb-0">
 							<FormGroup floating={true}>
 								<Input
 									id="selectedGroupName"
@@ -603,8 +602,8 @@
 								/>
 								<label class="form-label" for="selectedGroupName">Group Name</label>
 							</FormGroup>
-						</Col>
-						<Col class="ps-3 mb-0" xs="12" lg="6" xxl="7">
+						</div>
+						<div class="col-12 col-lg-6 col-xxl-7 ps-3 mb-0">
 							<FormGroup floating={true}>
 								<Input
 									id="selectedGroupLdapSync"
@@ -618,18 +617,18 @@
 									>LDAP Sync DN (optional)</label
 								>
 							</FormGroup>
-						</Col>
-						<Col class="ps-3 mb-0" xs="12">
-							<Button
-								color="primary"
-								class="float-end"
+						</div>
+						<div class="col-12 ps-3 mb-0">
+							<button
+								type="button"
+								class="btn btn-primary float-end"
 								disabled={$selectedGroup.name === '$superadmins'}
 								on:click={updateSelectedGroup}
 							>
 								Save
-							</Button>
-						</Col>
-						<Col class="ps-3 mb-0" xs="12">
+							</button>
+						</div>
+						<div class="col-12 ps-3 mb-0">
 							<h3>Members</h3>
 							<table class="table b-0 mb-3">
 								<thead class="bg-dark border-0 text-white">
@@ -649,10 +648,9 @@
 												<small>{user.id}</small>
 											</td>
 											<td>
-												<Button
-													color="danger"
-													size="sm"
-													class="float-end"
+												<button
+													type="button"
+													class="btn btn-sm btn-danger float-end"
 													disabled={$selectedGroup.name ===
 														'$superadmins' ||
 														groupLdapSyncFieldValue.length > 0}
@@ -661,14 +659,14 @@
 													}}
 												>
 													Remove
-												</Button>
+												</button>
 											</td>
 										</tr>
 									{/each}
 								</tbody>
 							</table>
-						</Col>
-						<Col class="ps-3 mb-0" xs="12">
+						</div>
+						<div class="col-12 ps-3 mb-0">
 							<div class="input-group flex-nowrap">
 								<div class="form-floating w-100">
 									<Input
@@ -695,15 +693,15 @@
 										{/if}
 									</label>
 								</div>
-								<Button
-									color="primary"
-									class="float-end text-nowrap px-4"
+								<button
+									type="button"
+									class="btn btn-primary float-end text-nowrap px-4"
 									disabled={$selectedGroup.name === '$superadmins' ||
 										groupLdapSyncFieldValue.length > 0}
 									on:click={addUserToSelectedGroup}
 								>
 									Add user
-								</Button>
+								</button>
 							</div>
 							{#if addUserFieldError}
 								<div class="invalid-feedback d-block">
@@ -711,8 +709,8 @@
 								</div>
 							{/if}
 							<div class="mb-3" />
-						</Col>
-						<Col class="ps-3 mb-0" xs="12">
+						</div>
+						<div class="col-12 ps-3 mb-0">
 							<h3>Permissions</h3>
 							<h5>Web Dashboard</h5>
 							<table class="table b-0 mb-3">
@@ -776,19 +774,19 @@
 										<th class="border-secondary ps-3"> Module </th>
 										<th class="border-secondary ps-3"> Arguments </th>
 										<td class="border-secondary">
-											<Button
-												size="sm"
-												color="success"
-												class="float-end"
+											<button
+												type="button"
+												class="btn btn-sm btn-success float-end"
 												style="margin-top: -4px;margin-bottom: -4px;"
 												disabled={$selectedGroup.name === '$superadmins'}
 												on:click={localAddMinionTarget}
-												><Icon
+											>
+												<Icon
 													name="plus"
 													size="1"
 													style="margin-top: -2px;"
-												/></Button
-											>
+												/>
+											</button>
 										</td>
 									</tr>
 								</thead>
@@ -817,10 +815,9 @@
 															Target
 														</label>
 													</div>
-													<Button
-														size="sm"
-														color="success"
-														class="float-end"
+													<button
+														type="button"
+														class="btn btn-sm btn-success float-end"
 														disabled={$selectedGroup.name ===
 															'$superadmins'}
 														on:click={() => {
@@ -834,7 +831,7 @@
 															size="1"
 															style="margin-top: -2px;"
 														/>
-													</Button>
+													</button>
 												</div>
 											</td>
 											<td style="width: 12rem;">
@@ -863,10 +860,9 @@
 																Module
 															</label>
 														</div>
-														<Button
-															size="sm"
-															color="danger"
-															class="float-end"
+														<button
+															type="button"
+															class="btn btn-sm btn-danger float-end"
 															disabled={$selectedGroup.name ===
 																'$superadmins'}
 															on:click={() => {
@@ -881,7 +877,7 @@
 																size="1"
 																style="margin-top: -2px;"
 															/>
-														</Button>
+														</button>
 													</div>
 												{/each}
 											</td>
@@ -957,11 +953,10 @@
 												{/each}
 											</td>
 											<td>
-												<Button
-													size="sm"
-													color="danger"
+												<button
+													type="button"
+													class="btn btn-sm btn-danger float-end mt-1"
 													style="height: 2rem;"
-													class="float-end mt-1"
 													disabled={$selectedGroup.name ===
 														'$superadmins'}
 													on:click={() => {
@@ -975,7 +970,7 @@
 														size="1"
 														style="margin-top: -2px;"
 													/>
-												</Button>
+												</button>
 											</td>
 										</tr>
 									{/each}
@@ -1011,8 +1006,8 @@
 									<code>".*"</code> to match all modules.
 								</Alert>
 							{/if}
-						</Col>
-						<Col class="ps-3 mb-0" xs="12">
+						</div>
+						<div class="col-12 ps-3 mb-0">
 							<h3>Actions</h3>
 							{#if groupNameFieldError}
 								<Alert color="danger">
@@ -1030,27 +1025,28 @@
 								</Alert>
 							{/if}
 
-							<Button
-								color="primary"
+							<button
+								type="button"
+								class="btn btn-primary"
 								disabled={$selectedGroup.name === '$superadmins'}
 								on:click={updateSelectedGroup}
 							>
 								Save
-							</Button>
-							<Button
-								color="danger"
-								class="float-end"
+							</button>
+							<button
+								type="button"
+								class="btn btn-danger float-end"
 								disabled={$selectedGroup.name === '$superadmins'}
 								on:click={deleteSelectedGroup}
 							>
 								Delete Group
-							</Button>
-						</Col>
+							</button>
+						</div>
 					</div>
 				{/if}
 			</div>
 		</div>
-	</Col>
+	</div>
 </div>
 
 <style lang="scss">

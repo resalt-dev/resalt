@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Col, FormGroup, Input } from 'sveltestrap';
+	import { FormGroup, Input } from 'sveltestrap';
 	import RunClientType from '../../models/RunClientType';
 	import RunCommand from '../../models/RunCommand';
 	import { quoteSplit } from '../../utils';
@@ -166,7 +166,7 @@
 </script>
 
 <div class="row">
-	<Col class="mb-0" md="3" lg="2">
+	<div class="col col-md-3 col-lg-2 mb-0">
 		<FormGroup floating={true}>
 			<Input
 				id="clientType"
@@ -182,8 +182,8 @@
 			</Input>
 			<label class="form-label" for="clientType">Client Type</label>
 		</FormGroup>
-	</Col>
-	<Col class="mb-0" md="2" lg={{ size: 1, offset: 1 }}>
+	</div>
+	<div class="col col-md-2 col-lg-1 offset-lg-1 mb-0">
 		{#if !batchFieldValue}
 			<div class="clearfix" />
 			<label class="form-label ms-1 mb-0" for="async">Async</label>
@@ -198,8 +198,8 @@
 				/>
 			</FormGroup>
 		{/if}
-	</Col>
-	<Col class="mb-0" md="2" lg={{ size: 1, offset: 1 }}>
+	</div>
+	<div class="col col-md-2 col-lg-1 offset-lg-1 mb-0">
 		{#if clientTypeFieldValue === 'local'}
 			<div class="clearfix" />
 			<label class="form-label ms-1 mb-0" for="batch">Batch</label>
@@ -214,8 +214,8 @@
 				/>
 			</FormGroup>
 		{/if}
-	</Col>
-	<Col class="mb-0" md="2" lg="2" xl="1">
+	</div>
+	<div class="col col-md-2 col-lg-2 col-xl-1 mb-0">
 		{#if clientTypeFieldValue === 'local' && batchFieldValue}
 			<FormGroup floating={true}>
 				<Input
@@ -228,11 +228,11 @@
 				<label class="form-label" for="batchSize">Batch Size</label>
 			</FormGroup>
 		{/if}
-	</Col>
+	</div>
 </div>
 
 <div class="row">
-	<Col class="mb-0" md="3" lg="2" xl="2" xxl="1">
+	<div class="col col-md-3 col-lg-2 col-xl-2 col-xxl-1 mb-0">
 		{#if clientTypeFieldValue === 'local'}
 			<FormGroup floating={true}>
 				<Input
@@ -257,8 +257,8 @@
 				<label class="form-label" for="targetType">Target Type</label>
 			</FormGroup>
 		{/if}
-	</Col>
-	<Col class="mb-0" md="5" lg="2">
+	</div>
+	<div class="col col-md-5 col-lg-2 mb-0">
 		{#if clientTypeFieldValue === 'local'}
 			<FormGroup floating={true}>
 				<Input
@@ -271,8 +271,8 @@
 				<label class="form-label" for="target">Target</label>
 			</FormGroup>
 		{/if}
-	</Col>
-	<Col class="mb-0" md="4" lg="2">
+	</div>
+	<div class="col col-md-4 col-lg-2 mb-0">
 		<FormGroup floating={true}>
 			<Input
 				id="function"
@@ -283,8 +283,8 @@
 			/>
 			<label class="form-label" for="function">Function</label>
 		</FormGroup>
-	</Col>
-	<Col class="mb-0" md="12" lg="3">
+	</div>
+	<div class="col col-md-12 col-lg-3 mb-0">
 		<FormGroup floating={true}>
 			<Input
 				id="arguments"
@@ -295,8 +295,8 @@
 			/>
 			<label class="form-label" for="arguments">Arguments</label>
 		</FormGroup>
-	</Col>
-	<Col class="mb-0" md="12" lg="3" xl="3" xxl="4">
+	</div>
+	<div class="col col-md-12 col-lg-3 col-xl-3 col-xxl-4 mb-0">
 		<FormGroup floating={true}>
 			<Input
 				id="keywordArguments"
@@ -307,5 +307,5 @@
 			/>
 			<label class="form-label" for="keywordArguments">Keyword Arguments</label>
 		</FormGroup>
-	</Col>
+	</div>
 </div>

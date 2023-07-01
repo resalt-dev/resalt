@@ -3,7 +3,7 @@
 	import { theme, currentUser, toasts } from '../../stores';
 	import { writable, type Writable } from 'svelte/store';
 	import { onMount } from 'svelte';
-	import { CardTitle, Col, FormGroup, Input } from 'sveltestrap';
+	import { FormGroup, Input } from 'sveltestrap';
 	import { MessageType } from '../../models/MessageType';
 	import JsonViewer from '../../components/JsonViewer.svelte';
 	import type User from '../../models/User';
@@ -101,10 +101,10 @@
 	</h1>
 
 	<div class="row">
-		<Col xs="12" xxl="4" class="pb-3">
+		<div class="col-12 col-xxl-4 pb-3">
 			<div class="card h-100 {$theme.dark ? 'bg-dark' : ''}">
 				<div class="card-header">
-					<CardTitle class="mb-0">General</CardTitle>
+					<h5 class="card-title mb-0">General</h5>
 				</div>
 				<ul class="list-group list-group-flush">
 					<li class="list-group-item {$theme.dark ? 'bg-dark text-light' : ''}">
@@ -150,12 +150,12 @@
 					</li>
 				</ul>
 			</div>
-		</Col>
+		</div>
 		{#if hasResaltPermission($currentUser, P_USER_ADMIN) || ($currentUser.id === $user.id && hasResaltPermission($currentUser, P_USER_PASSWORD))}
-			<Col xs="12" xxl="4" class="pb-3">
+			<div class="col-12 col-xxl-4 pb-3">
 				<div class="card h-100 {$theme.dark ? 'bg-dark' : ''}">
 					<div class="card-header">
-						<CardTitle class="mb-0">Password</CardTitle>
+						<h5 class="card-title mb-0">Password</h5>
 					</div>
 					<div class="card-body">
 						<FormGroup floating={true}>
@@ -202,15 +202,15 @@
 						>
 					</div>
 				</div>
-			</Col>
+			</div>
 		{/if}
-		<Col xs="12" xxl="4" class="pb-3">
+		<div class="col-12 col-xxl-4 pb-3">
 			<div class="card h-100 {$theme.dark ? 'bg-dark' : ''}">
 				<div class="card-header">
-					<CardTitle class="mb-0">Permissions</CardTitle>
+					<h5 class="card-title mb-0">Permissions</h5>
 				</div>
 				<JsonViewer data={$user.perms} sort={false} />
 			</div>
-		</Col>
+		</div>
 	</div>
 {/if}

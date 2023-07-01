@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
-	import { Table } from 'sveltestrap';
 	import { getSystemStatus } from '../../api';
 	import Icon from '../../components/Icon.svelte';
 	import ResaltProgress from '../../components/ResaltProgress.svelte';
@@ -39,17 +38,17 @@
 				<!-- <br />
 				<br />
 				<div class="row">
-					<Col xs="12" lg="4">
+					<div class="col-12 col-xl-4">
 						<h5 class="card-title">Get Started</h5>
-					</Col>
-					<Col xs="12" lg="4">
+					</div>
+					<div class="col-12 col-xl-4">
 						<h5 class="card-title">Next Steps</h5>
 						Hello!
-					</Col>
-					<Col xs="12" lg="4">
+					</div>
+					<div class="col-12 col-xl-4">
 						<h5 class="card-title">More Actions</h5>
 						Hello!
-					</Col>
+					</div>
 				</div> -->
 			</div>
 		</div>
