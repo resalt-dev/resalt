@@ -77,7 +77,7 @@
 	<div class="card-body">
 		<div class="row">
 			<div class="col col-md-5 col-lg-2 mb-0">
-				<FormGroup floating={true}>
+				<div class="form-floating mb-3">
 					<Input
 						id="userUsername"
 						type="text"
@@ -86,7 +86,7 @@
 						on:blur={validateUserUsernameField}
 					/>
 					<label class="form-label" for="userUsername">Username</label>
-				</FormGroup>
+				</div>
 			</div>
 			<div class="col col-md-2 col-lg-1 mb-0">
 				<div class="d-flex justify-content-center">
@@ -94,7 +94,7 @@
 				</div>
 				<div class="clearfix" />
 				<div class="d-flex justify-content-center">
-					<FormGroup floating={true} class="form-switch ps-0">
+					<div class="form-floating mb-3 ps-0 form-switch">
 						<Input
 							id="userLDAP"
 							type="switch"
@@ -102,12 +102,12 @@
 							bind:checked={userLDAPFieldValue}
 							on:blur={validateUserLDAPField}
 						/>
-					</FormGroup>
+					</div>
 				</div>
 			</div>
 			{#if userLDAPFieldValue}
 				<div class="col col-md-5 col-lg-5 mb-0">
-					<FormGroup floating={true}>
+					<div class="form-floating mb-3">
 						<Input
 							id="userLDAPSync"
 							type="text"
@@ -116,11 +116,11 @@
 							on:blur={validateUserLDAPSyncField}
 						/>
 						<label class="form-label" for="userLDAPSync">LDAP Sync DN</label>
-					</FormGroup>
+					</div>
 				</div>
 			{:else}
 				<div class="col col-md-5 col-lg-3 mb-0">
-					<FormGroup floating={true}>
+					<div class="form-floating mb-3">
 						<Input
 							id="userEmail"
 							type="email"
@@ -129,7 +129,7 @@
 							on:blur={validateUserEmailField}
 						/>
 						<label class="form-label" for="userEmail">Email (optional)</label>
-					</FormGroup>
+					</div>
 				</div>
 			{/if}
 		</div>

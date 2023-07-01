@@ -134,8 +134,12 @@
 					{/if}
 
 					<div class="text-center">
-						<button type="button" class="btn btn-warning me-2" on:click={close}>Cancel</button>
-						<button type="button" class="btn btn-danger" on:click={execute}>Execute</button>
+						<button type="button" class="btn btn-warning me-2" on:click={close}>
+							Cancel
+						</button>
+						<button type="button" class="btn btn-danger" on:click={execute}>
+							Execute
+						</button>
 					</div>
 				</div>
 			{/if}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { FormGroup, Input } from 'sveltestrap';
+	import { Input } from 'sveltestrap';
 	import RunClientType from '../../models/RunClientType';
 	import RunCommand from '../../models/RunCommand';
 	import { quoteSplit } from '../../utils';
@@ -167,7 +167,7 @@
 
 <div class="row">
 	<div class="col col-md-3 col-lg-2 mb-0">
-		<FormGroup floating={true}>
+		<div class="form-floating mb-3">
 			<Input
 				id="clientType"
 				type="select"
@@ -181,13 +181,13 @@
 				<option value="wheel">Wheel</option>
 			</Input>
 			<label class="form-label" for="clientType">Client Type</label>
-		</FormGroup>
+		</div>
 	</div>
 	<div class="col col-md-2 col-lg-1 offset-lg-1 mb-0">
 		{#if !batchFieldValue}
 			<div class="clearfix" />
 			<label class="form-label ms-1 mb-0" for="async">Async</label>
-			<FormGroup floating={true} class="form-switch ps-0">
+			<div class="form-floating mb-3 ps-0 form-switch">
 				<Input
 					id="async"
 					type="switch"
@@ -196,14 +196,14 @@
 					bind:checked={asyncFieldValue}
 					on:blur={validateClientTypeField}
 				/>
-			</FormGroup>
+			</div>
 		{/if}
 	</div>
 	<div class="col col-md-2 col-lg-1 offset-lg-1 mb-0">
 		{#if clientTypeFieldValue === 'local'}
 			<div class="clearfix" />
 			<label class="form-label ms-1 mb-0" for="batch">Batch</label>
-			<FormGroup floating={true} class="form-switch ps-0">
+			<div class="form-floating mb-3 ps-0 form-switch">
 				<Input
 					id="batch"
 					type="switch"
@@ -212,12 +212,12 @@
 					bind:checked={batchFieldValue}
 					on:blur={validateClientTypeField}
 				/>
-			</FormGroup>
+			</div>
 		{/if}
 	</div>
 	<div class="col col-md-2 col-lg-2 col-xl-1 mb-0">
 		{#if clientTypeFieldValue === 'local' && batchFieldValue}
-			<FormGroup floating={true}>
+			<div class="form-floating mb-3">
 				<Input
 					id="batchSize"
 					type="text"
@@ -226,7 +226,7 @@
 					on:blur={validateBatchSizeField}
 				/>
 				<label class="form-label" for="batchSize">Batch Size</label>
-			</FormGroup>
+			</div>
 		{/if}
 	</div>
 </div>
@@ -234,7 +234,7 @@
 <div class="row">
 	<div class="col col-md-3 col-lg-2 col-xl-2 col-xxl-1 mb-0">
 		{#if clientTypeFieldValue === 'local'}
-			<FormGroup floating={true}>
+			<div class="form-floating mb-3">
 				<Input
 					id="targetType"
 					type="select"
@@ -255,12 +255,12 @@
 					<option value="ipcidr">IPCIDR</option>
 				</Input>
 				<label class="form-label" for="targetType">Target Type</label>
-			</FormGroup>
+			</div>
 		{/if}
 	</div>
 	<div class="col col-md-5 col-lg-2 mb-0">
 		{#if clientTypeFieldValue === 'local'}
-			<FormGroup floating={true}>
+			<div class="form-floating mb-3">
 				<Input
 					id="target"
 					type="text"
@@ -269,11 +269,11 @@
 					on:blur={validateTargetField}
 				/>
 				<label class="form-label" for="target">Target</label>
-			</FormGroup>
+			</div>
 		{/if}
 	</div>
 	<div class="col col-md-4 col-lg-2 mb-0">
-		<FormGroup floating={true}>
+		<div class="form-floating mb-3">
 			<Input
 				id="function"
 				type="text"
@@ -282,10 +282,10 @@
 				on:blur={validateFunctionField}
 			/>
 			<label class="form-label" for="function">Function</label>
-		</FormGroup>
+		</div>
 	</div>
 	<div class="col col-md-12 col-lg-3 mb-0">
-		<FormGroup floating={true}>
+		<div class="form-floating mb-3">
 			<Input
 				id="arguments"
 				type="text"
@@ -294,10 +294,10 @@
 				on:blur={validateArgsField}
 			/>
 			<label class="form-label" for="arguments">Arguments</label>
-		</FormGroup>
+		</div>
 	</div>
 	<div class="col col-md-12 col-lg-3 col-xl-3 col-xxl-4 mb-0">
-		<FormGroup floating={true}>
+		<div class="form-floating mb-3">
 			<Input
 				id="keywordArguments"
 				type="text"
@@ -306,6 +306,6 @@
 				on:blur={validateKwargsField}
 			/>
 			<label class="form-label" for="keywordArguments">Keyword Arguments</label>
-		</FormGroup>
+		</div>
 	</div>
 </div>

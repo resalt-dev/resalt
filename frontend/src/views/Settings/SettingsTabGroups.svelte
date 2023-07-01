@@ -579,7 +579,7 @@
 							{/if}
 						</div>
 						<div class="col-12 ps-3 mb-0">
-							<FormGroup floating={true}>
+							<div class="form-floating mb-3">
 								<Input
 									id="selectedGroupId"
 									type="text"
@@ -587,10 +587,10 @@
 									disabled
 								/>
 								<label class="form-label" for="selectedGroupId">Group ID</label>
-							</FormGroup>
+							</div>
 						</div>
 						<div class="col-12 col-lg-6 col-xxl-5 ps-3 mb-0">
-							<FormGroup floating={true}>
+							<div class="form-floating mb-3">
 								<Input
 									id="selectedGroupName"
 									type="text"
@@ -601,10 +601,10 @@
 									required
 								/>
 								<label class="form-label" for="selectedGroupName">Group Name</label>
-							</FormGroup>
+							</div>
 						</div>
 						<div class="col-12 col-lg-6 col-xxl-7 ps-3 mb-0">
-							<FormGroup floating={true}>
+							<div class="form-floating mb-3">
 								<Input
 									id="selectedGroupLdapSync"
 									type="text"
@@ -616,7 +616,7 @@
 								<label class="form-label" for="selectedGroupLdapSync"
 									>LDAP Sync DN (optional)</label
 								>
-							</FormGroup>
+							</div>
 						</div>
 						<div class="col-12 ps-3 mb-0">
 							<button

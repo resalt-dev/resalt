@@ -4,7 +4,7 @@
 	import { auth, config, theme, toasts } from '../../stores';
 	import paths from '../../paths';
 	import { MessageType } from '../../models/MessageType';
-	import { FormGroup, Input } from 'sveltestrap';
+	import { Input } from 'sveltestrap';
 	import type { NavigateFn } from 'svelte-navigator';
 	import ResaltProgress from '../../components/ResaltProgress.svelte';
 
@@ -79,7 +79,7 @@
 	<p class="fw-bold">This is a restricted admin area. Please log in to continue.</p>
 	<br />
 	<form action="javascript:void(0);" autocomplete="false">
-		<FormGroup floating={true}>
+		<div class="form-floating mb-3">
 			<Input
 				id="username"
 				type="text"
@@ -89,8 +89,8 @@
 				bind:inner={usernameField}
 			/>
 			<label class="form-label" for="username">Username</label>
-		</FormGroup>
-		<FormGroup floating={true}>
+		</div>
+		<div class="form-floating mb-3">
 			<Input
 				id="password"
 				type="password"
@@ -99,7 +99,7 @@
 				on:blur={validatePasswordField}
 			/>
 			<label class="form-label" for="password">Password</label>
-		</FormGroup>
+		</div>
 
 		<br />
 

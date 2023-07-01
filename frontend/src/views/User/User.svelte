@@ -158,7 +158,7 @@
 						<h5 class="card-title mb-0">Password</h5>
 					</div>
 					<div class="card-body">
-						<FormGroup floating={true}>
+						<div class="form-floating mb-3">
 							<Input
 								id="password1"
 								type="password"
@@ -168,8 +168,8 @@
 								on:blur={validatePasswordField}
 							/>
 							<label class="form-label" for="password1">New password</label>
-						</FormGroup>
-						<FormGroup floating={true}>
+						</div>
+						<div class="form-floating mb-3">
 							<Input
 								id="password2"
 								type="password"
@@ -180,7 +180,7 @@
 								on:keyup={validateRepeatPasswordField}
 							/>
 							<label class="form-label" for="password2">Confirm password</label>
-						</FormGroup>
+						</div>
 						{#if $user.ldapSync !== null}
 							<p class="text-muted mt-3">
 								This user is synced with LDAP. Passwords can only be changed in
