@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { afterUpdate, beforeUpdate } from 'svelte';
-	import { Input } from 'sveltestrap';
 	import { FilterFieldType } from '../../models/FilterFieldType';
 	import { FilterOperand } from '../../models/FilterOperand';
 	import { TempusDominus, Namespace } from '@eonasdan/tempus-dominus';
@@ -151,10 +150,9 @@
 	<div class="row">
 		<div class="col-12 col-lg-3 col-xl-2">
 			<div class="form-floating {i + 1 === $filters.length ? 'mb-0' : 'mb-3'}">
-				<Input
+				<select
 					id="filterFieldType{i}"
-					type="select"
-					name="select"
+					class="form-select"
 					bind:value={filter.fieldType}
 					on:change={(event) => {
 						filterFieldTypeChanged(i, event);
@@ -176,7 +174,7 @@
 						value={FilterFieldType.PACKAGE}
 						selected={filter.fieldType === FilterFieldType.PACKAGE}>Package</option
 					>
-				</Input>
+				</select>
 				<label class="form-label" for="filterFieldType{i}">Filter Type</label>
 			</div>
 		</div>
@@ -184,10 +182,9 @@
 			<div class="col-12 col-lg-5 col-xl-3">
 				<div class="form-floating {i + 1 === $filters.length ? 'mb-0' : 'mb-3'}">
 					{#if filter.fieldType === FilterFieldType.OBJECT}
-						<Input
+						<select
 							id="filterField{i}"
-							type="select"
-							name="select"
+							class="form-select"
 							bind:value={filter.field}
 							on:change={(event) => {
 								filterFieldChanged(i, event);
@@ -218,9 +215,9 @@
 							>
 								Conformity Error
 							</option>
-						</Input>
+						</select>
 					{:else}
-						<Input id="filterField{i}" type="text" bind:value={filter.field} required />
+						<input id="filterField{i}" type="text" class="form-control" bind:value={filter.field} required />
 					{/if}
 					{#if filter.fieldType === FilterFieldType.PACKAGE}
 						<label class="form-label" for="filterField{i}">Package</label>
@@ -233,10 +230,9 @@
 			</div>
 			<div class="col-12 col-lg-4 col-xl-2">
 				<div class="form-floating {i + 1 === $filters.length ? 'mb-0' : 'mb-3'}">
-					<Input
+					<select
 						id="filterOperand{i}"
-						type="select"
-						name="select"
+						class="form-select"
 						bind:value={filter.operand}
 					>
 						{#if !(filter.fieldType === FilterFieldType.OBJECT && (filter.field === 'last_seen' || filter.field === 'conformity_success' || filter.field === 'conformity_incorrect' || filter.field === 'conformity_error'))}
@@ -271,7 +267,7 @@
 						{/if}
 						<option value={FilterOperand.GREATER_THAN_OR_EQUAL}> &gt;= </option>
 						<option value={FilterOperand.LESS_THAN_OR_EQUAL}> &lt;= </option>
-					</Input>
+					</select>
 					<label class="form-label" for="filterOperand{i}">Operand</label>
 				</div>
 			</div>
@@ -304,7 +300,7 @@
 					</div>
 				{:else}
 					<div class="form-floating {i + 1 === $filters.length ? 'mb-0' : 'mb-3'}">
-						<Input id="filterValue{i}" type="text" bind:value={filter.value} required />
+						<input id="filterValue{i}" type="text" class="form-control" bind:value={filter.value} required />
 						{#if filter.fieldType === FilterFieldType.PACKAGE}
 							<label class="form-label" for="filterValue{i}">Version</label>
 						{:else}

@@ -3,7 +3,7 @@
 	import { theme, currentUser, toasts } from '../../stores';
 	import { writable, type Writable } from 'svelte/store';
 	import { onMount } from 'svelte';
-	import { FormGroup, Input } from 'sveltestrap';
+	import { Input } from 'sveltestrap';
 	import { MessageType } from '../../models/MessageType';
 	import JsonViewer from '../../components/JsonViewer.svelte';
 	import type User from '../../models/User';

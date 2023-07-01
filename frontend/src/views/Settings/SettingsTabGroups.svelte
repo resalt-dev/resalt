@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
-	import { Alert, FormGroup, Input } from 'sveltestrap';
+	import { Alert, Input } from 'sveltestrap';
 	import Icon from '../../components/Icon.svelte';
 	import TablePaginate from '../../components/TablePaginate.svelte';
 	import {

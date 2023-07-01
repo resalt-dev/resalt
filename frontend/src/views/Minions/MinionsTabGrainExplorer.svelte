@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Writable } from 'svelte/store';
-	import { Input } from 'sveltestrap';
 	import { searchGrains } from '../../api';
 	import ConsoleChangeBranch from '../../components/ConsoleChangeBranch.svelte';
 	import FloatingRightButton from '../../components/FloatingRightButton.svelte';
@@ -67,10 +66,10 @@
 	<div class="row">
 		<div class="col-11 col-lg-6 col-xl-5">
 			<div class="form-floating mb-0">
-				<Input
+				<input
 					id="grainQuery"
 					type="text"
-					invalid={grainQueryFieldError}
+					class="form-control {grainQueryFieldError ? 'is-invalid' : ''}"
 					bind:value={grainQueryFieldValue}
 				/>
 				<label class="form-label" for="grainQuery">Grain Query (JSONPath)</label>

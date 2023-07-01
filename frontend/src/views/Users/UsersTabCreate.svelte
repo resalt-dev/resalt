@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { NavigateFn } from 'svelte-navigator';
-	import { FormGroup, Input } from 'sveltestrap';
+	import { Input } from 'sveltestrap';
 	import { createUser } from '../../api';
 	import { MessageType } from '../../models/MessageType';
 	import paths from '../../paths';

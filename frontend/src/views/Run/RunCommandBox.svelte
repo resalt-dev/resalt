@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { Input } from 'sveltestrap';
 	import RunClientType from '../../models/RunClientType';
 	import RunCommand from '../../models/RunCommand';
 	import { quoteSplit } from '../../utils';
@@ -168,18 +167,16 @@
 <div class="row">
 	<div class="col col-md-3 col-lg-2 mb-0">
 		<div class="form-floating mb-3">
-			<Input
+			<select
 				id="clientType"
-				type="select"
-				name="select"
-				invalid={clientTypeFieldError}
+				class="form-select {clientTypeFieldError ? 'is-invalid' : ''}"
 				bind:value={clientTypeFieldValue}
 				on:blur={validateClientTypeField}
 			>
 				<option value="local" selected>Local</option>
 				<option value="runner">Runner</option>
 				<option value="wheel">Wheel</option>
-			</Input>
+			</select>
 			<label class="form-label" for="clientType">Client Type</label>
 		</div>
 	</div>
@@ -187,15 +184,16 @@
 		{#if !batchFieldValue}
 			<div class="clearfix" />
 			<label class="form-label ms-1 mb-0" for="async">Async</label>
-			<div class="form-floating mb-3 ps-0 form-switch">
-				<Input
-					id="async"
-					type="switch"
-					class="fs-3"
-					invalid={clientTypeFieldError}
-					bind:checked={asyncFieldValue}
-					on:blur={validateClientTypeField}
-				/>
+			<div class="form-floating mb-3 ps-0">
+				<div class="fs-3 form-check form-switch">
+					<input
+						id="async"
+						type="checkbox" 
+						class="form-check-input"
+						bind:checked={asyncFieldValue}
+						on:blur={validateClientTypeField}
+					/>
+				</div>
 			</div>
 		{/if}
 	</div>
@@ -203,25 +201,26 @@
 		{#if clientTypeFieldValue === 'local'}
 			<div class="clearfix" />
 			<label class="form-label ms-1 mb-0" for="batch">Batch</label>
-			<div class="form-floating mb-3 ps-0 form-switch">
-				<Input
-					id="batch"
-					type="switch"
-					class="fs-3"
-					invalid={clientTypeFieldError}
-					bind:checked={batchFieldValue}
-					on:blur={validateClientTypeField}
-				/>
+			<div class="form-floating mb-3 ps-0">
+				<div class="fs-3 form-check form-switch">
+					<input
+						id="batch"
+						type="checkbox" 
+						class="form-check-input"
+						bind:checked={batchFieldValue}
+						on:blur={validateClientTypeField}
+					/>
+				</div>
 			</div>
 		{/if}
 	</div>
 	<div class="col col-md-2 col-lg-2 col-xl-1 mb-0">
 		{#if clientTypeFieldValue === 'local' && batchFieldValue}
 			<div class="form-floating mb-3">
-				<Input
+				<input
 					id="batchSize"
 					type="text"
-					invalid={batchSizeFieldError}
+					class="form-control {batchSizeFieldError ? 'is-invalid' : ''}"
 					bind:value={batchSizeFieldValue}
 					on:blur={validateBatchSizeField}
 				/>
@@ -235,10 +234,9 @@
 	<div class="col col-md-3 col-lg-2 col-xl-2 col-xxl-1 mb-0">
 		{#if clientTypeFieldValue === 'local'}
 			<div class="form-floating mb-3">
-				<Input
+				<select
 					id="targetType"
-					type="select"
-					invalid={targetTypeFieldError}
+					class="form-select {targetTypeFieldError ? 'is-invalid' : ''}"
 					bind:value={targetTypeFieldValue}
 					on:blur={validateTargetTypeField}
 				>
@@ -253,7 +251,7 @@
 					<option value="range">Range</option>
 					<option value="compound">Compound</option>
 					<option value="ipcidr">IPCIDR</option>
-				</Input>
+				</select>
 				<label class="form-label" for="targetType">Target Type</label>
 			</div>
 		{/if}
@@ -261,10 +259,10 @@
 	<div class="col col-md-5 col-lg-2 mb-0">
 		{#if clientTypeFieldValue === 'local'}
 			<div class="form-floating mb-3">
-				<Input
+				<input
 					id="target"
 					type="text"
-					invalid={targetFieldError}
+					class="form-control {targetFieldError ? 'is-invalid' : ''}"
 					bind:value={targetFieldValue}
 					on:blur={validateTargetField}
 				/>
@@ -274,10 +272,10 @@
 	</div>
 	<div class="col col-md-4 col-lg-2 mb-0">
 		<div class="form-floating mb-3">
-			<Input
+			<input
 				id="function"
 				type="text"
-				invalid={functionFieldError}
+				class="form-control {functionFieldError ? 'is-invalid' : ''}"
 				bind:value={functionFieldValue}
 				on:blur={validateFunctionField}
 			/>
@@ -286,10 +284,10 @@
 	</div>
 	<div class="col col-md-12 col-lg-3 mb-0">
 		<div class="form-floating mb-3">
-			<Input
+			<input
 				id="arguments"
 				type="text"
-				invalid={argsFieldError}
+				class="form-control {argsFieldError ? 'is-invalid' : ''}"
 				bind:value={argsFieldValue}
 				on:blur={validateArgsField}
 			/>
@@ -298,10 +296,10 @@
 	</div>
 	<div class="col col-md-12 col-lg-3 col-xl-3 col-xxl-4 mb-0">
 		<div class="form-floating mb-3">
-			<Input
+			<input
 				id="keywordArguments"
 				type="text"
-				invalid={kwargsFieldError}
+				class="form-control {kwargsFieldError ? 'is-invalid' : ''}"
 				bind:value={kwargsFieldValue}
 				on:blur={validateKwargsField}
 			/>
