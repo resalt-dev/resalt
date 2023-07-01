@@ -65,29 +65,29 @@
 
 <div class="card table-responsive border-bottom-0">
 	<table class="table table-hover b-0 mb-0">
-		<thead class="bg-dark border-0 text-white">
+		<thead class="border-0">
 			<tr>
-				<th class="border-secondary">
+				<th class="border-secondary bg-dark text-white">
 					<div class="row g-1">
 						<div class="col-auto align-self-center ps-2">Tag</div>
 					</div>
 				</th>
-				<th class="border-secondary">
+				<th class="border-secondary bg-dark text-white">
 					<div class="row g-1">
 						<div class="col-auto align-self-center">Function</div>
 					</div>
 				</th>
-				<th class="border-secondary">
+				<th class="border-secondary bg-dark text-white">
 					<div class="row g-1">
 						<div class="col-auto align-self-center">Target</div>
 					</div>
 				</th>
-				<th class="border-secondary">
+				<th class="border-secondary bg-dark text-white">
 					<div class="row g-1">
 						<div class="col-auto align-self-center">Job ID</div>
 					</div>
 				</th>
-				<th class="border-secondary">
+				<th class="border-secondary bg-dark text-white">
 					<div class="row g-1">
 						<div class="col-auto align-self-center">Date</div>
 					</div>
