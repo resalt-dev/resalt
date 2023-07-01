@@ -118,11 +118,10 @@
 	</div>
 </div>
 
-<style lang="scss">
-	$theme-box-size: 75px;
+<style>
 	:global(.theme-selector-box) {
-		width: $theme-box-size;
-		height: $theme-box-size;
+		width: 75px;
+		height: 75px;
 		border-radius: 10px;
 		border: 6px solid;
 

@@ -196,7 +196,7 @@
 	</div>
 </div>
 
-<style lang="scss">
+<style>
 	.update-label {
 		width: 150px;
 		display: inline-block;

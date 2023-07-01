@@ -103,7 +103,7 @@
 	</Clickable>
 </div>
 
-<style lang="scss">
+<style>
 	.sep {
 		margin-top: 0.4rem;
 		height: 1.5rem;

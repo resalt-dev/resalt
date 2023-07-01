@@ -93,13 +93,13 @@ export type ConformTreeNode = {
 	</ul>
 {/if}
 
-<style lang="scss">
+<style>
 	ul {
-		margin-bottom: 0; // override bootstrap
+		margin-bottom: 0;
 		padding-left: 5px;
 		list-style: none;
 
-		li {
+		& li {
 			position: relative;
 			padding-top: 5px;
 			padding-bottom: 5px;

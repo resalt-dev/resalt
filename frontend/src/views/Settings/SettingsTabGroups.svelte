@@ -1044,7 +1044,7 @@
 	</div>
 </div>
 
-<style lang="scss">
+<style>
 	.width-fit-content {
 		width: fit-content;
 	}

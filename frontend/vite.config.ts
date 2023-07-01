@@ -29,10 +29,6 @@ export default defineConfig({
 		svelte({
 			preprocess: sveltePreprocess({
 				sourceMap: !production,
-				scss: {
-					includePaths: ['src/layout/include'],
-					prependData: "@use 'src/styles/include/_include.scss';",
-				},
 				postcss: {
 					plugins: [autoprefixer()],
 				},

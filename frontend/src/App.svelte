@@ -106,10 +106,7 @@
 	</div>
 </main>
 
-<!-- svelte-ignore css-unused-selector -->
-<style lang="scss" global>
-	@use './styles/global/_global.scss';
-
+<style>
 	main {
 		width: 100vw;
 		height: 100vh;

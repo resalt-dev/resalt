@@ -29,27 +29,27 @@
 </script>
 
 {#if type === 'div' || type === undefined}
-	<div {...inputProps} on:click={wr(event)} on:keypress={wr(event)} role="button" tabindex="0">
+	<div role="button" tabindex="0" {...inputProps} on:click={wr(event)} on:keypress={wr(event)}>
 		<slot />
 	</div>
 {:else if type === 'span'}
-	<span {...inputProps} on:click={wr(event)} on:keypress={wr(event)} role="button" tabindex="0">
+	<span role="button" tabindex="0" {...inputProps} on:click={wr(event)} on:keypress={wr(event)}>
 		<slot />
 	</span>
 {:else if type === 'tr'}
-	<tr {...inputProps} on:click={wr(event)} on:keypress={wr(event)}>
+	<tr role="button" tabindex="0" {...inputProps} on:click={wr(event)} on:keypress={wr(event)}>
 		<slot />
 	</tr>
 {:else if type === 'td'}
-	<td {...inputProps} on:click={wr(event)} on:keypress={wr(event)}>
+	<td role="button" tabindex="0" {...inputProps} on:click={wr(event)} on:keypress={wr(event)}>
 		<slot />
 	</td>
 {:else if type === 'th'}
-	<th {...inputProps} on:click={wr(event)} on:keypress={wr(event)}>
+	<th role="button" tabindex="0" {...inputProps} on:click={wr(event)} on:keypress={wr(event)}>
 		<slot />
 	</th>
 {:else if type === 'button'}
-	<button {...inputProps} on:click={wr(event)} on:keypress={wr(event)}>
+	<button role="button" tabindex="0" {...inputProps} on:click={wr(event)} on:keypress={wr(event)}>
 		<slot />
 	</button>
 {:else}

@@ -604,11 +604,9 @@ samp {
 	border-color: var(--black);
 	color: var(--white);
 }
-.alert-red,
-.alert-danger {
-	code {
-		color: var(--dark);
-	}
+.alert-red code,
+.alert-danger code {
+	color: var(--dark);
 }
 
 .bg-red {
@@ -882,12 +880,6 @@ hr {
 /*
  * Tables
  */
-.table-dark > :not(caption) > * > * {
-	--bs-table-bg: var(--dark);
-}
-.table-dark.table-hover > tbody > tr:hover {
-	--bs-table-accent-bg: var(--dark-gray);
-}
 /* When both table-responsive and card */
 .table-responsive.card {
 	border-radius: 0;
@@ -895,7 +887,7 @@ hr {
 .table-responsive {
 	background-color: transparent !important;
 }
-// Fix thead.bg-light border color
+/* Fix thead.bg-light border color */
 .table > thead.bg-light:not(caption) > * > * {
 	border-color: var(--gray-6) !important;
 }
@@ -1004,7 +996,7 @@ hr {
 .toast.toast-warning .toast-header {
 	--bs-toast-bg: var(--light-warning);
 	--bs-toast-header-bg: var(--warning);
-	--bs-toast-header-color: var(--black); // special for yellow
+	--bs-toast-header-color: var(--black); /* special for yellow */
 }
 .toast.toast-danger,
 .toast.toast-danger .toast-header {
