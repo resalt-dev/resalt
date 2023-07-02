@@ -5,16 +5,8 @@ use resalt_security::*;
 use resalt_storage::StorageImpl;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct PresetsListQuery {
-    search: Option<String>,
-    limit: Option<i64>,
-    offset: Option<i64>,
-}
-
 pub async fn route_presets_get(
     data: web::Data<Box<dyn StorageImpl>>,
-    query: web::Query<PresetsListQuery>,
     req: HttpRequest,
 ) -> Result<impl Responder, ApiError> {
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
@@ -24,11 +16,7 @@ pub async fn route_presets_get(
         return Err(ApiError::Forbidden);
     }
 
-    let search = query.search.clone();
-    let limit = query.limit;
-    let offset = query.offset;
-
-    let presets = match data.list_minion_presets(search, limit, offset) {
+    let presets = match data.list_minion_presets() {
         Ok(presets) => presets,
         Err(e) => {
             error!("{:?}", e);

@@ -256,17 +256,8 @@ export async function searchGrains(query: string, filters: Filter[]): Promise<un
 ///
 
 export async function getMinionPresets(
-	search: string | null,
-	limit: number | null,
-	offset: number | null,
 ): Promise<Array<MinionPreset>> {
-	const args = new URLSearchParams();
-
-	if (search && search.length > 0) args.append('search', search);
-	if (limit) args.append('limit', limit.toString());
-	if (offset) args.append('offset', offset.toString());
-
-	return sendAuthenticatedRequest('GET', `/presets?${args.toString()}`).then((data: unknown) =>
+	return sendAuthenticatedRequest('GET', '/presets').then((data: unknown) =>
 		(data as Array<unknown>).map((p) => MinionPreset.fromObject(p)),
 	);
 }

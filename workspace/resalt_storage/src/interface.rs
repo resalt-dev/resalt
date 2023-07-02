@@ -222,12 +222,7 @@ pub trait StorageImpl: Send {
 
     fn insert_minion_preset(&self, name: &str, filter: &str) -> Result<String, String>;
 
-    fn list_minion_presets(
-        &self,
-        search: Option<String>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-    ) -> Result<Vec<MinionPreset>, String>;
+    fn list_minion_presets(&self) -> Result<Vec<MinionPreset>, String>;
 
     fn get_minion_preset_by_id(&self, id: &str) -> Result<Option<MinionPreset>, String>;
 

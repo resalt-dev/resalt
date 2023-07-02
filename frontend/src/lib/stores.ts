@@ -43,7 +43,6 @@ export const filters: Writable<Filter[]> = writable([
 	},
 ]);
 filters.subscribe((filters) => {
-	console.log('minions filters', filters);
 	if (filters.length === 0) {
 		filters.push({
 			fieldType: FilterFieldType.NONE,

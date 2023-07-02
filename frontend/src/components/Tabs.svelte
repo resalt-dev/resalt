@@ -6,12 +6,18 @@
 	export let tabs: Path[] = [];
 
 	$: pathname = $page.url.pathname;
-	$: currentTab = tabs.find((tab) => pathname.startsWith(tab.getBarePath()));
+	$: params = $page.params;
+	// $: console.log('= TABS', pathname, params);
+	// $: tabs.forEach((tab) => console.log(tab.name, tab.getPath(params)));
+	$: currentTab = tabs
+		.filter((tab) => pathname.startsWith(tab.getPath(params)))
+		.sort((a, b) => b.getPath(params).length - a.getPath(params).length)
+		.shift();
 </script>
 
 <!-- Tabs Header -->
 <div class="nav bg-dark w-100 no-select">
-	{#each tabs.filter((tab) => !tab.hasPermission($currentUser)) as tab}
+	{#each tabs.filter((tab) => tab.hasPermission($currentUser)) as tab}
 		<a
 			href={tab.getBarePath()}
 			class="nav-link px-4 py-3 fw-bold mouse-pointer {tab === currentTab

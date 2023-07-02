@@ -53,15 +53,18 @@ export class Path {
 		this.perms = perms;
 	}
 
-	getPath(...args: string[]): string {
+	getPath(params?: Record<string, string> | string, ...args: string[]): string {
 		let { path } = this;
+
+		if (typeof params === 'string') {
+			args.unshift(params);
+		} else if (params !== undefined) {
+			// Substitute url arguments (.e.g ":id" or ":group") with params
+			path = path.replace(/:([^/]+)/g, (_, key) => params[key] || '');
+		}
 
 		// Substitute url arguments (.e.g ":id" or ":group") with args
 		path = path.replace(/:([^/]+)/g, () => args.shift() || '');
-
-		if (args.length > 0) {
-			throw new Error(`Too many arguments for path ${this.name}: ${args}`);
-		}
 
 		// Trim trailing slashes
 		return path.replace(/\/+$/, '');
@@ -130,7 +133,7 @@ const paths = {
 	minions_presets: new Path(
 		41,
 		'minions_presets',
-		'/minions/presets/:selected',
+		'/minions/presets/:presetId',
 		'Presets',
 		null,
 		[P_MINION_PRESETS_LIST],

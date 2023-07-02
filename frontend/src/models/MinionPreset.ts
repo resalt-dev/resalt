@@ -5,25 +5,25 @@ class MinionPresetRaw {
 
 	name: string;
 
-	filters: string;
+	filter: string;
 
 	constructor(id: string, name: string, filters: string) {
 		this.id = id;
 		this.name = name;
-		this.filters = filters;
+		this.filter = filters;
 	}
 }
 
 export default class MinionPreset {
 	static fromObject(data: unknown): MinionPreset {
-		const { id, name, filters } = data as MinionPresetRaw;
+		const { id, name, filter } = data as MinionPresetRaw;
 
 		const parsedFilters: Filter[] = [];
 		let invalidData = false;
 		try {
-			const temp1 = JSON.parse(filters);
-			if (Array.isArray(temp1)) {
-				for (const f of temp1) {
+			const filters = JSON.parse(filter);
+			if (Array.isArray(filters)) {
+				for (const f of filters) {
 					parsedFilters.push(Filter.fromObject(f));
 				}
 			} else {

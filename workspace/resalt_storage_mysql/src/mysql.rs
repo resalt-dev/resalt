@@ -1113,21 +1113,11 @@ impl StorageImpl for StorageMySQL {
         Ok(id)
     }
 
-    fn list_minion_presets(
-        &self,
-        search: Option<String>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-    ) -> Result<Vec<MinionPreset>, String> {
+    fn list_minion_presets(&self) -> Result<Vec<MinionPreset>, String> {
         let mut connection = self.create_connection()?;
-        let mut query = minion_presets::table.into_boxed();
-        if let Some(search) = search {
-            query = query.filter(minion_presets::name.like(format!("%{}%", search)));
-        }
+        let query = minion_presets::table.into_boxed();
         query
             .order(minion_presets::name.asc())
-            .limit(limit.unwrap_or(100))
-            .offset(offset.unwrap_or(0))
             .load::<SQLMinionPreset>(&mut connection)
             .map_err(|e| format!("{:?}", e))
             .map(|v| v.into_iter().map(|v| v.into()).collect())
