@@ -5,9 +5,7 @@ export default class Filter {
 	static fromObject(data: unknown): Filter {
 		const { fieldType, field, operand, value } = data as Filter;
 		if (typeof fieldType !== 'string') {
-			throw new Error(
-				'Invalid filter fieldType, expected string, was ' + typeof fieldType,
-			);
+			throw new Error('Invalid filter fieldType, expected string, was ' + typeof fieldType);
 		}
 		if (typeof field !== 'string') {
 			throw new Error('Invalid filter field, expected string, was ' + typeof field);

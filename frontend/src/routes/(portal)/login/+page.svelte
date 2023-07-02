@@ -6,12 +6,13 @@
 	import paths from '$lib/paths';
 	import { MessageType } from '../../../models/MessageType';
 	import ResaltProgress from '../../../components/ResaltProgress.svelte';
+	import type AuthToken from '../../../models/AuthToken';
 
 	let usernameField: HTMLInputElement;
-	let usernameFieldValue: string = '';
-	let usernameFieldError: boolean = false;
-	let passwordFieldValue: string = '';
-	let passwordFieldError: boolean = false;
+	let usernameFieldValue = '';
+	let usernameFieldError = false;
+	let passwordFieldValue = '';
+	let passwordFieldError = false;
 
 	onMount(() => {
 		if ($config !== null && $config.authForwardEnabled) {
@@ -36,7 +37,7 @@
 		let username = usernameFieldValue;
 		let password = passwordFieldValue;
 		login(username, password)
-			.then((token: any) => {
+			.then((token: AuthToken) => {
 				auth.set(token);
 				goto(paths.dashboard.getPath());
 			})

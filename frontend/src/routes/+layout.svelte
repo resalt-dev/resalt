@@ -1,9 +1,9 @@
 <script lang="ts">
 	// Global CSS
-	import '$lib/css/bootstrap-5.3.0.min.css';
-	import '$lib/css/bootstrap-directional-buttons.min.css';
-	import '$lib/css/boxicons-2.1.2.min.css';
-	import '$lib/css/tempus-dominus-6.7.7.min.css';
+	import '@eonasdan/tempus-dominus/dist/css/tempus-dominus.min.css';
+	import 'bootstrap-directional-buttons/dist/bootstrap-directional-buttons.min.css';
+	import 'bootstrap/dist/css/bootstrap.min.css';
+	import 'boxicons/css/boxicons.min.css';
 	import '$lib/css/base.css';
 	import '$lib/css/resalt.css';
 
@@ -29,7 +29,7 @@
 					$theme.color = data.themeDefaultColor;
 				}
 			})
-			.catch((err: any) => {
+			.catch((err: unknown) => {
 				console.error(err);
 
 				errorLoadingConfig = true;

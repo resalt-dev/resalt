@@ -9,13 +9,13 @@
 	// Email is only shown if creating LOCAL user, as otherwise synced from LDAP.
 	// LDAP Sync is only shown if creating LDAP user.
 
-	let userLDAPFieldValue: boolean = false;
-	let userUsernameFieldValue: string = '';
-	let userUsernameFieldError: boolean = false;
-	let userEmailFieldValue: string = '';
-	let userEmailFieldError: boolean = false;
-	let userLDAPSyncFieldValue: string = '';
-	let userLDAPSyncFieldError: boolean = false;
+	let userLDAPFieldValue = false;
+	let userUsernameFieldValue = '';
+	let userUsernameFieldError = false;
+	let userEmailFieldValue = '';
+	let userEmailFieldError = false;
+	let userLDAPSyncFieldValue = '';
+	let userLDAPSyncFieldError = false;
 
 	function _create(): void {
 		if (!_validate()) {
