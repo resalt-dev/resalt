@@ -2,7 +2,7 @@
 node_modules
 /build/assets
 /build/*.html
-/build/_app/
+/build/*/*
 /.svelte-kit
 /package
 .env
