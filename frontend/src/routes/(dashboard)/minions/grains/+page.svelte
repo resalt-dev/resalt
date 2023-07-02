@@ -10,7 +10,7 @@
 	import { theme, toasts, filters } from '$lib/stores';
 	import MinionsFiltersBox from '../MinionsFiltersBox.svelte';
 
-	let result: any[] | null = null;
+	let result: unknown[] | null = null;
 	let loading = false;
 	let rawData = false;
 

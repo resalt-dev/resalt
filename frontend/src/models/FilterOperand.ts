@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/prefer-default-export, no-shadow
 export enum FilterOperand {
 	// eslint-disable-next-line no-unused-vars
 	CONTAINS = 'c',

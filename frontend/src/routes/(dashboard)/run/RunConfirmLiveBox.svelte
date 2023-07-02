@@ -1,6 +1,6 @@
 <script lang="ts">
 	import CopyButton from '../../../components/CopyButton.svelte';
-	import RunClientType from '../../../models/RunClientType';
+	import { getRCTBaseType, isRCTAsync, isRCTBatch } from '../../../models/RunClientType';
 	import type RunCommand from '../../../models/RunCommand';
 	import { currentUser, theme } from '$lib/stores';
 	import { hasPermission } from '$lib/perms';
@@ -73,9 +73,9 @@
 						<tbody>
 							<tr>
 								<th style="width: 50%">Client Type</th>
-								<td>{RunClientType.getBaseType(command.client)}</td>
+								<td>{getRCTBaseType(command.client)}</td>
 							</tr>
-							{#if RunClientType.getBaseType(command.client) === 'local'}
+							{#if getRCTBaseType(command.client) === 'local'}
 								<tr>
 									<th>Target Type</th>
 									<td>{command.targetType}</td>
@@ -99,14 +99,14 @@
 							</tr>
 							<tr>
 								<th>Async</th>
-								<td>{RunClientType.isAsync(command.client)}</td>
+								<td>{isRCTAsync(command.client)}</td>
 							</tr>
-							{#if RunClientType.getBaseType(command.client) === 'local'}
+							{#if getRCTBaseType(command.client) === 'local'}
 								<tr>
 									<th>Batch</th>
 									<td
-										>{RunClientType.isBatch(command.client)}
-										{#if RunClientType.isBatch(command.client)}({command.batchSize}){/if}</td
+										>{isRCTBatch(command.client)}
+										{#if isRCTBatch(command.client)}({command.batchSize}){/if}</td
 									>
 								</tr>
 							{/if}

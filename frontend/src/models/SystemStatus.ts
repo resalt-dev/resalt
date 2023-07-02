@@ -1,17 +1,30 @@
 export default class SystemStatus {
-	static fromObject(data: any): SystemStatus {
+	static fromObject(data: unknown): SystemStatus {
+		const {
+			salt,
+			db,
+			dbAuthTokensActive,
+			dbAuthTokensTotal,
+			dbEventsTotal,
+			dbJobReturnsTotal,
+			dbJobsTotal,
+			dbMinionsTotal,
+			dbPermissionGroupUsersTotal,
+			dbPermissionGroupsTotal,
+			dbUsersTotal,
+		} = data as SystemStatus;
 		return new SystemStatus(
-			data.salt,
-			data.db,
-			data.dbAuthTokensActive,
-			data.dbAuthTokensTotal,
-			data.dbEventsTotal,
-			data.dbJobReturnsTotal,
-			data.dbJobsTotal,
-			data.dbMinionsTotal,
-			data.dbPermissionGroupUsersTotal,
-			data.dbPermissionGroupsTotal,
-			data.dbUsersTotal,
+			salt,
+			db,
+			dbAuthTokensActive,
+			dbAuthTokensTotal,
+			dbEventsTotal,
+			dbJobReturnsTotal,
+			dbJobsTotal,
+			dbMinionsTotal,
+			dbPermissionGroupUsersTotal,
+			dbPermissionGroupsTotal,
+			dbUsersTotal,
 		);
 	}
 

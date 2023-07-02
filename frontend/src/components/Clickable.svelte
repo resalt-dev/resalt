@@ -3,7 +3,11 @@
 	type A11yType = 'div' | 'span' | 'tr' | 'td' | 'th' | 'button';
 	export let type: A11yType;
 	export let disabled = false;
-	let event: any, inputProps: any;
+	let event: () => void;
+	let inputProps: {
+		class?: string;
+		[key: string]: unknown;
+	};
 	$: ({ event, ...inputProps } = $$props);
 	// Check if props.class contain "mouse-pointer", if not add it
 	$: if (disabled) {
@@ -18,7 +22,7 @@
 		}
 	}
 
-	function wr(event: any): () => any {
+	function wr(event: () => void): () => void {
 		return () => {
 			if (disabled) {
 				return;

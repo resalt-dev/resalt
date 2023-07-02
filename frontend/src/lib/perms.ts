@@ -327,7 +327,7 @@ export function hasPermission(
 
 	let permissions: targetSection[] = [];
 	if (user && user.perms) {
-		permissions = user.perms;
+		permissions = user.perms as unknown as targetSection[];
 	}
 
 	// Both target and fun are REGEX, e.g "log*" or "pkg.*".

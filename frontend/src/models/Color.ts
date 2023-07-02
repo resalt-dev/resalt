@@ -205,11 +205,4 @@ export enum Color {
 	darkdanger = darkred,
 }
 
-// eslint-disable-next-line no-redeclare
-export namespace Color {
-	export function getColorValueByName(name: string): string {
-		return (Color as any)[name as keyof typeof Color];
-	}
-}
-
 export default Color;

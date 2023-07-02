@@ -30,15 +30,17 @@
 			.then((data) => {
 				events.set(
 					data.map((event) => {
-						const data: any = JSON.parse(event.data ?? '{data: {}}').data;
+						const data: { [fun: string]: unknown } = JSON.parse(
+							event.data ?? '{data: {}}',
+						).data;
 						return new EventsWriteableData(
 							event.id,
 							event.timestamp,
 							event.tag,
 							event.data,
-							data.jid ?? '',
-							data.id ?? '',
-							data.fun ?? '',
+							(data.jid as string) ?? '',
+							(data.id as string) ?? '',
+							(data.fun as string) ?? '',
 							data,
 							JSON.stringify(data, null, 2),
 							((event.tag ?? '') + '_' + (event.timestamp ?? '')).replace(/ /g, '_'),

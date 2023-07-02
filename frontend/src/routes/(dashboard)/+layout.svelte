@@ -15,7 +15,7 @@
 			.then((data: User) => {
 				currentUser.set(data);
 			})
-			.catch((err: any) => {
+			.catch((err: unknown) => {
 				console.error(err);
 				logout()
 					.then(() => {
@@ -26,7 +26,7 @@
 						);
 						goto(paths.login.getPath());
 					})
-					.catch((err: any) => {
+					.catch((err: unknown) => {
 						toasts.add(MessageType.ERROR, 'Logout Error', err);
 					});
 			});

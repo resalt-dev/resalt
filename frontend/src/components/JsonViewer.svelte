@@ -8,8 +8,9 @@
 	import { resaltDark } from './codemirror-resalt-theme-dark';
 	import { resaltLight } from './codemirror-resalt-theme-light';
 	import type { Unsubscriber } from 'svelte/store';
+	import type { EditorViewConfig } from '@codemirror/view';
 
-	export let data: any;
+	export let data: unknown;
 	export let sort = true;
 
 	let editorElement: HTMLElement;
@@ -29,21 +30,21 @@
 		}
 	}
 
-	function isObject(v: any): boolean {
+	function isObject(v: unknown): boolean {
 		return '[object Object]' === Object.prototype.toString.call(v);
 	}
 
-	function sortJSON(o: any): any {
+	function sortJSON(o: unknown): unknown {
 		if (Array.isArray(o)) {
 			// Do NOT sort arrays
 			return o;
 		} else if (isObject(o)) {
-			return Object.keys(o)
+			return Object.keys(o as object)
 				.sort()
-				.reduce(function (a: any, k: string) {
-					a[k] = sortJSON(o[k]);
+				.reduce(function (prev: { [fun: string]: unknown }, curr: string) {
+					prev[curr] = sortJSON((o as { [fun: string]: unknown })[curr]);
 
-					return a;
+					return prev;
 				}, {});
 		}
 		return o;
@@ -63,7 +64,7 @@
 				json(),
 			],
 		});
-		cm = new EditorView({ state });
+		cm = new EditorView({ state } as unknown as EditorViewConfig);
 		editorElement.replaceChildren(cm.dom);
 		let tree = ensureSyntaxTree(state, state.doc.length, 5000);
 		if (tree !== null) {

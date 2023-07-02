@@ -1,3 +1,4 @@
+import type { fPerm } from './PermissionGroup';
 export default class User {
 	static fromObject(data: unknown): User {
 		const { id, username, perms, lastLogin, permissionGroups, email, ldapSync } = data as User;
@@ -8,7 +9,7 @@ export default class User {
 
 	username: string;
 
-	perms: any[]; // the array contains both objects and strings
+	perms: fPerm[]; // the array contains both objects and strings
 
 	lastLogin: string | null;
 
@@ -21,7 +22,7 @@ export default class User {
 	constructor(
 		id: string,
 		username: string,
-		perms: any[],
+		perms: fPerm[],
 		lastLogin: string | null,
 		permissionGroups: { id: string; name: string }[],
 		email: string | null,

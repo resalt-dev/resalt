@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 
-	import RunClientType from '../../../models/RunClientType';
+	import { RunClientType } from '../../../models/RunClientType';
 	import RunCommand from '../../../models/RunCommand';
 	import { quoteSplit } from '$lib/utils';
 

@@ -7,7 +7,7 @@ import Job from '../models/Job';
 import User from '../models/User';
 import Key from '../models/Key';
 import Config from '../models/Config';
-import PermissionGroup from '../models/PermissionGroup';
+import PermissionGroup, { type fPerm } from '../models/PermissionGroup';
 import type Filter from '../models/Filter';
 import type RunCommand from '../models/RunCommand';
 import AuthToken from '../models/AuthToken';
@@ -418,7 +418,7 @@ export async function deletePermissionGroup(id: string): Promise<void> {
 export async function updatePermissionGroup(
 	id: string,
 	name: string,
-	perms: any[],
+	perms: fPerm[],
 	ldapSync: string | null,
 ): Promise<void> {
 	await sendAuthenticatedRequest('PUT', `/permissions/${id}`, {

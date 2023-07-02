@@ -1,3 +1,5 @@
+export type fPerm = { [fun: string]: unknown } | string;
+
 export default class PermissionGroup {
 	static fromObject(group: unknown): PermissionGroup {
 		const { id, name, perms, ldapSync, users } = group as PermissionGroup;
@@ -8,7 +10,7 @@ export default class PermissionGroup {
 
 	name: string;
 
-	perms: any[]; // the array contains both objects and strings
+	perms: fPerm[]; // the array contains both objects and strings
 
 	ldapSync: string | null; // ldap dn
 
@@ -17,7 +19,7 @@ export default class PermissionGroup {
 	constructor(
 		id: string,
 		name: string,
-		perms: any[],
+		perms: fPerm[],
 		ldapSync: string | null,
 		users: { id: string; username: string }[],
 	) {
@@ -31,12 +33,15 @@ export default class PermissionGroup {
 	hasResaltPermission(perm: string): boolean {
 		// Check if perms include { "@resalt": [...] } block,
 		// and if it does, check if it contains the permission
-		return this.perms.some((block) => {
-			if (typeof block !== 'object') {
+		return this.perms.some((rawBlock) => {
+			if (typeof rawBlock !== 'object') {
 				return false;
 			}
+			const block = rawBlock as { [key: string]: string[] }; // Assuming @resalt permissions are string[]-only!
 
-			return Object.keys(block).some((key) => key === '@resalt' && block[key].includes(perm));
+			return Object.keys(block).some(
+				(key) => key === '@resalt' && (block[key] ?? []).includes(perm),
+			);
 		});
 	}
 }

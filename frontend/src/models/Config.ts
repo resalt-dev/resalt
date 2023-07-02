@@ -1,13 +1,22 @@
 export default class Config {
-	static fromObject(data: any): Config {
+	static fromObject(data: unknown): Config {
+		const {
+			authForwardEnabled,
+			currentVersion,
+			latestVersion,
+			latestNews,
+			themeDefaultColor,
+			themeDefaultDark,
+			themeEnableSwitching,
+		} = data as Config;
 		return new Config(
-			data.authForwardEnabled,
-			data.currentVersion,
-			data.latestVersion,
-			data.latestNews,
-			data.themeDefaultColor,
-			data.themeDefaultDark,
-			data.themeEnableSwitching,
+			authForwardEnabled,
+			currentVersion,
+			latestVersion,
+			latestNews,
+			themeDefaultColor,
+			themeDefaultDark,
+			themeEnableSwitching,
 		);
 	}
 

@@ -1,4 +1,4 @@
-import { RunClientType } from './RunClientType';
+import { RunClientType, isRCTAsync } from '../models/RunClientType';
 
 export interface ToCommandLineParams {
 	forceWheel?: boolean;
@@ -91,7 +91,7 @@ export default class RunCommand {
 		}
 
 		// Async
-		if (RunClientType.isAsync(this.client)) {
+		if (isRCTAsync(this.client)) {
 			result += ' --async';
 		}
 

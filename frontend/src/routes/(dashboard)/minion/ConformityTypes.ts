@@ -1,3 +1,14 @@
+export type ConformDataOptional = {
+	__id__?: string;
+	__run_num__?: number;
+	__sls__?: string;
+	changes?: unknown;
+	comment?: string;
+	duration?: number;
+	name?: string;
+	result?: boolean | null;
+	start_time?: string;
+};
 export type ConformData = {
 	__id__: string;
 	__run_num__: number;

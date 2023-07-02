@@ -18,6 +18,7 @@
 	import ResaltProgress from '../../../components/ResaltProgress.svelte';
 	import { validateLdapDN } from '$lib/utils';
 	import { v4 as uuidv4 } from 'uuid';
+	import type { fPerm } from '../../../models/PermissionGroup';
 
 	let paginationSize = 20;
 	let paginationPage = 1;
@@ -223,7 +224,7 @@
 			return;
 		}
 
-		let perms: any[] = localCalculateSaltPermissions();
+		let perms: fPerm[] = localCalculateSaltPermissions();
 		console.log('perms', perms);
 		updatePermissionGroup(
 			$selectedGroup.id,
@@ -241,8 +242,8 @@
 			});
 	}
 
-	function localCalculateSaltPermissions(): any[] {
-		let perms = [];
+	function localCalculateSaltPermissions(): fPerm[] {
+		let perms: fPerm[] = [];
 
 		// Resalt web permissions
 		// { "@resalt": [ webPerms ] }

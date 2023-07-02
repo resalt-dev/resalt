@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/prefer-default-export, no-shadow
 export enum RunClientType {
 	// eslint-disable-next-line no-unused-vars
 	LOCAL_BATCH = 'local_batch',
@@ -16,25 +15,20 @@ export enum RunClientType {
 	WHEEL = 'wheel',
 }
 
-// eslint-disable-next-line no-redeclare
-export namespace RunClientType {
-	export function isAsync(client: RunClientType): boolean {
-		return client.endsWith('_async');
-	}
-
-	export function isBatch(client: RunClientType): boolean {
-		return client.endsWith('_batch');
-	}
-
-	export function getBaseType(client: RunClientType): string {
-		if (isAsync(client)) {
-			return client.slice(0, -6);
-		}
-		if (isBatch(client)) {
-			return client.slice(0, -6);
-		}
-		return client;
-	}
+export function isRCTAsync(client: RunClientType): boolean {
+	return client.endsWith('_async');
 }
 
-export default RunClientType;
+export function isRCTBatch(client: RunClientType): boolean {
+	return client.endsWith('_batch');
+}
+
+export function getRCTBaseType(client: RunClientType): string {
+	if (isRCTAsync(client)) {
+		return client.slice(0, -6);
+	}
+	if (isRCTBatch(client)) {
+		return client.slice(0, -6);
+	}
+	return client;
+}

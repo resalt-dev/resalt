@@ -6,7 +6,12 @@
 	import { theme } from '$lib/stores';
 	import ConformityResultBox from './ConformityResultBox.svelte';
 	import ConformityTreeView from './ConformityTreeView.svelte';
-	import type { ConformData, Conform, ConformTreeNode } from './ConformityTypes';
+	import type {
+		ConformDataOptional,
+		ConformData,
+		Conform,
+		ConformTreeNode,
+	} from './ConformityTypes';
 
 	export let minion: Writable<Minion>;
 	let rawData = false;
@@ -29,7 +34,7 @@
 
 	$: conformity = Object.entries(JSON.parse($minion?.conformity ?? '[]') ?? [])
 		.map(([key, v]) => {
-			let value: any = v;
+			let value = v as ConformDataOptional;
 
 			let parts = key.split('_|-');
 			let conform: Conform = {

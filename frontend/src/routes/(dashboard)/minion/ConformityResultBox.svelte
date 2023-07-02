@@ -15,7 +15,7 @@
 	export let comment: string;
 	export let startTime: string;
 	export let duration: number;
-	export let changes: any;
+	export let changes: unknown;
 	export let showCollapsed: boolean;
 	export let collapsed: boolean;
 
@@ -66,8 +66,10 @@
 			<pre class="m-0">{leftPadToTotalLength('Started', SHIFT)}: {startTime}</pre>
 			<pre class="m-0">{leftPadToTotalLength('Duration', SHIFT)}: {duration}</pre>
 			<pre class="m-0">{leftPadToTotalLength('Changes', SHIFT)}:</pre>
-			{#if Object.keys(changes).length != 0}
+			{#if typeof changes === 'object' && !changes}
+				<!-- {#if Object.keys(changes).length != 0} -->
 				<ConsoleChangeBranch data={changes} shift={SHIFT + 2} />
+				<!-- {/if} -->
 			{/if}
 		</div>
 	</TerminalBox>
