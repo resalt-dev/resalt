@@ -2,32 +2,33 @@ import { FilterFieldType } from './FilterFieldType';
 import { FilterOperand } from './FilterOperand';
 
 export default class Filter {
-	static fromObject(data: any): Filter {
-		if (typeof data.fieldType !== 'string') {
+	static fromObject(data: unknown): Filter {
+		const { fieldType, field, operand, value } = data as Filter;
+		if (typeof fieldType !== 'string') {
 			throw new Error(
-				'Invalid filter fieldType, expected string, was ' + typeof data.fieldType,
+				'Invalid filter fieldType, expected string, was ' + typeof fieldType,
 			);
 		}
-		if (typeof data.field !== 'string') {
-			throw new Error('Invalid filter field, expected string, was ' + typeof data.field);
+		if (typeof field !== 'string') {
+			throw new Error('Invalid filter field, expected string, was ' + typeof field);
 		}
-		if (typeof data.operand !== 'string') {
-			throw new Error('Invalid filter operand, expected string, was ' + typeof data.operand);
+		if (typeof operand !== 'string') {
+			throw new Error('Invalid filter operand, expected string, was ' + typeof operand);
 		}
-		if (typeof data.value !== 'string') {
-			throw new Error('Invalid filter value, expected string, was ' + typeof data.value);
+		if (typeof value !== 'string') {
+			throw new Error('Invalid filter value, expected string, was ' + typeof value);
 		}
 
 		// Check if fieldType is one of the enum values
-		if (!Object.values(FilterFieldType).includes(data.fieldType)) {
+		if (!Object.values(FilterFieldType).includes(fieldType)) {
 			throw new Error('Invalid filter data, invalid fieldType');
 		}
 		// Check if operand is one of the enum values
-		if (!Object.values(FilterOperand).includes(data.operand)) {
+		if (!Object.values(FilterOperand).includes(operand)) {
 			throw new Error('Invalid filter data, invalid operand');
 		}
 
-		return new Filter(data.fieldType, data.field, data.operand, data.value);
+		return new Filter(fieldType, field, operand, value);
 	}
 
 	fieldType: FilterFieldType;

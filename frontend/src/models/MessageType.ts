@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/prefer-default-export, no-shadow
 export enum MessageType {
 	// eslint-disable-next-line no-unused-vars
 	PRIMARY = 'primary',

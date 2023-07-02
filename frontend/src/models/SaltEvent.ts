@@ -1,6 +1,7 @@
 export default class SaltEvent {
-	static fromObject(item: any): SaltEvent {
-		return new SaltEvent(item.id, item.timestamp, item.tag, item.data);
+	static fromObject(item: unknown): SaltEvent {
+		const { id, timestamp, tag, data } = item as SaltEvent;
+		return new SaltEvent(id, timestamp, tag, data);
 	}
 
 	id: string;

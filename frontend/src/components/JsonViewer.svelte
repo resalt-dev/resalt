@@ -4,15 +4,16 @@
 	import { EditorState } from '@codemirror/state';
 	import { json } from '@codemirror/lang-json';
 	import { onDestroy, onMount } from 'svelte';
-	import { theme } from '../stores';
+	import { theme } from '$lib/stores';
 	import { resaltDark } from './codemirror-resalt-theme-dark';
 	import { resaltLight } from './codemirror-resalt-theme-light';
+	import type { Unsubscriber } from 'svelte/store';
 
 	export let data: any;
 	export let sort: boolean = true;
 
 	let editorElement: HTMLElement;
-	let cm: EditorView = undefined;
+	let cm: EditorView | undefined = undefined;
 
 	$: {
 		if (cm) {
@@ -39,7 +40,7 @@
 		} else if (isObject(o)) {
 			return Object.keys(o)
 				.sort()
-				.reduce(function (a, k) {
+				.reduce(function (a: any, k: string) {
 					a[k] = sortJSON(o[k]);
 
 					return a;
@@ -73,7 +74,7 @@
 		//cm.dispatch({});
 	}
 
-	let unsub = null;
+	let unsub: Unsubscriber | null = null;
 	onMount(() => {
 		// Theme listener
 		if (unsub != null) {

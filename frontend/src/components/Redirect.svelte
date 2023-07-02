@@ -1,12 +1,10 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import { useNavigate } from 'svelte-navigator';
-
-	const navigate = useNavigate();
 
 	export let to: string;
 
 	onMount(() => {
-		navigate(to);
+		goto(to);
 	});
 </script>

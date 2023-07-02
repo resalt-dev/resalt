@@ -1,14 +1,7 @@
 export default class User {
-	static fromObject(data: any): User {
-		return new User(
-			data.id,
-			data.username,
-			data.perms,
-			data.lastLogin,
-			data.permissionGroups,
-			data.email,
-			data.ldapSync,
-		);
+	static fromObject(data: unknown): User {
+		const { id, username, perms, lastLogin, permissionGroups, email, ldapSync } = data as User;
+		return new User(id, username, perms, lastLogin, permissionGroups, email, ldapSync);
 	}
 
 	id: string;

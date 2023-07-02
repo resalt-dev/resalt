@@ -1,6 +1,7 @@
 export default class PermissionGroup {
-	static fromObject(group: any): PermissionGroup {
-		return new PermissionGroup(group.id, group.name, group.perms, group.ldapSync, group.users);
+	static fromObject(group: unknown): PermissionGroup {
+		const { id, name, perms, ldapSync, users } = group as PermissionGroup;
+		return new PermissionGroup(id, name, perms, ldapSync, users);
 	}
 
 	id: string;

@@ -1,6 +1,7 @@
 export default class Job {
-	static fromObject(data: any): Job {
-		return new Job(data.id, data.timestamp, data.jid, data.user, data.minions);
+	static fromObject(data: unknown): Job {
+		const { id, timestamp, jid, user, minions } = data as Job;
+		return new Job(id, timestamp, jid, user, minions);
 	}
 
 	id: string;

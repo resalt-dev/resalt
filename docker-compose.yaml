@@ -38,14 +38,14 @@ services:
   frontend:
     image: node:20-alpine
     volumes:
-      - ./frontend/assets:/usr/src/app/assets:ro
       - ./frontend/src:/usr/src/app/src:ro
-      - ./frontend/index.html:/usr/src/app/index.html:ro
+      - ./frontend/static:/usr/src/app/static:ro
+      - ./frontend/.npmrc:/usr/src/app/.npmrc:ro
       - ./frontend/package.json:/usr/src/app/package.json:ro
+      - ./frontend/svelte.config.js:/usr/src/app/svelte.config.js:ro
       - ./frontend/tsconfig.json:/usr/src/app/tsconfig.json:ro
-      - ./frontend/tsconfig.node.json:/usr/src/app/tsconfig.node.json:ro
       - ./frontend/vite.config.ts:/usr/src/app/vite.config.ts:ro
-    command: /bin/sh -c "cd /usr/src/app && npm install --legacy-peer-deps && npm run dev"
+    command: /bin/sh -c "cd /usr/src/app && npm install && npm run dev"
     ports:
       - "5555:5555"
   backend:

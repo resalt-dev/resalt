@@ -1,5 +1,5 @@
 export default class EventsWriteableData {
-	// SaltEvent
+	// Added from {SaltEvent} object
 	id: string;
 	timestamp: string;
 	tag: string;
@@ -9,7 +9,31 @@ export default class EventsWriteableData {
 	jid: string;
 	target: string;
 	fun: string;
-	dataParsed: any;
+	dataParsed: unknown;
 	dataFormatted: string;
 	uniqueIndex: string;
+
+	constructor(
+		id: string,
+		timestamp: string,
+		tag: string,
+		data: string,
+		jid: string,
+		target: string,
+		fun: string,
+		dataParsed: unknown,
+		dataFormatted: string,
+		uniqueIndex: string,
+	) {
+		this.id = id;
+		this.timestamp = timestamp;
+		this.tag = tag;
+		this.data = data;
+		this.jid = jid;
+		this.target = target;
+		this.fun = fun;
+		this.dataParsed = dataParsed;
+		this.dataFormatted = dataFormatted;
+		this.uniqueIndex = uniqueIndex;
+	}
 }

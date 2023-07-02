@@ -1,6 +1,7 @@
 export default class AuthToken {
-	static fromObject(data: any): AuthToken {
-		return new AuthToken(data.userId, data.token, data.expiry);
+	static fromObject(data: unknown): AuthToken {
+		const { userId, token, expiry } = data as AuthToken;
+		return new AuthToken(userId, token, expiry);
 	}
 
 	userId: string;

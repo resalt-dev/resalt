@@ -7,9 +7,9 @@ export default class Message {
 
 	title: string;
 
-	message: any;
+	message: unknown;
 
-	constructor(type: string, title: string, message: any) {
+	constructor(type: string, title: string, message: unknown) {
 		this.id = uuidv4();
 		this.type = type;
 		this.title = title;

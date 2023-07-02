@@ -4,7 +4,7 @@ export interface ToCommandLineParams {
 	forceWheel?: boolean;
 }
 
-export default class RunResult {
+export default class RunCommand {
 	client: RunClientType;
 
 	targetType: string;

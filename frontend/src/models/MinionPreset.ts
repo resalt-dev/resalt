@@ -1,14 +1,30 @@
 import Filter from './Filter';
 
+class MinionPresetRaw {
+	id: string;
+
+	name: string;
+
+	filters: string;
+
+	constructor(id: string, name: string, filters: string) {
+		this.id = id;
+		this.name = name;
+		this.filters = filters;
+	}
+}
+
 export default class MinionPreset {
-	static fromObject(data: any): MinionPreset {
-		const filters: Filter[] = [];
+	static fromObject(data: unknown): MinionPreset {
+		const { id, name, filters } = data as MinionPresetRaw;
+
+		const parsedFilters: Filter[] = [];
 		let invalidData = false;
 		try {
-			const parsed = JSON.parse(data.filter);
-			if (Array.isArray(parsed)) {
-				for (const f of parsed) {
-					filters.push(Filter.fromObject(f));
+			const temp1 = JSON.parse(filters);
+			if (Array.isArray(temp1)) {
+				for (const f of temp1) {
+					parsedFilters.push(Filter.fromObject(f));
 				}
 			} else {
 				console.warn('Invalid filter data, expected array');
@@ -18,7 +34,7 @@ export default class MinionPreset {
 			console.warn('Failed to parse filter data:', e);
 			invalidData = true;
 		}
-		return new MinionPreset(data.id, data.name, filters, invalidData);
+		return new MinionPreset(id, name, parsedFilters, invalidData);
 	}
 
 	id: string;

@@ -1,6 +1,7 @@
 export default class Key {
-	static fromObject(item: any): Key {
-		return new Key(item.id, item.finger, item.state);
+	static fromObject(item: unknown): Key {
+		const { id, finger, state } = item as Key;
+		return new Key(id, finger, state);
 	}
 
 	id: string;

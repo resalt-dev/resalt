@@ -1,5 +1,5 @@
 <script lang="ts">
-	export let data: any;
+	export let data: unknown;
 	export let shift: number = 0;
 
 	function rightShiftLines(str: string, paddingLength: number, char: string = ' ') {

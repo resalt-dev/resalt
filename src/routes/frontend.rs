@@ -22,11 +22,18 @@ pub async fn route_frontend_get(
         path
     };
 
+    // Add .html if path does not contain a dot
+    let path: String = if !path.contains('.') {
+        format!("{}.html", path)
+    } else {
+        path.to_string()
+    };
+
     // fetch using FRONTEND_PUBLIC_DIR.get_file
     let file = if path.is_empty() {
         FRONTEND_PUBLIC_DIR.get_file("index.html")
     } else {
-        FRONTEND_PUBLIC_DIR.get_file(path)
+        FRONTEND_PUBLIC_DIR.get_file(&path)
     };
     let file = match file {
         Some(file) => file,

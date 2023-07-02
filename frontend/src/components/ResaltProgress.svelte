@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { theme } from '../stores';
+	import { theme } from '$lib/stores';
 </script>
 
 <div class="progress" role="progressbar" aria-label="Loading" aria-valuenow={100}>

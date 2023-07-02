@@ -5,9 +5,9 @@ export default class RunResult {
 
 	num: number;
 
-	data: any;
+	data: unknown;
 
-	constructor(command: RunCommand, num: number, data: any) {
+	constructor(command: RunCommand, num: number, data: unknown) {
 		this.command = command;
 		this.num = num;
 		this.data = data;

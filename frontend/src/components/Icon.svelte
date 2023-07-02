@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Tooltip } from '../../assets/js/bootstrap.esm-5.3.0.min';
+	import { Tooltip } from 'bootstrap';
 	import { onMount } from 'svelte';
 
 	export let type = 'regular';
@@ -8,7 +8,7 @@
 	export let align: 'top' | 'middle' | 'bottom' = 'middle';
 	let cssClass = '';
 	export { cssClass as class };
-	export let htmlElement = null;
+	export let htmlElement: HTMLElement | null = null;
 	export let style = '';
 	export let tooltip = '';
 
