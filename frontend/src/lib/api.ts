@@ -255,8 +255,7 @@ export async function searchGrains(query: string, filters: Filter[]): Promise<un
 /// Minion Presets
 ///
 
-export async function getMinionPresets(
-): Promise<Array<MinionPreset>> {
+export async function getMinionPresets(): Promise<Array<MinionPreset>> {
 	return sendAuthenticatedRequest('GET', '/presets').then((data: unknown) =>
 		(data as Array<unknown>).map((p) => MinionPreset.fromObject(p)),
 	);

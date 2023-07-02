@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { afterUpdate, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import {
 		createMinionPreset,
 		deleteMinionPreset,
@@ -154,7 +154,9 @@
 			});
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	function logic(_pathname: string) {
+		// _pathname is required to re-trigger render when $page.url.pathname changes
 		loadPresets();
 		if (selected) {
 			loadPreset(selected);
