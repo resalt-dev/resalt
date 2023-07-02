@@ -15,8 +15,8 @@
 		P_SALTKEY_REJECT,
 	} from '$lib/perms';
 
-	let paginationSize: number = 20;
-	let paginationPage: number = 1;
+	let paginationSize = 20;
+	let paginationPage = 1;
 	let keysView: Key[] = [];
 
 	const keys: Writable<Key[] | null> = writable(null);

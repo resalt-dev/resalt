@@ -9,8 +9,8 @@
 	import EventsWriteableData from '../../../models/EventsWriteableData';
 	import Clickable from '../../../components/Clickable.svelte';
 
-	let paginationSize: number = 20;
-	let paginationPage: number = 1;
+	let paginationSize = 20;
+	let paginationPage = 1;
 
 	const events: Writable<EventsWriteableData[] | null> = writable(null);
 	const expandedEvents: Writable<string[]> = writable([]);

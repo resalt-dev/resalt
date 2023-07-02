@@ -5,7 +5,7 @@
 	export let page: number;
 	export let last: boolean;
 	export let updateData: () => void;
-	export let resizeable: boolean = true;
+	export let resizeable = true;
 
 	function paginateIncrement(): void {
 		if (last) {

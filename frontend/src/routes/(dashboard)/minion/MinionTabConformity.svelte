@@ -20,11 +20,11 @@
 	}
 
 	let sortOrder: ConformSortOption = ConformSortOption.Incremental;
-	let showSuccess: boolean = true;
-	let showIncorrect: boolean = true;
-	let showError: boolean = true;
-	let showCollapsed: boolean = true;
-	let filterNamespace: string = '';
+	let showSuccess = true;
+	let showIncorrect = true;
+	let showError = true;
+	let showCollapsed = true;
+	let filterNamespace = '';
 	let collapseList: string[] = [];
 
 	$: conformity = Object.entries(JSON.parse($minion?.conformity ?? '[]') ?? [])

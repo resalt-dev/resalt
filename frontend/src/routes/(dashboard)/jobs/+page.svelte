@@ -11,8 +11,8 @@
 
 	let sortField: string | null = null;
 	let sortOrder: SortOrder = SortOrder.Up;
-	let paginationSize: number = 20;
-	let paginationPage: number = 1;
+	let paginationSize = 20;
+	let paginationPage = 1;
 
 	const jobs: Writable<Job[] | null> = writable(null);
 

@@ -16,7 +16,7 @@
 		}
 	}
 
-	async function openEvents(timeout: number = 1000): Promise<EventSource> {
+	async function openEvents(timeout = 1000): Promise<EventSource> {
 		if (stream) {
 			closeEvents();
 		}

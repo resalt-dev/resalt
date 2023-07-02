@@ -3,7 +3,7 @@
 	import TerminalBox from '../../../components/TerminalBox.svelte';
 
 	const SHIFT = 10;
-	let internalCollapsed: boolean = false;
+	let internalCollapsed = false;
 
 	export let color: string;
 	export let num: number;
@@ -19,10 +19,10 @@
 	export let showCollapsed: boolean;
 	export let collapsed: boolean;
 
-	function leftPadToTotalLength(str: string, maxLength: number, char: string = ' ') {
+	function leftPadToTotalLength(str: string, maxLength: number, char = ' ') {
 		return char.repeat(maxLength - str.length) + str;
 	}
-	function rightShiftLinesExceptFirst(str: string, paddingLength: number, char: string = ' ') {
+	function rightShiftLinesExceptFirst(str: string, paddingLength: number, char = ' ') {
 		// Append paddingLength of spaces to each line except the first
 		let lines = str.split('\n');
 		let firstLine = lines.shift() ?? '';

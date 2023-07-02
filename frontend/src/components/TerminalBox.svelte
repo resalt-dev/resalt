@@ -6,7 +6,7 @@
 
 	let topClass = '';
 	export { topClass as class };
-	export let collapsed: boolean = false;
+	export let collapsed = false;
 	export let toggleCollapse: undefined | (() => void) = undefined;
 
 	const randomId = uuidv4();

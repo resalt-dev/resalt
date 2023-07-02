@@ -11,11 +11,11 @@
 	import MinionsFiltersBox from '../MinionsFiltersBox.svelte';
 
 	let result: any[] | null = null;
-	let loading: boolean = false;
+	let loading = false;
 	let rawData = false;
 
-	let grainQueryFieldValue: string = '';
-	let grainQueryFieldError: boolean = false;
+	let grainQueryFieldValue = '';
+	let grainQueryFieldError = false;
 
 	function updateData() {
 		if (!_validate()) {

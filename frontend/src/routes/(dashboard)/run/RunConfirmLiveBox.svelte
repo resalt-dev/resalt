@@ -16,7 +16,7 @@
 
 	let commandLine: string;
 	$: commandLine = command !== null ? command.toCommandLine({}) : '';
-	let prettyKwargs: string = '';
+	let prettyKwargs = '';
 	$: {
 		prettyKwargs = '';
 		if (command !== null) {

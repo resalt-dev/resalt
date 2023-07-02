@@ -2,7 +2,7 @@
 <script lang="ts">
 	type A11yType = 'div' | 'span' | 'tr' | 'td' | 'th' | 'button';
 	export let type: A11yType;
-	export let disabled: boolean = false;
+	export let disabled = false;
 	let event: any, inputProps: any;
 	$: ({ event, ...inputProps } = $$props);
 	// Check if props.class contain "mouse-pointer", if not add it

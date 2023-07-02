@@ -8,7 +8,7 @@
 	export let field: string;
 	export let order: SortOrder;
 	export let click: (field: string, order: SortOrder) => void;
-	export let color: string = '';
+	export let color = '';
 </script>
 
 <Icon

@@ -3,7 +3,7 @@
 	import Icon from '../../../components/Icon.svelte';
 	import type { ConformTreeNode } from './ConformityTypes';
 	export let node: ConformTreeNode;
-	export let depth: number = 0;
+	export let depth = 0;
 	export let filterNamespace: string;
 	export let collapseList: string[];
 

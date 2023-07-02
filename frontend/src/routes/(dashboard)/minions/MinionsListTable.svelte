@@ -17,16 +17,16 @@
 
 	export let filters: Filter[];
 
-	let lastFilters: string = '[]';
+	let lastFilters = '[]';
 
-	let loading: boolean = true;
+	let loading = true;
 	let minions: Minion[] | null = null;
 	const refreshing: Writable<string[]> = writable([]);
 
 	let sortField: string | null = null;
 	let sortOrder: SortOrder = SortOrder.Down;
-	let paginationSize: number = 20;
-	let paginationPage: number = 1;
+	let paginationSize = 20;
+	let paginationPage = 1;
 	$: active = sortField + ':' + sortOrder;
 	$: updateData(filters, false);
 

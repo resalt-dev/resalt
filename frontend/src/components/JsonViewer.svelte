@@ -10,7 +10,7 @@
 	import type { Unsubscriber } from 'svelte/store';
 
 	export let data: any;
-	export let sort: boolean = true;
+	export let sort = true;
 
 	let editorElement: HTMLElement;
 	let cm: EditorView | undefined = undefined;

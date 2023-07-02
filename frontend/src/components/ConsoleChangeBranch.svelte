@@ -1,8 +1,8 @@
 <script lang="ts">
 	export let data: unknown;
-	export let shift: number = 0;
+	export let shift = 0;
 
-	function rightShiftLines(str: string, paddingLength: number, char: string = ' ') {
+	function rightShiftLines(str: string, paddingLength: number, char = ' ') {
 		// Append paddingLength of spaces to all lines
 		let lines = str.split('\n');
 		let padding = '';

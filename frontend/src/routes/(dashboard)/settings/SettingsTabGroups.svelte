@@ -19,8 +19,8 @@
 	import { validateLdapDN } from '$lib/utils';
 	import { v4 as uuidv4 } from 'uuid';
 
-	let paginationSize: number = 20;
-	let paginationPage: number = 1;
+	let paginationSize = 20;
+	let paginationPage = 1;
 
 	const groups: Writable<PermissionGroup[] | null> = writable(null);
 	const selectedGroup: Writable<PermissionGroup | null> = writable(null);
@@ -38,15 +38,15 @@
 		error: boolean;
 	};
 
-	let groupNameFieldValue: string = '';
-	let groupNameFieldError: boolean = false;
-	let groupLdapSyncFieldValue: string = '';
-	let groupLdapSyncFieldError: boolean = false;
-	let addUserFieldValue: string = '';
-	let addUserFieldError: boolean = false;
+	let groupNameFieldValue = '';
+	let groupNameFieldError = false;
+	let groupLdapSyncFieldValue = '';
+	let groupLdapSyncFieldError = false;
+	let addUserFieldValue = '';
+	let addUserFieldError = false;
 	let permissionWebFields: { [key: string]: boolean } = {};
 	const permissionMinionsFields: Writable<PermissionMinionTarget[]> = writable([]);
-	let permissionMinionsFieldsError: boolean = false;
+	let permissionMinionsFieldsError = false;
 
 	function updateData(): Promise<void> {
 		return new Promise((resolve, reject) => {

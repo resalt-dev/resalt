@@ -11,21 +11,21 @@
 
 	type clientType = 'local' | 'runner' | 'wheel';
 	let clientTypeFieldValue: clientType = (urlParams.get('client_type') as clientType) || 'local';
-	let clientTypeFieldError: boolean = false;
+	let clientTypeFieldError = false;
 	let targetTypeFieldValue: string = urlParams.get('target_type') || 'glob';
-	let targetTypeFieldError: boolean = false;
+	let targetTypeFieldError = false;
 	let targetFieldValue: string = urlParams.get('target') || '';
-	let targetFieldError: boolean = false;
+	let targetFieldError = false;
 	let functionFieldValue: string = urlParams.get('fun') || '';
-	let functionFieldError: boolean = false;
+	let functionFieldError = false;
 	let argsFieldValue: string = urlParams.get('arg') || '';
-	let argsFieldError: boolean = false;
+	let argsFieldError = false;
 	let kwargsFieldValue: string = urlParams.get('kwarg') || '';
-	let kwargsFieldError: boolean = false;
+	let kwargsFieldError = false;
 	let asyncFieldValue: boolean = urlParams.get('async') === 'true';
 	let batchFieldValue: boolean = urlParams.get('batch') === 'true';
 	let batchSizeFieldValue: string = urlParams.get('batch_size') || '';
-	let batchSizeFieldError: boolean = false;
+	let batchSizeFieldError = false;
 
 	function formToCommand(): RunCommand {
 		// client

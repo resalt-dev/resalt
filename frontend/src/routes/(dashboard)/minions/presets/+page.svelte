@@ -27,12 +27,12 @@
 	export let selected: string;
 
 	// Query
-	let search: string = '';
-	let paginationSize: number = 20;
-	let paginationPage: number = 1;
+	let search = '';
+	let paginationSize = 20;
+	let paginationPage = 1;
 
 	// Temporary data
-	let name: string = '';
+	let name = '';
 	let presets: MinionPreset[] | null = null;
 	let selectedPreset: MinionPreset = new MinionPreset('None', '', [], true);
 

@@ -9,16 +9,16 @@
 	import { hasResaltPermission, P_USER_ADMIN, P_USER_PASSWORD } from '$lib/perms';
 	import CopyButton from '../../../components/CopyButton.svelte';
 
-	const PASSWORD_MIN_LENGTH: number = 8;
+	const PASSWORD_MIN_LENGTH = 8;
 
 	export let userId: string;
 
 	const user: Writable<User | null> = writable(null);
 
-	let passwordFieldValue: string = '';
-	let passwordFieldError: boolean = false;
-	let repeatPasswordFieldValue: string = '';
-	let repeatPasswordFieldError: boolean = false;
+	let passwordFieldValue = '';
+	let passwordFieldError = false;
+	let repeatPasswordFieldValue = '';
+	let repeatPasswordFieldError = false;
 
 	function updateData(): void {
 		getUserById(userId)
