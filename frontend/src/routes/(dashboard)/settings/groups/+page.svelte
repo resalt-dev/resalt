@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
-	import Icon from '../../../components/Icon.svelte';
-	import TablePaginate from '../../../components/TablePaginate.svelte';
+	import Icon from '../../../../components/Icon.svelte';
+	import TablePaginate from '../../../../components/TablePaginate.svelte';
 	import {
 		addUserToPermissionGroup,
 		createPermissionGroup,
@@ -11,14 +11,14 @@
 		removeUserFromPermissionGroup,
 		updatePermissionGroup,
 	} from '$lib/api';
-	import { MessageType } from '../../../models/MessageType';
+	import { MessageType } from '../../../../models/MessageType';
 	import { resaltWebPermissions } from '$lib/perms';
 	import { theme, toasts } from '$lib/stores';
-	import type PermissionGroup from '../../../models/PermissionGroup';
-	import ResaltProgress from '../../../components/ResaltProgress.svelte';
+	import type PermissionGroup from '../../../../models/PermissionGroup';
+	import ResaltProgress from '../../../../components/ResaltProgress.svelte';
 	import { validateLdapDN } from '$lib/utils';
 	import { v4 as uuidv4 } from 'uuid';
-	import type { fPerm } from '../../../models/PermissionGroup';
+	import type { fPerm } from '../../../../models/PermissionGroup';
 
 	let paginationSize = 20;
 	let paginationPage = 1;
@@ -489,18 +489,22 @@
 	});
 </script>
 
+<svelte:head>
+	<title>Groups</title>
+</svelte:head>
+
 <div class="row">
 	<div class="col-12 col-md-4">
 		<div class="table-responsive border-bottom-0 mb-3">
 			<table class="table b-0 mb-0">
-				<thead class="bg-dark border-0 text-white">
+				<thead class="border-0">
 					<tr>
-						<th class="border-secondary">
+						<th class="border-secondary bg-dark text-white">
 							<div class="row g-1">
 								<div class="col-auto align-self-center ps-2">Group Name</div>
 							</div>
 						</th>
-						<th class="border-secondary">
+						<th class="border-secondary bg-dark text-white">
 							<div class="row g-1">
 								<div class="col-auto align-self-center">Members</div>
 							</div>

@@ -1,12 +1,10 @@
 <script lang="ts">
-	import paths from '$lib/paths';
-	import Tabs from '../../../components/Tabs.svelte';
+	import { config } from '$lib/stores';
+	import JsonViewer from '../../../components/JsonViewer.svelte';
 </script>
 
 <svelte:head>
 	<title>Settings</title>
 </svelte:head>
 
-<Tabs tabs={[paths.settings_config, paths.settings_groups]}>
-	<slot />
-</Tabs>
+<JsonViewer data={$config} />

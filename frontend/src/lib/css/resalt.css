@@ -40,14 +40,14 @@
 	.form-switch > input:checked {
 		background-color: var(--primary) !important;
 	}
-	// Disabled
+	/* Disabled */
 	.form-control:disabled,
 	.form-select:disabled,
 	.form-switch > input:disabled {
 		background-color: var(--bluegray-9) !important;
 		cursor: not-allowed;
 	}
-	// Double nested cards
+	/* Double nested cards */
 	.card-body {
 		.card-body {
 			.form-control,
@@ -60,7 +60,7 @@
 				background-color: var(--primary) !important;
 			}
 
-			// Disabled
+			/* Disabled */
 			.form-control:disabled,
 			.form-select:disabled,
 			.form-switch > input:disabled {
@@ -69,14 +69,14 @@
 				cursor: not-allowed;
 			}
 
-			// Error handling
+			/* Error handling */
 			.form-control.is-invalid,
 			.form-select.is-invalid {
 				border-color: var(--red);
 			}
 		}
 	}
-	// Error handling
+	/* Error handling */
 	.form-control.is-invalid,
 	.form-select.is-invalid {
 		border-color: var(--red);

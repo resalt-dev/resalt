@@ -4,6 +4,10 @@
 	import MinionsListTable from './MinionsListTable.svelte';
 </script>
 
+<svelte:head>
+	<title>Minions</title>
+</svelte:head>
+
 <MinionsFiltersBox />
 
 <hr class="text-light" />
