@@ -1,6 +1,6 @@
 <script lang="ts">
-	import ConsoleChangeBranch from '../../../components/ConsoleChangeBranch.svelte';
-	import TerminalBox from '../../../components/TerminalBox.svelte';
+	import ConsoleChangeBranch from '$component/ConsoleChangeBranch.svelte';
+	import TerminalBox from '$component/TerminalBox.svelte';
 
 	const SHIFT = 10;
 	let internalCollapsed = false;

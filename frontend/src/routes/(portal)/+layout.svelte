@@ -1,6 +1,6 @@
 <script lang="ts">
+	import Logo from '$component/Logo.svelte';
 	import { theme } from '$lib/stores';
-	import Logo from '../../components/Logo.svelte';
 </script>
 
 <div class="portal-background h-100">

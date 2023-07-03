@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import Icon from '../../../components/Icon.svelte';
+	import Clickable from '$component/Clickable.svelte';
+	import Icon from '$component/Icon.svelte';
+	import TablePaginate from '$component/TablePaginate.svelte';
 	import { getEvents } from '$lib/api';
 	import { toasts } from '$lib/stores';
-	import TablePaginate from '../../../components/TablePaginate.svelte';
-	import { MessageType } from '../../../models/MessageType';
+	import EventsWriteableData from '$model/EventsWriteableData';
+	import { MessageType } from '$model/MessageType';
+	import { onMount } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
-	import EventsWriteableData from '../../../models/EventsWriteableData';
-	import Clickable from '../../../components/Clickable.svelte';
 
 	let paginationSize = 20;
 	let paginationPage = 1;

@@ -1,19 +1,19 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
+	import TablePaginate from '$component/TablePaginate.svelte';
 	import { acceptKey, deleteKey, getKeys, rejectKey } from '$lib/api';
-	import { currentUser, toasts } from '$lib/stores';
-	import { writable, type Writable } from 'svelte/store';
-	import TablePaginate from '../../../components/TablePaginate.svelte';
 	import paths from '$lib/paths';
-	import type Key from '../../../models/Key';
-	import { MessageType } from '../../../models/MessageType';
 	import {
-		hasResaltPermission,
 		P_SALTKEY_ACCEPT,
 		P_SALTKEY_DELETE,
 		P_SALTKEY_REJECT,
+		hasResaltPermission,
 	} from '$lib/perms';
+	import { currentUser, toasts } from '$lib/stores';
+	import type Key from '$model/Key';
+	import { MessageType } from '$model/MessageType';
+	import { onMount } from 'svelte';
+	import { writable, type Writable } from 'svelte/store';
 
 	let paginationSize = 20;
 	let paginationPage = 1;

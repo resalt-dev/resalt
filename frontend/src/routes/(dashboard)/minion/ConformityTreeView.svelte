@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Clickable from '../../../components/Clickable.svelte';
-	import Icon from '../../../components/Icon.svelte';
+	import Clickable from '$component/Clickable.svelte';
+	import Icon from '$component/Icon.svelte';
 	import type { ConformTreeNode } from './ConformityTypes';
 	export let node: ConformTreeNode;
 	export let depth = 0;

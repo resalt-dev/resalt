@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { createUser } from '$lib/api';
-	import { MessageType } from '../../../../models/MessageType';
 	import paths from '$lib/paths';
 	import { theme, toasts } from '$lib/stores';
+	import { MessageType } from '$model/MessageType';
 
 	// Depending on if creating LOCAL or LDAP user, different fields are shown.
 	// Email is only shown if creating LOCAL user, as otherwise synced from LDAP.

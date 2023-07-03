@@ -1,7 +1,10 @@
 <script lang="ts">
-	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
+	import Clickable from '$component/Clickable.svelte';
+	import Icon from '$component/Icon.svelte';
+	import ResaltProgress from '$component/ResaltProgress.svelte';
+	import TableBottom from '$component/TableBottom.svelte';
 	import {
 		createMinionPreset,
 		deleteMinionPreset,
@@ -9,18 +12,15 @@
 		getMinionPresets,
 		updateMinionPreset,
 	} from '$lib/api';
-	import Clickable from '../../../../../components/Clickable.svelte';
-	import Icon from '../../../../../components/Icon.svelte';
-	import ResaltProgress from '../../../../../components/ResaltProgress.svelte';
-	import { MessageType } from '../../../../../models/MessageType';
-	import MinionPreset from '../../../../../models/MinionPreset';
 	import paths from '$lib/paths';
-	import { hasResaltPermission, P_MINION_PRESETS_MANAGE } from '$lib/perms';
-	import { currentUser, theme, toasts, filters } from '$lib/stores';
+	import { P_MINION_PRESETS_MANAGE, hasResaltPermission } from '$lib/perms';
+	import { currentUser, filters, theme, toasts } from '$lib/stores';
+	import { MessageType } from '$model/MessageType';
+	import MinionPreset from '$model/MinionPreset';
+	import { onMount } from 'svelte';
+	import { writable, type Writable } from 'svelte/store';
 	import MinionsFiltersBox from '../../MinionsFiltersBox.svelte';
 	import MinionsListTable from '../../MinionsListTable.svelte';
-	import TableBottom from '../../../../../components/TableBottom.svelte';
-	import { writable, type Writable } from 'svelte/store';
 
 	$: selected = $page.params.presetId as string | undefined;
 

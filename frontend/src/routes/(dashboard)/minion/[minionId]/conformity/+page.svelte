@@ -1,20 +1,19 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { onMount } from 'svelte';
-	import { MessageType } from '../../../../../models/MessageType';
+	import FloatingRightButton from '$component/FloatingRightButton.svelte';
+	import JsonViewer from '$component/JsonViewer.svelte';
 	import { getMinionById } from '$lib/api';
-	import { toasts } from '$lib/stores';
+	import { theme, toasts } from '$lib/stores';
+	import { MessageType } from '$model/MessageType';
+	import type Minion from '$model/Minion';
+	import { onMount } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
-	import FloatingRightButton from '../../../../../components/FloatingRightButton.svelte';
-	import JsonViewer from '../../../../../components/JsonViewer.svelte';
-	import type Minion from '../../../../../models/Minion';
-	import { theme } from '$lib/stores';
 	import ConformityResultBox from '../../ConformityResultBox.svelte';
 	import ConformityTreeView from '../../ConformityTreeView.svelte';
 	import type {
-		ConformDataOptional,
-		ConformData,
 		Conform,
+		ConformData,
+		ConformDataOptional,
 		ConformTreeNode,
 	} from '../../ConformityTypes';
 

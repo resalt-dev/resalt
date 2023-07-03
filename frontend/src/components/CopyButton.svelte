@@ -1,8 +1,7 @@
 <script lang="ts">
-	import Icon from '../components/Icon.svelte';
-	import { toasts } from '$lib/stores';
-	import { MessageType } from '../models/MessageType';
-	import { theme } from '$lib/stores';
+	import Icon from '$component/Icon.svelte';
+	import { theme, toasts } from '$lib/stores';
+	import { MessageType } from '$model/MessageType';
 
 	export let name: string;
 	export let value: unknown;

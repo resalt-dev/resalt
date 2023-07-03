@@ -1,17 +1,16 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { onMount } from 'svelte';
-	import { MessageType } from '../../../../models/MessageType';
+	import CopyButton from '$component/CopyButton.svelte';
+	import Icon from '$component/Icon.svelte';
 	import { getMinionById } from '$lib/api';
-	import { toasts } from '$lib/stores';
-	import { writable, type Writable } from 'svelte/store';
-	import CopyButton from '../../../../components/CopyButton.svelte';
-	import Icon from '../../../../components/Icon.svelte';
-	import type Minion from '../../../../models/Minion';
 	import paths from '$lib/paths';
 	import { hasResaltPermission, P_RUN_LIVE } from '$lib/perms';
-	import { currentUser, theme } from '$lib/stores';
+	import { currentUser, theme, toasts } from '$lib/stores';
 	import { formatAsSize } from '$lib/utils';
+	import { MessageType } from '$model/MessageType';
+	import type Minion from '$model/Minion';
+	import { onMount } from 'svelte';
+	import { writable, type Writable } from 'svelte/store';
 
 	$: minionId = $page.params.minionId;
 	const minion: Writable<Minion | null> = writable(null);

@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { currentUser, socket, theme, toasts } from '$lib/stores';
-	import paths, { getPathByName } from '$lib/paths';
-	import Icon from '../../components/Icon.svelte';
+	import Clickable from '$component/Clickable.svelte';
+	import Icon from '$component/Icon.svelte';
 	import { logout } from '$lib/api';
-	import { MessageType } from '../../models/MessageType';
-	import Clickable from '../../components/Clickable.svelte';
+	import paths, { getPathByName } from '$lib/paths';
+	import { currentUser, socket, theme, toasts } from '$lib/stores';
+	import { MessageType } from '$model/MessageType';
 
 	$: navbar = $page.url.pathname
 		.split('/')

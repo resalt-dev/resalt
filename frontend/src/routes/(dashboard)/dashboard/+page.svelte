@@ -1,12 +1,12 @@
 <script lang="ts">
+	import Icon from '$component/Icon.svelte';
+	import ResaltProgress from '$component/ResaltProgress.svelte';
+	import { getSystemStatus } from '$lib/api';
+	import { config, theme, toasts } from '$lib/stores';
+	import { MessageType } from '$model/MessageType';
+	import type SystemStatus from '$model/SystemStatus';
 	import { onMount } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
-	import { getSystemStatus } from '$lib/api';
-	import Icon from '../../../components/Icon.svelte';
-	import ResaltProgress from '../../../components/ResaltProgress.svelte';
-	import { MessageType } from '../../../models/MessageType';
-	import type SystemStatus from '../../../models/SystemStatus';
-	import { config, theme, toasts } from '$lib/stores';
 
 	const status: Writable<SystemStatus | null> = writable(null);
 

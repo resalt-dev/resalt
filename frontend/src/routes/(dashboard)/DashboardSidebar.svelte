@@ -1,13 +1,13 @@
 <script lang="ts">
-	import paths from '$lib/paths';
-	import { sidebarCollapsed as collapsed, theme, config, currentUser } from '$lib/stores';
-	import Icon from '../../components/Icon.svelte';
-	import Logo from '../../components/Logo.svelte';
-	import SidebarItem from './DashboardSidebarItem.svelte';
+	import Clickable from '$component/Clickable.svelte';
+	import Icon from '$component/Icon.svelte';
+	import Logo from '$component/Logo.svelte';
 	import constants from '$lib/constants';
-	import Clickable from '../../components/Clickable.svelte';
+	import paths from '$lib/paths';
+	import { sidebarCollapsed as collapsed, config, currentUser, theme } from '$lib/stores';
 	import { Modal } from 'bootstrap';
 	import { v4 as uuidv4 } from 'uuid';
+	import SidebarItem from './DashboardSidebarItem.svelte';
 
 	const randomId = uuidv4();
 

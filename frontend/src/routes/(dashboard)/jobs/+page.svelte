@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import Icon from '$component/Icon.svelte';
+	import TablePaginate from '$component/TablePaginate.svelte';
 	import { getJobs } from '$lib/api';
 	import { toasts } from '$lib/stores';
-	import Icon from '../../../components/Icon.svelte';
+	import type Job from '$model/Job';
+	import { MessageType } from '$model/MessageType';
+	import { SortOrder } from '$model/SortOrder';
+	import { onMount } from 'svelte';
 	import { writable, type Writable } from 'svelte/store';
-	import TablePaginate from '../../../components/TablePaginate.svelte';
-	import { MessageType } from '../../../models/MessageType';
-	import type Job from '../../../models/Job';
-	import { SortOrder } from '../../../models/SortOrder';
 
 	let sortField: string | null = null;
 	let sortOrder: SortOrder = SortOrder.Up;

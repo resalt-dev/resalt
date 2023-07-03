@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { writable, type Writable } from 'svelte/store';
-	import Icon from '../../../../components/Icon.svelte';
-	import TablePaginate from '../../../../components/TablePaginate.svelte';
+	import Icon from '$component/Icon.svelte';
+	import ResaltProgress from '$component/ResaltProgress.svelte';
+	import TablePaginate from '$component/TablePaginate.svelte';
 	import {
 		addUserToPermissionGroup,
 		createPermissionGroup,
@@ -11,14 +10,15 @@
 		removeUserFromPermissionGroup,
 		updatePermissionGroup,
 	} from '$lib/api';
-	import { MessageType } from '../../../../models/MessageType';
 	import { resaltWebPermissions } from '$lib/perms';
 	import { theme, toasts } from '$lib/stores';
-	import type PermissionGroup from '../../../../models/PermissionGroup';
-	import ResaltProgress from '../../../../components/ResaltProgress.svelte';
 	import { validateLdapDN } from '$lib/utils';
+	import { MessageType } from '$model/MessageType';
+	import type PermissionGroup from '$model/PermissionGroup';
+	import type { fPerm } from '$model/PermissionGroup';
+	import { onMount } from 'svelte';
+	import { writable, type Writable } from 'svelte/store';
 	import { v4 as uuidv4 } from 'uuid';
-	import type { fPerm } from '../../../../models/PermissionGroup';
 
 	let paginationSize = 20;
 	let paginationPage = 1;

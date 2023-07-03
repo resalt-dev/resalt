@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { EditorView, basicSetup } from 'codemirror';
+	import { resaltDark } from '$lib/codemirror-resalt-theme-dark';
+	import { resaltLight } from '$lib/codemirror-resalt-theme-light';
+	import { theme } from '$lib/stores';
+	import { json } from '@codemirror/lang-json';
 	import { ensureSyntaxTree, foldAll } from '@codemirror/language';
 	import { EditorState } from '@codemirror/state';
-	import { json } from '@codemirror/lang-json';
-	import { onDestroy, onMount } from 'svelte';
-	import { theme } from '$lib/stores';
-	import { resaltDark } from './codemirror-resalt-theme-dark';
-	import { resaltLight } from './codemirror-resalt-theme-light';
-	import type { Unsubscriber } from 'svelte/store';
 	import type { EditorViewConfig } from '@codemirror/view';
+	import { EditorView, basicSetup } from 'codemirror';
+	import { onDestroy, onMount } from 'svelte';
+	import type { Unsubscriber } from 'svelte/store';
 
 	export let data: unknown;
 	export let sort = true;

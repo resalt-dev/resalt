@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { writable, type Writable } from 'svelte/store';
-	import ConsoleChangeBranch from '../../../components/ConsoleChangeBranch.svelte';
+	import ConsoleChangeBranch from '$component/ConsoleChangeBranch.svelte';
+	import Tabs from '$component/Tabs.svelte';
 	import paths from '$lib/paths';
-	import Tabs from '../../../components/Tabs.svelte';
+	import { writable, type Writable } from 'svelte/store';
 
+	import TerminalBox from '$component/TerminalBox.svelte';
 	import { returns, theme } from '$lib/stores';
-	import TerminalBox from '../../../components/TerminalBox.svelte';
 
 	const collapsed: Writable<number[]> = writable([]);
 

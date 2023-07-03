@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
-	import { theme, currentUser, toasts } from '$lib/stores';
+	import Clickable from '$component/Clickable.svelte';
+	import TablePaginate from '$component/TablePaginate.svelte';
 	import { deleteUser, getUsers } from '$lib/api';
-	import { writable, type Writable } from 'svelte/store';
-	import TablePaginate from '../../../components/TablePaginate.svelte';
 	import paths from '$lib/paths';
-	import { MessageType } from '../../../models/MessageType';
-	import type User from '../../../models/User';
-	import Clickable from '../../../components/Clickable.svelte';
-	import { hasResaltPermission, P_USER_ADMIN } from '$lib/perms';
+	import { P_USER_ADMIN, hasResaltPermission } from '$lib/perms';
+	import { currentUser, theme, toasts } from '$lib/stores';
+	import { MessageType } from '$model/MessageType';
+	import type User from '$model/User';
+	import { onMount } from 'svelte';
+	import { writable, type Writable } from 'svelte/store';
 
 	let paginationSize = 20;
 	let paginationPage = 1;

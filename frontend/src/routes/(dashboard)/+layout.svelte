@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
-	import { currentUser, toasts } from '$lib/stores';
+	import SSEConnector from '$component/SSEConnector.svelte';
 	import { getCurrentUser, logout } from '$lib/api';
 	import paths from '$lib/paths';
-	import { MessageType } from '../../models/MessageType';
+	import { currentUser, toasts } from '$lib/stores';
+	import { MessageType } from '$model/MessageType';
+	import type User from '$model/User';
+	import { onMount } from 'svelte';
 	import DashboardHeader from './DashboardHeader.svelte';
 	import DashboardSidebar from './DashboardSidebar.svelte';
-	import SSEConnector from '../../components/SSEConnector.svelte';
-	import type User from '../../models/User';
 
 	onMount(() => {
 		getCurrentUser()

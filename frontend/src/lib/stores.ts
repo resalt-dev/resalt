@@ -1,15 +1,15 @@
-import { writable, type Readable, type Writable } from 'svelte/store';
-import { persisted } from 'svelte-local-storage-store';
 import constants from '$lib/constants';
-import type User from '../models/User';
-import type Config from '../models/Config';
-import Message from '../models/Message';
-import { FilterFieldType } from '../models/FilterFieldType';
-import { FilterOperand } from '../models/FilterOperand';
-import type { MessageType } from '../models/MessageType';
-import type AuthToken from '../models/AuthToken';
-import type Filter from '../models/Filter';
-import type RunResult from '../models/RunResult';
+import type AuthToken from '$model/AuthToken';
+import type Config from '$model/Config';
+import type Filter from '$model/Filter';
+import { FilterFieldType } from '$model/FilterFieldType';
+import { FilterOperand } from '$model/FilterOperand';
+import Message from '$model/Message';
+import type { MessageType } from '$model/MessageType';
+import type RunResult from '$model/RunResult';
+import type User from '$model/User';
+import { persisted } from 'svelte-local-storage-store';
+import { writable, type Readable, type Writable } from 'svelte/store';
 
 const prefix = `${constants.appName.toLowerCase()}_`;
 

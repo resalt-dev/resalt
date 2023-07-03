@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
+	import ResaltProgress from '$component/ResaltProgress.svelte';
 	import { login } from '$lib/api';
-	import { auth, config, theme, toasts } from '$lib/stores';
 	import paths from '$lib/paths';
-	import { MessageType } from '../../../models/MessageType';
-	import ResaltProgress from '../../../components/ResaltProgress.svelte';
-	import type AuthToken from '../../../models/AuthToken';
+	import { auth, config, theme, toasts } from '$lib/stores';
+	import type AuthToken from '$model/AuthToken';
+	import { MessageType } from '$model/MessageType';
+	import { onMount } from 'svelte';
 
 	let usernameField: HTMLInputElement;
 	let usernameFieldValue = '';

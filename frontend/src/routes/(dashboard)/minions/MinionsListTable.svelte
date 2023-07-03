@@ -1,19 +1,19 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { writable, type Writable } from 'svelte/store';
+	import Clickable from '$component/Clickable.svelte';
+	import Icon from '$component/Icon.svelte';
+	import ResaltProgress from '$component/ResaltProgress.svelte';
+	import SortIcon from '$component/SortIcon.svelte';
+	import TablePaginate from '$component/TablePaginate.svelte';
 	import { getMinions, refreshMinion } from '$lib/api';
-	import Clickable from '../../../components/Clickable.svelte';
-	import Icon from '../../../components/Icon.svelte';
-	import ResaltProgress from '../../../components/ResaltProgress.svelte';
-	import SortIcon from '../../../components/SortIcon.svelte';
-	import TablePaginate from '../../../components/TablePaginate.svelte';
-	import type Filter from '../../../models/Filter';
-	import { MessageType } from '../../../models/MessageType';
-	import type Minion from '../../../models/Minion';
-	import { SortOrder } from '../../../models/SortOrder';
 	import paths from '$lib/paths';
 	import { hasResaltPermission, P_MINION_CONFORMITY, P_MINION_REFRESH } from '$lib/perms';
 	import { currentUser, theme, toasts } from '$lib/stores';
+	import type Filter from '$model/Filter';
+	import { MessageType } from '$model/MessageType';
+	import type Minion from '$model/Minion';
+	import { SortOrder } from '$model/SortOrder';
+	import { writable, type Writable } from 'svelte/store';
 
 	export let filters: Filter[];
 

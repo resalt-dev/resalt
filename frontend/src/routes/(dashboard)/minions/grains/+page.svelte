@@ -1,13 +1,13 @@
 <script lang="ts">
+	import ConsoleChangeBranch from '$component/ConsoleChangeBranch.svelte';
+	import FloatingRightButton from '$component/FloatingRightButton.svelte';
+	import Icon from '$component/Icon.svelte';
+	import JsonViewer from '$component/JsonViewer.svelte';
+	import ResaltProgress from '$component/ResaltProgress.svelte';
+	import TerminalBox from '$component/TerminalBox.svelte';
 	import { searchGrains } from '$lib/api';
-	import ConsoleChangeBranch from '../../../../components/ConsoleChangeBranch.svelte';
-	import FloatingRightButton from '../../../../components/FloatingRightButton.svelte';
-	import Icon from '../../../../components/Icon.svelte';
-	import JsonViewer from '../../../../components/JsonViewer.svelte';
-	import ResaltProgress from '../../../../components/ResaltProgress.svelte';
-	import TerminalBox from '../../../../components/TerminalBox.svelte';
-	import { MessageType } from '../../../../models/MessageType';
-	import { theme, toasts, filters } from '$lib/stores';
+	import { filters, theme, toasts } from '$lib/stores';
+	import { MessageType } from '$model/MessageType';
 	import MinionsFiltersBox from '../MinionsFiltersBox.svelte';
 
 	let result: unknown[] | null = null;

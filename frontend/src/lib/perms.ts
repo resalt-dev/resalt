@@ -1,4 +1,4 @@
-import type User from '../models/User';
+import type User from '$model/User';
 
 export const P_ADMIN_SUPERADMIN = 'admin.superadmin';
 export const P_ADMIN_GROUP = 'admin.group';

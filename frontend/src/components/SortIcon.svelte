@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { SortOrder } from '../models/SortOrder';
+	import { SortOrder } from '$model/SortOrder';
 	import Icon from './Icon.svelte';
 
 	const SORT_COLOR = 'text-orange sort-active';

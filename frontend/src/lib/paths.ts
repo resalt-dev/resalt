@@ -1,4 +1,4 @@
-import type User from '../models/User';
+import type User from '$model/User';
 import {
 	P_ADMIN_GROUP,
 	P_EVENT_LIST,

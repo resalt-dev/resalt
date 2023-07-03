@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-
-	import { RunClientType } from '../../../models/RunClientType';
-	import RunCommand from '../../../models/RunCommand';
 	import { quoteSplit } from '$lib/utils';
+	import { RunClientType } from '$model/RunClientType';
+	import RunCommand from '$model/RunCommand';
 
 	const urlParams = $page.url.searchParams;
 

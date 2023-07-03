@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { toasts } from '$lib/stores';
 	import { runJob } from '$lib/api';
-	import RunResult from '../../../models/RunResult';
-	import { MessageType } from '../../../models/MessageType';
-	import RunConfirmLiveBox from './RunConfirmLiveBox.svelte';
+	import { toasts } from '$lib/stores';
+	import { MessageType } from '$model/MessageType';
+	import type RunCommand from '$model/RunCommand';
+	import RunResult from '$model/RunResult';
 	import type { Writable } from 'svelte/store';
 	import RunCommandBox from './RunCommandBox.svelte';
-	import type RunCommand from '../../../models/RunCommand';
+	import RunConfirmLiveBox from './RunConfirmLiveBox.svelte';
 
 	export let returns: Writable<RunResult[]>;
 

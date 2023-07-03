@@ -1,10 +1,10 @@
 <script lang="ts">
-	import CopyButton from '../../../components/CopyButton.svelte';
-	import { getRCTBaseType, isRCTAsync, isRCTBatch } from '../../../models/RunClientType';
-	import type RunCommand from '../../../models/RunCommand';
-	import { currentUser, theme } from '$lib/stores';
+	import Clickable from '$component/Clickable.svelte';
+	import CopyButton from '$component/CopyButton.svelte';
 	import { hasPermission } from '$lib/perms';
-	import Clickable from '../../../components/Clickable.svelte';
+	import { currentUser, theme } from '$lib/stores';
+	import { getRCTBaseType, isRCTAsync, isRCTBatch } from '$model/RunClientType';
+	import type RunCommand from '$model/RunCommand';
 	import { Modal } from 'bootstrap';
 	import { v4 as uuidv4 } from 'uuid';
 

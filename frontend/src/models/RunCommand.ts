@@ -1,4 +1,4 @@
-import { RunClientType, isRCTAsync } from '../models/RunClientType';
+import { RunClientType, isRCTAsync } from '$model/RunClientType';
 
 export interface ToCommandLineParams {
 	forceWheel?: boolean;

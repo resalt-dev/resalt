@@ -1,5 +1,5 @@
-import { EditorView } from '@codemirror/view';
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
+import { EditorView } from '@codemirror/view';
 import { tags as t } from '@lezer/highlight';
 
 // Same between Light and Dark themes
@@ -14,15 +14,15 @@ const field = 'var(--red)';
 const bool = 'var(--orange)';
 const keyword = 'var(--magenta)';
 
-// Unique to Dark theme
-const str = 'var(--blue)';
-const background = 'var(--black)';
-const highlightBackground = 'var(--gray-11)';
-const selection = 'var(--magenta-10)';
-const rownum = 'var(--light-gray)';
-const num = 'var(--yellow)';
+// Unique to Light theme
+const str = 'var(--primary)';
+const background = 'var(--white)';
+const highlightBackground = 'var(--gray-4)';
+const selection = 'var(--blue-2)';
+const rownum = 'var(--blue)';
+const num = 'var(--green-7)';
 
-export const resaltDarkTheme = EditorView.theme(
+export const resaltLightTheme = EditorView.theme(
 	{
 		'&': {
 			color: bracket,
@@ -96,7 +96,7 @@ export const resaltDarkTheme = EditorView.theme(
 	{ dark: true },
 );
 
-export const resaltDarkHighlightStyle = HighlightStyle.define([
+export const resaltLightHighlightStyle = HighlightStyle.define([
 	{ tag: t.keyword, color: keyword },
 	{
 		tag: [t.name, t.deleted, t.character, t.propertyName, t.macroName],
@@ -141,4 +141,4 @@ export const resaltDarkHighlightStyle = HighlightStyle.define([
 	{ tag: t.invalid, color: invalid },
 ]);
 
-export const resaltDark = [resaltDarkTheme, syntaxHighlighting(resaltDarkHighlightStyle)];
+export const resaltLight = [resaltLightTheme, syntaxHighlighting(resaltLightHighlightStyle)];

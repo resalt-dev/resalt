@@ -1,10 +1,10 @@
 <script lang="ts">
+	import Icon from '$component/Icon.svelte';
+	import { filters, theme } from '$lib/stores';
+	import { FilterFieldType } from '$model/FilterFieldType';
+	import { FilterOperand } from '$model/FilterOperand';
+	import { Namespace, TempusDominus } from '@eonasdan/tempus-dominus';
 	import { afterUpdate, beforeUpdate } from 'svelte';
-	import { FilterFieldType } from '../../../models/FilterFieldType';
-	import { FilterOperand } from '../../../models/FilterOperand';
-	import { TempusDominus, Namespace } from '@eonasdan/tempus-dominus';
-	import Icon from '../../../components/Icon.svelte';
-	import { theme, filters } from '$lib/stores';
 
 	const pickers: TempusDominus[] = [];
 

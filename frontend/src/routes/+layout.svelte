@@ -1,17 +1,17 @@
 <script lang="ts">
 	// Global CSS
+	import '$lib/css/base.css';
+	import '$lib/css/resalt.css';
 	import '@eonasdan/tempus-dominus/dist/css/tempus-dominus.min.css';
 	import 'bootstrap-directional-buttons/dist/bootstrap-directional-buttons.min.css';
 	import 'bootstrap/dist/css/bootstrap.min.css';
 	import 'boxicons/css/boxicons.min.css';
-	import '$lib/css/base.css';
-	import '$lib/css/resalt.css';
 
-	import { onMount } from 'svelte';
-	import { theme, config, toasts } from '$lib/stores';
 	import { ApiError, getConfig } from '$lib/api';
-	import type Config from '../models/Config';
-	import { MessageType } from '../models/MessageType';
+	import { config, theme, toasts } from '$lib/stores';
+	import type Config from '$model/Config';
+	import { MessageType } from '$model/MessageType';
+	import { onMount } from 'svelte';
 
 	let errorLoadingConfig = false;
 

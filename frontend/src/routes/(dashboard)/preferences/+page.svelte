@@ -1,10 +1,10 @@
 <script lang="ts">
-	import Icon from '../../../components/Icon.svelte';
+	import Clickable from '$component/Clickable.svelte';
+	import Icon from '$component/Icon.svelte';
 	import constants from '$lib/constants';
-	import { MessageType } from '../../../models/MessageType';
+	import { P_ADMIN_SUPERADMIN, hasResaltPermission } from '$lib/perms';
 	import { config, currentUser, theme, toasts } from '$lib/stores';
-	import Clickable from '../../../components/Clickable.svelte';
-	import { hasResaltPermission, P_ADMIN_SUPERADMIN } from '$lib/perms';
+	import { MessageType } from '$model/MessageType';
 
 	function selectColor(color: string): void {
 		console.log('selectColor', color);

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Tabs from '../../../components/Tabs.svelte';
+	import Tabs from '$component/Tabs.svelte';
 	import paths from '$lib/paths';
 </script>
 

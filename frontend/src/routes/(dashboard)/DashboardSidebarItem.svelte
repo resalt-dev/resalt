@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { theme } from '$lib/stores';
-	import Icon from '../../components/Icon.svelte';
+	import Icon from '$component/Icon.svelte';
 	import type { Path } from '$lib/paths';
+	import { theme } from '$lib/stores';
 
 	export let path: Path;
 	export let collapsed: boolean;

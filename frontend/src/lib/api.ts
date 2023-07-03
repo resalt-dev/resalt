@@ -1,19 +1,19 @@
+import AuthToken from '$model/AuthToken';
+import Config from '$model/Config';
+import type Filter from '$model/Filter';
+import { FilterFieldType } from '$model/FilterFieldType';
+import Job from '$model/Job';
+import Key from '$model/Key';
+import Minion from '$model/Minion';
+import MinionPreset from '$model/MinionPreset';
+import PermissionGroup, { type fPerm } from '$model/PermissionGroup';
+import type RunCommand from '$model/RunCommand';
+import SaltEvent from '$model/SaltEvent';
+import SystemStatus from '$model/SystemStatus';
+import User from '$model/User';
 import { get } from 'svelte/store';
-import { auth as authStore, currentUser as currentUserStore } from './stores';
 import constants from './constants';
-import Minion from '../models/Minion';
-import SaltEvent from '../models/SaltEvent';
-import Job from '../models/Job';
-import User from '../models/User';
-import Key from '../models/Key';
-import Config from '../models/Config';
-import PermissionGroup, { type fPerm } from '../models/PermissionGroup';
-import type Filter from '../models/Filter';
-import type RunCommand from '../models/RunCommand';
-import AuthToken from '../models/AuthToken';
-import SystemStatus from '../models/SystemStatus';
-import MinionPreset from '../models/MinionPreset';
-import { FilterFieldType } from '../models/FilterFieldType';
+import { auth as authStore, currentUser as currentUserStore } from './stores';
 
 export class ApiError extends Error {
 	code: number;

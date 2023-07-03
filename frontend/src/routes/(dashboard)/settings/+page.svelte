@@ -1,6 +1,6 @@
 <script lang="ts">
+	import JsonViewer from '$component/JsonViewer.svelte';
 	import { config } from '$lib/stores';
-	import JsonViewer from '../../../components/JsonViewer.svelte';
 </script>
 
 <svelte:head>
