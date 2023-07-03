@@ -81,7 +81,7 @@
 </script>
 
 <svelte:head>
-	<title>Run</title>
+	<title>Keys</title>
 </svelte:head>
 
 <div class="card table-responsive border-bottom-0">
