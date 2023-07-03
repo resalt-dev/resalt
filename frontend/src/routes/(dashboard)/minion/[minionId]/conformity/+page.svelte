@@ -1,19 +1,36 @@
 <script lang="ts">
-	import type { Writable } from 'svelte/store';
-	import FloatingRightButton from '../../../components/FloatingRightButton.svelte';
-	import JsonViewer from '../../../components/JsonViewer.svelte';
-	import type Minion from '../../../models/Minion';
+	import { page } from '$app/stores';
+	import { onMount } from 'svelte';
+	import { MessageType } from '../../../../../models/MessageType';
+	import { getMinionById } from '$lib/api';
+	import { toasts } from '$lib/stores';
+	import { writable, type Writable } from 'svelte/store';
+	import FloatingRightButton from '../../../../../components/FloatingRightButton.svelte';
+	import JsonViewer from '../../../../../components/JsonViewer.svelte';
+	import type Minion from '../../../../../models/Minion';
 	import { theme } from '$lib/stores';
-	import ConformityResultBox from './ConformityResultBox.svelte';
-	import ConformityTreeView from './ConformityTreeView.svelte';
+	import ConformityResultBox from '../../ConformityResultBox.svelte';
+	import ConformityTreeView from '../../ConformityTreeView.svelte';
 	import type {
 		ConformDataOptional,
 		ConformData,
 		Conform,
 		ConformTreeNode,
-	} from './ConformityTypes';
+	} from '../../ConformityTypes';
 
-	export let minion: Writable<Minion>;
+	$: minionId = $page.params.minionId;
+	const minion: Writable<Minion | null> = writable(null);
+
+	onMount(() => {
+		getMinionById(minionId)
+			.then((data) => {
+				minion.set(data);
+			})
+			.catch((err) => {
+				toasts.add(MessageType.ERROR, 'Failed fetching minion: ' + minionId, err);
+			});
+	});
+
 	let rawData = false;
 
 	enum ConformSortOption {
@@ -157,7 +174,7 @@
 	$: console.log(conformityTree);
 </script>
 
-{#if !$minion.conformity}
+{#if !$minion?.conformity}
 	<div class="p-3">No conformity data. Please refresh minion.</div>
 {:else}
 	<FloatingRightButton
@@ -166,7 +183,7 @@
 	/>
 
 	{#if rawData}
-		<JsonViewer data={JSON.parse($minion.conformity)} />
+		<JsonViewer data={JSON.parse($minion?.conformity)} />
 	{:else}
 		<div class="row">
 			<div class="col-3">

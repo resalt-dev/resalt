@@ -19,7 +19,7 @@
 <div class="nav bg-dark w-100 no-select">
 	{#each tabs.filter((tab) => tab.hasPermission($currentUser)) as tab}
 		<a
-			href={tab.getBarePath()}
+			href={tab.getPath(params)}
 			class="nav-link px-4 py-3 fw-bold mouse-pointer {tab === currentTab
 				? 'bg-' + $theme.color
 				: ''} {$theme.color === 'yellow' && tab === currentTab

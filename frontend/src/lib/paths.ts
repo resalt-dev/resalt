@@ -155,7 +155,7 @@ const paths = {
 	user: new Path(100, 'user', '/user/:userId', 'User', null, null),
 
 	users_list: new Path(110, 'users_list', '/users', 'Users', 'user-circle', [P_USER_LIST]),
-	users_new: new Path(110, 'users_new', '/users/:usersPage', 'Create New', null, [P_USER_ADMIN]),
+	users_add: new Path(110, 'users_add', '/users/add', 'Add user', null, [P_USER_ADMIN]),
 
 	settings_config: new Path(120, 'settings_config', '/settings', 'Settings', 'cog', []), // Config
 	settings_groups: new Path(121, 'settings_groups', '/settings/groups', 'Groups', null, [

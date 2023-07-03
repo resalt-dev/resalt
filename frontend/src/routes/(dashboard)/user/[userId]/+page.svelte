@@ -1,19 +1,19 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { getUserById, updateUserPassword } from '$lib/api';
 	import { theme, currentUser, toasts } from '$lib/stores';
 	import { writable, type Writable } from 'svelte/store';
 	import { onMount } from 'svelte';
-	import { MessageType } from '../../../models/MessageType';
-	import JsonViewer from '../../../components/JsonViewer.svelte';
-	import type User from '../../../models/User';
+	import { MessageType } from '../../../../models/MessageType';
+	import JsonViewer from '../../../../components/JsonViewer.svelte';
+	import type User from '../../../../models/User';
 	import { hasResaltPermission, P_USER_ADMIN, P_USER_PASSWORD } from '$lib/perms';
-	import CopyButton from '../../../components/CopyButton.svelte';
+	import CopyButton from '../../../../components/CopyButton.svelte';
 
 	const PASSWORD_MIN_LENGTH = 8;
-
-	export let userId: string;
-
 	const user: Writable<User | null> = writable(null);
+
+	$: userId = $page.params.userId;
 
 	let passwordFieldValue = '';
 	let passwordFieldError = false;

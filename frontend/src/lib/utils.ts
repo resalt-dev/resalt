@@ -28,3 +28,14 @@ export function validateLdapDN(dn: string): boolean {
 
 	return regex.test(dn);
 }
+
+export function formatAsSize(megabytes: unknown) {
+	if (typeof megabytes !== 'number') {
+		return null;
+	}
+	if (megabytes < 1024) {
+		return `${megabytes} MB`;
+	} else {
+		return `${(megabytes / 1024).toFixed(2)} GB`;
+	}
+}

@@ -1,27 +1,37 @@
 <script lang="ts">
-	import type { Writable } from 'svelte/store';
-	import CopyButton from '../../../components/CopyButton.svelte';
-	import Icon from '../../../components/Icon.svelte';
-	import type Minion from '../../../models/Minion';
+	import { page } from '$app/stores';
+	import { onMount } from 'svelte';
+	import { MessageType } from '../../../../models/MessageType';
+	import { getMinionById } from '$lib/api';
+	import { toasts } from '$lib/stores';
+	import { writable, type Writable } from 'svelte/store';
+	import CopyButton from '../../../../components/CopyButton.svelte';
+	import Icon from '../../../../components/Icon.svelte';
+	import type Minion from '../../../../models/Minion';
 	import paths from '$lib/paths';
 	import { hasResaltPermission, P_RUN_LIVE } from '$lib/perms';
 	import { currentUser, theme } from '$lib/stores';
+	import { formatAsSize } from '$lib/utils';
 
-	export let minion: Writable<Minion>;
+	$: minionId = $page.params.minionId;
+	const minion: Writable<Minion | null> = writable(null);
 
-	$: grains = JSON.parse($minion.grains ?? '{}');
+	onMount(() => {
+		getMinionById(minionId)
+			.then((data) => {
+				minion.set(data);
+			})
+			.catch((err) => {
+				toasts.add(MessageType.ERROR, 'Failed fetching minion: ' + minionId, err);
+			});
+	});
 
-	function formatAsSize(megabytes: unknown) {
-		if (typeof megabytes !== 'number') {
-			return null;
-		}
-		if (megabytes < 1024) {
-			return `${megabytes} MB`;
-		} else {
-			return `${(megabytes / 1024).toFixed(2)} GB`;
-		}
-	}
+	$: grains = JSON.parse($minion?.grains ?? '{}');
 </script>
+
+<svelte:head>
+	<title>Minion {$minion?.id}</title>
+</svelte:head>
 
 <div class="row">
 	<div class="col-6 col-xxl-3">
@@ -32,9 +42,9 @@
 					<strong class="align-middle">ID</strong>
 					<span class="float-end">
 						<span class="align-middle">
-							{$minion.id}
+							{$minion?.id}
 						</span>{#if hasResaltPermission($currentUser, P_RUN_LIVE)}
-							<a href={paths.run.getPath('live?target=' + $minion.id)}>
+							<a href={paths.run.getPath('live?target=' + $minion?.id)}>
 								<button
 									type="button"
 									class="btn btn-{$theme.color} btn-sm ms-2"
@@ -49,7 +59,7 @@
 								</button>
 							</a>
 						{/if}
-						<CopyButton name="Minion ID" value={$minion.id} />
+						<CopyButton name="Minion ID" value={$minion?.id} />
 					</span>
 				</li>
 				<li class="list-group-item">
@@ -187,13 +197,13 @@
 			<ul class="list-group list-group-flush">
 				<li class="list-group-item">
 					<strong>Last seen</strong>
-					<span class="float-end">{$minion.lastSeen} UTC</span>
+					<span class="float-end">{$minion?.lastSeen} UTC</span>
 				</li>
 				<li class="list-group-item">
 					<strong>Conformity check</strong>
 					<span class="float-end">
-						{#if $minion.lastUpdatedConformity != null}
-							{$minion.lastUpdatedConformity} UTC
+						{#if $minion?.lastUpdatedConformity}
+							{$minion?.lastUpdatedConformity} UTC
 						{:else}
 							<em>Unknown</em>
 						{/if}
@@ -202,8 +212,8 @@
 				<li class="list-group-item">
 					<strong>Grains fetched</strong>
 					<span class="float-end">
-						{#if $minion.lastUpdatedGrains != null}
-							{$minion.lastUpdatedGrains} UTC
+						{#if $minion?.lastUpdatedGrains}
+							{$minion?.lastUpdatedGrains} UTC
 						{:else}
 							<em>Unknown</em>
 						{/if}
@@ -212,8 +222,8 @@
 				<li class="list-group-item">
 					<strong>Pillars fetched</strong>
 					<span class="float-end">
-						{#if $minion.lastUpdatedPillars != null}
-							{$minion.lastUpdatedPillars} UTC
+						{#if $minion?.lastUpdatedPillars}
+							{$minion?.lastUpdatedPillars} UTC
 						{:else}
 							<em>Unknown</em>
 						{/if}
@@ -222,8 +232,8 @@
 				<li class="list-group-item">
 					<strong>Packages fetched</strong>
 					<span class="float-end">
-						{#if $minion.lastUpdatedPkgs != null}
-							{$minion.lastUpdatedPkgs} UTC
+						{#if $minion?.lastUpdatedPkgs}
+							{$minion?.lastUpdatedPkgs} UTC
 						{:else}
 							<em>Unknown</em>
 						{/if}

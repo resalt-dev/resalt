@@ -1,30 +1,59 @@
 <script lang="ts">
-	import { writable, type Writable } from 'svelte/store';
-	import ConsoleChangeBranch from '../../../components/ConsoleChangeBranch.svelte';
-	import paths from '$lib/paths';
-	import Tabs from '../../../components/Tabs.svelte';
+	import { toasts } from '$lib/stores';
+	import { runJob } from '$lib/api';
+	import RunResult from '../../../models/RunResult';
+	import { MessageType } from '../../../models/MessageType';
+	import RunConfirmLiveBox from './RunConfirmLiveBox.svelte';
+	import type { Writable } from 'svelte/store';
+	import RunCommandBox from './RunCommandBox.svelte';
+	import type RunCommand from '../../../models/RunCommand';
 
-	import { returns, theme } from '$lib/stores';
-	import TerminalBox from '../../../components/TerminalBox.svelte';
+	export let returns: Writable<RunResult[]>;
 
-	const collapsed: Writable<number[]> = writable([]);
+	let validate: () => RunCommand;
 
-	function toggleCollapsedResult(index: number) {
-		collapsed.update((collapsed) => {
-			if (collapsed.includes(index)) {
-				return collapsed.filter((i) => i !== index);
-			} else {
-				return [...collapsed, index];
-			}
-		});
+	// Pre-computed before showing the confirmation modal.
+	let command: RunCommand | null = null;
+
+	function formSaveTemplate() {
+		// TODO formSaveTemplate
 	}
 
-	function dataToObject(data: unknown): object {
-		if (typeof data === 'object' && data !== null) {
-			return data as object;
-		} else {
-			return {};
+	function formApproval() {
+		// TODO formApproval
+	}
+
+	function formRunNow() {
+		let result: RunCommand | null = validate();
+		if (result) {
+			command = result;
 		}
+	}
+
+	function closeRunNowDialog() {
+		command = null;
+	}
+
+	function _runNow() {
+		let localCommand: RunCommand;
+		if (command === null) {
+			return;
+		} else {
+			localCommand = command;
+		}
+		runJob(localCommand)
+			.then((result) => {
+				console.log(result);
+				returns.update((returns: RunResult[]) => [
+					new RunResult(localCommand, returns.length, result),
+					...returns,
+				]);
+			})
+			.catch((error) => {
+				console.error(error);
+				toasts.add(MessageType.ERROR, 'Failed executing job', error);
+			});
+		closeRunNowDialog();
 	}
 </script>
 
@@ -32,27 +61,21 @@
 	<title>Run</title>
 </svelte:head>
 
-<Tabs tabs={[paths.run]}>
-	<slot />
-</Tabs>
+<RunCommandBox bind:validate />
 
-{#each $returns as ret}
-	<TerminalBox
-		toggleCollapse={() => toggleCollapsedResult(ret.num)}
-		collapsed={$collapsed.includes(ret.num)}
-	>
-		<div slot="header">
-			<code class="fw-bold {$theme.dark ? '' : 'text-dark'}">
-				{ret.command.toCommandLine({ forceWheel: true })}
-			</code>
-			<small class="float-end text-muted pt-1">
-				# {ret.num + 1}
-			</small>
-		</div>
-		<div slot="body">
-			{#if Object.keys(dataToObject(ret.data)).length != 0}
-				<ConsoleChangeBranch data={ret.data} />
-			{/if}
-		</div>
-	</TerminalBox>
-{/each}
+<hr class="text-light mt-1" />
+
+<div class="row">
+	<div class="col" />
+	<div class="col-auto">
+		<button type="button" class="btn btn-success me-3" on:click={formSaveTemplate} disabled>
+			Save as Template
+		</button>
+		<button type="button" class="btn btn-primary me-3" on:click={formApproval} disabled>
+			Submit for Approval
+		</button>
+		<button type="button" class="btn btn-warning me-1" on:click={formRunNow}>Run Now</button>
+	</div>
+</div>
+
+<RunConfirmLiveBox {command} close={closeRunNowDialog} execute={_runNow} />

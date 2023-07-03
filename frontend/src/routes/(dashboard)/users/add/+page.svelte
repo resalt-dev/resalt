@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { createUser } from '$lib/api';
-	import { MessageType } from '../../../models/MessageType';
+	import { MessageType } from '../../../../models/MessageType';
 	import paths from '$lib/paths';
 	import { theme, toasts } from '$lib/stores';
 
@@ -68,6 +68,10 @@
 		userLDAPSyncFieldError = false;
 	}
 </script>
+
+<svelte:head>
+	<title>Add user</title>
+</svelte:head>
 
 <div class="card mb-3">
 	<div class="card-header">Create User</div>
