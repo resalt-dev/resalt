@@ -206,9 +206,6 @@ export async function getMinions(
 	limit: number | null,
 	offset: number | null,
 ): Promise<Array<Minion>> {
-	for (const filter of filters) {
-		console.log('Filter', filter instanceof Filter, filter);
-	}
 	const filteredFilters = filters.filter((f) => f.isValid());
 	const args = new URLSearchParams();
 

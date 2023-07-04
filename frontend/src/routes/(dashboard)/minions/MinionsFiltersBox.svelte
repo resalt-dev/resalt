@@ -4,7 +4,7 @@
 	import Filter from '$model/Filter';
 	import { FilterFieldType } from '$model/FilterFieldType';
 	import { FilterOperand } from '$model/FilterOperand';
-	import { Namespace, TempusDominus } from '@eonasdan/tempus-dominus';
+	import { DateTime, Namespace, TempusDominus } from '@eonasdan/tempus-dominus';
 	import { afterUpdate, beforeUpdate } from 'svelte';
 
 	const pickers: TempusDominus[] = [];
@@ -101,8 +101,9 @@
 				});
 
 				if (filter.value.length > 0) {
-					const parsedDate = picker.dates.parseInput(filter.value);
-					picker.dates.setValue(parsedDate);
+					if (DateTime.isValid(filter.value)) {
+						picker.dates.setValue(new DateTime(filter.value));
+					}
 				}
 
 				// Add an event listener to the picker

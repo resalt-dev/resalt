@@ -1,3 +1,4 @@
+import { DateTime } from '@eonasdan/tempus-dominus';
 import { FilterFieldType } from './FilterFieldType';
 import { FilterOperand } from './FilterOperand';
 
@@ -55,6 +56,7 @@ export default class Filter {
 		if (this.field === 'conformity_success' && !isNumOp(this.operand)) return false;
 		if (this.field === 'conformity_incorrect' && !isNumOp(this.operand)) return false;
 		if (this.field === 'conformity_error' && !isNumOp(this.operand)) return false;
+		if (this.field === 'last_seen' && !DateTime.isValid(this.value)) return false;
 
 		return true;
 	}
