@@ -3,12 +3,7 @@ import { FilterOperand } from './FilterOperand';
 
 export default class Filter {
 	static newEmpty(): Filter {
-		return new Filter(
-			FilterFieldType.NONE,
-			'',
-			FilterOperand.CONTAINS,
-			'',
-		);
+		return new Filter(FilterFieldType.NONE, '', FilterOperand.CONTAINS, '');
 	}
 	static fromObject(data: unknown): Filter {
 		const { fieldType, field, operand, value } = data as Filter;
@@ -59,7 +54,11 @@ export default class Filter {
 		if (this.field === 'conformity_success' && this.value === '') return false;
 		if (this.field === 'conformity_incorrect' && this.value === '') return false;
 		if (this.field === 'conformity_error' && this.value === '') return false;
-		
+
 		return true;
+	}
+
+	clone(): any {
+		return new Filter(this.fieldType, this.field, this.operand, this.value);
 	}
 }

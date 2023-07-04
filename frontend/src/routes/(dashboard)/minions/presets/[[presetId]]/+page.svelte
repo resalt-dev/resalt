@@ -21,6 +21,7 @@
 	import { writable, type Writable } from 'svelte/store';
 	import MinionsFiltersBox from '../../MinionsFiltersBox.svelte';
 	import MinionsListTable from '../../MinionsListTable.svelte';
+	import type Filter from '$model/Filter';
 
 	$: selected = $page.params.presetId as string | undefined;
 
@@ -65,7 +66,8 @@
 						'The selected preset has no filters. This is not allowed.',
 					);
 				} else {
-					let deepCopy = JSON.parse(JSON.stringify(data.filters));
+					// Clone using .clone instead of JSON.parse(JSON.stringify()) because it's faster
+					let deepCopy: Filter[] = [...data.filters.map((f: Filter) => f.clone())];
 					filters.set(deepCopy);
 				}
 			})
