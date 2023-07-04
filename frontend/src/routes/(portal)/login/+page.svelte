@@ -104,7 +104,7 @@
 
 		<br />
 
-		<button on:click={formLogin} class="btn btn-{$theme.color} px-5 fw-bold mb-3">
+		<button type="submit" on:click={formLogin} class="btn btn-{$theme.color} px-5 fw-bold mb-3">
 			Sign in
 		</button>
 	</form>
