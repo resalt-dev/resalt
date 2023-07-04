@@ -2,8 +2,6 @@ import constants from '$lib/constants';
 import type AuthToken from '$model/AuthToken';
 import type Config from '$model/Config';
 import Filter from '$model/Filter';
-import { FilterFieldType } from '$model/FilterFieldType';
-import { FilterOperand } from '$model/FilterOperand';
 import Message from '$model/Message';
 import type { MessageType } from '$model/MessageType';
 import type RunResult from '$model/RunResult';

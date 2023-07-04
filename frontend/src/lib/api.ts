@@ -1,7 +1,6 @@
 import AuthToken from '$model/AuthToken';
 import Config from '$model/Config';
-import Filter from '$model/Filter';
-import { FilterFieldType } from '$model/FilterFieldType';
+import type Filter from '$model/Filter';
 import Job from '$model/Job';
 import Key from '$model/Key';
 import Minion from '$model/Minion';

@@ -49,7 +49,11 @@ export default class Filter {
 	}
 
 	isValid(): boolean {
-		const isNumOp = (op: FilterOperand) => op === FilterOperand.EQUALS || op === FilterOperand.NOT_EQUALS || op === FilterOperand.GREATER_THAN_OR_EQUAL || op === FilterOperand.LESS_THAN_OR_EQUAL;
+		const isNumOp = (op: FilterOperand) =>
+			op === FilterOperand.EQUALS ||
+			op === FilterOperand.NOT_EQUALS ||
+			op === FilterOperand.GREATER_THAN_OR_EQUAL ||
+			op === FilterOperand.LESS_THAN_OR_EQUAL;
 		if (this.fieldType === FilterFieldType.NONE) return false;
 		if (this.field === '') return false;
 		if (this.field === 'last_seen' && this.value === '') return false;
@@ -61,7 +65,7 @@ export default class Filter {
 		return true;
 	}
 
-	clone(): any {
+	clone(): Filter {
 		return new Filter(this.fieldType, this.field, this.operand, this.value);
 	}
 }
