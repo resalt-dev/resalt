@@ -22,6 +22,10 @@
 	});
 </script>
 
+<svelte:head>
+	<title>Pillars :: {minionId}</title>
+</svelte:head>
+
 {#if !$minion?.pillars}
 	<div class="p-3">No pillars data. Please refresh minion.</div>
 {:else}

@@ -83,14 +83,17 @@
 	onMount(() => {
 		updateData();
 	});
+
+	function getTitle(user: User | null): string {
+		if (user) {
+			return 'User :: ' + user.username;
+		}
+		return 'User :: ' + userId;
+	}
 </script>
 
 <svelte:head>
-	{#if !$user}
-		<title>User {userId}</title>
-	{:else}
-		<title>User {$user.username}</title>
-	{/if}
+	<title>{getTitle($user)}</title>
 </svelte:head>
 
 {#if !$user}

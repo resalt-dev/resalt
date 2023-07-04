@@ -173,6 +173,10 @@
 	$: console.log(conformityTree);
 </script>
 
+<svelte:head>
+	<title>Conformity :: {minionId}</title>
+</svelte:head>
+
 {#if !$minion?.conformity}
 	<div class="p-3">No conformity data. Please refresh minion.</div>
 {:else}

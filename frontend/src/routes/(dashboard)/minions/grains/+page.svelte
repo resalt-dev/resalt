@@ -54,6 +54,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Grains</title>
+</svelte:head>
+
 <MinionsFiltersBox />
 
 <hr class="text-light" />

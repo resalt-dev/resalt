@@ -22,6 +22,10 @@
 	});
 </script>
 
+<svelte:head>
+	<title>Grains :: {minionId}</title>
+</svelte:head>
+
 {#if !$minion?.grains}
 	<div class="p-3">No grains data. Please refresh minion.</div>
 {:else}

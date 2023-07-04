@@ -29,7 +29,7 @@
 </script>
 
 <svelte:head>
-	<title>Minion {$minion?.id}</title>
+	<title>Minion :: {minionId}</title>
 </svelte:head>
 
 <div class="row">

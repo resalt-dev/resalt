@@ -27,6 +27,10 @@
 	$: pkgs = JSON.parse($minion?.pkgs ?? '{}');
 </script>
 
+<svelte:head>
+	<title>Packages :: {minionId}</title>
+</svelte:head>
+
 {#if !$minion?.pkgs}
 	<div class="p-3">No packages data. Please refresh minion.</div>
 {:else}

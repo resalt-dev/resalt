@@ -172,7 +172,27 @@
 	onMount(() => {
 		logic($page.url.pathname);
 	});
+
+	function getTitle(selectedPreset: MinionPreset): string {
+		if (selected) {
+			if (selectedPreset.id !== 'None') {
+				return 'Preset :: ' + selectedPreset.name;
+			} else {
+				return 'Preset :: ' + selected;
+			}
+		} else {
+			return 'Presets';
+		}
+	}
+
+	$: {
+		document.title = getTitle($selectedPreset);
+	}
 </script>
+
+<svelte:head>
+	<title>{getTitle($selectedPreset)}</title>
+</svelte:head>
 
 <div class="row">
 	<div class="col-3">
