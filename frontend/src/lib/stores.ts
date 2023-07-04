@@ -1,7 +1,7 @@
 import constants from '$lib/constants';
 import type AuthToken from '$model/AuthToken';
 import type Config from '$model/Config';
-import type Filter from '$model/Filter';
+import Filter from '$model/Filter';
 import { FilterFieldType } from '$model/FilterFieldType';
 import { FilterOperand } from '$model/FilterOperand';
 import Message from '$model/Message';
@@ -37,22 +37,10 @@ export const replacementParams: Writable<Record<string, string>> = writable({});
 export const returns: Writable<RunResult[]> = writable([]);
 
 // Used for Minion lists
-export const filters: Writable<Filter[]> = writable([
-	{
-		fieldType: FilterFieldType.NONE,
-		field: '',
-		operand: FilterOperand.CONTAINS,
-		value: '',
-	},
-]);
+export const filters: Writable<Filter[]> = writable([Filter.newEmpty()]);
 filters.subscribe((filters) => {
 	if (filters.length === 0) {
-		filters.push({
-			fieldType: FilterFieldType.NONE,
-			field: '',
-			operand: FilterOperand.CONTAINS,
-			value: '',
-		});
+		filters.push(Filter.newEmpty());
 	}
 });
 

@@ -2,6 +2,14 @@ import { FilterFieldType } from './FilterFieldType';
 import { FilterOperand } from './FilterOperand';
 
 export default class Filter {
+	static newEmpty(): Filter {
+		return new Filter(
+			FilterFieldType.NONE,
+			'',
+			FilterOperand.CONTAINS,
+			'',
+		);
+	}
 	static fromObject(data: unknown): Filter {
 		const { fieldType, field, operand, value } = data as Filter;
 		if (typeof fieldType !== 'string') {

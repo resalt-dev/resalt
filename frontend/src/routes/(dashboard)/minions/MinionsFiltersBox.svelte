@@ -10,10 +10,7 @@
 	const pickers: TempusDominus[] = [];
 
 	function addFilter(): void {
-		filters.update((f) => [
-			...f,
-			new Filter(FilterFieldType.NONE, '', FilterOperand.CONTAINS, ''),
-		]);
+		filters.update((f) => [...f, Filter.newEmpty()]);
 	}
 
 	function removeFilterByIndex(index: number): void {
@@ -22,7 +19,7 @@
 
 	function resetFilterByIndex(index: number): void {
 		filters.update((f) => {
-			f[index] = new Filter(FilterFieldType.NONE, '', FilterOperand.CONTAINS, '');
+			f[index] = Filter.newEmpty();
 			return f;
 		});
 	}
