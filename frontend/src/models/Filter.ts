@@ -1,4 +1,5 @@
 import { DateTime } from '@eonasdan/tempus-dominus';
+import { v4 } from 'uuid';
 import { FilterFieldType } from './FilterFieldType';
 import { FilterOperand } from './FilterOperand';
 
@@ -33,6 +34,8 @@ export default class Filter {
 		return new Filter(fieldType, field, operand, value);
 	}
 
+	id: string = v4(); // Random, only for UI, not used in backend
+
 	fieldType: FilterFieldType;
 
 	field: string;
@@ -60,7 +63,7 @@ export default class Filter {
 		if (this.field === 'conformity_success' && !isNumOp(this.operand)) return false;
 		if (this.field === 'conformity_incorrect' && !isNumOp(this.operand)) return false;
 		if (this.field === 'conformity_error' && !isNumOp(this.operand)) return false;
-		if (this.field === 'last_seen' && !DateTime.isValid(this.value)) return false;
+		if (this.field === 'last_seen' && !DateTime.isValid(new DateTime(this.value))) return false;
 
 		return true;
 	}

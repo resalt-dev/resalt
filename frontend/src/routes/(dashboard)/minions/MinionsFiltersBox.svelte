@@ -1,11 +1,11 @@
 <script lang="ts">
 	import Icon from '$component/Icon.svelte';
-	import { filters, theme } from '$lib/stores';
+	import { filters } from '$lib/stores';
 	import Filter from '$model/Filter';
 	import { FilterFieldType } from '$model/FilterFieldType';
 	import { FilterOperand } from '$model/FilterOperand';
 	import { DateTime, Namespace, TempusDominus } from '@eonasdan/tempus-dominus';
-	import { afterUpdate, beforeUpdate } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 
 	const pickers: TempusDominus[] = [];
 
@@ -13,11 +13,11 @@
 		filters.update((f) => [...f, Filter.newEmpty()]);
 	}
 
-	function removeFilterByIndex(index: number): void {
+	function removeFilter(index: number): void {
 		filters.update((f) => f.filter((_, i) => i !== index));
 	}
 
-	function resetFilterByIndex(index: number): void {
+	function resetFilter(index: number): void {
 		filters.update((f) => {
 			f[index] = Filter.newEmpty();
 			return f;
@@ -50,8 +50,95 @@
 			) {
 				f[index].operand = FilterOperand.GREATER_THAN_OR_EQUAL;
 			}
+			if (newField === 'last_seen' && f[index].value.length === 0) {
+				f[index].value = new DateTime().toISOString().replace('T', ' ').split('.')[0];
+			}
+			if (newField === 'last_seen') {
+				createDateTimePicker(f[index]);
+			} else {
+				// Destroy the picker
+				pickers[index].dispose();
+				pickers.splice(index, 1);
+			}
 			return f;
 		});
+	}
+
+	function createDateTimePicker(filter: Filter) {
+		// Check if fieldType OBJECT and field "last_seen"
+		if (!(filter.fieldType === FilterFieldType.OBJECT && filter.field === 'last_seen')) {
+			return;
+		}
+		const htmlElement = document.getElementById(`datetimepicker${filter.id}`);
+		if (htmlElement === null) {
+			console.error('htmlElement is null');
+			return;
+		}
+		// Create a new TempusDominus datetime picker
+		const picker = new TempusDominus(htmlElement, {
+			localization: {
+				format: 'yyyy-MM-dd HH:mm:ss',
+				hourCycle: 'h23',
+			},
+			display: {
+				buttons: {
+					today: true,
+					close: false,
+					clear: false,
+				},
+				calendarWeeks: true,
+				icons: {
+					type: 'icons',
+					time: 'bx fs-4 bx-time',
+					date: 'bx fs-4 bx-calendar',
+					up: 'bx fs-4 bx-up-arrow-alt',
+					down: 'bx fs-4 bx-down-arrow-alt',
+
+					previous: 'bx fs-4 bx-chevron-left',
+					next: 'bx fs-4 bx-chevron-right',
+
+					//today: 'bx fs-5 bx-calendar-check',
+					today: 'bx fs-5 bx-home',
+
+					// Unused
+					clear: 'bx fs-5 bx-trash',
+					close: 'bx fs-5 bx-x-circle',
+				},
+			},
+		});
+
+		// If we have a value, set the picker's date to it
+		if (filter.value.length > 0) {
+			let dt = new DateTime(filter.value);
+			if (DateTime.isValid(dt)) {
+				console.log('dt', dt);
+				picker.dates.setValue(dt);
+			}
+		}
+
+		const filterId = filter.id;
+
+		// Add an event listener to the picker
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		picker.subscribe(Namespace.events.change, (_e) => {
+			let picked = picker.dates.picked[0];
+			if (picked === undefined) {
+				return;
+			}
+			console.log('picked', picked.toISOString().replace('T', ' ').split('.')[0]);
+			// Update the filter's value to the picker's date
+			filters.update((f) => {
+				// Find by filterId
+				f.forEach((filter) => {
+					if (filter.id === filterId) {
+						filter.value = picked.toISOString().replace('T', ' ').split('.')[0];
+					}
+				});
+				return f;
+			});
+		});
+
+		pickers.push(picker);
 	}
 
 	function createDateTimePickers() {
@@ -61,82 +148,23 @@
 
 		// Loop over all $filters with index
 		$filters.forEach((filter, index) => {
-			// Check if fieldType OBJECT and field "last_seen"
-			if (filter.fieldType === FilterFieldType.OBJECT && filter.field === 'last_seen') {
-				const htmlElementUnchecked = document.getElementById(`datetimepicker${index}`);
-				let htmlElement: HTMLElement;
-				if (!htmlElementUnchecked) {
-					return;
-				} else {
-					htmlElement = htmlElementUnchecked;
-				}
-				// Create a new TempusDominus datetime picker
-				const picker = new TempusDominus(htmlElement, {
-					localization: {
-						format: 'yyyy-MM-dd HH:mm:ss',
-					},
-					display: {
-						theme: $theme.dark ? 'dark' : 'light',
-						icons: {
-							type: 'icons',
-							time: 'bx fs-4 bx-time',
-							date: 'bx fs-4 bx-calendar',
-							up: 'bx fs-4 bx-up-arrow-alt',
-							down: 'bx fs-4 bx-down-arrow-alt',
-
-							previous: 'bx fs-4 bx-chevron-left',
-							next: 'bx fs-4 bx-chevron-right',
-
-							// Unused
-							today: 'bx fs-5 bx-calendar-check',
-							clear: 'bx fs-5 bx-trash',
-							close: 'bx fs-5 bx-x',
-						},
-						buttons: {
-							today: false,
-							close: false,
-							clear: false,
-						},
-					},
-				});
-
-				if (filter.value.length > 0) {
-					if (DateTime.isValid(filter.value)) {
-						picker.dates.setValue(new DateTime(filter.value));
-					}
-				}
-
-				// Add an event listener to the picker
-				// eslint-disable-next-line @typescript-eslint/no-unused-vars
-				picker.subscribe(Namespace.events.change, (e) => {
-					// Update the filter's value to the picker's date
-					filters.update((f) => {
-						f[index].value = picker.dates.picked[0]
-							.toISOString()
-							.replace('T', ' ')
-							.split('.')[0];
-						return f;
-					});
-				});
-
-				pickers.push(picker);
-			}
+			createDateTimePicker(filter);
 		});
 	}
 
-	beforeUpdate(() => {
+	onDestroy(() => {
 		// Destroy all pickers
 		pickers.forEach((picker) => picker.dispose());
 		pickers.length = 0;
 	});
 
-	afterUpdate(() => {
+	onMount(() => {
 		createDateTimePickers();
 	});
 </script>
 
 {#each $filters as filter, i}
-	<div class="row">
+	<div class="row" id="filterRow{filter.id}">
 		<div class="col-12 col-lg-3 col-xl-2">
 			<div class="form-floating {i + 1 === $filters.length ? 'mb-0' : 'mb-3'}">
 				<select
@@ -266,24 +294,28 @@
 				{#if filter.fieldType === FilterFieldType.OBJECT && filter.field === 'last_seen'}
 					<div
 						class="input-group"
-						id="datetimepicker{i}"
+						id="datetimepicker{filter.id}"
 						data-td-target-input="nearest"
 						data-td-target-toggle="nearest"
 					>
 						<div class="form-floating {i + 1 === $filters.length ? 'mb-0' : 'mb-3'}">
 							<input
-								id="datetimepicker{i}Input"
+								id="datetimepicker{filter.id}Input"
 								type="text"
-								class="form-control"
-								data-td-target="#datetimepicker{i}"
+								class="form-control {!DateTime.isValid(new DateTime(filter.value))
+									? 'is-invalid'
+									: ''}"
+								data-td-target="#datetimepicker{filter.id}"
 							/>
-							<label class="form-label" for="datetimepicker{i}Input">Date</label>
+							<label class="form-label" for="datetimepicker{filter.id}Input"
+								>Date</label
+							>
 						</div>
 						<span
 							class="input-group-text btn-secondary {i + 1 === $filters.length
 								? 'mb-0'
 								: 'mb-3'}"
-							data-td-target="#datetimepicker{i}"
+							data-td-target="#datetimepicker{filter.id}"
 							data-td-toggle="datetimepicker"
 						>
 							<Icon name="calendar" size="1" />
@@ -316,7 +348,7 @@
 						class="mouse-pointer"
 						style="transform: translateY(65%);"
 						on:click={() => {
-							resetFilterByIndex(i);
+							resetFilter(i);
 						}}
 					/>
 				</div>
@@ -327,7 +359,7 @@
 				style="height: calc(2px + 3.5rem);"
 				disabled={$filters.length === 1}
 				on:click={() => {
-					removeFilterByIndex(i);
+					removeFilter(i);
 				}}
 			>
 				<Icon name="minus" size="1" style="margin-top: -2px;" />
