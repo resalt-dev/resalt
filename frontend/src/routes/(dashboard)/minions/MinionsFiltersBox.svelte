@@ -141,25 +141,18 @@
 		pickers.push(picker);
 	}
 
-	function createDateTimePickers() {
-		// Use TempusDominus
+	onMount(() => {
 		// Loop through all $filters and create a datetime picker for each
 		// that has a fieldType of FilterFieldType.OBJECT and a field of "last_seen".
-
-		// Loop over all $filters with index
-		$filters.forEach((filter, index) => {
+		$filters.forEach((filter) => {
 			createDateTimePicker(filter);
 		});
-	}
+	});
 
 	onDestroy(() => {
 		// Destroy all pickers
 		pickers.forEach((picker) => picker.dispose());
 		pickers.length = 0;
-	});
-
-	onMount(() => {
-		createDateTimePickers();
 	});
 </script>
 
