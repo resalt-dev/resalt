@@ -48,12 +48,13 @@ export default class Filter {
 	}
 
 	isValid(): boolean {
+		const isNumOp = (op: FilterOperand) => op === FilterOperand.EQUALS || op === FilterOperand.NOT_EQUALS || op === FilterOperand.GREATER_THAN_OR_EQUAL || op === FilterOperand.LESS_THAN_OR_EQUAL;
 		if (this.fieldType === FilterFieldType.NONE) return false;
 		if (this.field === '') return false;
 		if (this.field === 'last_seen' && this.value === '') return false;
-		if (this.field === 'conformity_success' && this.value === '') return false;
-		if (this.field === 'conformity_incorrect' && this.value === '') return false;
-		if (this.field === 'conformity_error' && this.value === '') return false;
+		if (this.field === 'conformity_success' && !isNumOp(this.operand)) return false;
+		if (this.field === 'conformity_incorrect' && !isNumOp(this.operand)) return false;
+		if (this.field === 'conformity_error' && !isNumOp(this.operand)) return false;
 
 		return true;
 	}
