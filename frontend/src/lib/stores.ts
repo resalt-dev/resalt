@@ -30,6 +30,9 @@ export const theme = persisted(`${prefix}theme`, {
 });
 export const currentUser: Writable<User | null> = persisted(`${prefix}currentUser`, null);
 
+// Used for turning variables into pretty names in Header
+export const replacementParams: Writable<Record<string, string>> = writable({});
+
 // Used for Run tab
 export const returns: Writable<RunResult[]> = writable([]);
 
@@ -83,10 +86,16 @@ function createToastStore(): ToastStore {
 			});
 			setTimeout(() => {
 				update((messages) => {
-					messages.shift();
-					return messages;
+					// console.log('Checking toast age');
+					// Check if all Messages are older than 5000ms + some change
+					if (messages.every((m) => m.timestamp < Date.now() - 5000)) {
+						// console.log('Cleaning up toasts');
+						return [];
+					} else {
+						return messages;
+					}
 				});
-			}, 5000);
+			}, 6500);
 		},
 		clear: () => set([]),
 	};

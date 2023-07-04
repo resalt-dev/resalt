@@ -84,6 +84,10 @@
 	<title>Keys</title>
 </svelte:head>
 
+Search box here.
+
+<hr class="text-light" />
+
 <div class="card table-responsive border-bottom-0">
 	<table class="table table-hover b-0 mb-0">
 		<thead class="border-0">

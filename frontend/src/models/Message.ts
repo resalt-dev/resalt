@@ -9,10 +9,13 @@ export default class Message {
 
 	message: unknown;
 
+	timestamp: number;
+
 	constructor(type: string, title: string, message: unknown) {
 		this.id = uuidv4();
 		this.type = type;
 		this.title = title;
 		this.message = message;
+		this.timestamp = Date.now();
 	}
 }

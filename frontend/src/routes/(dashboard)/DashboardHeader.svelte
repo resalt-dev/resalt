@@ -4,19 +4,92 @@
 	import Clickable from '$component/Clickable.svelte';
 	import Icon from '$component/Icon.svelte';
 	import { logout } from '$lib/api';
-	import paths, { getPathByName } from '$lib/paths';
-	import { currentUser, socket, theme, toasts } from '$lib/stores';
+	import paths from '$lib/paths';
+	import { currentUser, replacementParams, socket, theme, toasts } from '$lib/stores';
 	import { MessageType } from '$model/MessageType';
+	import type { Page } from '@sveltejs/kit';
 
-	$: navbar = $page.url.pathname
-		.split('/')
-		.filter(Boolean)
-		.map((str: string) => {
-			return {
-				title: str.indexOf('_') != -1 ? str : str.charAt(0).toUpperCase() + str.slice(1),
-				path: getPathByName(str.toLowerCase())?.getPath(),
-			};
-		});
+	type NavbarItem = {
+		title: string;
+		path: string | null;
+	};
+	function generateNavbar(page: Page, replacements: Record<string, string>): NavbarItem[] {
+		let navbar: NavbarItem[] = [];
+		let route = (page.route.id ?? '').replace(/\/\(dashboard\)/, '');
+
+		// If route = /minions/presets/[[presetId]], then split it so
+		// 0: /minions
+		// 1: /minions/presets
+		// 2: /minions/presets/[[presetId]]
+		let routeParts = route.split('/');
+		let routePath = '';
+
+		// Override-map for special cases where singular goes to plural
+		let overrides: Record<string, string> = {
+			'/minion': '/minions',
+			'/user': '/users',
+		};
+
+		for (let i = 1; i < routeParts.length; i++) {
+			let part = routeParts[i];
+			routePath += '/' + part;
+			let localRoutePath = routePath in overrides ? overrides[routePath] : routePath;
+
+			// console.log(localRoutePath);
+
+			let found = false;
+			// Loop over all paths
+			for (let path of Object.values(paths)) {
+				// If the path matches the localRoutePath, then add it to the navbar
+				let url = path.getRawPath();
+				if (!part.includes('[')) {
+					// Remove optional variables
+					url = url.replace(/\/\[\[.+?\]\]/g, '');
+				}
+				// console.log('   .: ', url, localRoutePath);
+				if (url === localRoutePath) {
+					// If part contains [, then find the value inside the brackets and get it from page.params, otherwise use path.label
+					let name;
+					if (part.includes('[')) {
+						let match = part
+							.replaceAll('[[', '[')
+							.replaceAll(']]', ']')
+							.match(/\[(.+?)\]/);
+						if (match) {
+							let variable = match?.[1];
+							if (variable in replacements) name = replacements[variable];
+							else if (variable in page.params) name = page.params[variable];
+							else name = part;
+						} else {
+							name = path.label;
+						}
+					} else {
+						name = path.label;
+					}
+
+					// console.log('          ', url, '\t', localRoutePath, name);
+					navbar.push({
+						title: name,
+						path: path.getPath(page.params),
+					});
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				navbar.push({
+					title: part,
+					path: null,
+				});
+			}
+		}
+
+		console.log(navbar);
+
+		return navbar;
+	}
+
+	$: navbar = generateNavbar($page, $replacementParams);
 </script>
 
 <div id="dashboard-header" class="g-0 d-flex align-items-center bg-light">

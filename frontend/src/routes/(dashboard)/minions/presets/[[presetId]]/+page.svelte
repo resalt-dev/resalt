@@ -14,7 +14,7 @@
 	} from '$lib/api';
 	import paths from '$lib/paths';
 	import { P_MINION_PRESETS_MANAGE, hasResaltPermission } from '$lib/perms';
-	import { currentUser, filters, theme, toasts } from '$lib/stores';
+	import { currentUser, filters, replacementParams, theme, toasts } from '$lib/stores';
 	import { MessageType } from '$model/MessageType';
 	import MinionPreset from '$model/MinionPreset';
 	import { onMount } from 'svelte';
@@ -49,6 +49,7 @@
 		getMinionPresetById(presetId)
 			.then((data: MinionPreset) => {
 				selectedPreset.set(data);
+				replacementParams.set({ ...$replacementParams, presetId: data.name });
 				if (data.invalidData) {
 					// Don't load invalid preset
 					toasts.add(

@@ -4,7 +4,7 @@
 	import JsonViewer from '$component/JsonViewer.svelte';
 	import { getUserById, updateUserPassword } from '$lib/api';
 	import { P_USER_ADMIN, P_USER_PASSWORD, hasResaltPermission } from '$lib/perms';
-	import { currentUser, theme, toasts } from '$lib/stores';
+	import { currentUser, replacementParams, theme, toasts } from '$lib/stores';
 	import { MessageType } from '$model/MessageType';
 	import type User from '$model/User';
 	import { onMount } from 'svelte';
@@ -24,6 +24,7 @@
 		getUserById(userId)
 			.then((data) => {
 				user.set(data);
+				replacementParams.set({ ...$replacementParams, userId: data.username });
 			})
 			.catch((err) => {
 				toasts.add(MessageType.ERROR, 'Failed fetching user: ' + userId, err);

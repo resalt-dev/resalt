@@ -12,7 +12,9 @@
 	import { config, theme, toasts } from '$lib/stores';
 	import type Config from '$model/Config';
 	import { MessageType } from '$model/MessageType';
-	import { onMount } from 'svelte';
+	import { afterUpdate, onMount } from 'svelte';
+	import { Toast } from 'bootstrap';
+	import type Message from '$model/Message';
 
 	let errorLoadingConfig = false;
 
@@ -38,6 +40,33 @@
 				toasts.add(MessageType.ERROR, 'Failed to load API Config', err);
 			});
 	});
+
+	let alreadyShownToasts: string[] = [];
+
+	function cleanupList(toasts: Message[]) {
+		// remove old toasts
+		alreadyShownToasts = alreadyShownToasts.filter((id) => {
+			return toasts.find((toast) => toast.id === id);
+		});
+	}
+
+	$: cleanupList($toasts);
+
+	afterUpdate(() => {
+		// init toasts
+		$toasts.forEach((toast) => {
+			if (alreadyShownToasts.includes(toast.id)) return;
+			const htmlToast = document.getElementById('toast-' + toast.id);
+			if (htmlToast) {
+				const bsToast = new Toast(htmlToast, {
+					autohide: true,
+					delay: 5000,
+				});
+				bsToast.show();
+				alreadyShownToasts.push(toast.id);
+			}
+		});
+	});
 </script>
 
 <main class="app">
@@ -55,12 +84,15 @@
 	<div class="position-fixed top-0 end-0 mt-5 me-5" style="z-index: 11">
 		{#each $toasts as toast}
 			<div
+				id="toast-{toast.id}"
 				class="toast {'toast-' + toast.type} mb-2"
 				role="alert"
 				aria-live="assertive"
 				aria-atomic="true"
 			>
-				<div class="toast-header">{toast.title}</div>
+				<div class="toast-header fw-bold">
+					{toast.title}
+				</div>
 				{#if toast.message instanceof ApiError}
 					<div class="toast-body">
 						<strong>Code: </strong>{toast.message.code}<br />

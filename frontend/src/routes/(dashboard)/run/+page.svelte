@@ -1,14 +1,11 @@
 <script lang="ts">
 	import { runJob } from '$lib/api';
-	import { toasts } from '$lib/stores';
+	import { returns, toasts } from '$lib/stores';
 	import { MessageType } from '$model/MessageType';
 	import type RunCommand from '$model/RunCommand';
 	import RunResult from '$model/RunResult';
-	import type { Writable } from 'svelte/store';
 	import RunCommandBox from './RunCommandBox.svelte';
 	import RunConfirmLiveBox from './RunConfirmLiveBox.svelte';
-
-	export let returns: Writable<RunResult[]>;
 
 	let validate: () => RunCommand;
 

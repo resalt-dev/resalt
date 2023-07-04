@@ -61,7 +61,7 @@
 	>
 		{#each Object.values(paths) as path}
 			{#if path.showInNav && path.hasPermission($currentUser)}
-				{#if path.name.startsWith('_')}
+				{#if path.label == '_'}
 					<li><hr /></li>
 				{:else}
 					<SidebarItem {path} collapsed={$collapsed} />

@@ -45,22 +45,6 @@
 			<DashboardHeader />
 			<div class="px-4 py-3">
 				<slot />
-				<!-- <Route path="dashboard/*subPage" component={Home} />
-				<Route path="minion/:minionId/*subPage" component={Minion} />
-				<Route path="minions/:subPage/*selected" component={Minions} />
-				<Route path="minions" component={Minions} />
-				<Route path="run/*subPage" component={Run} />
-				<Route path="job/:jobId" component={Job} />
-				<Route path="jobs" component={Jobs} />
-				<Route path="keys" component={Keys} />
-				<Route path="events" component={Events} />
-				<Route path="user/:userId" component={User} />
-				<Route path="users/*subPage" component={Users} />
-				<Route path="preferences/*subPage" component={Preferences} />
-				<Route path="settings/*subPage" component={Settings} />
-				<Route path="*">
-					<Redirect to={paths.dashboard.getPath()} />
-				</Route> -->
 			</div>
 		</div>
 	</div>

@@ -108,9 +108,9 @@
 				class="btn btn-warning"
 				on:click={() => {
 					toasts.add(
-						$toasts.length < Object.values(MessageType).length
-							? Object.values(MessageType)[$toasts.length]
-							: MessageType.SUCCESS,
+						Object.values(MessageType)[
+							$toasts.length % Object.values(MessageType).length
+						],
 						'Testing toast!',
 						"This is a test toast message. It's a bit longer than the others, but that's okay.",
 					);
