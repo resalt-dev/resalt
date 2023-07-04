@@ -84,8 +84,6 @@
 			}
 		}
 
-		console.log(navbar);
-
 		return navbar;
 	}
 
