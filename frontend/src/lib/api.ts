@@ -1,6 +1,6 @@
 import AuthToken from '$model/AuthToken';
 import Config from '$model/Config';
-import type Filter from '$model/Filter';
+import Filter from '$model/Filter';
 import { FilterFieldType } from '$model/FilterFieldType';
 import Job from '$model/Job';
 import Key from '$model/Key';
@@ -27,16 +27,6 @@ export class ApiError extends Error {
 	toString(): string {
 		return `${this.name}: ${this.message} (${this.code})`;
 	}
-}
-
-function filterFilters(filters: Filter[]): Filter[] {
-	return (
-		filters
-			.filter((f) => f.fieldType !== FilterFieldType.NONE)
-			.filter((f) => f.field !== '')
-			// Filter out where field is 'last_seen' and value is empty
-			.filter((f) => !(f.field === 'last_seen' && f.value === ''))
-	);
 }
 
 function getToken(): string {
@@ -216,7 +206,10 @@ export async function getMinions(
 	limit: number | null,
 	offset: number | null,
 ): Promise<Array<Minion>> {
-	const filteredFilters = filterFilters(filters);
+	for (const filter of filters) {
+		console.log('Filter', filter instanceof Filter, filter);
+	}
+	const filteredFilters = filters.filter((f) => f.isValid());
 	const args = new URLSearchParams();
 
 	if (filteredFilters && filteredFilters.length > 0)
@@ -241,7 +234,7 @@ export async function refreshMinion(minionId: string): Promise<void> {
 }
 
 export async function searchGrains(query: string, filters: Filter[]): Promise<unknown[]> {
-	const filteredFilters = filterFilters(filters);
+	const filteredFilters = filters.filter((f) => f.isValid());
 	const args = new URLSearchParams();
 
 	if (query) args.append('query', encodeURIComponent(query));
@@ -262,7 +255,7 @@ export async function getMinionPresets(): Promise<Array<MinionPreset>> {
 }
 
 export async function createMinionPreset(name: string, filters: Filter[]): Promise<MinionPreset> {
-	const filteredFilters = filterFilters(filters);
+	const filteredFilters = filters.filter((f) => f.isValid());
 	return sendAuthenticatedRequest('POST', '/presets', {
 		name,
 		filter: JSON.stringify(filteredFilters),
@@ -282,7 +275,7 @@ export async function updateMinionPreset(
 	name: string,
 	filters: Filter[],
 ): Promise<MinionPreset> {
-	const filteredFilters = filterFilters(filters);
+	const filteredFilters = filters.filter((f) => f.isValid());
 	return sendAuthenticatedRequest('PUT', `/presets/${id}`, {
 		name,
 		filter: JSON.stringify(filteredFilters),

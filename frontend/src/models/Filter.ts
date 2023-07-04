@@ -43,4 +43,15 @@ export default class Filter {
 		this.operand = operand;
 		this.value = value;
 	}
+
+	isValid(): boolean {
+		if (this.fieldType === FilterFieldType.NONE) return false;
+		if (this.field === '') return false;
+		if (this.field === 'last_seen' && this.value === '') return false;
+		if (this.field === 'conformity_success' && this.value === '') return false;
+		if (this.field === 'conformity_incorrect' && this.value === '') return false;
+		if (this.field === 'conformity_error' && this.value === '') return false;
+		
+		return true;
+	}
 }

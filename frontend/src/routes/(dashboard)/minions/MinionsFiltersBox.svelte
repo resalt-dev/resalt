@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Icon from '$component/Icon.svelte';
 	import { filters, theme } from '$lib/stores';
+	import Filter from '$model/Filter';
 	import { FilterFieldType } from '$model/FilterFieldType';
 	import { FilterOperand } from '$model/FilterOperand';
 	import { Namespace, TempusDominus } from '@eonasdan/tempus-dominus';
@@ -11,12 +12,7 @@
 	function addFilter(): void {
 		filters.update((f) => [
 			...f,
-			{
-				fieldType: FilterFieldType.NONE,
-				field: '',
-				operand: FilterOperand.CONTAINS,
-				value: '',
-			},
+			new Filter(FilterFieldType.NONE, '', FilterOperand.CONTAINS, ''),
 		]);
 	}
 
@@ -26,12 +22,7 @@
 
 	function resetFilterByIndex(index: number): void {
 		filters.update((f) => {
-			f[index] = {
-				fieldType: FilterFieldType.NONE,
-				field: '',
-				operand: FilterOperand.CONTAINS,
-				value: '',
-			};
+			f[index] = new Filter(FilterFieldType.NONE, '', FilterOperand.CONTAINS, '');
 			return f;
 		});
 	}
