@@ -52,24 +52,43 @@
 				# {num + 1}
 			</small>
 		</div>
-		<div slot="body" class="text-console text-{color}">
-			<pre class="m-0">{leftPadToTotalLength('ID', SHIFT)}: {stateName}</pre>
-			<pre class="m-0">{leftPadToTotalLength('Function', SHIFT)}: {fun}</pre>
-			<pre class="m-0">{leftPadToTotalLength('Name', SHIFT)}: {name}</pre>
-			<pre class="m-0">{leftPadToTotalLength('Result', SHIFT)}: <span
-					style="text-transform:capitalize;">{result === null ? 'None' : result}</span
+		<div slot="body">
+			<pre class="text-console text-{color} m-0">{leftPadToTotalLength(
+					'ID',
+					SHIFT,
+				)}: {stateName}</pre>
+			<pre class="text-console text-{color} m-0">{leftPadToTotalLength(
+					'Function',
+					SHIFT,
+				)}: {fun}</pre>
+			<pre class="text-console text-{color} m-0">{leftPadToTotalLength(
+					'Name',
+					SHIFT,
+				)}: {name}</pre>
+			<pre class="text-console text-{color} m-0">{leftPadToTotalLength(
+					'Result',
+					SHIFT,
+				)}: <span style="text-transform:capitalize;"
+					>{result === null ? 'None' : result}</span
 				></pre>
-			<pre class="m-0">{leftPadToTotalLength('Comment', SHIFT)}: {rightShiftLinesExceptFirst(
-					comment,
-					SHIFT + 2,
-				)}</pre>
-			<pre class="m-0">{leftPadToTotalLength('Started', SHIFT)}: {startTime}</pre>
-			<pre class="m-0">{leftPadToTotalLength('Duration', SHIFT)}: {duration}</pre>
-			<pre class="m-0">{leftPadToTotalLength('Changes', SHIFT)}:</pre>
+			<pre class="text-console text-{color} m-0">{leftPadToTotalLength(
+					'Comment',
+					SHIFT,
+				)}: {rightShiftLinesExceptFirst(comment, SHIFT + 2)}</pre>
+			<pre class="text-console text-{color} m-0">{leftPadToTotalLength(
+					'Started',
+					SHIFT,
+				)}: {startTime}</pre>
+			<pre class="text-console text-{color} m-0">{leftPadToTotalLength(
+					'Duration',
+					SHIFT,
+				)}: {duration}</pre>
+			<pre class="text-console text-{color} m-0">{leftPadToTotalLength(
+					'Changes',
+					SHIFT,
+				)}:</pre>
 			{#if typeof changes === 'object' && !changes}
-				<!-- {#if Object.keys(changes).length != 0} -->
 				<ConsoleChangeBranch data={changes} shift={SHIFT + 2} />
-				<!-- {/if} -->
 			{/if}
 		</div>
 	</TerminalBox>
