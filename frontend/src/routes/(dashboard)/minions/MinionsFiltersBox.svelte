@@ -111,7 +111,6 @@
 		if (filter.value.length > 0) {
 			let dt = new DateTime(filter.value);
 			if (DateTime.isValid(dt)) {
-				console.log('dt', dt);
 				picker.dates.setValue(dt);
 			}
 		}
