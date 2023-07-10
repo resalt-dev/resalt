@@ -30,7 +30,7 @@
 			'/user': '/users',
 		};
 
-		for (let i = 1; i < routeParts.length; i++) {
+		A: for (let i = 1; i < routeParts.length; i++) {
 			let part = routeParts[i];
 			routePath += '/' + part;
 			let localRoutePath = routePath in overrides ? overrides[routePath] : routePath;
@@ -59,7 +59,7 @@
 							let variable = match?.[1];
 							if (variable in replacements) name = replacements[variable];
 							else if (variable in page.params) name = page.params[variable];
-							else name = part;
+							else continue A;
 						} else {
 							name = path.label;
 						}
