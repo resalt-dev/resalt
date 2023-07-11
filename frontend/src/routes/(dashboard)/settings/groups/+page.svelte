@@ -731,8 +731,8 @@
 								<thead class="bg-dark border-0 text-white">
 									<tr>
 										<th class="border-secondary" />
-										<th class="border-secondary ps-0"> Permission </th>
-										<th class="border-secondary"> Description </th>
+										<th class="border-secondary ps-0">Permission</th>
+										<th class="border-secondary">Description</th>
 									</tr>
 								</thead>
 								<tbody class="align-middle">

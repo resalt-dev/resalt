@@ -1,12 +1,8 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import Clickable from '$component/Clickable.svelte';
 	import Icon from '$component/Icon.svelte';
-	import { logout } from '$lib/api';
 	import paths from '$lib/paths';
-	import { currentUser, replacementParams, socket, theme, toasts } from '$lib/stores';
-	import { MessageType } from '$model/MessageType';
+	import { currentUser, replacementParams, socket, theme } from '$lib/stores';
 	import type { Page } from '@sveltejs/kit';
 
 	type NavbarItem = {
@@ -148,27 +144,13 @@
 	<div class="col-auto">
 		<div class="vr sep" />
 	</div>
-	<Clickable
-		type="div"
-		event={() => {
-			logout()
-				.then(() => {
-					toasts.add(
-						MessageType.SUCCESS,
-						'Logout Success',
-						'You have now been logged out.',
-					);
-					goto(paths.login.getPath());
-				})
-				.catch((err) => {
-					toasts.add(MessageType.ERROR, 'Logout Error', err);
-				});
-		}}
+	<a
+		href={paths.logout.getPath()}
 		class="col-auto px-3 text-reset text-decoration-none mouse-pointer"
 	>
 		<Icon name="log-out" size="1.5" class="pe-1" />
 		Logout
-	</Clickable>
+	</a>
 </div>
 
 <style>

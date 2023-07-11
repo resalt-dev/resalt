@@ -90,6 +90,7 @@ export class Path {
 
 const paths = {
 	login: new Path(0, '/login', 'Login', null, null),
+	logout: new Path(1, '/logout', 'Logout', null, null),
 
 	dashboard: new Path(10, '/dashboard', 'Dashboard', 'home', null),
 

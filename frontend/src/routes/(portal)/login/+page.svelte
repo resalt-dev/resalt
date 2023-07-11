@@ -69,7 +69,6 @@
 
 <svelte:head>
 	<title>Login</title>
-	<meta name="description" content="Login" />
 </svelte:head>
 
 {#if $config !== null && $config.authForwardEnabled}
