@@ -129,7 +129,9 @@ const paths = {
 
 	_1: new Path(99, '/_', '_', '', null),
 
-	user: new Path(100, '/user/[userId]', 'User', null, null),
+	user_info: new Path(100, '/user/[userId]', 'User', null, null),
+	user_security: new Path(101, '/user/[userId]/security', 'Security', null, null),
+	user_permissions: new Path(102, '/user/[userId]/permissions', 'Permissions', null, null),
 
 	users_list: new Path(110, '/users', 'Users', 'user-circle', [P_USER_LIST]),
 	users_add: new Path(110, '/users/add', 'Add user', null, [P_USER_ADMIN]),

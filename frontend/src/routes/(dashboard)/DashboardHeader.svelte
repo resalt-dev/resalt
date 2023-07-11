@@ -128,7 +128,7 @@
 	</div>
 	<div class="col-auto px-3 text-reset text-decoration-none">
 		<a
-			href={paths.user.getPath($currentUser?.id ?? '')}
+			href={paths.user_info.getPath($currentUser?.id ?? '')}
 			class="text-decoration-none text-reset"
 		>
 			<Icon name="user" size="1.5" type="solid" class="pe-1" />
