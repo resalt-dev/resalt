@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import SSEConnector from '$component/SSEConnector.svelte';
-	import { getCurrentUser, logout } from '$lib/api';
+	import { getCurrentUser } from '$lib/api';
 	import paths from '$lib/paths';
-	import { currentUser, toasts } from '$lib/stores';
+	import { auth, currentUser, toasts } from '$lib/stores';
 	import { MessageType } from '$model/MessageType';
 	import type User from '$model/User';
 	import { onMount } from 'svelte';
@@ -11,24 +11,22 @@
 	import DashboardSidebar from './DashboardSidebar.svelte';
 
 	onMount(() => {
+		if ($auth == null) {
+			goto(paths.login.getPath());
+			return;
+		}
 		getCurrentUser()
 			.then((data: User) => {
 				currentUser.set(data);
 			})
 			.catch((err: unknown) => {
 				console.error(err);
-				logout()
-					.then(() => {
-						toasts.add(
-							MessageType.WARNING,
-							'Logged out',
-							'You have been logged out due to the token being invalid.',
-						);
-						goto(paths.login.getPath());
-					})
-					.catch((err: unknown) => {
-						toasts.add(MessageType.ERROR, 'Logout Error', err);
-					});
+				toasts.add(
+					MessageType.WARNING,
+					'Logged out',
+					'You have been logged out due to the token being invalid.',
+				);
+				goto(paths.logout.getPath());
 			});
 	});
 </script>
