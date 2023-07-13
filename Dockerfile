@@ -9,7 +9,7 @@ RUN npm install && npm run build
 #
 # BUILD BACKEND
 #
-FROM rust:1.69-slim as build_backend
+FROM rust:1.70-slim as build_backend
 WORKDIR /usr/src/app
 RUN apt-get update && \
   apt-get upgrade -y -o DPkg::Options::=--force-confold && \
@@ -23,12 +23,12 @@ RUN cargo build --release
 #
 # SHIP APP
 #
-FROM debian:bookworm-slim
+FROM debian:bullseye-slim
 
 # Upgrade System and Install dependencies
 RUN apt-get update && \
   apt-get upgrade -y -o DPkg::Options::=--force-confold && \
-  apt-get install -y -o DPkg::Options::=--force-confold libssl-dev libssl-dev mariadb-client libmariadb-dev default-libmysqlclient-dev 
+  apt-get install -y -o DPkg::Options::=--force-confold libssl-dev mariadb-client libmariadb-dev default-libmysqlclient-dev
 
 # Copy the binary from the build stage
 COPY --from=build_backend /usr/src/app/target/release/resalt /usr/src/app/resalt
