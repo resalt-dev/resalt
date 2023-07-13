@@ -42,7 +42,21 @@
 				goto(paths.dashboard.getPath());
 			})
 			.catch((err: unknown) => {
-				toasts.add(MessageType.ERROR, 'Login Error', err);
+				// Check if error msg contains "Internal error"
+				if (err instanceof Error && err.message.includes('Internal error')) {
+					// If so, it's probably a 500 error
+					toasts.add(
+						MessageType.ERROR,
+						'Login Error',
+						'An internal error occurred. Retrying...',
+					);
+					// Try again after timeout
+					setTimeout(() => {
+						_login();
+					}, 1000);
+				} else {
+					toasts.add(MessageType.ERROR, 'Login Error', err);
+				}
 			});
 	}
 
