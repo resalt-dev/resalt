@@ -13,23 +13,25 @@ pub async fn route_frontend_get(
 ) -> Result<ServiceResponse, actix_web::Error> {
     let (req, _payload) = service_request.into_parts();
 
-    // fetch file from FRONTEND_PUBLIC_DIR based on request URL
+    // Fetch file from FRONTEND_PUBLIC_DIR based on request URL
     let path = req.uri().path();
+
     // If path starts with /, trim it
     let path = if let Some(path) = path.strip_prefix('/') {
         path
     } else {
         path
     };
-
-    // Add .html if path does not contain a dot
+    // If path is empty, serve index.html
+    let path = if path.is_empty() { "index.html" } else { path };
+    // If path does not contain a dot, add .html
     let path: String = if !path.contains('.') {
         format!("{}.html", path)
     } else {
         path.to_string()
     };
 
-    // fetch using FRONTEND_PUBLIC_DIR.get_file
+    // Fetch using FRONTEND_PUBLIC_DIR.get_file
     let file = if path.is_empty() {
         FRONTEND_PUBLIC_DIR.get_file("index.html")
     } else {
