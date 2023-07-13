@@ -169,10 +169,11 @@ impl StorageImpl for StorageMySQL {
             .count()
             .get_result::<i64>(&mut connection)
             .map_err(|e| format!("{:?}", e))?;
-        let events_total = events::table
-            .count()
-            .get_result::<i64>(&mut connection)
-            .map_err(|e| format!("{:?}", e))?;
+        // let events_total = events::table
+        //     .count()
+        //     .get_result::<i64>(&mut connection)
+        //     .map_err(|e| format!("{:?}", e))?;
+        let events_total = -1;
         let job_returns_total = job_returns::table
             .count()
             .get_result::<i64>(&mut connection)
