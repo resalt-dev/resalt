@@ -3,8 +3,6 @@ use actix_web::{
     HttpResponse,
 };
 use include_dir::{include_dir, Dir};
-use log::*;
-use resalt_models::ApiError;
 
 static FRONTEND_PUBLIC_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/frontend/build");
 
@@ -22,27 +20,14 @@ pub async fn route_frontend_get(
     } else {
         path
     };
+
     // If path is empty, serve index.html
     let path = if path.is_empty() { "index.html" } else { path };
-    // If path does not contain a dot, add .html
-    let path: String = if !path.contains('.') {
-        format!("{}.html", path)
-    } else {
-        path.to_string()
-    };
 
     // Fetch using FRONTEND_PUBLIC_DIR.get_file
-    let file = if path.is_empty() {
-        FRONTEND_PUBLIC_DIR.get_file("index.html")
-    } else {
-        FRONTEND_PUBLIC_DIR.get_file(&path)
-    };
-    let file = match file {
+    let file = match FRONTEND_PUBLIC_DIR.get_file(&path) {
         Some(file) => file,
-        None => {
-            warn!("File not found: {}", path);
-            return Err(ApiError::NotFound.into());
-        }
+        None => FRONTEND_PUBLIC_DIR.get_file("index.html").unwrap(),
     };
 
     let body = file.contents();
