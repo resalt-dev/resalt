@@ -1,6 +1,6 @@
 [package]
 name = "resalt"
-version = "0.4.1"
+version = "0.5.0"
 authors = ["Max Faxälv <max@foorack.com>"]
 edition = "2021"
 readme = "README.md"
