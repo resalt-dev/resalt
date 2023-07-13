@@ -30,7 +30,7 @@ pub async fn route_status_get(
         db: db_status.is_some(),
         db_auth_tokens_total: db_status.clone().map(|s| s.auth_tokens_total),
         db_auth_tokens_active: db_status.clone().map(|s| s.auth_tokens_active),
-        db_events_total: db_status.clone().map(|s| s.events_total),
+        db_events_total: Some(-1), //db_status.clone().map(|s| s.events_total),
         db_job_returns_total: db_status.clone().map(|s| s.job_returns_total),
         db_jobs_total: db_status.clone().map(|s| s.jobs_total),
         db_minions_total: db_status.clone().map(|s| s.minions_total),
