@@ -34,7 +34,7 @@
 		"eslint-config-prettier": "8.8.0",
 		"eslint-plugin-import": "2.27.5",
 		"eslint-plugin-svelte": "2.32.4",
-		"prettier": "2.8.8",
+		"prettier": "3.0.0",
 		"prettier-plugin-svelte": "2.10.1",
 		"sirv-cli": "2.0.2",
 		"svelte": "4.0.5",
