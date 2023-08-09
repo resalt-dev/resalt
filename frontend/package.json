@@ -19,7 +19,7 @@
 		"@eonasdan/tempus-dominus": "6.7.11",
 		"@lezer/highlight": "1.1.6",
 		"@sveltejs/adapter-static": "2.0.2",
-		"@sveltejs/kit": "1.21.0",
+		"@sveltejs/kit": "1.22.4",
 		"@sveltejs/vite-plugin-svelte": "2.4.2",
 		"@tsconfig/svelte": "5.0.0",
 		"@types/bootstrap": "5.2.6",
