@@ -4,7 +4,6 @@
 	"trailingComma": "all",
 	"printWidth": 100,
 	"plugins": ["prettier-plugin-svelte"],
-	"pluginSearchDirs": ["."],
 	"tabWidth": 4,
 	"semi": true,
 	"arrowParens": "always",
