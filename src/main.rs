@@ -33,6 +33,19 @@ async fn init_db() -> Box<dyn StorageImpl> {
                     .unwrap_or_else(|_| panic!("Error connecting to {}", &database_url)),
             )
         }
+        "redis" => {
+            let database_url = format!(
+                "redis://{}:{}/{}",
+                SConfig::database_host(),
+                SConfig::database_port(),
+                SConfig::database_database()
+            );
+            Box::new(
+                resalt_storage_redis::StorageRedis::connect(&database_url)
+                    .await
+                    .unwrap_or_else(|_| panic!("Error connecting to {}", &database_url)),
+            )
+        }
         _ => todo!(),
     }
 }

@@ -3,6 +3,50 @@ use resalt_models::*;
 use serde_json::Value;
 use version_compare::Cmp;
 
+pub fn sort_minions(minions: &mut Vec<Minion>, sort: &str) {
+    minions.sort_by(|a, b| match sort {
+        "id.asc" => a.id.cmp(&b.id),
+        "id.desc" => b.id.cmp(&a.id),
+        "lastSeen.asc" => a.last_seen.cmp(&b.last_seen),
+        "lastSeen.desc" => b.last_seen.cmp(&a.last_seen),
+        "conformitySuccess.asc" => a
+            .conformity_success
+            .unwrap_or_default()
+            .cmp(&b.conformity_success.unwrap_or_default()),
+        "conformitySuccess.desc" => b
+            .conformity_success
+            .unwrap_or_default()
+            .cmp(&a.conformity_success.unwrap_or_default()),
+        "conformityIncorrect.asc" => a
+            .conformity_incorrect
+            .unwrap_or_default()
+            .cmp(&b.conformity_incorrect.unwrap_or_default()),
+        "conformityIncorrect.desc" => b
+            .conformity_incorrect
+            .unwrap_or_default()
+            .cmp(&a.conformity_incorrect.unwrap_or_default()),
+        "conformityError.asc" => a
+            .conformity_error
+            .unwrap_or_default()
+            .cmp(&b.conformity_error.unwrap_or_default()),
+        "conformityError.desc" => b
+            .conformity_error
+            .unwrap_or_default()
+            .cmp(&a.conformity_error.unwrap_or_default()),
+        "osType.asc" => a
+            .os_type
+            .as_ref()
+            .unwrap_or(&String::from(""))
+            .cmp(&b.os_type.as_ref().unwrap_or(&String::from(""))),
+        "osType.desc" => b
+            .os_type
+            .as_ref()
+            .unwrap_or(&String::from(""))
+            .cmp(&a.os_type.as_ref().unwrap_or(&String::from(""))),
+        _ => std::cmp::Ordering::Equal,
+    })
+}
+
 fn value_to_simple_str(value: &Value) -> String {
     match value {
         Value::String(s) => strip_quotes!(s.to_string()),
@@ -18,6 +62,128 @@ fn value_to_simple_str(value: &Value) -> String {
     }
 }
 
+fn filter_str_logic(minion_value: &str, filter_value: &str, operand: &FilterOperand) -> bool {
+    match operand {
+        FilterOperand::Contains => minion_value.contains(filter_value),
+        FilterOperand::NotContains => !minion_value.contains(filter_value),
+        FilterOperand::Equals => minion_value == filter_value,
+        FilterOperand::NotEquals => minion_value != filter_value,
+        FilterOperand::StartsWith => minion_value.starts_with(filter_value),
+        FilterOperand::EndsWith => minion_value.ends_with(filter_value),
+        FilterOperand::GreaterThanOrEqual => minion_value >= filter_value,
+        FilterOperand::LessThanOrEqual => minion_value <= filter_value,
+    }
+}
+
+fn filter_i32_logic(minion_value: i32, filter_value: &str, operand: &FilterOperand) -> bool {
+    match filter_value.parse::<i32>() {
+        Ok(filter_value) => match operand {
+            FilterOperand::Equals => minion_value == filter_value,
+            FilterOperand::NotEquals => minion_value != filter_value,
+            FilterOperand::GreaterThanOrEqual => minion_value >= filter_value,
+            FilterOperand::LessThanOrEqual => minion_value <= filter_value,
+            FilterOperand::Contains
+            | FilterOperand::NotContains
+            | FilterOperand::StartsWith
+            | FilterOperand::EndsWith => false,
+        },
+        Err(_) => false,
+    }
+}
+
+fn filter_timestamp_logic(
+    minion_timestamp: chrono::NaiveDateTime,
+    filter_timestamp: chrono::NaiveDateTime,
+    operand: &FilterOperand,
+) -> bool {
+    let minion_str = minion_timestamp.format("%Y-%m-%d %H:%M:%S").to_string();
+    let filter_str = filter_timestamp.format("%Y-%m-%d %H:%M:%S").to_string();
+    match operand {
+        FilterOperand::Contains => minion_str.contains(&filter_str),
+        FilterOperand::NotContains => !minion_str.contains(&filter_str),
+        FilterOperand::StartsWith => minion_str.starts_with(&filter_str),
+        FilterOperand::EndsWith => minion_str.ends_with(&filter_str),
+        FilterOperand::Equals => minion_timestamp == filter_timestamp,
+        FilterOperand::NotEquals => minion_timestamp != filter_timestamp,
+        FilterOperand::GreaterThanOrEqual => minion_timestamp >= filter_timestamp,
+        FilterOperand::LessThanOrEqual => minion_timestamp <= filter_timestamp,
+    }
+}
+
+fn filter_minion(minion: &Minion, filters: &[Filter]) -> bool {
+    for filter in filters {
+        match filter.field_type {
+            FilterFieldType::None => {}
+            FilterFieldType::Object => match filter.field.as_str() {
+                "id" => {
+                    if !filter_str_logic(&minion.id, &filter.value, &filter.operand) {
+                        return false;
+                    }
+                }
+                "os_type" => {
+                    let value: &str = match &minion.os_type {
+                        Some(value) => value,
+                        None => "",
+                    };
+                    if !filter_str_logic(value, &filter.value, &filter.operand) {
+                        return false;
+                    }
+                }
+                "last_seen" => {
+                    if !filter_timestamp_logic(
+                        minion.last_seen,
+                        chrono::NaiveDateTime::parse_from_str(&filter.value, "%Y-%m-%d %H:%M:%S")
+                            .unwrap_or_default(),
+                        &filter.operand,
+                    ) {
+                        return false;
+                    }
+                }
+                "conformity_success" => {
+                    let value: i32 = match minion.conformity_success {
+                        Some(value) => value,
+                        None => return false,
+                    };
+                    if !filter_i32_logic(value, &filter.value, &filter.operand) {
+                        return false;
+                    }
+                }
+                "conformity_incorrect" => {
+                    let value: i32 = match minion.conformity_incorrect {
+                        Some(value) => value,
+                        None => return false,
+                    };
+                    if !filter_i32_logic(value, &filter.value, &filter.operand) {
+                        return false;
+                    }
+                }
+                "conformity_error" => {
+                    let value: i32 = match minion.conformity_error {
+                        Some(value) => value,
+                        None => return false,
+                    };
+                    if !filter_i32_logic(value, &filter.value, &filter.operand) {
+                        return false;
+                    }
+                }
+                _ => {
+                    log::warn!("Filtering on unknown field: {}", filter.field);
+                    return false;
+                }
+            },
+            FilterFieldType::Grain => todo!(),
+            FilterFieldType::Package => todo!(),
+        }
+    }
+    true
+}
+
+pub fn filter_minions(minions: &mut Vec<Minion>, filters: &[Filter]) {
+    // Filter each minion on filter_minion
+    minions.retain(|minion| filter_minion(minion, filters));
+}
+
+// Deprecated
 pub fn filter_minions_on_grains(minions: &mut Vec<Minion>, filters: &[Filter]) {
     // Map grain values to json paths
     // If filter.field does not start with "$", prepend it.

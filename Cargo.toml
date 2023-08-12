@@ -19,6 +19,7 @@ members = [
     "workspace/resalt_security",
     "workspace/resalt_storage",
     "workspace/resalt_storage_mysql",
+    "workspace/resalt_storage_redis",
 ]
 
 [dependencies]
@@ -31,6 +32,7 @@ resalt_salt = { path = "workspace/resalt_salt" }
 resalt_security = { path = "workspace/resalt_security" }
 resalt_storage = { path = "workspace/resalt_storage" }
 resalt_storage_mysql = { path = "workspace/resalt_storage_mysql" }
+resalt_storage_redis = { path = "workspace/resalt_storage_redis" }
 
 # Web
 actix-web = { version = "4.1.0", features=["compress-gzip"], default-features = false }
