@@ -10,7 +10,6 @@ use log::*;
 use resalt_config::SConfig;
 use resalt_models::*;
 use resalt_storage::{StorageImpl, StorageStatus};
-use serde_json::json;
 
 type DbPooledConnection = PooledConnection<ConnectionManager<MysqlConnection>>;
 
@@ -912,16 +911,6 @@ impl StorageImpl for StorageMySQL {
         let mut connection = self.create_connection()?;
         permission_groups::table
             .filter(permission_groups::id.eq(id))
-            .first::<SQLPermissionGroup>(&mut connection)
-            .optional()
-            .map_err(|e| format!("{:?}", e))
-            .map(|v| v.map(|v| v.into()))
-    }
-
-    fn get_permission_group_by_name(&self, name: &str) -> Result<Option<PermissionGroup>, String> {
-        let mut connection = self.create_connection()?;
-        permission_groups::table
-            .filter(permission_groups::name.eq(name))
             .first::<SQLPermissionGroup>(&mut connection)
             .optional()
             .map_err(|e| format!("{:?}", e))

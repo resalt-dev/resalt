@@ -1,14 +1,10 @@
 extern crate r2d2_redis;
 
-use chrono::NaiveDateTime;
-use chrono::Utc;
 use r2d2_redis::r2d2::Pool;
 use r2d2_redis::r2d2::PooledConnection;
 use r2d2_redis::redis::Commands;
-use r2d2_redis::redis::ConnectionLike;
 use r2d2_redis::redis::Iter;
 use r2d2_redis::{r2d2, RedisConnectionManager};
-use resalt_config::SConfig;
 use resalt_models::*;
 use resalt_storage::{StorageImpl, StorageStatus};
 
@@ -46,15 +42,15 @@ impl StorageImpl for StorageRedis {
     }
 
     fn get_status(&self) -> Result<resalt_storage::StorageStatus, String> {
-        let mut connection = self.create_connection()?;
+        //        let mut connection = self.create_connection()?;
 
-        let lifespan = SConfig::auth_session_lifespan() * 1000;
-        let auth_expiry: NaiveDateTime = match NaiveDateTime::from_timestamp_millis(
-            Utc::now().timestamp_millis() - (lifespan as i64),
-        ) {
-            Some(dt) => dt,
-            None => return Err("Failed to convert timestamp to NaiveDateTime: {:?}".to_string()),
-        };
+        //let lifespan = SConfig::auth_session_lifespan() * 1000;
+        // let auth_expiry: NaiveDateTime = match NaiveDateTime::from_timestamp_millis(
+        //     Utc::now().timestamp_millis() - (lifespan as i64),
+        // ) {
+        //     Some(dt) => dt,
+        //     None => return Err("Failed to convert timestamp to NaiveDateTime: {:?}".to_string()),
+        // };
 
         let auth_tokens_total = -1;
         let auth_tokens_active = -1;
@@ -159,11 +155,12 @@ impl StorageImpl for StorageRedis {
             .collect();
 
         for key in keys {
+            let id: String = key.split(":").last().unwrap().to_string();
             // Fields are stored as HashMap
             let values = connection
                 .hgetall(key.as_str())
                 .map_err(|e| format!("{:?}", e))?;
-            let user: User = User::dehash(values);
+            let user: User = User::dehash(id, values);
             users.push(user);
         }
 
@@ -180,29 +177,31 @@ impl StorageImpl for StorageRedis {
             return Ok(None);
         }
 
-        let user: User = User::dehash(values);
+        let user: User = User::dehash(id.to_string(), values);
 
         Ok(Some(user))
     }
 
     fn get_user_by_username(&self, username: &str) -> Result<Option<User>, String> {
-        let mut connection = self.create_connection()?;
+        let mut conn_iter = self.create_connection()?;
+        let mut conn_lookup = self.create_connection()?;
         // If user doesn't exist, return None
 
         // Search for Hashmap where user:*.username == username
-        let keys: Iter<'_, String> = connection
+        let keys: Iter<'_, String> = conn_iter
             .scan_match("user:*")
             .map_err(|e| format!("{:?}", e))?;
 
         for key in keys {
-            let values: Vec<(String, String)> = connection
+            let id: String = key.split(":").last().unwrap().to_string();
+            let values: Vec<(String, String)> = conn_lookup
                 .hgetall(key.as_str())
                 .map_err(|e| format!("{:?}", e))?;
             if values.is_empty() {
                 continue;
             }
 
-            let user: User = User::dehash(values);
+            let user: User = User::dehash(id, values);
 
             if user.username == username {
                 return Ok(Some(user));
@@ -247,7 +246,7 @@ impl StorageImpl for StorageRedis {
 
         // Insert auth token
         connection
-            .hset_multiple(format!("authtoken:{}", id), values.as_slice())
+            .hset_multiple(format!("authtoken:{}", authtoken.id), values.as_slice())
             .map_err(|e| format!("{:?}", e))?;
 
         // Update user's last_login
@@ -272,7 +271,7 @@ impl StorageImpl for StorageRedis {
             return Ok(None);
         }
 
-        let authtoken: AuthToken = AuthToken::dehash(values);
+        let authtoken: AuthToken = AuthToken::dehash(id.to_string(), values);
 
         Ok(Some(authtoken))
     }
@@ -321,7 +320,7 @@ impl StorageImpl for StorageRedis {
         keys.sort();
 
         // QUICK PAGINATION (Skip offset & Limit)
-        if (filters.len() == 0) {
+        if filters.len() == 0 {
             keys = keys
                 .into_iter()
                 .skip(offset.unwrap_or(0) as usize)
@@ -330,11 +329,12 @@ impl StorageImpl for StorageRedis {
         }
 
         for key in keys {
+            let id: String = key.split(":").last().unwrap().to_string();
             // Fields are stored as HashMap
             let values = connection
                 .hgetall(key.as_str())
                 .map_err(|e| format!("{:?}", e))?;
-            let minion: Minion = Minion::dehash(values);
+            let minion: Minion = Minion::dehash(id, values);
             minions.push(minion);
         }
 
@@ -365,7 +365,7 @@ impl StorageImpl for StorageRedis {
             return Ok(None);
         }
 
-        let minion: Minion = Minion::dehash(values);
+        let minion: Minion = Minion::dehash(id.to_string(), values);
 
         Ok(Some(minion))
     }
@@ -417,8 +417,7 @@ impl StorageImpl for StorageRedis {
             conformity_error,
             last_updated_conformity,
             os_type,
-        }
-        .into();
+        };
 
         let values = minion.hash();
 
@@ -451,41 +450,47 @@ impl StorageImpl for StorageRedis {
     ) -> Result<String, String> {
         let mut connection = self.create_connection()?;
         let id = format!("evnt_{}", uuid::Uuid::new_v4());
-        let event: SQLEvent = Event {
+        let event = Event {
             id: id.clone(),
             timestamp,
             tag,
             data,
-        }
-        .into();
-        diesel::insert_into(events::table)
-            .values(&event)
-            .execute(&mut connection)
+        };
+
+        let values = event.hash();
+
+        connection
+            .hset_multiple(format!("event:{}", id), values.as_slice())
             .map_err(|e| format!("{:?}", e))?;
         Ok(id)
     }
 
     fn list_events(&self, limit: Option<i64>, offset: Option<i64>) -> Result<Vec<Event>, String> {
         let mut connection = self.create_connection()?;
-        let mut query = events::table.into_boxed();
-        query = query.order(events::timestamp.desc());
+        let mut events: Vec<Event> = Vec::new();
 
-        // Filtering
+        // Loop over event:*, which are HashMaps
+        let mut keys: Vec<String> = connection.keys("event:*").map_err(|e| format!("{:?}", e))?;
+        keys.sort();
 
-        // Pagination
-        query = query.limit(limit.unwrap_or(100));
-        query = query.offset(offset.unwrap_or(0));
+        // Skip offset & Limit
+        keys = keys
+            .into_iter()
+            .skip(offset.unwrap_or(0) as usize)
+            .take(limit.unwrap_or(100) as usize)
+            .collect();
 
-        // Query
-        query
-            .load::<SQLEvent>(&mut connection)
-            .map_err(|e| format!("{:?}", e))
-            .map(|sql_events| {
-                sql_events
-                    .into_iter()
-                    .map(|sql_event| sql_event.into())
-                    .collect()
-            })
+        for key in keys {
+            let id: String = key.split(":").last().unwrap().to_string();
+            // Fields are stored as HashMap
+            let values = connection
+                .hgetall(key.as_str())
+                .map_err(|e| format!("{:?}", e))?;
+            let event: Event = Event::dehash(id, values);
+            events.push(event);
+        }
+
+        Ok(events)
     }
 
     fn insert_job(
@@ -496,18 +501,18 @@ impl StorageImpl for StorageRedis {
         timestamp: chrono::NaiveDateTime,
     ) -> Result<(), String> {
         let mut connection = self.create_connection()?;
-        let id = format!("job_{}", uuid::Uuid::new_v4());
-        let job: SQLJob = Job {
-            id,
+        let job = Job {
+            id: jid.clone(),
             timestamp,
-            jid,
+            jid: jid.clone(), // TODO: remove, id = jid
             user,
             event_id,
-        }
-        .into();
-        diesel::insert_into(jobs::table)
-            .values(&job)
-            .execute(&mut connection)
+        };
+
+        let values = job.hash();
+
+        connection
+            .hset_multiple(format!("job:{}", jid), values.as_slice())
             .map_err(|e| format!("{:?}", e))?;
         Ok(())
     }
@@ -519,43 +524,49 @@ impl StorageImpl for StorageRedis {
         offset: Option<i64>,
     ) -> Result<Vec<Job>, String> {
         let mut connection = self.create_connection()?;
-        let mut query = jobs::table.into_boxed();
-        query = query.order(jobs::timestamp.desc());
+        let mut jobs: Vec<Job> = Vec::new();
 
-        // Filtering
+        // Loop over job:*, which are HashMaps
+        let mut keys: Vec<String> = connection.keys("job:*").map_err(|e| format!("{:?}", e))?;
+        keys.sort();
 
-        // Sorting
-        match sort.unwrap_or_else(|| "id.asc".to_string()).as_str() {
-            "id.asc" => query = query.order(jobs::id.asc()),
-            "id.desc" => query = query.order(jobs::id.desc()),
-            "timestamp.asc" => query = query.order(jobs::timestamp.asc()),
-            "timestamp.desc" => query = query.order(jobs::timestamp.desc()),
-            "jid.asc" => query = query.order(jobs::jid.asc()),
-            "jid.desc" => query = query.order(jobs::jid.desc()),
-            "user.asc" => query = query.order(jobs::user.asc()),
-            "user.desc" => query = query.order(jobs::user.desc()),
-            _ => return Err(String::from("Invalid sort parameter")),
+        // Skip offset & Limit
+        keys = keys
+            .into_iter()
+            .skip(offset.unwrap_or(0) as usize)
+            .take(limit.unwrap_or(100) as usize)
+            .collect();
+
+        for key in keys {
+            let id: String = key.split(":").last().unwrap().to_string();
+            // Fields are stored as HashMap
+            let values = connection
+                .hgetall(key.as_str())
+                .map_err(|e| format!("{:?}", e))?;
+            let job: Job = Job::dehash(id, values);
+            jobs.push(job);
         }
 
-        // Pagination
-        query = query.limit(limit.unwrap_or(100));
-        query = query.offset(offset.unwrap_or(0));
+        // Sorting
+        let sort = sort.unwrap_or("id.asc".to_string());
+        resalt_storage::sort_jobs(&mut jobs, &sort);
 
-        // Query
-        query
-            .load::<SQLJob>(&mut connection)
-            .map_err(|e| format!("{:?}", e))
-            .map(|sql_jobs| sql_jobs.into_iter().map(|sql_job| sql_job.into()).collect())
+        Ok(jobs)
     }
 
     fn get_job_by_jid(&self, jid: &str) -> Result<Option<Job>, String> {
         let mut connection = self.create_connection()?;
-        jobs::table
-            .filter(jobs::jid.eq(jid))
-            .first::<SQLJob>(&mut connection)
-            .optional()
-            .map_err(|e| format!("{:?}", e))
-            .map(|sql_job| sql_job.map(|sql_job| sql_job.into()))
+        // If job doesn't exist, return None
+        let values: Vec<(String, String)> = connection
+            .hgetall(format!("job:{}", jid))
+            .map_err(|e| format!("{:?}", e))?;
+        if values.is_empty() {
+            return Ok(None);
+        }
+
+        let job: Job = Job::dehash(jid.to_string(), values);
+
+        Ok(Some(job))
     }
 
     ///////////////////
@@ -572,30 +583,27 @@ impl StorageImpl for StorageRedis {
     ) -> Result<(), String> {
         let mut connection = self.create_connection()?;
         let id = format!("jret_{}", uuid::Uuid::new_v4());
-        let job_return: SQLJobReturn = JobReturn {
-            id,
+        let job_return = JobReturn {
+            id: id.clone(),
             timestamp,
             jid,
             job_id,
             event_id,
             minion_id,
-        }
-        .into();
-        diesel::insert_into(job_returns::table)
-            .values(&job_return)
-            .execute(&mut connection)
+        };
+
+        let values = job_return.hash();
+
+        connection
+            .hset_multiple(format!("job_return:{}", id), values.as_slice())
             .map_err(|e| format!("{:?}", e))?;
         Ok(())
     }
 
     fn get_job_returns_by_job(&self, job: &Job) -> Result<Vec<Event>, String> {
         let mut connection = self.create_connection()?;
-        events::table
-            .inner_join(job_returns::table.on(events::id.eq(job_returns::event_id)))
-            .filter(job_returns::job_id.eq(&job.id))
-            .load::<(SQLEvent, SQLJobReturn)>(&mut connection)
-            .map(|v: Vec<(SQLEvent, SQLJobReturn)>| v.into_iter().map(|(e, _)| e.into()).collect())
-            .map_err(|e| format!("{:?}", e))
+
+        todo!() // WTF??
     }
 
     /////////////////////////
@@ -605,16 +613,17 @@ impl StorageImpl for StorageRedis {
     fn create_permission_group(&self, name: &str) -> Result<String, String> {
         let mut connection = self.create_connection()?;
         let id = format!("pg_{}", uuid::Uuid::new_v4());
-        let permission_group: SQLPermissionGroup = PermissionGroup {
+        let permission_group = PermissionGroup {
             id: id.clone(),
             name: name.to_owned(),
             perms: "[]".to_string(),
             ldap_sync: None,
-        }
-        .into();
-        diesel::insert_into(permission_groups::table)
-            .values(&permission_group)
-            .execute(&mut connection)
+        };
+
+        let values = permission_group.hash();
+
+        connection
+            .hset_multiple(format!("permission_group:{}", id), values.as_slice())
             .map_err(|e| format!("{:?}", e))?;
         Ok(id)
     }
@@ -625,102 +634,118 @@ impl StorageImpl for StorageRedis {
         offset: Option<i64>,
     ) -> Result<Vec<PermissionGroup>, String> {
         let mut connection = self.create_connection()?;
-        let mut query = permission_groups::table.into_boxed();
-        query = query.order(permission_groups::name.asc());
+        let mut permission_groups: Vec<PermissionGroup> = Vec::new();
 
-        // Filtering
+        // Loop over permission_group:*, which are HashMaps
+        let mut keys: Vec<String> = connection
+            .keys("permission_group:*")
+            .map_err(|e| format!("{:?}", e))?;
+        keys.sort();
 
-        // Pagination
-        query = query.limit(limit.unwrap_or(100));
-        query = query.offset(offset.unwrap_or(0));
+        // Skip offset & Limit
+        keys = keys
+            .into_iter()
+            .skip(offset.unwrap_or(0) as usize)
+            .take(limit.unwrap_or(100) as usize)
+            .collect();
 
-        // Query
-        query
-            .load::<SQLPermissionGroup>(&mut connection)
-            .map_err(|e| format!("{:?}", e))
-            .map(|v| v.into_iter().map(|v| v.into()).collect())
+        for key in keys {
+            let id: String = key.split(":").last().unwrap().to_string();
+            // Fields are stored as HashMap
+            let values = connection
+                .hgetall(key.as_str())
+                .map_err(|e| format!("{:?}", e))?;
+            let permission_group: PermissionGroup = PermissionGroup::dehash(id, values);
+            permission_groups.push(permission_group);
+        }
+
+        Ok(permission_groups)
     }
 
     fn get_permission_group_by_id(&self, id: &str) -> Result<Option<PermissionGroup>, String> {
         let mut connection = self.create_connection()?;
-        permission_groups::table
-            .filter(permission_groups::id.eq(id))
-            .first::<SQLPermissionGroup>(&mut connection)
-            .optional()
-            .map_err(|e| format!("{:?}", e))
-            .map(|v| v.map(|v| v.into()))
-    }
+        // If permission_group doesn't exist, return None
+        let values: Vec<(String, String)> = connection
+            .hgetall(format!("permission_group:{}", id))
+            .map_err(|e| format!("{:?}", e))?;
+        if values.is_empty() {
+            return Ok(None);
+        }
 
-    fn get_permission_group_by_name(&self, name: &str) -> Result<Option<PermissionGroup>, String> {
-        let mut connection = self.create_connection()?;
-        permission_groups::table
-            .filter(permission_groups::name.eq(name))
-            .first::<SQLPermissionGroup>(&mut connection)
-            .optional()
-            .map_err(|e| format!("{:?}", e))
-            .map(|v| v.map(|v| v.into()))
+        let permission_group: PermissionGroup = PermissionGroup::dehash(id.to_string(), values);
+
+        Ok(Some(permission_group))
     }
 
     fn get_permission_group_by_ldap_sync(
         &self,
         ldap_sync: &str,
     ) -> Result<Option<PermissionGroup>, String> {
-        let mut connection = self.create_connection()?;
-        permission_groups::table
-            .filter(permission_groups::ldap_sync.eq(ldap_sync))
-            .first::<SQLPermissionGroup>(&mut connection)
-            .optional()
-            .map_err(|e| format!("{:?}", e))
-            .map(|v| v.map(|v| v.into()))
+        let mut conn_iter = self.create_connection()?;
+        let mut conn_lookup = self.create_connection()?;
+        // If permission_group doesn't exist, return None
+
+        // Search for Hashmap where permission_group:*.ldap_sync == ldap_sync
+        let keys: Iter<'_, String> = conn_iter
+            .scan_match("permission_group:*")
+            .map_err(|e| format!("{:?}", e))?;
+
+        for key in keys {
+            let id: String = key.split(":").last().unwrap().to_string();
+            let values: Vec<(String, String)> = conn_lookup
+                .hgetall(key.as_str())
+                .map_err(|e| format!("{:?}", e))?;
+            if values.is_empty() {
+                continue;
+            }
+
+            let permission_group: PermissionGroup = PermissionGroup::dehash(id, values);
+
+            if permission_group.ldap_sync == Some(ldap_sync.to_string()) {
+                return Ok(Some(permission_group));
+            }
+        }
+
+        Ok(None)
     }
 
     fn is_user_member_of_group(&self, user_id: &str, group_id: &str) -> Result<bool, String> {
         let mut connection = self.create_connection()?;
-        permission_group_users::table
-            .filter(permission_group_users::user_id.eq(user_id))
-            .filter(permission_group_users::group_id.eq(group_id))
-            .first::<SQLPermissionGroupUser>(&mut connection)
-            .optional()
-            .map_err(|e| format!("{:?}", e))
-            .map(|v| v.is_some())
+
+        // Search for existance of permission_group_user:<user_id>:<group_id>
+        let key = format!("permission_group_user:{}:{}", user_id, group_id);
+        let exists: bool = connection
+            .exists(key.as_str())
+            .map_err(|e| format!("{:?}", e))?;
+
+        Ok(exists)
     }
 
     fn update_permission_group(&self, permission_group: &PermissionGroup) -> Result<(), String> {
         let mut connection = self.create_connection()?;
-        diesel::update(permission_groups::table)
-            .filter(permission_groups::id.eq(&permission_group.id))
-            // set name, perms, ldap_sync
-            .set((
-                permission_groups::name.eq(&permission_group.name),
-                permission_groups::perms.eq(&permission_group.perms),
-                permission_groups::ldap_sync.eq(&permission_group.ldap_sync),
-            ))
-            .execute(&mut connection)
+        let values = permission_group.hash();
+        connection
+            .hset_multiple(
+                format!("permission_group:{}", permission_group.id),
+                values.as_slice(),
+            )
             .map_err(|e| format!("{:?}", e))?;
         Ok(())
     }
 
     fn delete_permission_group(&self, id: &str) -> Result<(), String> {
         let mut connection = self.create_connection()?;
-        diesel::delete(permission_groups::table)
-            .filter(permission_groups::id.eq(id))
-            .execute(&mut connection)
+        connection
+            .del(format!("permission_group:{}", id))
             .map_err(|e| format!("{:?}", e))?;
         Ok(())
     }
 
     fn insert_permission_group_user(&self, user_id: &str, group_id: &str) -> Result<(), String> {
         let mut connection = self.create_connection()?;
-        let id = format!("pgu_{}", uuid::Uuid::new_v4());
-        let permission_group_user: SQLPermissionGroupUser = PermissionGroupUser {
-            id,
-            user_id: user_id.to_string(),
-            group_id: group_id.to_string(),
-        }
-        .into();
-        diesel::insert_into(permission_group_users::table)
-            .values(&permission_group_user)
-            .execute(&mut connection)
+        let key = format!("permission_group_user:{}:{}", user_id, group_id);
+        connection
+            .set(key.as_str(), "1")
             .map_err(|e| format!("{:?}", e))?;
         Ok(())
     }
@@ -729,33 +754,62 @@ impl StorageImpl for StorageRedis {
         &self,
         user_id: &str,
     ) -> Result<Vec<PermissionGroup>, String> {
-        let mut connection = self.create_connection()?;
-        permission_groups::table
-            .inner_join(permission_group_users::table)
-            .filter(permission_group_users::user_id.eq(user_id))
-            .select(permission_groups::all_columns)
-            .load::<SQLPermissionGroup>(&mut connection)
-            .map_err(|e| format!("{:?}", e))
-            .map(|v| v.into_iter().map(|v| v.into()).collect())
+        let mut conn_iter = self.create_connection()?;
+        let mut conn_lookup = self.create_connection()?;
+        let mut permission_groups: Vec<PermissionGroup> = Vec::new();
+
+        // Search for Hashmap where permission_group_user:<user_id>:* exists
+        let keys: Iter<'_, String> = conn_iter
+            .scan_match(format!("permission_group_user:{}:*", user_id).as_str())
+            .map_err(|e| format!("{:?}", e))?;
+
+        for key in keys {
+            let group_id: String = key.split(":").last().unwrap().to_string();
+            let values: Vec<(String, String)> = conn_lookup
+                .hgetall(format!("permission_group:{}", group_id))
+                .map_err(|e| format!("{:?}", e))?;
+            if values.is_empty() {
+                continue;
+            }
+
+            let permission_group: PermissionGroup = PermissionGroup::dehash(group_id, values);
+            permission_groups.push(permission_group);
+        }
+
+        Ok(permission_groups)
     }
 
     fn list_users_by_permission_group_id(&self, group_id: &str) -> Result<Vec<User>, String> {
-        let mut connection = self.create_connection()?;
-        users::table
-            .inner_join(permission_group_users::table)
-            .filter(permission_group_users::group_id.eq(group_id))
-            .select(users::all_columns)
-            .load::<SQLUser>(&mut connection)
-            .map_err(|e| format!("{:?}", e))
-            .map(|v| v.into_iter().map(|v| v.into()).collect())
+        let mut conn_iter = self.create_connection()?;
+        let mut conn_lookup = self.create_connection()?;
+        let mut users: Vec<User> = Vec::new();
+
+        // Search for Hashmap where permission_group_user:*:<group_id> exists
+        let keys: Iter<'_, String> = conn_iter
+            .scan_match(format!("permission_group_user:*:{}", group_id).as_str())
+            .map_err(|e| format!("{:?}", e))?;
+
+        for key in keys {
+            let user_id: String = key.split(":").nth(1).unwrap().to_string();
+            let values: Vec<(String, String)> = conn_lookup
+                .hgetall(format!("user:{}", user_id))
+                .map_err(|e| format!("{:?}", e))?;
+            if values.is_empty() {
+                continue;
+            }
+
+            let user: User = User::dehash(user_id, values);
+            users.push(user);
+        }
+
+        Ok(users)
     }
 
     fn delete_permission_group_user(&self, user_id: &str, group_id: &str) -> Result<(), String> {
         let mut connection = self.create_connection()?;
-        diesel::delete(permission_group_users::table)
-            .filter(permission_group_users::user_id.eq(user_id))
-            .filter(permission_group_users::group_id.eq(group_id))
-            .execute(&mut connection)
+        let key = format!("permission_group_user:{}:{}", user_id, group_id);
+        connection
+            .del(key.as_str())
             .map_err(|e| format!("{:?}", e))?;
         Ok(())
     }
@@ -767,55 +821,75 @@ impl StorageImpl for StorageRedis {
     fn insert_minion_preset(&self, name: &str, filter: &str) -> Result<String, String> {
         let mut connection = self.create_connection()?;
         let id = format!("pre_{}", uuid::Uuid::new_v4());
-        let minion_preset: SQLMinionPreset = MinionPreset {
+        let minion_preset = MinionPreset {
             id: id.clone(),
             name: name.to_string(),
             filter: filter.to_string(),
-        }
-        .into();
-        diesel::insert_into(minion_presets::table)
-            .values(&minion_preset)
-            .execute(&mut connection)
+        };
+
+        let values = minion_preset.hash();
+
+        connection
+            .hset_multiple(format!("minion_preset:{}", id), values.as_slice())
             .map_err(|e| format!("{:?}", e))?;
+
         Ok(id)
     }
 
     fn list_minion_presets(&self) -> Result<Vec<MinionPreset>, String> {
         let mut connection = self.create_connection()?;
-        let query = minion_presets::table.into_boxed();
-        query
-            .order(minion_presets::name.asc())
-            .load::<SQLMinionPreset>(&mut connection)
-            .map_err(|e| format!("{:?}", e))
-            .map(|v| v.into_iter().map(|v| v.into()).collect())
+        let mut minion_presets: Vec<MinionPreset> = Vec::new();
+
+        // Loop over minion_preset:*, which are HashMaps
+        let mut keys: Vec<String> = connection
+            .keys("minion_preset:*")
+            .map_err(|e| format!("{:?}", e))?;
+        keys.sort();
+
+        for key in keys {
+            let id: String = key.split(":").last().unwrap().to_string();
+            // Fields are stored as HashMap
+            let values = connection
+                .hgetall(key.as_str())
+                .map_err(|e| format!("{:?}", e))?;
+            let minion_preset: MinionPreset = MinionPreset::dehash(id, values);
+            minion_presets.push(minion_preset);
+        }
+
+        Ok(minion_presets)
     }
 
     fn get_minion_preset_by_id(&self, id: &str) -> Result<Option<MinionPreset>, String> {
         let mut connection = self.create_connection()?;
-        minion_presets::table
-            .filter(minion_presets::id.eq(id))
-            .first::<SQLMinionPreset>(&mut connection)
-            .optional()
-            .map_err(|e| format!("{:?}", e))
-            .map(|v| v.map(|v| v.into()))
+        // If minion_preset doesn't exist, return None
+        let values: Vec<(String, String)> = connection
+            .hgetall(format!("minion_preset:{}", id))
+            .map_err(|e| format!("{:?}", e))?;
+        if values.is_empty() {
+            return Ok(None);
+        }
+
+        let minion_preset: MinionPreset = MinionPreset::dehash(id.to_string(), values);
+
+        Ok(Some(minion_preset))
     }
 
     fn update_minion_preset(&self, minion_preset: &MinionPreset) -> Result<(), String> {
         let mut connection = self.create_connection()?;
-        let minion_preset: SQLMinionPreset = minion_preset.clone().into();
-        diesel::update(minion_presets::table)
-            .filter(minion_presets::id.eq(&minion_preset.id))
-            .set(&minion_preset)
-            .execute(&mut connection)
+        let values = minion_preset.hash();
+        connection
+            .hset_multiple(
+                format!("minion_preset:{}", minion_preset.id),
+                values.as_slice(),
+            )
             .map_err(|e| format!("{:?}", e))?;
         Ok(())
     }
 
     fn delete_minion_preset(&self, id: &str) -> Result<(), String> {
         let mut connection = self.create_connection()?;
-        diesel::delete(minion_presets::table)
-            .filter(minion_presets::id.eq(id))
-            .execute(&mut connection)
+        connection
+            .del(format!("minion_preset:{}", id))
             .map_err(|e| format!("{:?}", e))?;
         Ok(())
     }

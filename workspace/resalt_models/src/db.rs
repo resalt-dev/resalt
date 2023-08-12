@@ -19,7 +19,6 @@ pub struct AuthToken {
 impl AuthToken {
     pub fn hash(&self) -> Vec<(&str, String)> {
         let mut values = Vec::from([
-            ("id", self.id.clone()),
             ("user_id", self.user_id.clone()),
             (
                 "timestamp",
@@ -32,16 +31,15 @@ impl AuthToken {
         values
     }
 
-    pub fn dehash(values: Vec<(String, String)>) -> Self {
+    pub fn dehash(id: String, values: Vec<(String, String)>) -> Self {
         let mut auth_token = AuthToken {
-            id: "".to_string(),
+            id,
             user_id: "".to_string(),
-            timestamp: chrono::NaiveDateTime::default(),
+            timestamp: ResaltTime::default().into(),
             salt_token: None,
         };
         for (key, value) in values {
             match key.as_str() {
-                "id" => auth_token.id = value,
                 "user_id" => auth_token.user_id = value,
                 "timestamp" => {
                     auth_token.timestamp =
@@ -63,6 +61,46 @@ pub struct Event {
     pub data: String,
 }
 
+impl Event {
+    pub fn hash(&self) -> Vec<(&str, String)> {
+        let values = Vec::from([
+            (
+                "timestamp",
+                self.timestamp
+                    .format("%Y-%m-%d %H:%M:%S")
+                    .to_string()
+                    .into(),
+            ),
+            ("tag", self.tag.clone()),
+            ("data", self.data.clone()),
+        ]);
+        values
+    }
+
+    pub fn dehash(id: String, values: Vec<(String, String)>) -> Self {
+        let mut event = Event {
+            id,
+            timestamp: ResaltTime::default(),
+            tag: "".to_string(),
+            data: "".to_string(),
+        };
+        for (key, value) in values {
+            match key.as_str() {
+                "timestamp" => {
+                    event.timestamp =
+                        chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S")
+                            .unwrap()
+                            .into()
+                }
+                "tag" => event.tag = value,
+                "data" => event.data = value,
+                _ => (),
+            }
+        }
+        event
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Job {
     pub id: String,
@@ -71,6 +109,49 @@ pub struct Job {
     pub user: Option<String>,
     #[serde(rename = "eventId")]
     pub event_id: Option<String>,
+}
+
+impl Job {
+    pub fn hash(&self) -> Vec<(&str, String)> {
+        let mut values = Vec::from([(
+            "timestamp",
+            self.timestamp
+                .format("%Y-%m-%d %H:%M:%S")
+                .to_string()
+                .into(),
+        )]);
+        if let Some(user) = &self.user {
+            values.push(("user", user.clone()));
+        }
+        if let Some(event_id) = &self.event_id {
+            values.push(("event_id", event_id.clone()));
+        }
+        values
+    }
+
+    pub fn dehash(id: String, values: Vec<(String, String)>) -> Self {
+        let mut job = Job {
+            id: id.clone(),
+            timestamp: ResaltTime::default(),
+            jid: id,
+            user: None,
+            event_id: None,
+        };
+        for (key, value) in values {
+            match key.as_str() {
+                "timestamp" => {
+                    job.timestamp =
+                        chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S")
+                            .unwrap()
+                            .into()
+                }
+                "user" => job.user = Some(value),
+                "event_id" => job.event_id = Some(value),
+                _ => (),
+            }
+        }
+        job
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -84,6 +165,49 @@ pub struct JobReturn {
     pub event_id: String,
     #[serde(rename = "minionId")]
     pub minion_id: String,
+}
+
+impl JobReturn {
+    pub fn hash(&self) -> Vec<(&str, String)> {
+        let values = Vec::from([
+            (
+                "timestamp",
+                self.timestamp.format("%Y-%m-%d %H:%M:%S").to_string(),
+            ),
+            ("jid", self.jid.clone()),
+            ("job_id", self.job_id.clone()),
+            ("event_id", self.event_id.clone()),
+            ("minion_id", self.minion_id.clone()),
+        ]);
+        values
+    }
+
+    pub fn dehash(id: String, values: Vec<(String, String)>) -> Self {
+        let mut job_return = JobReturn {
+            id,
+            timestamp: ResaltTime::default(),
+            jid: "".to_string(),
+            job_id: "".to_string(),
+            event_id: "".to_string(),
+            minion_id: "".to_string(),
+        };
+        for (key, value) in values {
+            match key.as_str() {
+                "timestamp" => {
+                    job_return.timestamp =
+                        chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S")
+                            .unwrap()
+                            .into()
+                }
+                "jid" => job_return.jid = value,
+                "job_id" => job_return.job_id = value,
+                "event_id" => job_return.event_id = value,
+                "minion_id" => job_return.minion_id = value,
+                _ => (),
+            }
+        }
+        job_return
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -115,13 +239,10 @@ pub struct Minion {
 
 impl Minion {
     pub fn hash(&self) -> Vec<(&str, String)> {
-        let mut values = Vec::from([
-            ("id", self.id.clone()),
-            (
-                "last_seen",
-                self.last_seen.format("%Y-%m-%d %H:%M:%S").to_string(),
-            ),
-        ]);
+        let mut values = Vec::from([(
+            "last_seen",
+            self.last_seen.format("%Y-%m-%d %H:%M:%S").to_string(),
+        )]);
         if let Some(grains) = &self.grains {
             values.push(("grains", grains.clone()));
         }
@@ -175,10 +296,10 @@ impl Minion {
         values
     }
 
-    pub fn dehash(values: Vec<(String, String)>) -> Self {
+    pub fn dehash(id: String, values: Vec<(String, String)>) -> Self {
         let mut minion = Minion {
-            id: "".to_string(),
-            last_seen: chrono::NaiveDateTime::default(),
+            id,
+            last_seen: ResaltTime::default(),
             grains: None,
             pillars: None,
             pkgs: None,
@@ -194,27 +315,34 @@ impl Minion {
         };
         for (key, value) in values {
             match key.as_str() {
-                "id" => minion.id = value,
                 "last_seen" => {
                     minion.last_seen =
-                        chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap()
+                        chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S")
+                            .unwrap()
+                            .into()
                 }
                 "grains" => minion.grains = Some(value),
                 "pillars" => minion.pillars = Some(value),
                 "pkgs" => minion.pkgs = Some(value),
                 "last_updated_grains" => {
                     minion.last_updated_grains = Some(
-                        chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap(),
+                        chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S")
+                            .unwrap()
+                            .into(),
                     )
                 }
                 "last_updated_pillars" => {
                     minion.last_updated_pillars = Some(
-                        chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap(),
+                        chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S")
+                            .unwrap()
+                            .into(),
                     )
                 }
                 "last_updated_pkgs" => {
                     minion.last_updated_pkgs = Some(
-                        chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap(),
+                        chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S")
+                            .unwrap()
+                            .into(),
                     )
                 }
                 "conformity" => minion.conformity = Some(value),
@@ -227,7 +355,9 @@ impl Minion {
                 "conformity_error" => minion.conformity_error = Some(value.parse::<i32>().unwrap()),
                 "last_updated_conformity" => {
                     minion.last_updated_conformity = Some(
-                        chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap(),
+                        chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S")
+                            .unwrap()
+                            .into(),
                     )
                 }
                 "os_type" => minion.os_type = Some(value),
@@ -308,7 +438,6 @@ impl User {
 
     pub fn hash(&self) -> Vec<(&str, String)> {
         let mut values = Vec::from([
-            ("id", self.id.clone()),
             ("username", self.username.clone()),
             ("perms", "[]".to_owned()),
         ]);
@@ -330,9 +459,9 @@ impl User {
         values
     }
 
-    pub fn dehash(values: Vec<(String, String)>) -> Self {
+    pub fn dehash(id: String, values: Vec<(String, String)>) -> Self {
         let mut user = User {
-            id: "".to_string(),
+            id,
             username: "".to_string(),
             password: None,
             perms: "[]".to_string(),
@@ -342,13 +471,14 @@ impl User {
         };
         for (key, value) in values {
             match key.as_str() {
-                "id" => user.id = value,
                 "username" => user.username = value,
                 "password" => user.password = Some(value),
                 "perms" => user.perms = value,
                 "last_login" => {
                     user.last_login = Some(
-                        chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap(),
+                        chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S")
+                            .unwrap()
+                            .into(),
                     )
                 }
                 "email" => user.email = Some(value),
@@ -386,6 +516,32 @@ impl PermissionGroup {
             })).collect::<Vec<Value>>(),
         })
     }
+
+    pub fn hash(&self) -> Vec<(&str, String)> {
+        let mut values = Vec::from([("name", self.name.clone()), ("perms", "[]".to_owned())]);
+        if let Some(ldap_sync) = &self.ldap_sync {
+            values.push(("ldap_sync", ldap_sync.clone()));
+        }
+        values
+    }
+
+    pub fn dehash(id: String, values: Vec<(String, String)>) -> Self {
+        let mut permission_group = PermissionGroup {
+            id,
+            name: "".to_string(),
+            perms: "[]".to_string(),
+            ldap_sync: None,
+        };
+        for (key, value) in values {
+            match key.as_str() {
+                "name" => permission_group.name = value,
+                "perms" => permission_group.perms = value,
+                "ldap_sync" => permission_group.ldap_sync = Some(value),
+                _ => (),
+            }
+        }
+        permission_group
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -400,4 +556,27 @@ pub struct MinionPreset {
     pub id: String,
     pub name: String,
     pub filter: String,
+}
+
+impl MinionPreset {
+    pub fn hash(&self) -> Vec<(&str, String)> {
+        let values = Vec::from([("name", self.name.clone()), ("filter", self.filter.clone())]);
+        values
+    }
+
+    pub fn dehash(id: String, values: Vec<(String, String)>) -> Self {
+        let mut minion_preset = MinionPreset {
+            id,
+            name: "".to_string(),
+            filter: "".to_string(),
+        };
+        for (key, value) in values {
+            match key.as_str() {
+                "name" => minion_preset.name = value,
+                "filter" => minion_preset.filter = value,
+                _ => (),
+            }
+        }
+        minion_preset
+    }
 }

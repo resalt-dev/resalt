@@ -47,6 +47,19 @@ pub fn sort_minions(minions: &mut Vec<Minion>, sort: &str) {
     })
 }
 
+pub fn sort_jobs(jobs: &mut Vec<Job>, sort: &str) {
+    jobs.sort_by(|a, b| match sort {
+        "id.asc" => a.id.cmp(&b.id),
+        "id.desc" => b.id.cmp(&a.id),
+        "timestamp.asc" => a.timestamp.cmp(&b.timestamp),
+        "timestamp.desc" => b.timestamp.cmp(&a.timestamp),
+        "jid.asc" => a.jid.cmp(&b.jid),
+        "jid.desc" => b.jid.cmp(&a.jid),
+        "user.asc" => a.user.cmp(&b.user),
+        "user.desc" => b.user.cmp(&a.user),
+        _ => std::cmp::Ordering::Equal,
+    })
+}
 fn value_to_simple_str(value: &Value) -> String {
     match value {
         Value::String(s) => strip_quotes!(s.to_string()),
@@ -92,8 +105,8 @@ fn filter_i32_logic(minion_value: i32, filter_value: &str, operand: &FilterOpera
 }
 
 fn filter_timestamp_logic(
-    minion_timestamp: chrono::NaiveDateTime,
-    filter_timestamp: chrono::NaiveDateTime,
+    minion_timestamp: ResaltTime,
+    filter_timestamp: ResaltTime,
     operand: &FilterOperand,
 ) -> bool {
     let minion_str = minion_timestamp.format("%Y-%m-%d %H:%M:%S").to_string();
@@ -132,7 +145,7 @@ fn filter_minion(minion: &Minion, filters: &[Filter]) -> bool {
                 "last_seen" => {
                     if !filter_timestamp_logic(
                         minion.last_seen,
-                        chrono::NaiveDateTime::parse_from_str(&filter.value, "%Y-%m-%d %H:%M:%S")
+                        ResaltTime::parse_from_str(&filter.value, "%Y-%m-%d %H:%M:%S")
                             .unwrap_or_default(),
                         &filter.operand,
                     ) {

@@ -11,7 +11,9 @@ use crate::StorageStatus;
 
 pub trait StorageImpl: Send {
     fn init(&self) {
-        // Create default user
+        //
+        // Create default admin user
+        //
         if self.get_user_by_username("admin").unwrap().is_none() {
             // Generate random password instead of using default
             let random_password = rand::thread_rng()
@@ -53,43 +55,50 @@ pub trait StorageImpl: Send {
             );
             warn!("============================================================");
         }
-        // Create default permission group
-        if self
-            .get_permission_group_by_name("$superadmins")
-            .unwrap()
-            .is_none()
-        {
-            self.create_permission_group(
-                None,
-                "$superadmins",
-                Some(
-                    json!([
-                        ".*".to_string(),
-                        "@runner".to_string(),
-                        "@wheel".to_string(),
-                        {
-                            "@resalt": [
-                                "admin.superadmin".to_string(),
-                            ]
-                        }
-                    ])
-                    .to_string(),
-                ),
-            )
-            .unwrap();
+
+        //
+        // Create default permission admin group
+        //
+        // 1. Get all groups
+        let groups = self.list_permission_groups(None, None).unwrap();
+        // 2. Check if $superadmins exists
+        let mut superadmins_group_id = None;
+        for group in groups {
+            if group.name == "$superadmins" {
+                superadmins_group_id = Some(group.id);
+                break;
+            }
+        }
+        // 3. Create $superadmins if not exists
+        if let None = superadmins_group_id {
+            superadmins_group_id = Some(
+                self.create_permission_group(
+                    None,
+                    "$superadmins",
+                    Some(
+                        json!([
+                            ".*".to_string(),
+                            "@runner".to_string(),
+                            "@wheel".to_string(),
+                            {
+                                "@resalt": [
+                                    "admin.superadmin".to_string(),
+                                ]
+                            }
+                        ])
+                        .to_string(),
+                    ),
+                )
+                .unwrap(),
+            );
         }
         // Add admin to $superadmins if not member
-        let superadmins_group_id = self
-            .get_permission_group_by_name("$superadmins")
-            .unwrap()
-            .unwrap()
-            .id;
         let admin_user_id = self.get_user_by_username("admin").unwrap().unwrap().id;
         if !self
-            .is_user_member_of_group(&admin_user_id, &superadmins_group_id)
+            .is_user_member_of_group(&admin_user_id, &superadmins_group_id.clone().unwrap())
             .unwrap()
         {
-            self.insert_permission_group_user(&admin_user_id, &superadmins_group_id)
+            self.insert_permission_group_user(&admin_user_id, &superadmins_group_id.unwrap())
                 .unwrap();
         }
     }
@@ -373,8 +382,6 @@ pub trait StorageImpl: Send {
     ) -> Result<Vec<PermissionGroup>, String>;
 
     fn get_permission_group_by_id(&self, id: &str) -> Result<Option<PermissionGroup>, String>;
-
-    fn get_permission_group_by_name(&self, name: &str) -> Result<Option<PermissionGroup>, String>;
 
     fn get_permission_group_by_ldap_sync(
         &self,
