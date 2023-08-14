@@ -749,6 +749,20 @@ impl StorageImpl for StorageMySQL {
             })
     }
 
+    fn get_event_by_id(&self, id: &str) -> Result<Option<Event>, String> {
+        let mut connection = self.create_connection()?;
+        events::table
+            .filter(events::id.eq(id))
+            .first::<SQLEvent>(&mut connection)
+            .optional()
+            .map_err(|e| format!("{:?}", e))
+            .map(|sql_job| sql_job.map(|sql_job| sql_job.into()))
+    }
+
+    ////////////
+    /// Jobs ///
+    ////////////
+
     fn insert_job(
         &self,
         jid: String,
@@ -849,13 +863,13 @@ impl StorageImpl for StorageMySQL {
         Ok(())
     }
 
-    fn get_job_returns_by_job(&self, job: &Job) -> Result<Vec<Event>, String> {
+    fn get_job_returns_by_job(&self, job: &Job) -> Result<Vec<JobReturn>, String> {
         let mut connection = self.create_connection()?;
-        events::table
-            .inner_join(job_returns::table.on(events::id.eq(job_returns::event_id)))
+        job_returns::table
+            .inner_join(events::table.on(events::id.eq(job_returns::event_id)))
             .filter(job_returns::job_id.eq(&job.id))
-            .load::<(SQLEvent, SQLJobReturn)>(&mut connection)
-            .map(|v: Vec<(SQLEvent, SQLJobReturn)>| v.into_iter().map(|(e, _)| e.into()).collect())
+            .load::<(SQLJobReturn, SQLEvent)>(&mut connection)
+            .map(|v: Vec<(SQLJobReturn, SQLEvent)>| v.into_iter().map(|(e, _)| e.into()).collect())
             .map_err(|e| format!("{:?}", e))
     }
 

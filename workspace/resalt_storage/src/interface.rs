@@ -340,6 +340,8 @@ pub trait StorageImpl: Send {
 
     fn list_events(&self, limit: Option<i64>, offset: Option<i64>) -> Result<Vec<Event>, String>;
 
+    fn get_event_by_id(&self, id: &str) -> Result<Option<Event>, String>;
+
     fn insert_job(
         &self,
         jid: String,
@@ -366,7 +368,7 @@ pub trait StorageImpl: Send {
         timestamp: NaiveDateTime,
     ) -> Result<(), String>;
 
-    fn get_job_returns_by_job(&self, job: &Job) -> Result<Vec<Event>, String>;
+    fn get_job_returns_by_job(&self, job: &Job) -> Result<Vec<JobReturn>, String>;
 
     fn create_permission_group(
         &self,

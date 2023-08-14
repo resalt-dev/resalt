@@ -1,22 +1,17 @@
-extern crate r2d2_redis;
-
-use r2d2_redis::r2d2::Pool;
-use r2d2_redis::r2d2::PooledConnection;
-use r2d2_redis::redis::Commands;
-use r2d2_redis::redis::Iter;
-use r2d2_redis::{r2d2, RedisConnectionManager};
+use r2d2::{Pool, PooledConnection};
+use redis::{Client, Commands, Iter};
 use resalt_models::*;
 use resalt_storage::{StorageImpl, StorageStatus};
 
 #[derive(Clone)]
 pub struct StorageRedis {
-    pool: Pool<RedisConnectionManager>,
+    pool: Pool<Client>,
 }
 
 impl StorageRedis {
     pub async fn connect(database_url: &str) -> Result<Self, String> {
-        let manager = RedisConnectionManager::new(database_url).unwrap();
-        let pool = r2d2::Pool::builder().build(manager);
+        let client = Client::open(database_url).unwrap();
+        let pool = Pool::builder().build(client);
 
         match pool {
             Ok(pool) => {
@@ -28,7 +23,7 @@ impl StorageRedis {
         }
     }
 
-    fn create_connection(&self) -> Result<PooledConnection<RedisConnectionManager>, String> {
+    fn create_connection(&self) -> Result<PooledConnection<Client>, String> {
         match self.pool.get() {
             Ok(conn) => Ok(conn),
             Err(e) => Err(format!("{:?}", e)),
@@ -493,6 +488,25 @@ impl StorageImpl for StorageRedis {
         Ok(events)
     }
 
+    fn get_event_by_id(&self, id: &str) -> Result<Option<Event>, String> {
+        let mut connection = self.create_connection()?;
+        // If event doesn't exist, return None
+        let values: Vec<(String, String)> = connection
+            .hgetall(format!("event:{}", id))
+            .map_err(|e| format!("{:?}", e))?;
+        if values.is_empty() {
+            return Ok(None);
+        }
+
+        let event: Event = Event::dehash(id.to_string(), values);
+
+        Ok(Some(event))
+    }
+
+    ////////////
+    /// Jobs ///
+    ////////////
+
     fn insert_job(
         &self,
         jid: String,
@@ -584,9 +598,9 @@ impl StorageImpl for StorageRedis {
         let mut connection = self.create_connection()?;
         let id = format!("jret_{}", uuid::Uuid::new_v4());
         let job_return = JobReturn {
-            id: id.clone(),
+            id: "".to_string(),
             timestamp,
-            jid,
+            jid: jid.clone(),
             job_id,
             event_id,
             minion_id,
@@ -595,15 +609,32 @@ impl StorageImpl for StorageRedis {
         let values = job_return.hash();
 
         connection
-            .hset_multiple(format!("job_return:{}", id), values.as_slice())
+            .hset_multiple(format!("job_return:{}:{}", jid, id), values.as_slice())
             .map_err(|e| format!("{:?}", e))?;
         Ok(())
     }
 
-    fn get_job_returns_by_job(&self, job: &Job) -> Result<Vec<Event>, String> {
+    fn get_job_returns_by_job(&self, job: &Job) -> Result<Vec<JobReturn>, String> {
         let mut connection = self.create_connection()?;
+        let mut job_returns: Vec<JobReturn> = Vec::new();
 
-        todo!() // WTF??
+        // Loop over job_return:<jid>:*
+        let mut keys: Vec<String> = connection
+            .keys(format!("job_return:{}:*", job.id))
+            .map_err(|e| format!("{:?}", e))?;
+        keys.sort();
+
+        for key in keys {
+            let id: String = key.split(":").last().unwrap().to_string();
+            // Fields are stored as HashMap
+            let values = connection
+                .hgetall(key.as_str())
+                .map_err(|e| format!("{:?}", e))?;
+            let job_return: JobReturn = JobReturn::dehash(id, values);
+            job_returns.push(job_return);
+        }
+
+        Ok(job_returns)
     }
 
     /////////////////////////

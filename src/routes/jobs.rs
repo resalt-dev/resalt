@@ -187,7 +187,7 @@ pub struct JobGetInfo {
 #[derive(Serialize)]
 pub struct JobGetResponse {
     job: Job,
-    returns: Vec<Event>,
+    returns: Vec<JobReturn>,
 }
 
 pub async fn route_job_get(
