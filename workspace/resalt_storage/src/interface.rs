@@ -32,18 +32,17 @@ pub trait StorageImpl: Send {
                 )
                 .unwrap();
 
-            // Give permissions to admmin
-            let mut perms: Value = json!([
+            // Give permissions to admin
+            let perms: Value = json!([
                 ".*".to_string(),
                 "@runner".to_string(),
                 "@wheel".to_string(),
+                {
+                    "@resalt": [
+                        "admin.superadmin".to_string(),
+                    ],
+                },
             ]);
-            // Add object permission. The array is of both strings and objects...
-            perms.as_array_mut().unwrap().push(json!({
-                "@resalt": [
-                    "admin.superadmin".to_string(),
-                ],
-            }));
             user.perms = serde_json::to_string(&perms).unwrap();
             self.update_user(&user).unwrap();
 

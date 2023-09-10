@@ -7,6 +7,7 @@ use resalt_pipeline::PipelineServer;
 use resalt_salt::{SaltAPI, SaltEventListener, SaltEventListenerStatus};
 use resalt_storage::{StorageCloneWrapper, StorageImpl};
 use resalt_storage_mysql::StorageMySQL;
+use resalt_storage_redis::StorageRedis;
 use routes::*;
 use tokio::task;
 
@@ -35,13 +36,17 @@ async fn init_db() -> Box<dyn StorageImpl> {
         }
         "redis" => {
             let database_url = format!(
-                "redis://{}:{}/{}",
+                "redis://{}:{}@{}:{}/{}",
+                SConfig::database_username(),
+                SConfig::database_password(),
                 SConfig::database_host(),
                 SConfig::database_port(),
                 SConfig::database_database()
             );
+
+            println!("Connecting to {}", &database_url);
             Box::new(
-                resalt_storage_redis::StorageRedis::connect(&database_url)
+                StorageRedis::connect(&database_url)
                     .await
                     .unwrap_or_else(|_| panic!("Error connecting to {}", &database_url)),
             )

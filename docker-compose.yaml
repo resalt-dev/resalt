@@ -2,16 +2,10 @@ version: '3'
 
 services:
   db:
-    image: mariadb
-    environment:
-      MYSQL_DATABASE: salt
-      MYSQL_ROOT_PASSWORD: supersecretpassword
-      MYSQL_USER: resalt
-      MYSQL_PASSWORD: resalt
-    volumes:
-      - ./docker/sql/mysql:/docker-entrypoint-initdb.d
+    image: redis:7-alpine
+    command: redis-server --save 60 1 --requirepass resalt
     ports:
-      - "3306:3306"
+      - "6379:6379"
 
   master:
     image: saltstack/salt:3006.3
@@ -75,6 +69,7 @@ services:
       RESALT_AUTH_LDAP_USER_FILTER: ${RESALT_AUTH_LDAP_USER_FILTER:-}
       RESALT_AUTH_LDAP_USER_ATTRIBUTE: ${RESALT_AUTH_LDAP_USER_ATTRIBUTE:-}
       RESALT_AUTH_SESSION_LIFESPAN: ${RESALT_AUTH_SESSION_LIFESPAN:-}
+      RESALT_DATABASE_TYPE: ${RESALT_DATABASE_TYPE:-}
       RESALT_DATABASE_USERNAME: ${RESALT_DATABASE_USERNAME:-}
       RESALT_DATABASE_PASSWORD: ${RESALT_DATABASE_PASSWORD:-}
       RESALT_DATABASE_PASSWORDFILE: ${RESALT_DATABASE_PASSWORDFILE:-}
