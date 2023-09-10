@@ -439,7 +439,7 @@ impl User {
     pub fn hash(&self) -> Vec<(&str, String)> {
         let mut values = Vec::from([
             ("username", self.username.clone()),
-            ("perms", "[]".to_owned()),
+            ("perms", self.perms.clone()),
         ]);
         if let Some(password) = &self.password {
             values.push(("password", password.clone()));
@@ -518,7 +518,7 @@ impl PermissionGroup {
     }
 
     pub fn hash(&self) -> Vec<(&str, String)> {
-        let mut values = Vec::from([("name", self.name.clone()), ("perms", "[]".to_owned())]);
+        let mut values = Vec::from([("name", self.name.clone()), ("perms", self.perms.clone())]);
         if let Some(ldap_sync) = &self.ldap_sync {
             values.push(("ldap_sync", ldap_sync.clone()));
         }
