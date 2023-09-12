@@ -4,11 +4,8 @@
 node_modules
 
 # Svelte
-/build/assets
-/build/*.html
-/build/*/*
-/.svelte-kit
-/package
+**/build
+.svelte-kit
 
 # Env
 .env
