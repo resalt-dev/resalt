@@ -5,7 +5,6 @@
 	import { json } from '@codemirror/lang-json';
 	import { ensureSyntaxTree, foldAll } from '@codemirror/language';
 	import { EditorState } from '@codemirror/state';
-	import type { EditorViewConfig } from '@codemirror/view';
 	import { EditorView, basicSetup } from 'codemirror';
 	import { onDestroy, onMount } from 'svelte';
 	import type { Unsubscriber } from 'svelte/store';
@@ -64,9 +63,9 @@
 				json(),
 			],
 		});
-		cm = new EditorView({ state } as unknown as EditorViewConfig);
+		cm = new EditorView({ state, parent: editorElement });
 		editorElement.replaceChildren(cm.dom);
-		let tree = ensureSyntaxTree(state, state.doc.length, 5000);
+		let tree = ensureSyntaxTree(state, state.doc.length, 500099);
 		if (tree !== null) {
 			console.log(tree);
 		} else {

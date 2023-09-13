@@ -38,12 +38,13 @@ services:
   frontend:
     image: oven/bun:1.0
     volumes:
-      - ./frontend/src:/usr/src/app/src:ro
-      - ./frontend/static:/usr/src/app/static:ro
-      - ./frontend/package.json:/usr/src/app/package.json:ro
-      - ./frontend/svelte.config.js:/usr/src/app/svelte.config.js:ro
-      - ./frontend/tsconfig.json:/usr/src/app/tsconfig.json:ro
-      - ./frontend/vite.config.ts:/usr/src/app/vite.config.ts:ro
+      - ./frontend/.svelte-kit/tsconfig.json:/usr/src/app/.svelte-kit/tsconfig.json
+      - ./frontend/src:/usr/src/app/src
+      - ./frontend/static:/usr/src/app/static
+      - ./frontend/package.json:/usr/src/app/package.json
+      - ./frontend/svelte.config.js:/usr/src/app/svelte.config.js
+      - ./frontend/tsconfig.json:/usr/src/app/tsconfig.json
+      - ./frontend/vite.config.ts:/usr/src/app/vite.config.ts
     command: /bin/sh -c "cd /usr/src/app && bun install && bun run dev"
     ports:
       - "5555:5555"

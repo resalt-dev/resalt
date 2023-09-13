@@ -5,7 +5,9 @@ node_modules
 
 # Svelte
 **/build
-.svelte-kit
+.svelte-kit/ambient.d.ts
+.svelte-kit/generated
+.svelte-kit/types
 
 # Env
 .env

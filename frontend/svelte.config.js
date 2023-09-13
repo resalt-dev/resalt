@@ -1,4 +1,4 @@
-import adapter from '@sveltejs/adapter-static';
+import adapter from 'svelte-adapter-bun';
 import { vitePreprocess } from '@sveltejs/kit/vite';
 import path from 'path';
 

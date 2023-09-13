@@ -17,7 +17,8 @@
 			"$component/*": ["src/components/*"],
 			"$model": ["src/models"],
 			"$model/*": ["src/models/*"]
-		}
+		},
+		"types": ["bun-types"]
 	}
 	// Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias
 }
