@@ -1,33 +1,18 @@
 <script lang="ts">
-	import { resaltDark } from '$lib/codemirror-resalt-theme-dark';
-	import { resaltLight } from '$lib/codemirror-resalt-theme-light';
-	import { theme } from '$lib/stores';
-	import { json } from '@codemirror/lang-json';
-	import { ensureSyntaxTree, foldAll } from '@codemirror/language';
-	import { EditorState } from '@codemirror/state';
-	import { EditorView, basicSetup } from 'codemirror';
-	import { onDestroy, onMount } from 'svelte';
-	import type { Unsubscriber } from 'svelte/store';
+	import hljs from 'highlight.js/lib/core';
+	import json from 'highlight.js/lib/languages/json';
+	import { onMount } from 'svelte';
+	import Icon from './Icon.svelte';
+	import Clickable from './Clickable.svelte';
+	hljs.registerLanguage('json', json);
 
 	export let data: unknown;
 	export let sort = true;
 
-	let editorElement: HTMLElement;
-	let cm: EditorView | undefined = undefined;
-
-	$: {
-		if (cm) {
-			createJSONView();
-
-			if (
-				data !== undefined &&
-				!(data instanceof Array) &&
-				JSON.stringify(data).includes('cpu_flags')
-			) {
-				foldAll(cm);
-			}
-		}
-	}
+	let viewElement: HTMLElement;
+	let collapsable: Array<string | undefined> = [];
+	let collapsed: Set<string> = new Set(['cpu_flags']);
+	let lineNumbers: Array<number> = [];
 
 	function isObject(v: unknown): boolean {
 		return '[object Object]' === Object.prototype.toString.call(v);
@@ -49,56 +34,126 @@
 		return o;
 	}
 
-	function createJSONView() {
+	function render(data: unknown) {
+		let removedValues: Map<string, number> = new Map();
+
+		// Clone if non-undefined
 		let clone = data ? JSON.parse(JSON.stringify(data)) : undefined;
+		// Sort if non-undefined and if sort=true
 		if (clone && sort) {
 			clone = sortJSON(clone);
 		}
-		let state = EditorState.create({
-			doc: JSON.stringify(clone, null, 2),
-			extensions: [
-				basicSetup,
-				$theme.dark ? resaltDark : resaltLight,
-				EditorState.readOnly.of(true),
-				json(),
-			],
-		});
-		cm = new EditorView({ state, parent: editorElement });
-		editorElement.replaceChildren(cm.dom);
-		let tree = ensureSyntaxTree(state, state.doc.length, 500099);
-		if (tree !== null) {
-			console.log(tree);
-		} else {
-			console.error('Syntax tree parsing timed out.');
+		// Collapse elements in root obj which are collaposed
+		if (typeof clone === 'object') {
+			for (const item of collapsed) {
+				// Check if item exists in root object
+				const value = clone[item];
+				if (Array.isArray(value)) {
+					clone[item] = [];
+				} else if (typeof value === 'object') {
+					clone[item] = {};
+				}
+				if (typeof value === 'object') {
+					removedValues.set(item, JSON.stringify(value, null, 2).split('\n').length);
+				}
+			}
 		}
-		//cm.dispatch({});
+
+		let res = hljs.highlight(JSON.stringify(clone, null, 2), { language: 'json' }).value;
+		// replace /n with <br>
+		res = res.replace(/\n/g, '<br>\n');
+		// replace spacespace with &nbsp;&nbsp;
+		res = res.replace(/  /g, '&nbsp;&nbsp;');
+
+		let lines = res.split('\n');
+		collapsable = [];
+		lineNumbers = [];
+		let lastAdder = 1;
+		for (let i = 0; i != lines.length; i++) {
+			const isCollapsable =
+				(lines[i].indexOf('{') != -1 || lines[i].indexOf('[') != -1) &&
+				lines[i].startsWith('&nbsp;&nbsp;<span');
+			// get value >"value"<
+			const key = (lines[i].match(/>&quot;(.*)&quot;</) || [])[0]
+				?.replaceAll('&quot;', '')
+				.replaceAll('>', '')
+				.replaceAll('<', '');
+			collapsable[i] = isCollapsable ? key : undefined;
+
+			const rB1 = '<span class="hljs-punctuation">[</span>';
+			const rB2 = '<span class="hljs-punctuation">]</span>';
+			const rB3 = '<span class="hljs-punctuation">{</span>';
+			const rB4 = '<span class="hljs-punctuation">}</span>';
+			const rDots = '<span class="no-select text-muted">&lt;collapsed&gt;</span>';
+
+			if (typeof key === 'string' && collapsed.has(key)) {
+				console.warn('Found!', key, removedValues.get(key));
+				lines[i] = lines[i]
+					.replaceAll(`${rB1}${rB2}`, `${rB1} ${rDots} ${rB2}`)
+					.replaceAll(`${rB3}${rB4}`, `${rB3} ${rDots} ${rB4}`);
+			}
+			lineNumbers[i] = (lineNumbers[i - 1] ?? 0) + lastAdder;
+			lastAdder = removedValues.get(key ?? '') ?? 1;
+			//console.log(i, ' - ', collapsable[i]);
+		}
+		return lines.join('\n');
 	}
 
-	let unsub: Unsubscriber | null = null;
+	function toggleCollapse(entry: string | undefined) {
+		if (!entry) {
+			return;
+		}
+
+		let toggled = collapsed.has(entry);
+		if (toggled) {
+			collapsed.delete(entry);
+		} else {
+			collapsed.add(entry);
+		}
+		viewElement.innerHTML = render(data);
+	}
+
+	$: {
+		if (viewElement) {
+			viewElement.innerHTML = render(data);
+		}
+	}
 	onMount(() => {
-		// Theme listener
-		if (unsub != null) {
-			unsub();
-			unsub = null;
-		}
-		unsub = theme.subscribe(createJSONView);
-	});
-
-	onDestroy(() => {
-		// Theme listener
-		if (unsub != null) {
-			unsub();
-			unsub = null;
-		}
-
-		// Cleanup
-		editorElement.replaceChildren();
-		cm = undefined;
+		viewElement.innerHTML = render(data);
 	});
 </script>
 
-<div class="d-none">
-	<!-- This MUST be here to force Svelte to re-render on changes -->
-	{data}
+<div class="container-fluid font-monospace">
+	<div class="row">
+		<div class="col-auto text-primary text-end">
+			{#each lineNumbers as v, i}
+				{v}
+				<br />
+			{/each}
+		</div>
+		<div class="col-auto p-0 text-primary text-end">
+			{#each Array(collapsable.length) as _, i}
+				{#if collapsable[i]}
+					<Clickable
+						type="div"
+						event={() => {
+							console.log('click', i, collapsable[i]);
+							toggleCollapse(collapsable[i]);
+						}}
+					>
+						<Icon size="1" name="chevron-down" class="text-primary" />
+					</Clickable>
+				{:else}
+					<br />
+				{/if}
+			{/each}
+		</div>
+		<div class="col" bind:this={viewElement} />
+	</div>
 </div>
-<div bind:this={editorElement} />
+
+<style>
+	* {
+		outline: 0px solid red;
+	}
+</style>

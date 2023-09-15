@@ -8,7 +8,4 @@ export default defineConfig({
 			port: 5555,
 		},
 	},
-	optimizeDeps: {
-		exclude: ['codemirror', '@codemirror/view', '@codemirror/language'],
-	},
 });

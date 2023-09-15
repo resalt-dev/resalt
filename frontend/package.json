@@ -12,10 +12,6 @@
     "format": "prettier --plugin-search-dir . --write ."
   },
   "devDependencies": {
-    "@codemirror/lang-json": "6.0.1",
-    "@codemirror/language": "6.9.0",
-    "@codemirror/state": "6.2.1",
-    "@codemirror/view": "6.18.1",
     "@eonasdan/tempus-dominus": "6.7.11",
     "@lezer/highlight": "1.1.6",
     "@sveltejs/kit": "1.24.1",
@@ -28,7 +24,6 @@
     "bootstrap": "5.3.1",
     "bootstrap-directional-buttons": "1.0.1",
     "boxicons": "2.1.4",
-    "codemirror": "6.0.1",
     "eslint": "8.49.0",
     "eslint-config-prettier": "9.0.0",
     "eslint-plugin-import": "2.28.0",
@@ -48,6 +43,7 @@
   },
   "type": "module",
   "dependencies": {
-    "bun-types": "^1.0.1"
+    "bun-types": "^1.0.1",
+    "highlight.js": "^11.8.0"
   }
 }
