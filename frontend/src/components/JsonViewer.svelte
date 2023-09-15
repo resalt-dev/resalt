@@ -87,14 +87,12 @@
 			const rDots = '<span class="no-select text-muted">&lt;collapsed&gt;</span>';
 
 			if (typeof key === 'string' && collapsed.has(key)) {
-				console.warn('Found!', key, removedValues.get(key));
 				lines[i] = lines[i]
 					.replaceAll(`${rB1}${rB2}`, `${rB1} ${rDots} ${rB2}`)
 					.replaceAll(`${rB3}${rB4}`, `${rB3} ${rDots} ${rB4}`);
 			}
 			lineNumbers[i] = (lineNumbers[i - 1] ?? 0) + lastAdder;
 			lastAdder = removedValues.get(key ?? '') ?? 1;
-			//console.log(i, ' - ', collapsable[i]);
 		}
 		return lines.join('\n');
 	}
@@ -137,7 +135,6 @@
 					<Clickable
 						type="div"
 						event={() => {
-							console.log('click', i, collapsable[i]);
 							toggleCollapse(collapsable[i]);
 						}}
 					>
