@@ -12,20 +12,18 @@ jobs:
     name: Frontend Lint
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
+      - uses: oven-sh/setup-bun@v1
       - name: 'Cache node_modules'
         uses: actions/cache@v3
         with:
           path: ./frontend/node_modules
-          key: ${{ runner.os }}-node-v18-${{ hashFiles('./frontend/package-lock.json') }}
+          key: ${{ runner.os }}-node-v18-${{ hashFiles('./frontend/bun.lockb') }}
       
       - name: "cd into /frontend and lint"
         run: |
           cd frontend
-          npm install --legacy-peer-deps
-          npm run lint
+          bun install
+          bun run lint
 
   backend-lint:
     runs-on: ubuntu-latest
@@ -53,7 +51,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ./frontend/node_modules
-          key: ${{ runner.os }}-node-v18-${{ hashFiles('./frontend/package-lock.json') }}
+          key: ${{ runner.os }}-node-v18-${{ hashFiles('./frontend/bun.lockb') }}
 
       - name: Read version number
         run: |

@@ -1,10 +1,10 @@
 #
 # BUILD FRONTEND
 #
-FROM node:20-alpine as build_frontend
+FROM oven/bun:1.0 as build_frontend
 WORKDIR /usr/src/app/frontend
 COPY frontend .
-RUN npm install && npm run build
+RUN bun install && bun run build
 
 #
 # BUILD BACKEND

@@ -7,6 +7,7 @@
 
 	import '$lib/css/base.css';
 	import '$lib/css/resalt.css';
+	import 'highlight.js/styles/github.css';
 
 	import { ApiError, getConfig } from '$lib/api';
 	import { config, theme, toasts } from '$lib/stores';
