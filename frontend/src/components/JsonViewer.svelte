@@ -63,7 +63,7 @@
 		// replace /n with <br>
 		res = res.replace(/\n/g, '<br>\n');
 		// replace spacespace with &nbsp;&nbsp;
-		res = res.replace(/  /g, '&nbsp;&nbsp;');
+		res = res.replace(/ {2}/g, '&nbsp;&nbsp;');
 
 		let lines = res.split('\n');
 		collapsable = [];
@@ -124,13 +124,13 @@
 <div class="container-fluid font-monospace">
 	<div class="row">
 		<div class="col-auto text-primary text-end">
-			{#each lineNumbers as v, i}
+			{#each lineNumbers as v}
 				{v}
 				<br />
 			{/each}
 		</div>
 		<div class="col-auto p-0 text-primary text-end">
-			{#each Array(collapsable.length) as _, i}
+			{#each [...Array(collapsable.length).keys()] as i}
 				{#if collapsable[i]}
 					<Clickable
 						type="div"
