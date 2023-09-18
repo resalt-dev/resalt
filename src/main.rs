@@ -218,6 +218,14 @@ async fn main() -> std::io::Result<()> {
                             .route("/{id}", web::delete().to(route_permission_delete))
                             .default_service(route_fallback_404),
                     )
+                    // settings
+                    .service(
+                        web::scope("/settings")
+                            .wrap(RequireAuth::new())
+                            .route("/export", web::get().to(route_settings_export_get))
+                            //.route("/import", web::post().to(route_settings_import_post))
+                            .default_service(route_fallback_404),
+                    )
                     // fallback to 404
                     .default_service(route_fallback_404),
             )

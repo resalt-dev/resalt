@@ -14,6 +14,7 @@ mod minions;
 mod permissions;
 mod pipeline;
 mod presets;
+mod settings_export;
 mod status;
 mod users;
 
@@ -34,5 +35,6 @@ pub use minions::*;
 pub use permissions::*;
 pub use pipeline::*;
 pub use presets::*;
+pub use settings_export::*;
 pub use status::*;
 pub use users::*;
