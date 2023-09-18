@@ -3,11 +3,11 @@
 import globals from 'globals';
 
 // Imports
-import typescript from '@typescript-eslint';
-import sveltePlugin from 'eslint-plugin-svelte';
+import js from '@eslint/js';
 import prettier from 'eslint-config-prettier';
 
 // Plugins
+import sveltePlugin from 'eslint-plugin-svelte';
 import typescriptPlugin from '@typescript-eslint/eslint-plugin';
 
 // Parsers
@@ -15,10 +15,20 @@ import svelteParser from 'svelte-eslint-parser';
 import typescriptParser from '@typescript-eslint/parser';
 
 export default [
-	'eslint:recommended',
-	typescriptPlugin.configs.recommended,
-	sveltePlugin.configs.recommended,
-	prettier,
+	{
+		ignores: ['.svelte-kit/**/*', 'build/**/*', 'node_modules/**/*'],
+	},
+
+	// JavaScript
+	{
+		files: ['src/**/*.js'],
+		rules: {
+			...js.configs.recommended.rules,
+			...prettier.rules,
+		},
+	},
+
+	// TypeScript
 	{
 		files: ['src/**/*.ts'],
 		languageOptions: {
@@ -29,22 +39,46 @@ export default [
 			},
 			parser: typescriptParser,
 			parserOptions: {
-				sourceType: 'module',
-				ecmaVersion: 2022,
+				project: './tsconfig.json',
 				extraFileExtensions: ['.svelte'],
 			},
 		},
 		plugins: {
-			typescript: typescriptPlugin,
+			svelte: sveltePlugin,
+			'@typescript-eslint': typescriptPlugin,
+		},
+		rules: {
+			...js.configs.recommended.rules,
+			...typescriptPlugin.configs.recommended.rules,
+			...sveltePlugin.configs.recommended.rules,
+			...prettier.rules,
 		},
 	},
+
+	// Svelte
 	{
 		files: ['src/**/*.svelte'],
 		languageOptions: {
+			globals: {
+				...globals.browser,
+				...globals.es2021,
+				...globals.node,
+			},
 			parser: svelteParser,
 			parserOptions: {
 				parser: typescriptParser,
+				project: './tsconfig.json',
+				extraFileExtensions: ['.svelte'],
 			},
+		},
+		plugins: {
+			svelte: sveltePlugin,
+			'@typescript-eslint': typescriptPlugin,
+		},
+		rules: {
+			...typescriptPlugin.configs.recommended.rules,
+			...sveltePlugin.configs.recommended.rules,
+			...prettier.rules,
 		},
 	},
 ];
