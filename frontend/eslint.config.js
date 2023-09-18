@@ -3,7 +3,7 @@
 import globals from 'globals';
 
 // Imports
-import typescript from '@typescript-eslint'
+import typescript from '@typescript-eslint';
 import sveltePlugin from 'eslint-plugin-svelte';
 import prettier from 'eslint-config-prettier';
 
