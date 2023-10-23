@@ -14,7 +14,7 @@
 	"type": "module",
 	"dependencies": {
 		"@eonasdan/tempus-dominus": "6.7.13",
-		"@eslint/js": "8.49.0",
+		"@eslint/js": "8.52.0",
 		"@lezer/highlight": "1.1.6",
 		"@sveltejs/kit": "1.24.1",
 		"@sveltejs/vite-plugin-svelte": "2.4.2",
