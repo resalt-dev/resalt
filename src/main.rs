@@ -99,7 +99,7 @@ async fn main() -> std::io::Result<()> {
                         db_clone_wrapper.clone().storage,
                         salt_api,
                     ))
-                    .route("/", web::get().to(route_index_get))
+                    .route("", web::get().to(route_index_get))
                     .route("/config", web::get().to(route_config_get))
                     .route("/metrics", web::get().to(route_metrics_get))
                     // auth
