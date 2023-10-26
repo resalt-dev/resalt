@@ -5,7 +5,7 @@
 	import { MessageType } from '$model/MessageType';
 
 	let inputValue = '';
-	let data: any = undefined;
+	let data: { users: []; groups: []; minions: [] } | undefined = undefined;
 	let loading: boolean = false;
 
 	function reviewImport() {
@@ -17,7 +17,7 @@
 			}
 			// Rewrite the above to use a for loop and check for the existence of all required fields
 			for (const f of ['users', 'groups', 'minions']) {
-				if (data[f].length < 1) {
+				if (!Object.prototype.hasOwnProperty.call(data, f)) {
 					throw new Error('Invalid JSON');
 				}
 			}
@@ -41,6 +41,7 @@
 				data = undefined;
 			})
 			.catch((e) => {
+				console.error(e);
 				toasts.add(MessageType.ERROR, 'Import Failed', 'Please see server logs.');
 			})
 			.finally(() => {
