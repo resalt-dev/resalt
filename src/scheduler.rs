@@ -6,9 +6,8 @@ use std::{
 use clokwerk::TimeUnits;
 use log::*;
 use resalt_config::SConfig;
-use resalt_ldap::{LdapHandler, LdapUser};
+use resalt_ldap::{sync_ldap_groups, LdapHandler, LdapUser};
 use resalt_models::User;
-use resalt_security::sync_ldap_groups;
 use resalt_storage::StorageCloneWrapper;
 use tokio::task;
 

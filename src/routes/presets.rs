@@ -12,7 +12,7 @@ pub async fn route_presets_get(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_resalt_permission(&data, &auth.user_id, P_MINION_PRESETS_LIST)? {
+    if !has_resalt_permission(&auth.perms, P_MINION_PRESETS_LIST)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -41,7 +41,7 @@ pub async fn route_presets_post(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_resalt_permission(&data, &auth.user_id, P_MINION_PRESETS_MANAGE)? {
+    if !has_resalt_permission(&auth.perms, P_MINION_PRESETS_MANAGE)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -82,7 +82,7 @@ pub async fn route_preset_get(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_resalt_permission(&data, &auth.user_id, P_MINION_PRESETS_LIST)? {
+    if !has_resalt_permission(&auth.perms, P_MINION_PRESETS_LIST)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -117,7 +117,7 @@ pub async fn route_preset_put(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_resalt_permission(&data, &auth.user_id, P_MINION_PRESETS_MANAGE)? {
+    if !has_resalt_permission(&auth.perms, P_MINION_PRESETS_MANAGE)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -164,7 +164,7 @@ pub async fn route_preset_delete(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_resalt_permission(&data, &auth.user_id, P_MINION_PRESETS_MANAGE)? {
+    if !has_resalt_permission(&auth.perms, P_MINION_PRESETS_MANAGE)? {
         return Err(ApiError::Forbidden);
     }
 

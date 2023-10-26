@@ -3,7 +3,6 @@ use std::collections::HashMap;
 use log::*;
 use regex::Regex;
 use resalt_models::ApiError;
-use resalt_storage::StorageImpl;
 use serde_json::Value;
 
 pub const P_ADMIN_SUPERADMIN: &str = "admin.superadmin";
@@ -58,22 +57,8 @@ pub const P_USER_EMAIL: &str = "user.email";
 pub const P_USER_PASSWORD: &str = "user.password";
 
 #[allow(clippy::borrowed_box)]
-pub fn has_resalt_permission(
-    data: &Box<dyn StorageImpl>,
-    user_id: &str,
-    permission: &str,
-) -> Result<bool, ApiError> {
-    let user = match data.get_user_by_id(user_id) {
-        Ok(user) => match user {
-            Some(user) => user,
-            None => return Ok(false),
-        },
-        Err(e) => {
-            error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
-        }
-    };
-    let perms = match serde_json::from_str(&user.perms) {
+pub fn has_resalt_permission(perms: &String, permission: &str) -> Result<bool, ApiError> {
+    let perms = match serde_json::from_str(perms) {
         Ok(perms) => perms,
         Err(e) => {
             error!("{:?}", e);

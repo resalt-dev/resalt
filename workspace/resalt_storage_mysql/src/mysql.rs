@@ -244,10 +244,12 @@ impl StorageImpl for StorageMySQL {
     /// Users ///
     /////////////
 
-    fn create_user(
+    fn create_user_hashed(
         &self,
         username: String,
         password: Option<String>,
+        perms: String,
+        last_login: Option<ResaltTime>,
         email: Option<String>,
         ldap_sync: Option<String>,
     ) -> Result<User, String> {
@@ -256,9 +258,9 @@ impl StorageImpl for StorageMySQL {
         let user = SQLUser {
             id,
             username,
-            password: password.map(|v| resalt_security::hash_password(&v)),
-            perms: "[]".to_string(),
-            last_login: None,
+            password,
+            perms,
+            last_login: last_login.map(|rt| rt.into()),
             email,
             ldap_sync,
         };

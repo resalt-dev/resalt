@@ -20,7 +20,7 @@ pub async fn route_users_get(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_resalt_permission(&data, &auth.user_id, P_USER_LIST)? {
+    if !has_resalt_permission(&auth.perms, P_USER_LIST)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -68,7 +68,7 @@ pub async fn route_users_post(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_resalt_permission(&data, &auth.user_id, P_USER_ADMIN)? {
+    if !has_resalt_permission(&auth.perms, P_USER_ADMIN)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -129,7 +129,7 @@ pub async fn route_user_get(
         // Always allow fetching self
     } else {
         #[allow(clippy:collapsible_else_if)]
-        if !has_resalt_permission(&data, &auth.user_id, P_USER_LIST)? {
+        if !has_resalt_permission(&auth.perms, P_USER_LIST)? {
             return Err(ApiError::Forbidden);
         }
     }
@@ -168,7 +168,7 @@ pub async fn route_user_delete(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_resalt_permission(&data, &auth.user_id, P_USER_ADMIN)? {
+    if !has_resalt_permission(&auth.perms, P_USER_ADMIN)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -221,12 +221,12 @@ pub async fn route_user_password_post(
 
     // Validate permission
     if auth.user_id == info.user_id {
-        if !has_resalt_permission(&data, &auth.user_id, P_USER_PASSWORD)? {
+        if !has_resalt_permission(&auth.perms, P_USER_PASSWORD)? {
             return Err(ApiError::Forbidden);
         }
     } else {
         #[allow(clippy:collapsible_else_if)]
-        if !has_resalt_permission(&data, &auth.user_id, P_USER_LIST)? {
+        if !has_resalt_permission(&auth.perms, P_USER_LIST)? {
             return Err(ApiError::Forbidden);
         }
     }
@@ -281,7 +281,7 @@ pub async fn route_user_permissions_post(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_resalt_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
+    if !has_resalt_permission(&auth.perms, P_ADMIN_GROUP)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -336,7 +336,7 @@ pub async fn route_user_permissions_post(
         }
 
         // Update user-cached permissions
-        refresh_user_permissions(&data, &user)?;
+        data.refresh_user_permissions(&user)?;
     }
 
     Ok(web::Json(()))
@@ -351,7 +351,7 @@ pub async fn route_user_permissions_delete(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_resalt_permission(&data, &auth.user_id, P_ADMIN_GROUP)? {
+    if !has_resalt_permission(&auth.perms, P_ADMIN_GROUP)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -395,7 +395,7 @@ pub async fn route_user_permissions_delete(
     }
 
     // Update user-cached permissions
-    refresh_user_permissions(&data, &user)?;
+    data.refresh_user_permissions(&user)?;
 
     Ok(web::Json(()))
 }

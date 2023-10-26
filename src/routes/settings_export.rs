@@ -19,7 +19,7 @@ pub async fn route_settings_export_get(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_resalt_permission(&data, &auth.user_id, P_ADMIN_SUPERADMIN)? {
+    if !has_resalt_permission(&auth.perms, P_ADMIN_SUPERADMIN)? {
         return Err(ApiError::Forbidden);
     }
 

@@ -29,6 +29,7 @@ impl SaltToken {
 #[derive(Clone, Debug, PartialEq)]
 pub struct AuthStatus {
     pub user_id: String,
+    pub perms: String,
     pub auth_token: String,
     pub salt_token: Option<SaltToken>,
 }
