@@ -20,39 +20,41 @@ pub async fn route_settings_import_post(
 
     // Import users
     for user in &input.users {
-        // Check if user exists, if so, delete
-        match data.get_user_by_id(&user.id) {
-            Ok(_) => {
-                info!("route_settings_import_post user exists, deleting");
-                match data.delete_user(&user.id) {
-                    Ok(_) => {}
-                    Err(e) => {
-                        error!("route_settings_import_post delete_user {:?}", e);
-                        return Err(ApiError::DatabaseError);
-                    }
-                };
-            }
+        // Check if user exists
+        let user_exists = match data.get_user_by_username(&user.username) {
+            Ok(Some(_)) => true,
+            Ok(None) => false,
             Err(e) => {
-                error!("route_settings_import_post get_user {:?}", e);
+                error!("route_settings_import_post get_user_by_username {:?}", e);
                 return Err(ApiError::DatabaseError);
             }
         };
-        // Create user
-        match data.create_user_hashed(
-            Some(user.id.clone()),
-            user.username.clone(),
-            user.password.clone(),
-            user.perms.clone(),
-            user.last_login.clone(),
-            user.email.clone(),
-            user.ldap_sync.clone(),
-        ) {
-            Ok(_) => {}
-            Err(e) => {
-                error!("route_settings_import_post create_user_hashed {:?}", e);
-                return Err(ApiError::DatabaseError);
-            }
-        };
+        if user_exists {
+            match data.update_user(user) {
+                Ok(_) => {}
+                Err(e) => {
+                    error!("route_settings_import_post update_user {:?}", e);
+                    return Err(ApiError::DatabaseError);
+                }
+            };
+        } else {
+            // Create user
+            match data.create_user_hashed(
+                Some(user.id.clone()),
+                user.username.clone(),
+                user.password.clone(),
+                user.perms.clone(),
+                user.last_login.clone(),
+                user.email.clone(),
+                user.ldap_sync.clone(),
+            ) {
+                Ok(_) => {}
+                Err(e) => {
+                    error!("route_settings_import_post create_user_hashed {:?}", e);
+                    return Err(ApiError::DatabaseError);
+                }
+            };
+        }
     }
 
     // // Import groups
