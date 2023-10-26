@@ -164,7 +164,10 @@ pub struct User {
 impl User {
     pub fn public(&self, permission_groups: Vec<PermissionGroup>) -> Value {
         let mut result: Value = serde_json::value::to_value(self).unwrap();
+        // Remove password
         result.as_object_mut().unwrap().remove("password");
+
+        // Add groups
         let permission_groups_json = permission_groups
             .iter()
             .map(|g| {
@@ -178,6 +181,17 @@ impl User {
             "permissionGroups".to_owned(),
             serde_json::Value::Array(permission_groups_json),
         );
+
+        // Convert "perms" to array
+        let perms: Value = match serde_json::from_str(&self.perms) {
+            Ok(perms) => perms,
+            Err(_) => json!(Vec::<String>::new()),
+        };
+        result
+            .as_object_mut()
+            .unwrap()
+            .insert("perms".to_owned(), perms);
+
         return result;
     }
 }
