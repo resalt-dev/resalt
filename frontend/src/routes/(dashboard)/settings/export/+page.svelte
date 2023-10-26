@@ -2,7 +2,7 @@
 	import CopyButton from '$component/CopyButton.svelte';
 	import JsonViewer from '$component/JsonViewer.svelte';
 	import { getExport } from '$lib/api';
-	import { config, toasts } from '$lib/stores';
+	import { toasts } from '$lib/stores';
 	import { MessageType } from '$model/MessageType';
 	import { writable, type Writable } from 'svelte/store';
 
@@ -27,6 +27,6 @@
 
 <CopyButton name="Export" value={JSON.stringify($data)} size="md" class="btn-dark" />
 
-<hr />
+<hr class="text-light" />
 
 <JsonViewer data={$data} />
