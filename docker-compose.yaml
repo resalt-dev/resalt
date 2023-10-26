@@ -14,7 +14,7 @@ services:
       - "3306:3306"
 
   master:
-    image: saltstack/salt:3006.1
+    image: saltstack/salt:3006.3
     hostname: master
     volumes:
       - ./docker/saltconfig/etc/master:/etc/salt/master:ro
@@ -26,7 +26,7 @@ services:
     ports:
       - "8080:8080"
   minion:
-    image: saltstack/salt:3006.1
+    image: saltstack/salt:3006.3
     command: salt-minion -l info
     volumes:
       - ./docker/saltconfig/etc/minion:/etc/salt/minion:ro
@@ -36,7 +36,7 @@ services:
       replicas: 3
 
   frontend:
-    image: oven/bun:1.0
+    image: oven/bun:1.0.7
     volumes:
       - ./frontend/.svelte-kit/tsconfig.json:/usr/src/app/.svelte-kit/tsconfig.json
       - ./frontend/src:/usr/src/app/src
