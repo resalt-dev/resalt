@@ -1,6 +1,7 @@
 import type User from '$model/User';
 import {
 	P_ADMIN_GROUP,
+	P_ADMIN_SUPERADMIN,
 	P_EVENT_LIST,
 	P_JOB_LIST,
 	P_MINION_CONFORMITY,
@@ -138,6 +139,8 @@ const paths = {
 
 	settings_config: new Path(120, '/settings', 'Settings', 'cog', []), // Config
 	settings_groups: new Path(121, '/settings/groups', 'Groups', null, [P_ADMIN_GROUP]),
+	settings_export: new Path(122, '/settings/export', 'Export', null, [P_ADMIN_SUPERADMIN]),
+	settings_import: new Path(123, '/settings/import', 'Import', null, [P_ADMIN_SUPERADMIN]),
 
 	preferences: new Path(120, '/preferences', 'Preferences', 'wrench', null),
 

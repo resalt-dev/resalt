@@ -243,6 +243,20 @@ impl PermissionGroup {
     }
 }
 
+impl Serialize for PermissionGroup {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let mut state = serializer.serialize_struct("PermissionGroup", 4)?;
+        state.serialize_field("id", &self.id)?;
+        state.serialize_field("name", &self.name)?;
+        state.serialize_field("perms", &self.perms)?;
+        state.serialize_field("ldapSync", &self.ldap_sync)?;
+        state.end()
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PermissionGroupUser {
     pub id: String,

@@ -406,3 +406,11 @@ export async function updatePermissionGroup(
 		ldapSync,
 	});
 }
+
+///
+/// Settings
+///
+
+export async function getExport(): Promise<unknown> {
+	return sendAuthenticatedRequest('GET', '/settings/export');
+}

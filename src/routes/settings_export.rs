@@ -1,5 +1,5 @@
 use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
-use resalt_models::{ApiError, AuthStatus, User};
+use resalt_models::{ApiError, AuthStatus, Minion, PermissionGroup, User};
 use resalt_security::{has_resalt_permission, P_ADMIN_SUPERADMIN};
 use resalt_storage::StorageImpl;
 use serde::Serialize;
@@ -8,6 +8,8 @@ use serde::Serialize;
 #[derive(Debug, Serialize)]
 struct SettingsExport {
     users: Vec<User>,
+    groups: Vec<PermissionGroup>,
+    minions: Vec<Minion>,
 }
 
 pub async fn route_settings_export_get(
@@ -21,7 +23,26 @@ pub async fn route_settings_export_get(
         return Err(ApiError::Forbidden);
     }
 
-    let users = Vec::<User>::new();
-    let config = SettingsExport { users };
+    // Get all users (Warning: This will include passwords!)
+    let users = match data.list_users(Some(i64::MAX), Some(0)) {
+        Ok(users) => users,
+        Err(_) => return Err(ApiError::DatabaseError),
+    };
+    // Get all permission groups
+    let groups = match data.list_permission_groups(Some(i64::MAX), Some(0)) {
+        Ok(groups) => groups,
+        Err(_) => return Err(ApiError::DatabaseError),
+    };
+    // Get all minions
+    let minions = match data.list_minions(vec![], None, Some(i64::MAX), Some(0)) {
+        Ok(minions) => minions,
+        Err(_) => return Err(ApiError::DatabaseError),
+    };
+
+    let config = SettingsExport {
+        users,
+        groups,
+        minions,
+    };
     Ok(web::Json(config))
 }
