@@ -15,6 +15,7 @@ mod permissions;
 mod pipeline;
 mod presets;
 mod settings_export;
+mod settings_import;
 mod status;
 mod users;
 
@@ -36,5 +37,6 @@ pub use permissions::*;
 pub use pipeline::*;
 pub use presets::*;
 pub use settings_export::*;
+pub use settings_import::*;
 pub use status::*;
 pub use users::*;

@@ -414,3 +414,7 @@ export async function updatePermissionGroup(
 export async function getExport(): Promise<unknown> {
 	return sendAuthenticatedRequest('GET', '/settings/export');
 }
+
+export async function importData(data: unknown): Promise<void> {
+	await sendAuthenticatedRequest('POST', '/settings/import', data);
+}

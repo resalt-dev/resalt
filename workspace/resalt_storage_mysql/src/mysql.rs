@@ -710,18 +710,18 @@ impl StorageImpl for StorageMySQL {
 
         let changeset: SQLMinion = Minion {
             id: minion_id.clone(),
-            last_seen: time,
+            last_seen: time.into(),
             grains,
             pillars,
             pkgs,
-            last_updated_grains,
-            last_updated_pillars,
-            last_updated_pkgs,
+            last_updated_grains: last_updated_grains.map(|t| t.into()),
+            last_updated_pillars: last_updated_pillars.map(|t| t.into()),
+            last_updated_pkgs: last_updated_pkgs.map(|t| t.into()),
             conformity,
             conformity_success,
             conformity_incorrect,
             conformity_error,
-            last_updated_conformity,
+            last_updated_conformity: last_updated_conformity.map(|t| t.into()),
             os_type,
         }
         .into();
@@ -787,7 +787,7 @@ impl StorageImpl for StorageMySQL {
         let id = format!("evnt_{}", uuid::Uuid::new_v4());
         let event: SQLEvent = Event {
             id: id.clone(),
-            timestamp,
+            timestamp: timestamp.into(),
             tag,
             data,
         }
@@ -833,7 +833,7 @@ impl StorageImpl for StorageMySQL {
         let id = format!("job_{}", uuid::Uuid::new_v4());
         let job: SQLJob = Job {
             id,
-            timestamp,
+            timestamp: timestamp.into(),
             jid,
             user,
             event_id,
@@ -908,7 +908,7 @@ impl StorageImpl for StorageMySQL {
         let id = format!("jret_{}", uuid::Uuid::new_v4());
         let job_return: SQLJobReturn = JobReturn {
             id,
-            timestamp,
+            timestamp: timestamp.into(),
             jid,
             job_id,
             event_id,

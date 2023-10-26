@@ -2,14 +2,14 @@ use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use resalt_models::{ApiError, AuthStatus, Minion, PermissionGroup, User};
 use resalt_security::{has_resalt_permission, P_ADMIN_SUPERADMIN};
 use resalt_storage::StorageImpl;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 #[allow(non_snake_case)]
-#[derive(Debug, Serialize)]
-struct SettingsExport {
-    users: Vec<User>,
-    groups: Vec<PermissionGroup>,
-    minions: Vec<Minion>,
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SettingsExport {
+    pub users: Vec<User>,
+    pub groups: Vec<PermissionGroup>,
+    pub minions: Vec<Minion>,
 }
 
 pub async fn route_settings_export_get(

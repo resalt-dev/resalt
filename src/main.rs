@@ -223,7 +223,7 @@ async fn main() -> std::io::Result<()> {
                         web::scope("/settings")
                             .wrap(RequireAuth::new())
                             .route("/export", web::get().to(route_settings_export_get))
-                            //.route("/import", web::post().to(route_settings_import_post))
+                            .route("/import", web::post().to(route_settings_import_post))
                             .default_service(route_fallback_404),
                     )
                     // fallback to 404

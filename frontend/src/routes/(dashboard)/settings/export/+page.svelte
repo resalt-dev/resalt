@@ -25,7 +25,9 @@
 
 <button type="button" class="btn btn-warning" on:click={getData}>Generate Export</button>
 
-<CopyButton name="Export" value={JSON.stringify($data)} size="md" class="btn-dark" />
+{#if $data !== undefined}
+	<CopyButton name="Export" value={JSON.stringify($data)} size="md" class="btn-dark" />
+{/if}
 
 <hr class="text-light" />
 
