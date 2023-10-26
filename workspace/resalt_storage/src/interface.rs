@@ -1,6 +1,9 @@
 use chrono::*;
 use log::*;
-use resalt_models::*;
+use resalt_models::{
+    ApiError, AuthToken, Event, Filter, Job, Minion, MinionPreset, PermissionGroup, ResaltTime,
+    SaltToken, User,
+};
 use serde_json::Value;
 
 use crate::StorageStatus;
@@ -18,6 +21,7 @@ pub trait StorageImpl: Send {
         ldap_sync: Option<String>,
     ) -> Result<User, String> {
         self.create_user_hashed(
+            None,
             username,
             password.map(|v| resalt_security::hash_password(&v)),
             "[]".to_string(),
@@ -29,6 +33,7 @@ pub trait StorageImpl: Send {
 
     fn create_user_hashed(
         &self,
+        id: Option<String>,
         username: String,
         password: Option<String>,
         perms: String,

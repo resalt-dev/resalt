@@ -20,7 +20,26 @@ pub async fn route_settings_import_post(
 
     // Import users
     for user in &input.users {
+        // Check if user exists, if so, delete
+        match data.get_user_by_id(&user.id) {
+            Ok(_) => {
+                info!("route_settings_import_post user exists, deleting");
+                match data.delete_user(&user.id) {
+                    Ok(_) => {}
+                    Err(e) => {
+                        error!("route_settings_import_post delete_user {:?}", e);
+                        return Err(ApiError::DatabaseError);
+                    }
+                };
+            }
+            Err(e) => {
+                error!("route_settings_import_post get_user {:?}", e);
+                return Err(ApiError::DatabaseError);
+            }
+        };
+        // Create user
         match data.create_user_hashed(
+            Some(user.id.clone()),
             user.username.clone(),
             user.password.clone(),
             user.perms.clone(),

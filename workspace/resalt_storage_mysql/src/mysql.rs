@@ -246,6 +246,7 @@ impl StorageImpl for StorageMySQL {
 
     fn create_user_hashed(
         &self,
+        id: Option<String>,
         username: String,
         password: Option<String>,
         perms: String,
@@ -254,7 +255,7 @@ impl StorageImpl for StorageMySQL {
         ldap_sync: Option<String>,
     ) -> Result<User, String> {
         let mut connection = self.create_connection()?;
-        let id = format!("usr_{}", uuid::Uuid::new_v4());
+        let id = id.unwrap_or(format!("usr_{}", uuid::Uuid::new_v4()));
         let user = SQLUser {
             id,
             username,
