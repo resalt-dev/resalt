@@ -691,13 +691,25 @@ impl StorageImpl for StorageMySQL {
         conformity_success: Option<i32>,
         conformity_incorrect: Option<i32>,
         conformity_error: Option<i32>,
+        last_updated_grains: Option<ResaltTime>,
+        last_updated_pillars: Option<ResaltTime>,
+        last_updated_pkgs: Option<ResaltTime>,
+        last_updated_conformity: Option<ResaltTime>,
     ) -> Result<(), String> {
         let mut connection = self.create_connection()?;
 
-        let last_updated_grains = grains.as_ref().map(|_| time);
-        let last_updated_pillars = pillars.as_ref().map(|_| time);
-        let last_updated_pkgs = pkgs.as_ref().map(|_| time);
-        let last_updated_conformity = conformity.as_ref().map(|_| time);
+        let last_updated_grains = grains
+            .as_ref()
+            .map(|_| last_updated_grains.unwrap_or(time.into()));
+        let last_updated_pillars = pillars
+            .as_ref()
+            .map(|_| last_updated_pillars.unwrap_or(time.into()));
+        let last_updated_pkgs = pkgs
+            .as_ref()
+            .map(|_| last_updated_pkgs.unwrap_or(time.into()));
+        let last_updated_conformity = conformity
+            .as_ref()
+            .map(|_| last_updated_conformity.unwrap_or(time.into()));
 
         // Parse grains as JSON, and fetch osfullname+osrelease as os_type.
         let parsed_grains = grains

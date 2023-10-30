@@ -95,5 +95,30 @@ pub async fn route_settings_import_post(
         }
     }
 
-    Ok(web::Json(input))
+    // Import minions
+    for minion in &input.minions {
+        match data.update_minion(
+            minion.id.clone(),
+            minion.last_seen.clone().into(),
+            minion.grains.clone(),
+            minion.pillars.clone(),
+            minion.pkgs.clone(),
+            minion.conformity.clone(),
+            minion.conformity_success,
+            minion.conformity_incorrect,
+            minion.conformity_error,
+            minion.last_updated_grains.clone(),
+            minion.last_updated_pillars.clone(),
+            minion.last_updated_pkgs.clone(),
+            minion.last_updated_conformity.clone(),
+        ) {
+            Ok(_) => {}
+            Err(e) => {
+                error!("route_settings_import_post update_minion {:?}", e);
+                return Err(ApiError::DatabaseError);
+            }
+        };
+    }
+
+    Ok(web::Json(()))
 }

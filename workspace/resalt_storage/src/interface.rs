@@ -124,6 +124,10 @@ pub trait StorageImpl: Send {
         conformity_success: Option<i32>,
         conformity_incorrect: Option<i32>,
         conformity_error: Option<i32>,
+        last_updated_grains: Option<ResaltTime>,
+        last_updated_pillars: Option<ResaltTime>,
+        last_updated_pkgs: Option<ResaltTime>,
+        last_updated_conformity: Option<ResaltTime>,
     ) -> Result<(), String>;
 
     fn update_minion_last_seen(
@@ -131,7 +135,9 @@ pub trait StorageImpl: Send {
         minion_id: String,
         time: chrono::NaiveDateTime,
     ) -> Result<(), String> {
-        self.update_minion(minion_id, time, None, None, None, None, None, None, None)
+        self.update_minion(
+            minion_id, time, None, None, None, None, None, None, None, None, None, None, None,
+        )
     }
 
     fn update_minion_grains(
@@ -144,6 +150,10 @@ pub trait StorageImpl: Send {
             minion_id,
             time,
             Some(grains),
+            None,
+            None,
+            None,
+            None,
             None,
             None,
             None,
@@ -169,6 +179,10 @@ pub trait StorageImpl: Send {
             None,
             None,
             None,
+            None,
+            None,
+            None,
+            None,
         )
     }
 
@@ -184,6 +198,10 @@ pub trait StorageImpl: Send {
             None,
             None,
             Some(pkgs),
+            None,
+            None,
+            None,
+            None,
             None,
             None,
             None,
@@ -210,6 +228,10 @@ pub trait StorageImpl: Send {
             Some(success),
             Some(incorrect),
             Some(error),
+            None,
+            None,
+            None,
+            None,
         )
     }
 
