@@ -102,23 +102,24 @@ impl StorageMySQL {
             .unwrap()
             .is_none()
         {
-            self.create_permission_group("$superadmins").unwrap();
-            let mut group = self
-                .get_permission_group_by_name("$superadmins")
-                .unwrap()
-                .unwrap();
-            group.perms = json!([
-                ".*".to_string(),
-                "@runner".to_string(),
-                "@wheel".to_string(),
-                {
-                    "@resalt": [
-                        "admin.superadmin".to_string(),
-                    ]
-                }
-            ])
-            .to_string();
-            self.update_permission_group(&group).unwrap();
+            self.create_permission_group(
+                None,
+                "$superadmins",
+                Some(
+                    json!([
+                        ".*".to_string(),
+                        "@runner".to_string(),
+                        "@wheel".to_string(),
+                        {
+                            "@resalt": [
+                                "admin.superadmin".to_string(),
+                            ]
+                        }
+                    ])
+                    .to_string(),
+                ),
+            )
+            .unwrap();
         }
         // Add admin to $superadmins if not member
         let superadmins_group_id = self
@@ -939,13 +940,18 @@ impl StorageImpl for StorageMySQL {
     /// Permission Groups ///
     /////////////////////////
 
-    fn create_permission_group(&self, name: &str) -> Result<String, String> {
+    fn create_permission_group(
+        &self,
+        id: Option<String>,
+        name: &str,
+        perms: Option<String>,
+    ) -> Result<String, String> {
         let mut connection = self.create_connection()?;
-        let id = format!("pg_{}", uuid::Uuid::new_v4());
+        let id = id.unwrap_or(format!("pg_{}", uuid::Uuid::new_v4()));
         let permission_group: SQLPermissionGroup = PermissionGroup {
             id: id.clone(),
             name: name.to_owned(),
-            perms: "[]".to_string(),
+            perms: perms.unwrap_or("[]".to_string()),
             ldap_sync: None,
         }
         .into();

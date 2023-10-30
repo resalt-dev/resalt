@@ -1,4 +1,4 @@
-use chrono::*;
+use chrono::NaiveDateTime;
 use log::*;
 use resalt_models::{
     ApiError, AuthToken, Event, Filter, Job, Minion, MinionPreset, PermissionGroup, ResaltTime,
@@ -252,7 +252,12 @@ pub trait StorageImpl: Send {
 
     fn get_job_returns_by_job(&self, job: &Job) -> Result<Vec<Event>, String>;
 
-    fn create_permission_group(&self, name: &str) -> Result<String, String>;
+    fn create_permission_group(
+        &self,
+        id: Option<String>,
+        name: &str,
+        perms: Option<String>,
+    ) -> Result<String, String>;
 
     fn list_permission_groups(
         &self,

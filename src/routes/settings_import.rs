@@ -57,16 +57,43 @@ pub async fn route_settings_import_post(
         }
     }
 
-    // // Import groups
-    // for group in input.groups {
-    //     data.create_group(
-    //         group.name,
-    //         group.perms,
-    //         group.users,
-    //         group.minions,
-    //         group.ldap_sync,
-    //     )?;
-    // }
+    // Import groups
+    for group in &input.groups {
+        // Check if group exists
+        let group_exists = match data.get_permission_group_by_name(&group.name) {
+            Ok(Some(_)) => true,
+            Ok(None) => false,
+            Err(e) => {
+                error!(
+                    "route_settings_import_post get_permission_group_by_name {:?}",
+                    e
+                );
+                return Err(ApiError::DatabaseError);
+            }
+        };
+        if group_exists {
+            match data.update_permission_group(group) {
+                Ok(_) => {}
+                Err(e) => {
+                    error!("route_settings_import_post update_permission_group {:?}", e);
+                    return Err(ApiError::DatabaseError);
+                }
+            };
+        } else {
+            // Create group
+            match data.create_permission_group(
+                Some(group.id.clone()),
+                &group.name.clone(),
+                Some(group.perms.clone()),
+            ) {
+                Ok(_) => {}
+                Err(e) => {
+                    error!("route_settings_import_post create_permission_group {:?}", e);
+                    return Err(ApiError::DatabaseError);
+                }
+            };
+        }
+    }
 
     Ok(web::Json(input))
 }

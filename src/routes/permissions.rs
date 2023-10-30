@@ -95,7 +95,7 @@ pub async fn route_permissions_post(
         return Err(ApiError::Forbidden);
     }
 
-    let permission_group_id = match data.create_permission_group(&input.name) {
+    let permission_group_id = match data.create_permission_group(None, &input.name, None) {
         Ok(id) => id,
         Err(e) => {
             error!("{:?}", e);
