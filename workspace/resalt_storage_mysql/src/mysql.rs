@@ -1119,9 +1119,14 @@ impl StorageImpl for StorageMySQL {
     /// Minion Presets ///
     //////////////////////
 
-    fn insert_minion_preset(&self, name: &str, filter: &str) -> Result<String, String> {
+    fn insert_minion_preset(
+        &self,
+        id: Option<String>,
+        name: &str,
+        filter: &str,
+    ) -> Result<String, String> {
         let mut connection = self.create_connection()?;
-        let id = format!("pre_{}", uuid::Uuid::new_v4());
+        let id = id.unwrap_or(format!("pre_{}", uuid::Uuid::new_v4()));
         let minion_preset: SQLMinionPreset = MinionPreset {
             id: id.clone(),
             name: name.to_string(),

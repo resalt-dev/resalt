@@ -313,7 +313,12 @@ pub trait StorageImpl: Send {
 
     fn delete_permission_group_user(&self, user_id: &str, group_id: &str) -> Result<(), String>;
 
-    fn insert_minion_preset(&self, name: &str, filter: &str) -> Result<String, String>;
+    fn insert_minion_preset(
+        &self,
+        id: Option<String>,
+        name: &str,
+        filter: &str,
+    ) -> Result<String, String>;
 
     fn list_minion_presets(&self) -> Result<Vec<MinionPreset>, String>;
 

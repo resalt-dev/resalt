@@ -1,5 +1,5 @@
 use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
-use resalt_models::{ApiError, AuthStatus, Minion, PermissionGroup, User};
+use resalt_models::{ApiError, AuthStatus, Minion, MinionPreset, PermissionGroup, User};
 use resalt_security::{has_resalt_permission, P_ADMIN_SUPERADMIN};
 use resalt_storage::StorageImpl;
 use serde::{Deserialize, Serialize};
@@ -11,6 +11,8 @@ pub struct SettingsExport {
     pub groups: Vec<PermissionGroup>,
     pub memberships: std::collections::HashMap<String, Vec<String>>,
     pub minions: Vec<Minion>,
+    #[serde(rename = "minionPresets")]
+    pub minion_presets: Vec<MinionPreset>,
 }
 
 pub async fn route_settings_export_get(
@@ -52,11 +54,18 @@ pub async fn route_settings_export_get(
         Err(_) => return Err(ApiError::DatabaseError),
     };
 
+    // Get all minion presets
+    let minion_presets = match data.list_minion_presets() {
+        Ok(minion_presets) => minion_presets,
+        Err(_) => return Err(ApiError::DatabaseError),
+    };
+
     let config = SettingsExport {
         users,
         groups,
         memberships: users_by_group_id,
         minions,
+        minion_presets,
     };
     Ok(web::Json(config))
 }

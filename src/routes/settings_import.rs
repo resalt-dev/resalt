@@ -136,5 +136,16 @@ pub async fn route_settings_import_post(
         };
     }
 
+    // Import minion presets
+    for preset in &input.minion_presets {
+        match data.insert_minion_preset(Some(preset.id.clone()), &preset.name, &preset.filter) {
+            Ok(_) => {}
+            Err(e) => {
+                error!("route_settings_import_post update_minion_preset {:?}", e);
+                return Err(ApiError::DatabaseError);
+            }
+        };
+    }
+
     Ok(web::Json(()))
 }

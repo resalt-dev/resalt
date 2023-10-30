@@ -52,7 +52,7 @@ pub async fn route_presets_post(
         return Err(ApiError::InvalidRequest);
     }
 
-    let preset_id = match data.insert_minion_preset(&name, &filter) {
+    let preset_id = match data.insert_minion_preset(None, &name, &filter) {
         Ok(preset) => preset,
         Err(e) => {
             error!("{:?}", e);
