@@ -40,6 +40,6 @@
 		"svelte-local-storage-store": "0.5.0",
 		"svelte-preprocess": "5.0.4",
 		"uuid": "9.0.1",
-		"vite": "4.4.9"
+		"vite": "4.5.0"
 	}
 }
