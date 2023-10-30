@@ -209,7 +209,7 @@ pub trait StorageImpl: Send {
     fn update_minion(
         &self,
         minion_id: String,
-        time: chrono::NaiveDateTime,
+        time: NaiveDateTime,
         grains: Option<String>,
         pillars: Option<String>,
         pkgs: Option<String>,
@@ -226,7 +226,7 @@ pub trait StorageImpl: Send {
     fn update_minion_last_seen(
         &self,
         minion_id: String,
-        time: chrono::NaiveDateTime,
+        time: NaiveDateTime,
     ) -> Result<(), String> {
         self.update_minion(
             minion_id, time, None, None, None, None, None, None, None, None, None, None, None,
@@ -236,7 +236,7 @@ pub trait StorageImpl: Send {
     fn update_minion_grains(
         &self,
         minion_id: String,
-        time: chrono::NaiveDateTime,
+        time: NaiveDateTime,
         grains: String,
     ) -> Result<(), String> {
         self.update_minion(
@@ -259,7 +259,7 @@ pub trait StorageImpl: Send {
     fn update_minion_pillars(
         &self,
         minion_id: String,
-        time: chrono::NaiveDateTime,
+        time: NaiveDateTime,
         pillars: String,
     ) -> Result<(), String> {
         self.update_minion(
