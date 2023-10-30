@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 pub struct SettingsExport {
     pub users: Vec<User>,
     pub groups: Vec<PermissionGroup>,
+    pub memberships: std::collections::HashMap<String, Vec<String>>,
     pub minions: Vec<Minion>,
 }
 
@@ -33,6 +34,18 @@ pub async fn route_settings_export_get(
         Ok(groups) => groups,
         Err(_) => return Err(ApiError::DatabaseError),
     };
+    // Get all permission group memberships
+    let mut users_by_group_id: std::collections::HashMap<String, Vec<String>> =
+        std::collections::HashMap::new();
+    for group in &groups {
+        let users = match data.list_users_by_permission_group_id(&group.id) {
+            Ok(users) => users,
+            Err(_) => return Err(ApiError::DatabaseError),
+        };
+        let users: Vec<String> = users.iter().map(|u| u.id.clone()).collect();
+        users_by_group_id.insert(group.id.clone(), users);
+    }
+
     // Get all minions
     let minions = match data.list_minions(vec![], None, Some(i64::MAX), Some(0)) {
         Ok(minions) => minions,
@@ -42,6 +55,7 @@ pub async fn route_settings_export_get(
     let config = SettingsExport {
         users,
         groups,
+        memberships: users_by_group_id,
         minions,
     };
     Ok(web::Json(config))

@@ -95,6 +95,22 @@ pub async fn route_settings_import_post(
         }
     }
 
+    // Import memberships
+    for (group_id, user_ids) in &input.memberships {
+        for user_id in user_ids {
+            match data.insert_permission_group_user(user_id, group_id) {
+                Ok(_) => {}
+                Err(e) => {
+                    error!(
+                        "route_settings_import_post update_permission_group_memberships {:?}",
+                        e
+                    );
+                    return Err(ApiError::DatabaseError);
+                }
+            };
+        }
+    }
+
     // Import minions
     for minion in &input.minions {
         match data.update_minion(
