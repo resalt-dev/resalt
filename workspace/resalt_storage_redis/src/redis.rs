@@ -105,22 +105,24 @@ impl StorageImpl for StorageRedis {
     /// Users ///
     /////////////
 
-    fn create_user(
+    fn create_user_hashed(
         &self,
+        id: Option<String>,
         username: String,
         password: Option<String>,
+        perms: String,
+        last_login: Option<ResaltTime>,
         email: Option<String>,
         ldap_sync: Option<String>,
     ) -> Result<User, String> {
         let mut connection = self.create_connection()?;
-        let id = format!("usr_{}", uuid::Uuid::new_v4());
+        let id = id.unwrap_or(format!("usr_{}", uuid::Uuid::new_v4()));
         let user = User {
             id: id.clone(),
             username: username.clone(),
-            // TODO: // Move hashing out of connection-specific class
-            password: password.map(|v| resalt_security::hash_password(&v)),
-            perms: "[]".to_string(),
-            last_login: None,
+            password,
+            perms,
+            last_login: last_login.map(|v| v.into()),
             email: email.clone(),
             ldap_sync: ldap_sync.clone(),
         };
@@ -376,13 +378,25 @@ impl StorageImpl for StorageRedis {
         conformity_success: Option<i32>,
         conformity_incorrect: Option<i32>,
         conformity_error: Option<i32>,
+        last_updated_grains: Option<ResaltTime>,
+        last_updated_pillars: Option<ResaltTime>,
+        last_updated_pkgs: Option<ResaltTime>,
+        last_updated_conformity: Option<ResaltTime>,
     ) -> Result<(), String> {
         let mut connection = self.create_connection()?;
 
-        let last_updated_grains = grains.as_ref().map(|_| time);
-        let last_updated_pillars = pillars.as_ref().map(|_| time);
-        let last_updated_pkgs = pkgs.as_ref().map(|_| time);
-        let last_updated_conformity = conformity.as_ref().map(|_| time);
+        let last_updated_grains = grains
+            .as_ref()
+            .map(|_| last_updated_grains.unwrap_or(time.into()));
+        let last_updated_pillars = pillars
+            .as_ref()
+            .map(|_| last_updated_pillars.unwrap_or(time.into()));
+        let last_updated_pkgs = pkgs
+            .as_ref()
+            .map(|_| last_updated_pkgs.unwrap_or(time.into()));
+        let last_updated_conformity = conformity
+            .as_ref()
+            .map(|_| last_updated_conformity.unwrap_or(time.into()));
 
         // Parse grains as JSON, and fetch osfullname+osrelease as os_type.
         let parsed_grains = grains
@@ -399,7 +413,7 @@ impl StorageImpl for StorageRedis {
 
         let minion = Minion {
             id: minion_id.clone(),
-            last_seen: time,
+            last_seen: time.into(),
             grains,
             pillars,
             pkgs,
@@ -447,7 +461,7 @@ impl StorageImpl for StorageRedis {
         let id = format!("evnt_{}", uuid::Uuid::new_v4());
         let event = Event {
             id: id.clone(),
-            timestamp,
+            timestamp: timestamp.into(),
             tag,
             data,
         };
@@ -517,7 +531,7 @@ impl StorageImpl for StorageRedis {
         let mut connection = self.create_connection()?;
         let job = Job {
             id: jid.clone(),
-            timestamp,
+            timestamp: timestamp.into(),
             jid: jid.clone(), // TODO: remove, id = jid
             user,
             event_id,
@@ -599,7 +613,7 @@ impl StorageImpl for StorageRedis {
         let id = format!("jret_{}", uuid::Uuid::new_v4());
         let job_return = JobReturn {
             id: "".to_string(),
-            timestamp,
+            timestamp: timestamp.into(),
             jid: jid.clone(),
             job_id,
             event_id,
@@ -641,13 +655,18 @@ impl StorageImpl for StorageRedis {
     /// Permission Groups ///
     /////////////////////////
 
-    fn create_permission_group(&self, name: &str) -> Result<String, String> {
+    fn create_permission_group(
+        &self,
+        id: Option<String>,
+        name: &str,
+        perms: Option<String>,
+    ) -> Result<String, String> {
         let mut connection = self.create_connection()?;
-        let id = format!("pg_{}", uuid::Uuid::new_v4());
+        let id = id.unwrap_or(format!("pg_{}", uuid::Uuid::new_v4()));
         let permission_group = PermissionGroup {
             id: id.clone(),
             name: name.to_owned(),
-            perms: "[]".to_string(),
+            perms: perms.unwrap_or("[]".to_string()),
             ldap_sync: None,
         };
 
@@ -849,9 +868,14 @@ impl StorageImpl for StorageRedis {
     /// Minion Presets ///
     //////////////////////
 
-    fn insert_minion_preset(&self, name: &str, filter: &str) -> Result<String, String> {
+    fn insert_minion_preset(
+        &self,
+        id: Option<String>,
+        name: &str,
+        filter: &str,
+    ) -> Result<String, String> {
         let mut connection = self.create_connection()?;
-        let id = format!("pre_{}", uuid::Uuid::new_v4());
+        let id = id.unwrap_or(format!("pre_{}", uuid::Uuid::new_v4()));
         let minion_preset = MinionPreset {
             id: id.clone(),
             name: name.to_string(),

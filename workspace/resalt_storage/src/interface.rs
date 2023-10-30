@@ -2,8 +2,8 @@ use chrono::NaiveDateTime;
 use log::*;
 use rand::Rng;
 use resalt_models::{
-    ApiError, AuthToken, Event, Filter, Job, Minion, MinionPreset, PermissionGroup, ResaltTime,
-    SaltToken, User,
+    ApiError, AuthToken, Event, Filter, Job, JobReturn, Minion, MinionPreset, PermissionGroup,
+    ResaltTime, SaltToken, User,
 };
 use serde_json::{json, Value};
 
