@@ -8,7 +8,7 @@ services:
       - "6379:6379"
 
   master:
-    image: saltstack/salt:3006.3
+    image: saltstack/salt:3006.4
     hostname: master
     volumes:
       - ./docker/saltconfig/etc/master:/etc/salt/master:ro
@@ -20,7 +20,7 @@ services:
     ports:
       - "8080:8080"
   minion:
-    image: saltstack/salt:3006.3
+    image: saltstack/salt:3006.4
     command: salt-minion -l info
     volumes:
       - ./docker/saltconfig/etc/minion:/etc/salt/minion:ro
