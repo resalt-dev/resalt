@@ -54,7 +54,7 @@ impl From<Event> for SQLEvent {
     fn from(event: Event) -> Self {
         SQLEvent {
             id: event.id,
-            timestamp: event.timestamp,
+            timestamp: event.timestamp.into(),
             tag: event.tag,
             data: event.data,
         }
@@ -65,7 +65,7 @@ impl From<SQLEvent> for Event {
     fn from(sql_event: SQLEvent) -> Self {
         Event {
             id: sql_event.id,
-            timestamp: sql_event.timestamp,
+            timestamp: sql_event.timestamp.into(),
             tag: sql_event.tag,
             data: sql_event.data,
         }
@@ -89,7 +89,7 @@ impl From<Job> for SQLJob {
     fn from(job: Job) -> Self {
         SQLJob {
             id: job.id,
-            timestamp: job.timestamp,
+            timestamp: job.timestamp.into(),
             jid: job.jid,
             user: job.user,
             event_id: job.event_id,
@@ -101,7 +101,7 @@ impl From<SQLJob> for Job {
     fn from(sql_job: SQLJob) -> Self {
         Job {
             id: sql_job.id,
-            timestamp: sql_job.timestamp,
+            timestamp: sql_job.timestamp.into(),
             jid: sql_job.jid,
             user: sql_job.user,
             event_id: sql_job.event_id,
@@ -129,7 +129,7 @@ impl From<JobReturn> for SQLJobReturn {
     fn from(job_return: JobReturn) -> Self {
         SQLJobReturn {
             id: job_return.id,
-            timestamp: job_return.timestamp,
+            timestamp: job_return.timestamp.into(),
             jid: job_return.jid,
             job_id: job_return.job_id,
             event_id: job_return.event_id,
@@ -142,7 +142,7 @@ impl From<SQLJobReturn> for JobReturn {
     fn from(sql_job_return: SQLJobReturn) -> Self {
         JobReturn {
             id: sql_job_return.id,
-            timestamp: sql_job_return.timestamp,
+            timestamp: sql_job_return.timestamp.into(),
             jid: sql_job_return.jid,
             job_id: sql_job_return.job_id,
             event_id: sql_job_return.event_id,
@@ -174,18 +174,18 @@ impl From<Minion> for SQLMinion {
     fn from(minion: Minion) -> Self {
         SQLMinion {
             id: minion.id,
-            last_seen: minion.last_seen,
+            last_seen: minion.last_seen.into(),
             grains: minion.grains,
             pillars: minion.pillars,
             pkgs: minion.pkgs,
-            last_updated_grains: minion.last_updated_grains,
-            last_updated_pillars: minion.last_updated_pillars,
-            last_updated_pkgs: minion.last_updated_pkgs,
+            last_updated_grains: minion.last_updated_grains.map(|rt| rt.into()),
+            last_updated_pillars: minion.last_updated_pillars.map(|rt| rt.into()),
+            last_updated_pkgs: minion.last_updated_pkgs.map(|rt| rt.into()),
             conformity: minion.conformity,
             conformity_success: minion.conformity_success,
             conformity_incorrect: minion.conformity_incorrect,
             conformity_error: minion.conformity_error,
-            last_updated_conformity: minion.last_updated_conformity,
+            last_updated_conformity: minion.last_updated_conformity.map(|rt| rt.into()),
             os_type: minion.os_type,
         }
     }
@@ -195,18 +195,18 @@ impl From<SQLMinion> for Minion {
     fn from(sql_minion: SQLMinion) -> Self {
         Minion {
             id: sql_minion.id,
-            last_seen: sql_minion.last_seen,
+            last_seen: sql_minion.last_seen.into(),
             grains: sql_minion.grains,
             pillars: sql_minion.pillars,
             pkgs: sql_minion.pkgs,
-            last_updated_grains: sql_minion.last_updated_grains,
-            last_updated_pillars: sql_minion.last_updated_pillars,
-            last_updated_pkgs: sql_minion.last_updated_pkgs,
+            last_updated_grains: sql_minion.last_updated_grains.map(|rt| rt.into()),
+            last_updated_pillars: sql_minion.last_updated_pillars.map(|rt| rt.into()),
+            last_updated_pkgs: sql_minion.last_updated_pkgs.map(|rt| rt.into()),
             conformity: sql_minion.conformity,
             conformity_success: sql_minion.conformity_success,
             conformity_incorrect: sql_minion.conformity_incorrect,
             conformity_error: sql_minion.conformity_error,
-            last_updated_conformity: sql_minion.last_updated_conformity,
+            last_updated_conformity: sql_minion.last_updated_conformity.map(|rt| rt.into()),
             os_type: sql_minion.os_type,
         }
     }
@@ -231,7 +231,7 @@ impl From<User> for SQLUser {
             username: user.username,
             password: user.password,
             perms: user.perms,
-            last_login: user.last_login,
+            last_login: user.last_login.map(|rt| rt.into()),
             email: user.email,
             ldap_sync: user.ldap_sync,
         }
@@ -245,7 +245,7 @@ impl From<SQLUser> for User {
             username: sql_user.username,
             password: sql_user.password,
             perms: sql_user.perms,
-            last_login: sql_user.last_login,
+            last_login: sql_user.last_login.map(|rt| rt.into()),
             email: sql_user.email,
             ldap_sync: sql_user.ldap_sync,
         }

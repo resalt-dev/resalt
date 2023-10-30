@@ -1,5 +1,10 @@
-use chrono::*;
-use resalt_models::*;
+use chrono::NaiveDateTime;
+use log::*;
+use resalt_models::{
+    ApiError, AuthToken, Event, Filter, Job, Minion, MinionPreset, PermissionGroup, ResaltTime,
+    SaltToken, User,
+};
+use serde_json::Value;
 
 use crate::StorageStatus;
 
@@ -14,6 +19,27 @@ pub trait StorageImpl: Send {
         password: Option<String>,
         email: Option<String>,
         ldap_sync: Option<String>,
+    ) -> Result<User, String> {
+        self.create_user_hashed(
+            None,
+            username,
+            password.map(|v| resalt_security::hash_password(&v)),
+            "[]".to_string(),
+            None,
+            email,
+            ldap_sync,
+        )
+    }
+
+    fn create_user_hashed(
+        &self,
+        id: Option<String>,
+        username: String,
+        password: Option<String>,
+        perms: String,
+        last_login: Option<ResaltTime>,
+        email: Option<String>,
+        ldap_sync: Option<String>,
     ) -> Result<User, String>;
 
     fn list_users(&self, limit: Option<i64>, offset: Option<i64>) -> Result<Vec<User>, String>;
@@ -25,6 +51,46 @@ pub trait StorageImpl: Send {
     fn update_user(&self, user: &User) -> Result<(), String>;
 
     fn delete_user(&self, id: &str) -> Result<(), String>;
+
+    #[allow(clippy::borrowed_box)]
+    fn refresh_user_permissions(&self, user: &User) -> Result<(), ApiError> {
+        let groups = match self.list_permission_groups_by_user_id(&user.id) {
+            Ok(groups) => groups,
+            Err(e) => {
+                error!("{:?}", e);
+                return Err(ApiError::DatabaseError);
+            }
+        };
+        let mut perms: Vec<Value> = Vec::new();
+        for group in groups {
+            // Parse group.perms as json array
+            let serdegroup: serde_json::Value = match serde_json::from_str(&group.perms) {
+                Ok(serdegroup) => serdegroup,
+                Err(e) => {
+                    error!("{:?}", e);
+                    return Err(ApiError::DatabaseError);
+                }
+            };
+            let group_perms = match serdegroup.as_array() {
+                Some(group_perms) => group_perms,
+                None => continue,
+            };
+            for group_perm in group_perms {
+                perms.push(group_perm.clone());
+            }
+        }
+        let perms = Value::Array(perms);
+        let perms = serde_json::to_string(&perms).unwrap();
+        let mut user: User = user.clone();
+        user.perms = perms;
+        match self.update_user(&user) {
+            Ok(_) => Ok(()),
+            Err(e) => {
+                error!("{:?}", e);
+                Err(ApiError::DatabaseError)
+            }
+        }
+    }
 
     fn create_authtoken(&self, user_id: String) -> Result<AuthToken, String>;
 
@@ -58,6 +124,10 @@ pub trait StorageImpl: Send {
         conformity_success: Option<i32>,
         conformity_incorrect: Option<i32>,
         conformity_error: Option<i32>,
+        last_updated_grains: Option<ResaltTime>,
+        last_updated_pillars: Option<ResaltTime>,
+        last_updated_pkgs: Option<ResaltTime>,
+        last_updated_conformity: Option<ResaltTime>,
     ) -> Result<(), String>;
 
     fn update_minion_last_seen(
@@ -65,7 +135,9 @@ pub trait StorageImpl: Send {
         minion_id: String,
         time: chrono::NaiveDateTime,
     ) -> Result<(), String> {
-        self.update_minion(minion_id, time, None, None, None, None, None, None, None)
+        self.update_minion(
+            minion_id, time, None, None, None, None, None, None, None, None, None, None, None,
+        )
     }
 
     fn update_minion_grains(
@@ -78,6 +150,10 @@ pub trait StorageImpl: Send {
             minion_id,
             time,
             Some(grains),
+            None,
+            None,
+            None,
+            None,
             None,
             None,
             None,
@@ -103,6 +179,10 @@ pub trait StorageImpl: Send {
             None,
             None,
             None,
+            None,
+            None,
+            None,
+            None,
         )
     }
 
@@ -118,6 +198,10 @@ pub trait StorageImpl: Send {
             None,
             None,
             Some(pkgs),
+            None,
+            None,
+            None,
+            None,
             None,
             None,
             None,
@@ -144,6 +228,10 @@ pub trait StorageImpl: Send {
             Some(success),
             Some(incorrect),
             Some(error),
+            None,
+            None,
+            None,
+            None,
         )
     }
 
@@ -186,7 +274,12 @@ pub trait StorageImpl: Send {
 
     fn get_job_returns_by_job(&self, job: &Job) -> Result<Vec<Event>, String>;
 
-    fn create_permission_group(&self, name: &str) -> Result<String, String>;
+    fn create_permission_group(
+        &self,
+        id: Option<String>,
+        name: &str,
+        perms: Option<String>,
+    ) -> Result<String, String>;
 
     fn list_permission_groups(
         &self,
@@ -220,7 +313,12 @@ pub trait StorageImpl: Send {
 
     fn delete_permission_group_user(&self, user_id: &str, group_id: &str) -> Result<(), String>;
 
-    fn insert_minion_preset(&self, name: &str, filter: &str) -> Result<String, String>;
+    fn insert_minion_preset(
+        &self,
+        id: Option<String>,
+        name: &str,
+        filter: &str,
+    ) -> Result<String, String>;
 
     fn list_minion_presets(&self) -> Result<Vec<MinionPreset>, String>;
 

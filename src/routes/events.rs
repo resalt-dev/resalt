@@ -19,7 +19,7 @@ pub async fn route_events_get(
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     // Validate permission
-    if !has_resalt_permission(&data, &auth.user_id, P_EVENT_LIST)? {
+    if !has_resalt_permission(&auth.perms, P_EVENT_LIST)? {
         return Err(ApiError::Forbidden);
     }
 

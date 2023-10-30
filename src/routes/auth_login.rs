@@ -1,12 +1,11 @@
 use actix_web::{web, HttpRequest, Responder, Result};
 use log::*;
 use resalt_config::SConfig;
+use resalt_ldap::sync_ldap_groups;
 use resalt_ldap::LdapHandler;
 use resalt_ldap::LdapUser;
 use resalt_models::{ApiError, User};
 use resalt_salt::SaltAPI;
-use resalt_security::refresh_user_permissions;
-use resalt_security::sync_ldap_groups;
 use resalt_storage::StorageImpl;
 use serde::{Deserialize, Serialize};
 
@@ -118,7 +117,7 @@ pub async fn route_auth_login_post(
     debug!("User {} found, generating token", &user.username);
 
     // Refresh their user-cached permissions before doing anything else
-    refresh_user_permissions(&data, &user)?;
+    data.refresh_user_permissions(&user)?;
 
     // Create token
     let authtoken = match data.create_authtoken(user.id.clone()) {

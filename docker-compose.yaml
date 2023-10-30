@@ -46,6 +46,7 @@ services:
       - ./frontend/tsconfig.json:/usr/src/app/tsconfig.json
       - ./frontend/vite.config.ts:/usr/src/app/vite.config.ts
     command: /bin/sh -c "cd /usr/src/app && bun install && bun run dev"
+    restart: always
     ports:
       - "5555:5555"
   backend:
@@ -91,6 +92,7 @@ services:
       RESALT_HTTP_FRONTEND_THEME_ENABLED: ${RESALT_HTTP_FRONTEND_THEME_ENABLED:-}
       RESALT_HTTP_FRONTEND_THEME_COLOR: ${RESALT_HTTP_FRONTEND_THEME_COLOR:-}
       RESALT_HTTP_FRONTEND_THEME_DARK: ${RESALT_HTTP_FRONTEND_THEME_DARK:-}
+    restart: always
     ports:
       - "8000:8000"
 

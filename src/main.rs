@@ -99,7 +99,7 @@ async fn main() -> std::io::Result<()> {
                         db_clone_wrapper.clone().storage,
                         salt_api,
                     ))
-                    .route("/", web::get().to(route_index_get))
+                    .route("", web::get().to(route_index_get))
                     .route("/config", web::get().to(route_config_get))
                     .route("/metrics", web::get().to(route_metrics_get))
                     // auth
@@ -216,6 +216,14 @@ async fn main() -> std::io::Result<()> {
                             .route("/{id}", web::get().to(route_permission_get))
                             .route("/{id}", web::put().to(route_permission_update))
                             .route("/{id}", web::delete().to(route_permission_delete))
+                            .default_service(route_fallback_404),
+                    )
+                    // settings
+                    .service(
+                        web::scope("/settings")
+                            .wrap(RequireAuth::new())
+                            .route("/export", web::get().to(route_settings_export_get))
+                            .route("/import", web::post().to(route_settings_import_post))
                             .default_service(route_fallback_404),
                     )
                     // fallback to 404

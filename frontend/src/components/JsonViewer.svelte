@@ -43,6 +43,10 @@
 		if (clone && sort) {
 			clone = sortJSON(clone);
 		}
+		// Check if cloen is falsy
+		if (!clone) {
+			return '';
+		}
 		// Collapse elements in root obj which are collaposed
 		if (typeof clone === 'object') {
 			for (const item of collapsed) {
@@ -123,13 +127,13 @@
 
 <div class="container-fluid font-monospace">
 	<div class="row">
-		<div class="col-auto text-primary text-end">
+		<div class="col-auto text-primary text-end no-select">
 			{#each lineNumbers as v}
 				{v}
 				<br />
 			{/each}
 		</div>
-		<div class="col-auto p-0 text-primary text-end">
+		<div class="col-auto p-0 text-primary text-end no-select">
 			{#each [...Array(collapsable.length).keys()] as i}
 				{#if collapsable[i]}
 					<Clickable
@@ -145,7 +149,7 @@
 				{/if}
 			{/each}
 		</div>
-		<div class="col" bind:this={viewElement} />
+		<div class="col text-nowrap" bind:this={viewElement} style="overflow-x: auto;"></div>
 	</div>
 </div>
 

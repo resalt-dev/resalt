@@ -11,3 +11,5 @@ lazy_static = "1.4.0"
 ldap3 = { version = "0.11.1", features = ["tls-native"], default-features = false }
 log = { version = "0.4.17" }
 resalt_config = { path = "../resalt_config" }
+resalt_models = { path = "../resalt_models" }
+resalt_storage = { path = "../resalt_storage" }

@@ -1,7 +1,7 @@
 export default class Job {
 	static fromObject(data: unknown): Job {
-		const { id, timestamp, jid, user, minions } = data as Job;
-		return new Job(id, timestamp, jid, user, minions);
+		const { id, timestamp, jid, user, eventId } = data as Job;
+		return new Job(id, timestamp, jid, user, eventId);
 	}
 
 	id: string;
@@ -12,13 +12,13 @@ export default class Job {
 
 	user: string;
 
-	minions: string[];
+	eventId: string[];
 
-	constructor(id: string, timestamp: string, jid: string, user: string, minions: string[]) {
+	constructor(id: string, timestamp: string, jid: string, user: string, eventId: string[]) {
 		this.id = id;
 		this.timestamp = timestamp;
 		this.jid = jid;
 		this.user = user;
-		this.minions = minions;
+		this.eventId = eventId;
 	}
 }

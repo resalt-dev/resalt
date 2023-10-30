@@ -1,10 +1,10 @@
 use actix_web::{web, Result};
 use log::*;
 use resalt_config::SConfig;
-use resalt_ldap::LdapHandler;
+use resalt_ldap::{sync_ldap_groups, LdapHandler};
 use resalt_models::*;
 use resalt_salt::SaltAPI;
-use resalt_security::{sync_ldap_groups, verify_password};
+use resalt_security::verify_password;
 use resalt_storage::StorageImpl;
 
 #[allow(clippy::borrowed_box)]
@@ -46,6 +46,7 @@ pub async fn renew_token_salt_token(
 
     Ok(AuthStatus {
         user_id: user_id.to_owned(),
+        perms: user.perms,
         auth_token: auth_token.to_owned(),
         salt_token: Some(salt_token),
     })
@@ -79,8 +80,20 @@ pub fn validate_auth_token(
         return Ok(None);
     }
 
+    let user = match data.get_user_by_id(&authtoken.user_id) {
+        Ok(user) => match user {
+            Some(user) => user,
+            None => return Err(ApiError::DatabaseError),
+        },
+        Err(e) => {
+            error!("{:?}", e);
+            return Err(ApiError::DatabaseError);
+        }
+    };
+
     Ok(Some(AuthStatus {
         user_id: authtoken.user_id,
+        perms: user.perms,
         auth_token: authtoken.id,
         salt_token: match authtoken.salt_token {
             Some(v) => match serde_json::from_str::<SaltToken>(&v) {
