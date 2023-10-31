@@ -26,13 +26,21 @@ pub fn verify_password(password: &str, password_hash: &str) -> bool {
         .is_ok()
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-//     #[test]
-//     fn it_works() {
-//         let result = add(2, 2);
-//         assert_eq!(result, 4);
-//     }
-// }
+    #[test]
+    fn test_hash_password() {
+        let password = "password";
+        let password_hash = hash_password(password);
+        assert_ne!(password, password_hash);
+    }
+
+    #[test]
+    fn test_verify_password() {
+        let password = "password";
+        let password_hash = hash_password(password);
+        assert!(verify_password(password, &password_hash));
+    }
+}

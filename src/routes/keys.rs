@@ -57,13 +57,15 @@ pub async fn route_keys_get(
         .into_iter()
         .map(|key| key.id)
         .collect::<Vec<String>>();
-    match data.prune_minions(ids) {
-        Ok(_) => (),
-        Err(e) => {
-            error!("{:?}", e);
-            return Err(ApiError::InternalError);
-        }
-    };
+    for id in ids {
+        match data.delete_minion(id) {
+            Ok(_) => (),
+            Err(e) => {
+                error!("{:?}", e);
+                return Err(ApiError::InternalError);
+            }
+        };
+    }
 
     Ok(web::Json(keys))
 }

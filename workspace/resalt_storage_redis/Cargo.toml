@@ -1,5 +1,5 @@
 [package]
-name = "resalt_storage_mysql"
+name = "resalt_storage_redis"
 version = "0.1.0"
 edition = "2021"
 publish = false
@@ -7,12 +7,14 @@ publish = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-chrono = "0.4.24"
-diesel = { version = "2.1.0", features = ["mysql", "chrono", "r2d2"] }
-diesel_migrations = "2.1.0"
-log = { version = "0.4.17" }
 resalt_config = { path = "../resalt_config" }
 resalt_models = { path = "../resalt_models" }
+resalt_security = { path = "../resalt_security" }
 resalt_storage = { path = "../resalt_storage" }
+chrono = "0.4.24"
+redis = { version = "0.23.1", features = ['r2d2'] }
+r2d2 = "0.8.10"
+log = { version = "0.4.17" }
+rand = "0.8.5"
 serde_json = "1.0.82"
 uuid = { version = "1.1.2", features = ["serde", "v4"] }

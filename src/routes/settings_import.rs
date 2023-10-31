@@ -60,12 +60,12 @@ pub async fn route_settings_import_post(
     // Import groups
     for group in &input.groups {
         // Check if group exists
-        let group_exists = match data.get_permission_group_by_name(&group.name) {
+        let group_exists = match data.get_permission_group_by_id(&group.id) {
             Ok(Some(_)) => true,
             Ok(None) => false,
             Err(e) => {
                 error!(
-                    "route_settings_import_post get_permission_group_by_name {:?}",
+                    "route_settings_import_post get_permission_group_by_id {:?}",
                     e
                 );
                 return Err(ApiError::DatabaseError);

@@ -1,14 +1,107 @@
 use chrono::NaiveDateTime;
 use log::*;
+use rand::Rng;
 use resalt_models::{
-    ApiError, AuthToken, Event, Filter, Job, Minion, MinionPreset, PermissionGroup, ResaltTime,
-    SaltToken, User,
+    ApiError, AuthToken, Event, Filter, Job, JobReturn, Minion, MinionPreset, PermissionGroup,
+    ResaltTime, SaltToken, User,
 };
-use serde_json::Value;
+use serde_json::{json, Value};
 
 use crate::StorageStatus;
 
 pub trait StorageImpl: Send {
+    fn init(&self) {
+        //
+        // Create default admin user
+        //
+        if self.get_user_by_username("admin").unwrap().is_none() {
+            // Generate random password instead of using default
+            let random_password = rand::thread_rng()
+                .sample_iter(&rand::distributions::Alphanumeric)
+                .take(15)
+                .map(|c| c.to_string())
+                .collect::<String>();
+
+            // Create initial admin user
+            let mut user = self
+                .create_user(
+                    "admin".to_string(),
+                    Some(random_password.to_string()),
+                    None,
+                    None,
+                )
+                .unwrap();
+
+            // Give permissions to admin
+            let perms: Value = json!([
+                ".*".to_string(),
+                "@runner".to_string(),
+                "@wheel".to_string(),
+                {
+                    "@resalt": [
+                        "admin.superadmin".to_string(),
+                    ],
+                },
+            ]);
+            user.perms = serde_json::to_string(&perms).unwrap();
+            self.update_user(&user).unwrap();
+
+            // Announce randomly generated password
+            warn!("============================================================");
+            warn!(
+                "==  CREATED DEFAULT USER: admin WITH PASSWORD: {}  ==",
+                random_password
+            );
+            warn!("============================================================");
+        }
+
+        //
+        // Create default permission admin group
+        //
+        // 1. Get all groups
+        let groups = self.list_permission_groups(None, None).unwrap();
+        // 2. Check if $superadmins exists
+        let mut superadmins_group_id = None;
+        for group in groups {
+            if group.name == "$superadmins" {
+                superadmins_group_id = Some(group.id);
+                break;
+            }
+        }
+        // 3. Create $superadmins if not exists
+        if let None = superadmins_group_id {
+            superadmins_group_id = Some(
+                self.create_permission_group(
+                    None,
+                    "$superadmins",
+                    Some(
+                        json!([
+                            ".*".to_string(),
+                            "@runner".to_string(),
+                            "@wheel".to_string(),
+                            {
+                                "@resalt": [
+                                    "admin.superadmin".to_string(),
+                                ]
+                            }
+                        ])
+                        .to_string(),
+                    ),
+                )
+                .unwrap(),
+            );
+        }
+        // Add admin to $superadmins if not member
+        let admin_user_id = self.get_user_by_username("admin").unwrap().unwrap().id;
+        if !self
+            .is_user_member_of_group(&admin_user_id, &superadmins_group_id.clone().unwrap())
+            .unwrap()
+        {
+            self.insert_permission_group_user(&admin_user_id, &superadmins_group_id.unwrap())
+                .unwrap();
+        }
+    }
+
     fn clone(&self) -> Box<dyn StorageImpl>;
 
     fn get_status(&self) -> Result<StorageStatus, String>;
@@ -116,7 +209,7 @@ pub trait StorageImpl: Send {
     fn update_minion(
         &self,
         minion_id: String,
-        time: chrono::NaiveDateTime,
+        time: NaiveDateTime,
         grains: Option<String>,
         pillars: Option<String>,
         pkgs: Option<String>,
@@ -133,7 +226,7 @@ pub trait StorageImpl: Send {
     fn update_minion_last_seen(
         &self,
         minion_id: String,
-        time: chrono::NaiveDateTime,
+        time: NaiveDateTime,
     ) -> Result<(), String> {
         self.update_minion(
             minion_id, time, None, None, None, None, None, None, None, None, None, None, None,
@@ -143,7 +236,7 @@ pub trait StorageImpl: Send {
     fn update_minion_grains(
         &self,
         minion_id: String,
-        time: chrono::NaiveDateTime,
+        time: NaiveDateTime,
         grains: String,
     ) -> Result<(), String> {
         self.update_minion(
@@ -166,7 +259,7 @@ pub trait StorageImpl: Send {
     fn update_minion_pillars(
         &self,
         minion_id: String,
-        time: chrono::NaiveDateTime,
+        time: NaiveDateTime,
         pillars: String,
     ) -> Result<(), String> {
         self.update_minion(
@@ -235,7 +328,7 @@ pub trait StorageImpl: Send {
         )
     }
 
-    fn prune_minions(&self, ids: Vec<String>) -> Result<(), String>;
+    fn delete_minion(&self, id: String) -> Result<(), String>;
 
     fn insert_event(
         &self,
@@ -245,6 +338,8 @@ pub trait StorageImpl: Send {
     ) -> Result<String, String>;
 
     fn list_events(&self, limit: Option<i64>, offset: Option<i64>) -> Result<Vec<Event>, String>;
+
+    fn get_event_by_id(&self, id: &str) -> Result<Option<Event>, String>;
 
     fn insert_job(
         &self,
@@ -272,7 +367,7 @@ pub trait StorageImpl: Send {
         timestamp: NaiveDateTime,
     ) -> Result<(), String>;
 
-    fn get_job_returns_by_job(&self, job: &Job) -> Result<Vec<Event>, String>;
+    fn get_job_returns_by_job(&self, job: &Job) -> Result<Vec<JobReturn>, String>;
 
     fn create_permission_group(
         &self,
@@ -288,8 +383,6 @@ pub trait StorageImpl: Send {
     ) -> Result<Vec<PermissionGroup>, String>;
 
     fn get_permission_group_by_id(&self, id: &str) -> Result<Option<PermissionGroup>, String>;
-
-    fn get_permission_group_by_name(&self, name: &str) -> Result<Option<PermissionGroup>, String>;
 
     fn get_permission_group_by_ldap_sync(
         &self,

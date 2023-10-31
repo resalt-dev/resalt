@@ -7,11 +7,9 @@ use chrono::Utc;
 use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
 use diesel_migrations::EmbeddedMigrations;
 use log::*;
-use rand::Rng;
 use resalt_config::SConfig;
 use resalt_models::*;
 use resalt_storage::{StorageImpl, StorageStatus};
-use serde_json::{json, Value};
 
 type DbPooledConnection = PooledConnection<ConnectionManager<MysqlConnection>>;
 
@@ -50,90 +48,6 @@ impl StorageMySQL {
                 Ok(own)
             }
             Err(e) => Err(format!("{:?}", e)),
-        }
-    }
-
-    fn init(&self) {
-        // Create default user
-        if self.get_user_by_username("admin").unwrap().is_none() {
-            // Generate random password instead of using default
-            let random_password = rand::thread_rng()
-                .sample_iter(&rand::distributions::Alphanumeric)
-                .take(15)
-                .map(|c| c.to_string())
-                .collect::<String>();
-
-            // Create initial admin user
-            let mut user = self
-                .create_user(
-                    "admin".to_string(),
-                    Some(random_password.to_string()),
-                    None,
-                    None,
-                )
-                .unwrap();
-
-            // Give permissions to admmin
-            let mut perms: Value = json!([
-                ".*".to_string(),
-                "@runner".to_string(),
-                "@wheel".to_string(),
-            ]);
-            // Add object permission. The array is of both strings and objects...
-            perms.as_array_mut().unwrap().push(json!({
-                "@resalt": [
-                    "admin.superadmin".to_string(),
-                ],
-            }));
-            user.perms = serde_json::to_string(&perms).unwrap();
-            self.update_user(&user).unwrap();
-
-            // Announce randomly generated password
-            warn!("============================================================");
-            warn!(
-                "==  CREATED DEFAULT USER: admin WITH PASSWORD: {}  ==",
-                random_password
-            );
-            warn!("============================================================");
-        }
-        // Create default permission group
-        if self
-            .get_permission_group_by_name("$superadmins")
-            .unwrap()
-            .is_none()
-        {
-            self.create_permission_group(
-                None,
-                "$superadmins",
-                Some(
-                    json!([
-                        ".*".to_string(),
-                        "@runner".to_string(),
-                        "@wheel".to_string(),
-                        {
-                            "@resalt": [
-                                "admin.superadmin".to_string(),
-                            ]
-                        }
-                    ])
-                    .to_string(),
-                ),
-            )
-            .unwrap();
-        }
-        // Add admin to $superadmins if not member
-        let superadmins_group_id = self
-            .get_permission_group_by_name("$superadmins")
-            .unwrap()
-            .unwrap()
-            .id;
-        let admin_user_id = self.get_user_by_username("admin").unwrap().unwrap().id;
-        if !self
-            .is_user_member_of_group(&admin_user_id, &superadmins_group_id)
-            .unwrap()
-        {
-            self.insert_permission_group_user(&admin_user_id, &superadmins_group_id)
-                .unwrap();
         }
     }
 
@@ -778,15 +692,12 @@ impl StorageImpl for StorageMySQL {
         Ok(())
     }
 
-    // Delete minions not in the list of ID's
-    fn prune_minions(&self, ids: Vec<String>) -> Result<(), String> {
+    fn delete_minion(&self, id: String) -> Result<(), String> {
         let mut connection = self.create_connection()?;
-
-        diesel::delete(minions::table.filter(minions::id.ne_all(ids)))
+        diesel::delete(minions::table.find(id))
             .execute(&mut connection)
-            .map_err(|e| format!("{:?}", e))?;
-
-        Ok(())
+            .map_err(|e| format!("{:?}", e))
+            .map(|_| ())
     }
 
     //////////////
@@ -837,6 +748,20 @@ impl StorageImpl for StorageMySQL {
                     .collect()
             })
     }
+
+    fn get_event_by_id(&self, id: &str) -> Result<Option<Event>, String> {
+        let mut connection = self.create_connection()?;
+        events::table
+            .filter(events::id.eq(id))
+            .first::<SQLEvent>(&mut connection)
+            .optional()
+            .map_err(|e| format!("{:?}", e))
+            .map(|sql_job| sql_job.map(|sql_job| sql_job.into()))
+    }
+
+    ////////////
+    /// Jobs ///
+    ////////////
 
     fn insert_job(
         &self,
@@ -938,13 +863,13 @@ impl StorageImpl for StorageMySQL {
         Ok(())
     }
 
-    fn get_job_returns_by_job(&self, job: &Job) -> Result<Vec<Event>, String> {
+    fn get_job_returns_by_job(&self, job: &Job) -> Result<Vec<JobReturn>, String> {
         let mut connection = self.create_connection()?;
-        events::table
-            .inner_join(job_returns::table.on(events::id.eq(job_returns::event_id)))
+        job_returns::table
+            .inner_join(events::table.on(events::id.eq(job_returns::event_id)))
             .filter(job_returns::job_id.eq(&job.id))
-            .load::<(SQLEvent, SQLJobReturn)>(&mut connection)
-            .map(|v: Vec<(SQLEvent, SQLJobReturn)>| v.into_iter().map(|(e, _)| e.into()).collect())
+            .load::<(SQLJobReturn, SQLEvent)>(&mut connection)
+            .map(|v: Vec<(SQLJobReturn, SQLEvent)>| v.into_iter().map(|(e, _)| e.into()).collect())
             .map_err(|e| format!("{:?}", e))
     }
 
@@ -1000,16 +925,6 @@ impl StorageImpl for StorageMySQL {
         let mut connection = self.create_connection()?;
         permission_groups::table
             .filter(permission_groups::id.eq(id))
-            .first::<SQLPermissionGroup>(&mut connection)
-            .optional()
-            .map_err(|e| format!("{:?}", e))
-            .map(|v| v.map(|v| v.into()))
-    }
-
-    fn get_permission_group_by_name(&self, name: &str) -> Result<Option<PermissionGroup>, String> {
-        let mut connection = self.create_connection()?;
-        permission_groups::table
-            .filter(permission_groups::name.eq(name))
             .first::<SQLPermissionGroup>(&mut connection)
             .optional()
             .map_err(|e| format!("{:?}", e))

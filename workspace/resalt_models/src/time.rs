@@ -1,11 +1,31 @@
 // Wrapper around chrono::NaiveDateTime, but make it serializable/deserializable
 
-use chrono::NaiveDateTime;
+use chrono::{
+    format::{DelayedFormat, StrftimeItems},
+    NaiveDateTime, ParseError,
+};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ResaltTime {
     time: NaiveDateTime,
+}
+
+impl ResaltTime {
+    #[inline]
+    #[must_use]
+    pub fn format<'a>(&self, fmt: &'a str) -> DelayedFormat<StrftimeItems<'a>> {
+        self.time.format(fmt)
+    }
+
+    #[inline]
+    #[must_use]
+    pub fn parse_from_str(s: &str, fmt: &str) -> Result<ResaltTime, ParseError> {
+        match NaiveDateTime::parse_from_str(s, fmt) {
+            Ok(time) => Ok(ResaltTime { time }),
+            Err(e) => Err(e),
+        }
+    }
 }
 
 impl Default for ResaltTime {

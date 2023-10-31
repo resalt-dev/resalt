@@ -41,13 +41,13 @@ attribute = "uid"
 lifespan = 43200
 
 [database]
-type = "mysql"
-username = "resalt"
+type = "redis"
+username = "default"
 password = "resalt"
 passwordfile = ""
 host = "db"
-port = "3306"
-database = "resalt"
+port = "6379"
+database = "0"
 
 [metrics]
 enabled = false
