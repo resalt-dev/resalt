@@ -30,7 +30,6 @@
 
 <style>
 	.portal-background {
-		background: var(--dark);
 		background-image: url('/images/0da7530ac9cd4c88850c62138da12e66.jpg');
 		background-size: cover;
 		background-position: center;
