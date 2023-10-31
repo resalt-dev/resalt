@@ -238,51 +238,41 @@
 							{#if minion.lastUpdatedConformity === null}
 								<span class="badge bg-purple"> Unknown </span>
 							{:else}
-								<Clickable
-									type="span"
-									event={() =>
-										goto(
-											paths.minion_conformity.getPath({
-												minionId: minion.id,
-											}),
-										)}
-									disabled={!hasResaltPermission(
-										$currentUser,
-										P_MINION_CONFORMITY,
-									)}
-									class="badge bg-success"
+								<svelte:element
+									this={hasResaltPermission($currentUser, P_MINION_CONFORMITY)
+										? 'a'
+										: 'span'}
+									href={paths.minion_conformity.getPath({
+										minionId: minion.id,
+									})}
+									class="badge bg-success text-decoration-none"
 								>
 									{minion.conformitySuccess ?? '?'}
-								</Clickable>
+								</svelte:element>
 								/
-								<Clickable
-									type="span"
-									event={() =>
-										goto(
-											paths.minion_conformity.getPath({
-												minionId: minion.id,
-											}),
-										)}
-									disabled={!hasResaltPermission(
-										$currentUser,
-										P_MINION_CONFORMITY,
-									)}
-									class="badge bg-warning"
+								<svelte:element
+									this={hasResaltPermission($currentUser, P_MINION_CONFORMITY)
+										? 'a'
+										: 'span'}
+									href={paths.minion_conformity.getPath({
+										minionId: minion.id,
+									})}
+									class="badge bg-warning text-decoration-none"
 								>
 									{minion.conformityIncorrect ?? '?'}
-								</Clickable>
+								</svelte:element>
 								/
-								<Clickable
-									type="span"
-									event={() => goto(paths.minion_conformity.getPath(minion.id))}
-									disabled={!hasResaltPermission(
-										$currentUser,
-										P_MINION_CONFORMITY,
-									)}
-									class="badge bg-danger"
+								<svelte:element
+									this={hasResaltPermission($currentUser, P_MINION_CONFORMITY)
+										? 'a'
+										: 'span'}
+									href={paths.minion_conformity.getPath({
+										minionId: minion.id,
+									})}
+									class="badge bg-danger text-decoration-none"
 								>
 									{minion.conformityError ?? '?'}
-								</Clickable>
+								</svelte:element>
 							{/if}
 						</td>
 						<td>
