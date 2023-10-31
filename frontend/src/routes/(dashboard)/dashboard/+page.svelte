@@ -2,7 +2,7 @@
 	import Icon from '$component/Icon.svelte';
 	import ResaltProgress from '$component/ResaltProgress.svelte';
 	import { getSystemStatus } from '$lib/api';
-	import { config, theme, toasts } from '$lib/stores';
+	import { config, toasts } from '$lib/stores';
 	import { MessageType } from '$model/MessageType';
 	import type SystemStatus from '$model/SystemStatus';
 	import { onMount } from 'svelte';
@@ -31,7 +31,7 @@
 
 <div class="row">
 	<div class="col-12 pb-3">
-		<div class="card {$theme.dark ? 'bg-dark' : ''}">
+		<div class="card">
 			<div class="card-body">
 				<!-- welcome title -->
 				<h1 class="display-4">Welcome to Resalt</h1>
@@ -58,7 +58,7 @@
 		</div>
 	</div>
 	<div class="col-12 col-xl-4 pb-3">
-		<div class="card {$theme.dark ? 'bg-dark' : ''}">
+		<div class="card">
 			<div class="card-header">
 				<h5 class="card-title mb-0">System Summary</h5>
 			</div>
@@ -135,7 +135,7 @@
 		</div>
 	</div>
 	<div class="col-12 col-xl-4 pb-3">
-		<div class="card {$theme.dark ? 'bg-dark' : ''}">
+		<div class="card">
 			<div class="card-header">
 				<h5 class="card-title mb-0">Quick Links</h5>
 			</div>
@@ -168,7 +168,7 @@
 		</div>
 	</div>
 	<div class="col-12 col-xl-4 pb-3">
-		<div class="card {$theme.dark ? 'bg-dark' : ''}">
+		<div class="card">
 			<div class="card-header">
 				<h5 class="card-title mb-0">Latest News</h5>
 			</div>

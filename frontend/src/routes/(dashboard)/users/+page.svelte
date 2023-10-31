@@ -103,9 +103,7 @@ Search box here.
 							{#if user.ldapSync !== null}
 								<span class="badge bg-{$theme.color}"> Yes </span>
 							{:else}
-								<span class="badge bg-{$theme.dark ? 'secondary' : 'dark'}">
-									No
-								</span>
+								<span class="badge bg-dark"> No </span>
 							{/if}
 						</td>
 						<td>

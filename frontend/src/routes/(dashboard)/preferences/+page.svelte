@@ -14,11 +14,6 @@
 			$theme.color = color;
 		}
 	}
-
-	function setDarkMode(dark: boolean): void {
-		console.log('toggleDarkMode');
-		theme.update((t) => ({ ...t, dark: dark }));
-	}
 </script>
 
 <svelte:head>
@@ -35,9 +30,7 @@
 						<Clickable
 							type="div"
 							event={() => selectColor(color)}
-							class="theme-selector-box bg-{color} mb-4 border-{$theme.dark
-								? 'secondary'
-								: 'light'}"
+							class="theme-selector-box bg-{color} mb-4 border-light"
 						>
 							{#if $theme.color === color}
 								<Icon
@@ -64,46 +57,10 @@
 	</div>
 {/if}
 
-<div class="card mb-0">
-	<div class="card-header">Dark mode</div>
-	<div class="card-body">
-		<div class="row">
-			<div class="col-auto">
-				<Clickable
-					type="div"
-					event={() => setDarkMode(false)}
-					class="theme-selector-box mb-4 border-{$theme.dark ? 'secondary' : 'light'}"
-					style="background-color: #fff;"
-				>
-					{#if $theme.dark === false}
-						<Icon name="check" class="text-black" size="3" />
-					{/if}
-				</Clickable>
-			</div>
-			<div class="col-auto">
-				<Clickable
-					type="div"
-					event={() => setDarkMode(true)}
-					class="theme-selector-box bg-dark mb-4 border-{$theme.dark
-						? 'secondary'
-						: 'light'}"
-				>
-					{#if $theme.dark === true}
-						<Icon name="check" class="text-white" size="3" />
-					{/if}
-				</Clickable>
-			</div>
-		</div>
-
-		<button
-			type="button"
-			class="btn btn-{$theme.color}"
-			on:click={() => setDarkMode($config?.themeDefaultDark ?? false)}
-		>
-			Reset
-		</button>
-
-		{#if hasResaltPermission($currentUser, P_ADMIN_SUPERADMIN)}
+{#if hasResaltPermission($currentUser, P_ADMIN_SUPERADMIN)}
+	<div class="card mb-0">
+		<div class="card-header">Debug</div>
+		<div class="card-body">
 			<button
 				class="btn btn-warning"
 				on:click={() => {
@@ -118,9 +75,9 @@
 			>
 				Show toast
 			</button>
-		{/if}
+		</div>
 	</div>
-</div>
+{/if}
 
 <style>
 	:global(.theme-selector-box) {

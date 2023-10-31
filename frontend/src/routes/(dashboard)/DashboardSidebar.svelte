@@ -130,7 +130,7 @@
 </div>
 
 <div>
-	<div class="modal {$theme.dark ? 'theme-dark' : ''}" tabindex="-1" role="dialog" id={randomId}>
+	<div class="modal" tabindex="-1" role="dialog" id={randomId}>
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<Clickable

@@ -5,7 +5,7 @@
 	import { writable, type Writable } from 'svelte/store';
 
 	import TerminalBox from '$component/TerminalBox.svelte';
-	import { returns, theme } from '$lib/stores';
+	import { returns } from '$lib/stores';
 
 	const collapsed: Writable<number[]> = writable([]);
 
@@ -38,7 +38,7 @@
 		collapsed={$collapsed.includes(ret.num)}
 	>
 		<div slot="header">
-			<code class="fw-bold {$theme.dark ? '' : 'text-dark'}">
+			<code class="fw-bold">
 				{ret.command.toCommandLine({ forceWheel: true })}
 			</code>
 			<small class="float-end text-muted pt-1">

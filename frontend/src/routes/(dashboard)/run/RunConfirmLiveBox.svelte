@@ -2,7 +2,7 @@
 	import Clickable from '$component/Clickable.svelte';
 	import CopyButton from '$component/CopyButton.svelte';
 	import { hasPermission } from '$lib/perms';
-	import { currentUser, theme } from '$lib/stores';
+	import { currentUser } from '$lib/stores';
 	import { getRCTBaseType, isRCTAsync, isRCTBatch } from '$model/RunClientType';
 	import type RunCommand from '$model/RunCommand';
 	import { Modal } from 'bootstrap';
@@ -56,9 +56,9 @@
 </script>
 
 <!-- isOpen={command !== null} -->
-<div class="modal {$theme.dark ? 'theme-dark' : ''}" tabindex="-1" role="dialog" id={randomId}>
+<div class="modal" tabindex="-1" role="dialog" id={randomId}>
 	<div class="modal-dialog">
-		<div class="modal-content {$theme.dark ? 'bg-secondary text-white' : ''}">
+		<div class="modal-content">
 			<Clickable type="div" event={close} class="modal-header bg-warning text-dark">
 				Live-Run Execution
 			</Clickable>

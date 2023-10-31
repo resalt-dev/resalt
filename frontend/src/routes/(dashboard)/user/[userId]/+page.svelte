@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import CopyButton from '$component/CopyButton.svelte';
 	import { getUserById } from '$lib/api';
-	import { replacementParams, theme, toasts } from '$lib/stores';
+	import { replacementParams, toasts } from '$lib/stores';
 	import { MessageType } from '$model/MessageType';
 	import type User from '$model/User';
 	import { onMount } from 'svelte';
@@ -41,21 +41,21 @@
 {:else}
 	<div class="row">
 		<div class="col-12 col-xxl-4 pb-3">
-			<div class="card h-100 {$theme.dark ? 'bg-dark' : ''}">
+			<div class="card h-100">
 				<div class="card-header">General</div>
 				<ul class="list-group list-group-flush">
-					<li class="list-group-item {$theme.dark ? 'bg-dark text-light' : ''}">
+					<li class="list-group-item">
 						<strong>ID</strong>
 						<span class="float-end">
 							{$user.id}
 							<CopyButton name="User ID" value={$user.id} />
 						</span>
 					</li>
-					<li class="list-group-item {$theme.dark ? 'bg-dark text-light' : ''}">
+					<li class="list-group-item">
 						<strong>Username</strong>
 						<span class="float-end">{$user.username}</span>
 					</li>
-					<li class="list-group-item {$theme.dark ? 'bg-dark text-light' : ''}">
+					<li class="list-group-item">
 						<strong>Last Login</strong>
 						<span class="float-end">
 							{#if $user.lastLogin}
@@ -65,7 +65,7 @@
 							{/if}
 						</span>
 					</li>
-					<li class="list-group-item {$theme.dark ? 'bg-dark text-light' : ''}">
+					<li class="list-group-item">
 						<strong>Email</strong>
 						<span class="float-end">
 							{#if $user.email}
@@ -75,7 +75,7 @@
 							{/if}
 						</span>
 					</li>
-					<li class="list-group-item {$theme.dark ? 'bg-dark text-light' : ''}">
+					<li class="list-group-item">
 						<strong>LDAP Sync DN</strong>
 						<span class="float-end">
 							{#if $user.ldapSync}

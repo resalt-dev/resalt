@@ -24,7 +24,6 @@ export const socket = writable<{ connected: boolean; lastPing: Date | null }>({
 });
 export const theme = persisted(`${prefix}theme`, {
 	color: 'primary',
-	dark: false,
 });
 export const currentUser: Writable<User | null> = persisted(`${prefix}currentUser`, null);
 

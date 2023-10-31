@@ -98,7 +98,6 @@ lazy_static::lazy_static! {
     static ref HTTP_PORT: u16 = conf!("http.port").parse().unwrap();
     static ref HTTP_FRONTEND_THEME_ENABLED: bool = conf!("http.frontend.theme.enabled").parse().unwrap();
     static ref HTTP_FRONTEND_THEME_COLOR: String = conf!("http.frontend.theme.color");
-    static ref HTTP_FRONTEND_THEME_DARK: bool = conf!("http.frontend.theme.dark").parse().unwrap();
 }
 
 pub struct SConfig {}
@@ -198,10 +197,6 @@ impl SConfig {
     pub fn http_frontend_theme_color() -> String {
         HTTP_FRONTEND_THEME_COLOR.clone()
     }
-
-    pub fn http_frontend_theme_dark() -> bool {
-        *HTTP_FRONTEND_THEME_DARK
-    }
 }
 
 #[cfg(test)]
@@ -236,6 +231,5 @@ mod tests {
         SConfig::http_port();
         SConfig::http_frontend_theme_enabled();
         SConfig::http_frontend_theme_color();
-        SConfig::http_frontend_theme_dark();
     }
 }

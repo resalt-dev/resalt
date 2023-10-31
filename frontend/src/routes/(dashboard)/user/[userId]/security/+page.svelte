@@ -97,7 +97,7 @@
 	<div class="row">
 		{#if hasResaltPermission($currentUser, P_USER_ADMIN) || ($currentUser?.id === $user.id && hasResaltPermission($currentUser, P_USER_PASSWORD))}
 			<div class="col-12 col-xxl-4 pb-3">
-				<div class="card h-100 {$theme.dark ? 'bg-dark' : ''}">
+				<div class="card h-100">
 					<div class="card-header">Password</div>
 					<div class="card-body">
 						<div class="form-floating mb-3">
