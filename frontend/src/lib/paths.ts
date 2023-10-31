@@ -25,7 +25,7 @@ import {
 // Type parameter T is used to define the required params for the path
 // T MUST be an object with string properties
 // e.g. {userId: string} or {minionId: string}
-export class Path<T = {}> {
+export class Path<T = object> {
 	order: number;
 
 	private path: string;
