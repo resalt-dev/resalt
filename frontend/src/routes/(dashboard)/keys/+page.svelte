@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import Clickable from '$component/Clickable.svelte';
 	import TablePaginate from '$component/TablePaginate.svelte';
 	import { acceptKey, deleteKey, getKeys, rejectKey } from '$lib/api';
 	import paths from '$lib/paths';
@@ -118,12 +119,18 @@ Search box here.
 			{:else}
 				{#each keysView as key}
 					<tr>
-						<th
+						<Clickable
+							type="th"
 							class="mouse-pointer"
-							on:click={() => goto(paths.minion.getPath({ minionId: key.id }))}
+							event={() => goto(paths.minion.getPath({ minionId: key.id }))}
 						>
-							{key.id}
-						</th>
+							<a
+								href={paths.minion.getPath({ minionId: key.id })}
+								class="text-decoration-none text-reset"
+							>
+								{key.id}
+							</a>
+						</Clickable>
 						<td>
 							{#if key.state === 'minions'}
 								<span class="badge bg-success">Accepted</span>
