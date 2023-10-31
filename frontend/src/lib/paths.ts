@@ -65,9 +65,7 @@ export class Path<T = {}> {
 		const requiredParams = path.match(/\/\[([A-Za-z]+])\]/g);
 		if (requiredParams !== null) {
 			if (typeof params !== 'object' || params === null) {
-				throw new Error(
-					`Path "${this.label}" requires params, but none were provided`,
-				);
+				throw new Error(`Path "${this.label}" requires params, but none were provided`);
 			}
 
 			// Check if all required params are present
@@ -80,11 +78,13 @@ export class Path<T = {}> {
 				}
 			}
 		}
-		
 
 		// If params is an object, substitute url arguments (.e.g "[userId]" or "[minionId]") with params
 		if (typeof params === 'object' && params !== null) {
-			path = path.replace(/\[([A-Za-z]+)\]/g, (_, key) => ((params as Record<string, unknown>)[key] + "") || '');
+			path = path.replace(
+				/\[([A-Za-z]+)\]/g,
+				(_, key) => (params as Record<string, unknown>)[key] + '' || '',
+			);
 		}
 
 		// If searchParams is an object, add query string to url
@@ -130,8 +130,14 @@ const paths = {
 		P_RUN_TEMPLATE_GLOBAL,
 	]),
 
-	minion: new Path<{minionId: string}>(30, '/minion/[minionId]', 'Minion', null, null),
-	minion_grains: new Path<{minionId: string}>(31, '/minion/[minionId]/grains', 'Grains', null, null),
+	minion: new Path<{ minionId: string }>(30, '/minion/[minionId]', 'Minion', null, null),
+	minion_grains: new Path<{ minionId: string }>(
+		31,
+		'/minion/[minionId]/grains',
+		'Grains',
+		null,
+		null,
+	),
 	minion_conformity: new Path(32, '/minion/[minionId]/conformity', 'Conformity', null, [
 		P_MINION_CONFORMITY,
 	]),
@@ -141,12 +147,16 @@ const paths = {
 	]),
 
 	minions: new Path(40, '/minions', 'Minions', 'server', [P_MINION_LIST]),
-	minions_presets: new Path<{presetId?: string}>(41, '/minions/presets/[[presetId]]', 'Presets', null, [
-		P_MINION_PRESETS_LIST,
-	]),
+	minions_presets: new Path<{ presetId?: string }>(
+		41,
+		'/minions/presets/[[presetId]]',
+		'Presets',
+		null,
+		[P_MINION_PRESETS_LIST],
+	),
 	minions_grains: new Path(42, '/minions/grains', 'Grains', null, [P_MINION_GRAINEXPLORER]),
 
-	job: new Path<{jobId: string}>(50, '/job/[jobId]', 'Job', null, null),
+	job: new Path<{ jobId: string }>(50, '/job/[jobId]', 'Job', null, null),
 
 	jobs: new Path(60, '/jobs', 'Jobs', 'briefcase', [P_JOB_LIST]),
 
@@ -156,9 +166,21 @@ const paths = {
 
 	_1: new Path(99, '/_', '_', '', null),
 
-	user_info: new Path<{userId: string}>(100, '/user/[userId]', 'User', null, null),
-	user_security: new Path<{userId: string}>(101, '/user/[userId]/security', 'Security', null, null),
-	user_permissions: new Path<{userId: string}>(102, '/user/[userId]/permissions', 'Permissions', null, null),
+	user_info: new Path<{ userId: string }>(100, '/user/[userId]', 'User', null, null),
+	user_security: new Path<{ userId: string }>(
+		101,
+		'/user/[userId]/security',
+		'Security',
+		null,
+		null,
+	),
+	user_permissions: new Path<{ userId: string }>(
+		102,
+		'/user/[userId]/permissions',
+		'Permissions',
+		null,
+		null,
+	),
 
 	users_list: new Path(110, '/users', 'Users', 'user-circle', [P_USER_LIST]),
 	users_add: new Path(110, '/users/add', 'Add user', null, [P_USER_ADMIN]),
