@@ -84,9 +84,12 @@ Search box here.
 			{:else}
 				{#each $users as user}
 					<tr>
-						<Clickable event={() => goto(paths.user_info.getPath(user.id))} type="th">
+						<Clickable
+							event={() => goto(paths.user_info.getPath({ userId: user.id }))}
+							type="th"
+						>
 							<a
-								href={paths.user_info.getPath(user.id)}
+								href={paths.user_info.getPath({ userId: user.id })}
 								class="text-decoration-none text-reset"
 							>
 								{user.username}
@@ -107,7 +110,7 @@ Search box here.
 						</td>
 						<td>
 							<a
-								href={paths.user_info.getPath(user.id)}
+								href={paths.user_info.getPath({ userId: user.id })}
 								class="btn btn-{$theme.color} btn-sm px-3 me-2"
 							>
 								View

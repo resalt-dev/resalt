@@ -28,7 +28,7 @@
 			userLDAPSyncFieldValue.length === 0 ? null : userLDAPSyncFieldValue,
 		)
 			.then((user) => {
-				goto(paths.user_info.getPath(user.id));
+				goto(paths.user_info.getPath({ userId: user.id }));
 				toasts.add(MessageType.SUCCESS, 'User created', `User ${user.username} created`);
 			})
 			.catch((err) => {

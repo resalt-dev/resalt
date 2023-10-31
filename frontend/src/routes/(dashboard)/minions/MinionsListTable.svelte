@@ -221,9 +221,12 @@
 			{:else}
 				{#each minions as minion}
 					<tr>
-						<Clickable event={() => goto(paths.minion.getPath(minion.id))} type="th">
+						<Clickable
+							event={() => goto(paths.minion.getPath({ minionId: minion.id }))}
+							type="th"
+						>
 							<a
-								href={paths.minion.getPath(minion.id)}
+								href={paths.minion.getPath({ minionId: minion.id })}
 								class="text-decoration-none text-reset"
 							>
 								{minion.id}
@@ -238,7 +241,11 @@
 								<Clickable
 									type="span"
 									event={() =>
-										goto(paths.minion.getPath(minion.id, 'conformity'))}
+										goto(
+											paths.minion_conformity.getPath({
+												minionId: minion.id,
+											}),
+										)}
 									disabled={!hasResaltPermission(
 										$currentUser,
 										P_MINION_CONFORMITY,
@@ -251,7 +258,11 @@
 								<Clickable
 									type="span"
 									event={() =>
-										goto(paths.minion.getPath(minion.id, 'conformity'))}
+										goto(
+											paths.minion_conformity.getPath({
+												minionId: minion.id,
+											}),
+										)}
 									disabled={!hasResaltPermission(
 										$currentUser,
 										P_MINION_CONFORMITY,
@@ -263,8 +274,7 @@
 								/
 								<Clickable
 									type="span"
-									event={() =>
-										goto(paths.minion.getPath(minion.id, 'conformity'))}
+									event={() => goto(paths.minion_conformity.getPath(minion.id))}
 									disabled={!hasResaltPermission(
 										$currentUser,
 										P_MINION_CONFORMITY,
@@ -277,7 +287,7 @@
 						</td>
 						<td>
 							<a
-								href={paths.minion.getPath(minion.id)}
+								href={paths.minion.getPath({ minionId: minion.id })}
 								class="btn btn-{$theme.color} btn-sm px-3 me-2"
 							>
 								View

@@ -40,7 +40,9 @@
 			if (!selected) {
 				// If no preset is selected, select the first one
 				if (data.length > 0) {
-					goto(paths.minions_presets.getPath(data[0].id), { invalidateAll: true });
+					goto(paths.minions_presets.getPath({ presetId: data[0].id }), {
+						invalidateAll: true,
+					});
 				}
 			}
 		});
@@ -86,7 +88,7 @@
 					'Preset saved',
 					'New preset "' + data.name + '" saved.',
 				);
-				goto(paths.minions_presets.getPath(data.id), { invalidateAll: true });
+				goto(paths.minions_presets.getPath({ presetId: data.id }), { invalidateAll: true });
 			})
 			.catch((error: Error) => {
 				toasts.add(MessageType.ERROR, 'Failed to save new preset', error);
@@ -112,7 +114,7 @@
 					'Preset saved',
 					'New preset "' + data.name + '" saved.',
 				);
-				goto(paths.minions_presets.getPath(data.id), { invalidateAll: true });
+				goto(paths.minions_presets.getPath({ presetId: data.id }), { invalidateAll: true });
 			})
 			.catch((error: Error) => {
 				toasts.add(MessageType.ERROR, 'Failed to save new preset', error);
@@ -133,7 +135,7 @@
 					'Preset "' + data.name + '" updated.',
 				);
 				logic($page.url.pathname);
-				goto(paths.minions_presets.getPath(data.id), { invalidateAll: true });
+				goto(paths.minions_presets.getPath({ presetId: data.id }), { invalidateAll: true });
 			})
 			.catch((error: Error) => {
 				toasts.add(MessageType.ERROR, 'Failed to update preset', error);
@@ -243,7 +245,8 @@
 						{#each $presets ?? [] as preset}
 							<Clickable
 								type="tr"
-								event={() => goto(paths.minions_presets.getPath(preset.id))}
+								event={() =>
+									goto(paths.minions_presets.getPath({ presetId: preset.id }))}
 								class={$selectedPreset.id === preset.id ? 'text-success' : ''}
 							>
 								<th

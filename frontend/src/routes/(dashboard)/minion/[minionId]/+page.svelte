@@ -43,7 +43,7 @@
 						<span class="align-middle">
 							{$minion?.id}
 						</span>{#if hasResaltPermission($currentUser, P_RUN_LIVE)}
-							<a href={paths.run.getPath('live?target=' + $minion?.id)}>
+							<a href={paths.run.getPath({}, { target: $minion?.id ?? '' })}>
 								<button
 									type="button"
 									class="btn btn-{$theme.color} btn-sm ms-2"

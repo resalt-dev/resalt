@@ -120,7 +120,7 @@ Search box here.
 					<tr>
 						<th
 							class="mouse-pointer"
-							on:click={() => goto(paths.minion.getPath(key.id))}
+							on:click={() => goto(paths.minion.getPath({ minionId: key.id }))}
 						>
 							{key.id}
 						</th>
