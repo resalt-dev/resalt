@@ -138,13 +138,27 @@ const paths = {
 		null,
 		null,
 	),
-	minion_conformity: new Path<{minionId: string}>(32, '/minion/[minionId]/conformity', 'Conformity', null, [
-		P_MINION_CONFORMITY,
-	]),
-	minion_pillars: new Path<{minionId: string}>(33, '/minion/[minionId]/pillars', 'Pillars', null, [P_MINION_PILLARS]),
-	minion_packages: new Path<{minionId: string}>(34, '/minion/[minionId]/packages', 'Packages', null, [
-		P_MINION_PACKAGES,
-	]),
+	minion_conformity: new Path<{ minionId: string }>(
+		32,
+		'/minion/[minionId]/conformity',
+		'Conformity',
+		null,
+		[P_MINION_CONFORMITY],
+	),
+	minion_pillars: new Path<{ minionId: string }>(
+		33,
+		'/minion/[minionId]/pillars',
+		'Pillars',
+		null,
+		[P_MINION_PILLARS],
+	),
+	minion_packages: new Path<{ minionId: string }>(
+		34,
+		'/minion/[minionId]/packages',
+		'Packages',
+		null,
+		[P_MINION_PACKAGES],
+	),
 
 	minions: new Path(40, '/minions', 'Minions', 'server', [P_MINION_LIST]),
 	minions_presets: new Path<{ presetId?: string }>(
