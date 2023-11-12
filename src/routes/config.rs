@@ -2,9 +2,8 @@ use actix_web::{web, Responder, Result};
 use log::error;
 use resalt_config::SConfig;
 use resalt_models::ApiError;
+use resalt_updater::{get_update_cache, CURRENT_VERSION};
 use serde::Serialize;
-
-use crate::update;
 
 #[allow(non_snake_case)]
 #[derive(Debug, Serialize)]
@@ -18,10 +17,10 @@ struct ApiConfig {
 }
 
 pub async fn route_config_get() -> Result<impl Responder, ApiError> {
-    let update_info = update::get_update_cache(false).await;
+    let update_info = get_update_cache(false).await;
     let config = ApiConfig {
         authForwardEnabled: SConfig::auth_forward_enabled(),
-        currentVersion: update::CURRENT_VERSION.to_string(),
+        currentVersion: CURRENT_VERSION.to_string(),
         latestVersion: match update_info.version {
             Some(version) => version,
             None => {

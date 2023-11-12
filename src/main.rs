@@ -5,6 +5,7 @@ use middleware::{RequireAuth, ValidateAuth};
 use resalt_config::SConfig;
 use resalt_pipeline::PipelineServer;
 use resalt_salt::{SaltAPI, SaltEventListener, SaltEventListenerStatus};
+use resalt_scheduler::Scheduler;
 use resalt_storage::{StorageCloneWrapper, StorageImpl};
 use resalt_storage_mysql::StorageMySQL;
 use resalt_storage_redis::StorageRedis;
@@ -14,8 +15,6 @@ use tokio::task;
 mod auth;
 mod middleware;
 mod routes;
-mod scheduler;
-mod update;
 
 async fn init_db() -> Box<dyn StorageImpl> {
     match SConfig::database_type().to_lowercase().as_str() {
@@ -90,7 +89,7 @@ async fn main() -> std::io::Result<()> {
     });
 
     // Scheduler
-    let mut scheduler = scheduler::Scheduler::new(db_clone_wrapper.clone());
+    let mut scheduler = Scheduler::new(db_clone_wrapper.clone());
     scheduler.register_system_jobs();
     scheduler.start();
 
