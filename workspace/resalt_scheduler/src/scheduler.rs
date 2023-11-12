@@ -9,9 +9,8 @@ use resalt_config::SConfig;
 use resalt_ldap::{sync_ldap_groups, LdapHandler, LdapUser};
 use resalt_models::User;
 use resalt_storage::StorageCloneWrapper;
+use resalt_updater::get_update_cache;
 use tokio::task;
-
-use crate::update;
 
 #[derive(Clone)]
 pub struct Scheduler {
@@ -38,7 +37,7 @@ impl Scheduler {
             let rt = tokio::runtime::Runtime::new().unwrap();
             let ls = task::LocalSet::new();
             ls.block_on(&rt, async {
-                update::get_update_cache(true).await;
+                get_update_cache(true).await;
             });
         });
 

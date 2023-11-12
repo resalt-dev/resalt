@@ -1,0 +1,17 @@
+[package]
+name = "resalt_scheduler"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clokwerk = "0.4.0"
+log = { version = "0.4.17" }
+resalt_config = { path = "../resalt_config" }
+resalt_ldap = { path = "../resalt_ldap" }
+resalt_models = { path = "../resalt_models" }
+resalt_storage = { path = "../resalt_storage" }
+resalt_updater = { path = "../resalt_updater" }
+tokio = { version = "1.20.0", features = ["rt-multi-thread"], default-features = false }
