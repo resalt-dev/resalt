@@ -1,18 +1,17 @@
 use std::sync::{Arc, Mutex};
 
 use actix_web::{http::header, middleware::*, web, App, HttpServer};
+use env_logger::{init_from_env, Env};
 use resalt_config::SConfig;
 use resalt_middleware::{RequireAuth, ValidateAuth};
 use resalt_pipeline::PipelineServer;
+use resalt_routes::*;
 use resalt_salt::{SaltAPI, SaltEventListener, SaltEventListenerStatus};
 use resalt_scheduler::Scheduler;
 use resalt_storage::{StorageCloneWrapper, StorageImpl};
 use resalt_storage_mysql::StorageMySQL;
 use resalt_storage_redis::StorageRedis;
-use routes::*;
 use tokio::task;
-
-mod routes;
 
 async fn init_db() -> Box<dyn StorageImpl> {
     match SConfig::database_type().to_lowercase().as_str() {
@@ -54,7 +53,7 @@ async fn init_db() -> Box<dyn StorageImpl> {
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
-    env_logger::init_from_env(env_logger::Env::new().default_filter_or("Debug"));
+    init_from_env(Env::new().default_filter_or("Debug"));
 
     // SSE
     let pipeline = PipelineServer::new();

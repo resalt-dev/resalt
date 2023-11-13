@@ -7,14 +7,14 @@ use serde::Deserialize;
 use serde_json::{json, Value};
 
 #[derive(Deserialize)]
-pub struct MinionsListGetQuery {
+pub struct GrainsGetQuery {
     query: String,
     filter: Option<String>, // URL-encoded JSON
 }
 
 pub async fn route_grains_get(
     data: web::Data<Box<dyn StorageImpl>>,
-    info: web::Query<MinionsListGetQuery>,
+    info: web::Query<GrainsGetQuery>,
     req: HttpRequest,
 ) -> Result<impl Responder, ApiError> {
     let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
