@@ -1,10 +1,9 @@
 use std::sync::{Arc, Mutex};
 
 use awc::Client;
-use cargo_toml::Inheritable::Set;
-use cargo_toml::Manifest;
 use lazy_static::lazy_static;
 use log::*;
+use toml::Table;
 
 const UPDATE_URL: &str = "https://secure.resalt.dev/Cargo.toml";
 
@@ -51,27 +50,26 @@ async fn fetch_remote_info() -> Result<UpdateInfo, String> {
         }
     };
     // Parse TOML
-    let toml = match Manifest::from_str(&body_str) {
-        Ok(toml) => toml,
+    let cargo = match body_str.parse::<Table>() {
+        Ok(cargo) => cargo,
         Err(e) => return Err(format!("Error parsing TOML: {}", e)),
     };
 
     // Get version
-    let package = match toml.package {
+    let package = match cargo.get("package") {
         Some(package) => package,
         None => return Err("Error parsing TOML: no package".to_string()),
     };
-    let version: String = match package.version {
-        Set(version) => version,
-        _ => {
-            return Err(
-                "Error parsing TOML: inherited version in top toml not possible".to_string(),
-            )
-        }
+    let version: String = match package.get("version") {
+        Some(version) => match version.as_str() {
+            Some(version) => version.to_string(),
+            None => return Err("Error parsing TOML: version is not a string".to_string()),
+        },
+        None => return Err("Error parsing TOML: no version".to_string()),
     };
 
     // Get news (package.metadata.resalt.news)
-    let metadata = match package.metadata {
+    let metadata = match package.get("metadata") {
         Some(metadata) => metadata,
         None => return Err("Error parsing TOML: no metadata".to_string()),
     };

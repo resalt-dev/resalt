@@ -8,7 +8,7 @@ publish = false
 
 [dependencies]
 awc = { version = "3.1.1", features=["openssl", "compress-gzip"], default-features = false }
-cargo_toml = "0.17.0"
+toml = { version = "0.8.8", features = ["parse"], default-features = false }
 chrono = "0.4.24"
 log = { version = "0.4.17" }
 lazy_static = "1.4.0"
