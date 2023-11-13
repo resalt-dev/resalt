@@ -1,5 +1,8 @@
 use actix_web::{web, HttpRequest, Responder, Result};
 use log::*;
+use resalt_auth::auth_login_classic;
+use resalt_auth::auth_login_ldap;
+use resalt_auth::renew_token_salt_token;
 use resalt_config::SConfig;
 use resalt_ldap::sync_ldap_groups;
 use resalt_ldap::LdapHandler;
@@ -8,10 +11,6 @@ use resalt_models::{ApiError, User};
 use resalt_salt::SaltAPI;
 use resalt_storage::StorageImpl;
 use serde::{Deserialize, Serialize};
-
-use crate::auth::auth_login_classic;
-use crate::auth::auth_login_ldap;
-use crate::auth::renew_token_salt_token;
 
 #[derive(Deserialize, Debug)]
 pub struct LoginRequest {

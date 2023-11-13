@@ -13,8 +13,12 @@ publish = false
 
 [workspace]
 members = [
+    "workspace/resalt_auth",
     "workspace/resalt_config",
+    "workspace/resalt_ldap",
+    "workspace/resalt_middleware",
     "workspace/resalt_models",
+    "workspace/resalt_pipeline",
     "workspace/resalt_salt",
     "workspace/resalt_scheduler",
     "workspace/resalt_security",
@@ -26,8 +30,10 @@ members = [
 
 [dependencies]
 # Own modules
+resalt_auth = { path = "workspace/resalt_auth" }
 resalt_config = { path = "workspace/resalt_config" }
 resalt_ldap = { path = "workspace/resalt_ldap" }
+resalt_middleware = { path = "workspace/resalt_middleware" }
 resalt_models = { path = "workspace/resalt_models" }
 resalt_pipeline = { path = "workspace/resalt_pipeline" }
 resalt_salt = { path = "workspace/resalt_salt" }
@@ -47,7 +53,6 @@ env_logger = "0.10.0"
 
 # Threading
 tokio = { version = "1.20.0", features = ["rt-multi-thread"], default-features = false }
-futures = "0.3.21"
 
 # Utils
 chrono = "0.4.24"

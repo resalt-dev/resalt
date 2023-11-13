@@ -1,4 +1,3 @@
-use crate::auth::{renew_token_salt_token, validate_auth_token};
 use actix_web::{
     dev::{forward_ready, Service, ServiceRequest, ServiceResponse, Transform},
     web::Query,
@@ -6,6 +5,7 @@ use actix_web::{
 };
 use futures::future::{ok, Future, Ready};
 use log::*;
+use resalt_auth::{renew_token_salt_token, validate_auth_token};
 use resalt_models::AuthStatus;
 use resalt_salt::SaltAPI;
 use resalt_storage::StorageImpl;

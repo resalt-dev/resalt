@@ -1,6 +1,6 @@
-use crate::auth::*;
 use actix_web::{web, HttpResponse, Responder, Result};
 use log::*;
+use resalt_auth::validate_auth_token;
 use resalt_config::SConfig;
 use resalt_models::ApiError;
 use resalt_salt::RESALT_SALT_SYSTEM_SERVICE_USERNAME;

@@ -1,8 +1,8 @@
 use std::sync::{Arc, Mutex};
 
 use actix_web::{http::header, middleware::*, web, App, HttpServer};
-use middleware::{RequireAuth, ValidateAuth};
 use resalt_config::SConfig;
+use resalt_middleware::{RequireAuth, ValidateAuth};
 use resalt_pipeline::PipelineServer;
 use resalt_salt::{SaltAPI, SaltEventListener, SaltEventListenerStatus};
 use resalt_scheduler::Scheduler;
@@ -12,8 +12,6 @@ use resalt_storage_redis::StorageRedis;
 use routes::*;
 use tokio::task;
 
-mod auth;
-mod middleware;
 mod routes;
 
 async fn init_db() -> Box<dyn StorageImpl> {

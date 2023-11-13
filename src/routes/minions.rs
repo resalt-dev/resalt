@@ -1,6 +1,6 @@
-use crate::auth::*;
 use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
+use resalt_auth::renew_token_salt_token;
 use resalt_models::*;
 use resalt_salt::{SaltAPI, SaltError};
 use resalt_security::*;

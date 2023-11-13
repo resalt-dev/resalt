@@ -6,7 +6,7 @@ use resalt_security::*;
 use resalt_storage::StorageImpl;
 use serde::Deserialize;
 
-use crate::auth::renew_token_salt_token;
+use resalt_auth::renew_token_salt_token;
 
 pub async fn route_keys_get(
     salt: web::Data<SaltAPI>,
