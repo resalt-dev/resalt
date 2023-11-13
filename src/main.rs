@@ -105,7 +105,6 @@ async fn main() -> std::io::Result<()> {
                     .app_data(web::Data::new(db_clone_wrapper.clone().storage))
                     .app_data(web::Data::new(salt_api.clone()))
                     .app_data(web::Data::new(listener_status.clone()))
-                    .app_data(web::Data::new(scheduler.clone()))
                     // enable logger - always register Actix Web Logger middleware last
                     .wrap(Logger::default())
                     // validate auth
