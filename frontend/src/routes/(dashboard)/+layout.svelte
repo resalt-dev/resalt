@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import SSEConnector from '$component/SSEConnector.svelte';
 	import { getCurrentUser } from '$lib/api';
 	import paths from '$lib/paths';
 	import { auth, currentUser, toasts } from '$lib/stores';
@@ -34,7 +33,6 @@
 {#if $currentUser === null}
 	<p>Loading...</p>
 {:else}
-	<SSEConnector />
 	<div class="d-flex flex-row h-100">
 		<div class="">
 			<DashboardSidebar />

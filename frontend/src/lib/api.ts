@@ -39,12 +39,6 @@ function getToken(): string {
 	return auth.token;
 }
 
-export async function createSSESocket(): Promise<EventSource> {
-	const token = getToken();
-	const stream = new EventSource(`${constants.apiUrl}/pipeline?token=${token}`);
-	return stream;
-}
-
 async function sendRequest(url: string, options: RequestInit): Promise<unknown> {
 	const res = await fetch(url, options);
 

@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import Icon from '$component/Icon.svelte';
 	import paths from '$lib/paths';
-	import { currentUser, replacementParams, socket, theme } from '$lib/stores';
+	import { currentUser, replacementParams, socketDeprecated, theme } from '$lib/stores';
 	import type { Page } from '@sveltejs/kit';
 
 	type NavbarItem = {
@@ -108,10 +108,10 @@
 		</div>
 	</div>
 	<div class="col-auto pe-3 d-flex align-items-center">
-		{#if $socket.connected}
+		{#if $socketDeprecated.connected}
 			<!-- display lastPing as hh:mm:ss -->
 			<span class="font-monospace pt-1 ps-3"
-				>Connected: {new Date($socket.lastPing ?? new Date(0))
+				>Connected: {new Date($socketDeprecated.lastPing ?? new Date(0))
 					.toLocaleTimeString('en-US', {
 						timeZone: 'UTC',
 						timeZoneName: 'short',

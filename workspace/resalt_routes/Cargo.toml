@@ -15,7 +15,6 @@ resalt_auth = { path = "../resalt_auth" }
 resalt_config = { path = "../resalt_config" }
 resalt_ldap = { path = "../resalt_ldap" }
 resalt_models = { path = "../resalt_models" }
-resalt_pipeline = { path = "../resalt_pipeline" }
 resalt_salt = { path = "../resalt_salt" }
 resalt_security = { path = "../resalt_security" }
 resalt_storage = { path = "../resalt_storage" }

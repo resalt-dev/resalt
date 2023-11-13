@@ -18,7 +18,10 @@ export const sidebarCollapsed = persisted(`${prefix}sidebarCollapsed`, false);
 
 export const auth: Writable<AuthToken | null> = persisted(`${prefix}auth`, null);
 export const config: Writable<Config | null> = persisted(`${prefix}config`, null);
-export const socket = writable<{ connected: boolean; lastPing: Date | null }>({
+/**
+ * @deprecated
+ */
+export const socketDeprecated = writable<{ connected: boolean; lastPing: Date | null }>({
 	connected: false,
 	lastPing: null,
 });

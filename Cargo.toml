@@ -18,7 +18,6 @@ members = [
     "workspace/resalt_ldap",
     "workspace/resalt_middleware",
     "workspace/resalt_models",
-    "workspace/resalt_pipeline",
     "workspace/resalt_routes",
     "workspace/resalt_salt",
     "workspace/resalt_scheduler",
@@ -36,7 +35,6 @@ resalt_config = { path = "workspace/resalt_config" }
 resalt_ldap = { path = "workspace/resalt_ldap" }
 resalt_middleware = { path = "workspace/resalt_middleware" }
 resalt_models = { path = "workspace/resalt_models" }
-resalt_pipeline = { path = "workspace/resalt_pipeline" }
 resalt_routes = { path = "workspace/resalt_routes" }
 resalt_salt = { path = "workspace/resalt_salt" }
 resalt_scheduler = { path = "workspace/resalt_scheduler" }

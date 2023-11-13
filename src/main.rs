@@ -4,7 +4,6 @@ use actix_web::{http::header, middleware::*, web, App, HttpServer};
 use env_logger::{init_from_env, Env};
 use resalt_config::SConfig;
 use resalt_middleware::{RequireAuth, ValidateAuth};
-use resalt_pipeline::PipelineServer;
 use resalt_routes::*;
 use resalt_salt::{SaltAPI, SaltEventListener, SaltEventListenerStatus};
 use resalt_scheduler::Scheduler;
@@ -55,9 +54,6 @@ async fn init_db() -> Box<dyn StorageImpl> {
 async fn main() -> std::io::Result<()> {
     init_from_env(Env::new().default_filter_or("Debug"));
 
-    // SSE
-    let pipeline = PipelineServer::new();
-
     // Database
     let db: Box<dyn StorageImpl> = init_db().await;
     let db_clone_wrapper = StorageCloneWrapper {
@@ -65,7 +61,6 @@ async fn main() -> std::io::Result<()> {
     };
 
     // Salt WebSocket
-    let salt_listener_pipeline = pipeline.clone();
     let salt_listener_db = db.clone();
     let listener_status: Arc<Mutex<SaltEventListenerStatus>> =
         Arc::new(Mutex::new(SaltEventListenerStatus { connected: false }));
@@ -76,11 +71,7 @@ async fn main() -> std::io::Result<()> {
         ls.block_on(&rt, async {
             // Wait a few seconds before starting SSE, so web server gets time to start
             tokio::time::sleep(std::time::Duration::from_secs(1)).await;
-            let salt_ws = SaltEventListener::new(
-                salt_listener_pipeline,
-                salt_listener_db,
-                salt_listener_status,
-            );
+            let salt_ws = SaltEventListener::new(salt_listener_db, salt_listener_status);
             salt_ws.start().await;
         });
     });
@@ -101,7 +92,6 @@ async fn main() -> std::io::Result<()> {
             .wrap(NormalizePath::trim())
             .service(
                 web::scope("/api/1")
-                    .app_data(web::Data::new(pipeline.clone()))
                     .app_data(web::Data::new(db_clone_wrapper.clone().storage))
                     .app_data(web::Data::new(salt_api.clone()))
                     .app_data(web::Data::new(listener_status.clone()))
@@ -176,13 +166,6 @@ async fn main() -> std::io::Result<()> {
                         web::scope("/events")
                             .wrap(RequireAuth::new())
                             .route("", web::get().to(route_events_get))
-                            .default_service(route_fallback_404),
-                    )
-                    // pipeline
-                    .service(
-                        web::scope("/pipeline")
-                            .wrap(RequireAuth::new())
-                            .route("", web::get().to(route_pipeline_get))
                             .default_service(route_fallback_404),
                     )
                     // users
