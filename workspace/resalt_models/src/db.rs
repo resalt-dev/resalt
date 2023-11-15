@@ -8,11 +8,11 @@ use serde_json::{json, Value};
 =========================
 */
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct AuthToken {
     pub id: String,
     pub user_id: String,
-    pub timestamp: chrono::NaiveDateTime,
+    pub timestamp: ResaltTime,
     pub salt_token: Option<String>,
 }
 
@@ -35,7 +35,7 @@ impl AuthToken {
         let mut auth_token = AuthToken {
             id,
             user_id: "".to_string(),
-            timestamp: ResaltTime::default().into(),
+            timestamp: ResaltTime::default(),
             salt_token: None,
         };
         for (key, value) in values {
@@ -43,7 +43,7 @@ impl AuthToken {
                 "user_id" => auth_token.user_id = value,
                 "timestamp" => {
                     auth_token.timestamp =
-                        chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap()
+                        ResaltTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap()
                 }
                 "salt_token" => auth_token.salt_token = Some(value),
                 _ => (),
@@ -66,10 +66,7 @@ impl Event {
         let values = Vec::from([
             (
                 "timestamp",
-                self.timestamp
-                    .format("%Y-%m-%d %H:%M:%S")
-                    .to_string()
-                    .into(),
+                self.timestamp.format("%Y-%m-%d %H:%M:%S").to_string(),
             ),
             ("tag", self.tag.clone()),
             ("data", self.data.clone()),
@@ -88,9 +85,7 @@ impl Event {
             match key.as_str() {
                 "timestamp" => {
                     event.timestamp =
-                        chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S")
-                            .unwrap()
-                            .into()
+                        ResaltTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap()
                 }
                 "tag" => event.tag = value,
                 "data" => event.data = value,
@@ -140,10 +135,7 @@ impl Job {
         for (key, value) in values {
             match key.as_str() {
                 "timestamp" => {
-                    job.timestamp =
-                        chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S")
-                            .unwrap()
-                            .into()
+                    job.timestamp = ResaltTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap()
                 }
                 "user" => job.user = Some(value),
                 "event_id" => job.event_id = Some(value),
@@ -195,9 +187,7 @@ impl JobReturn {
             match key.as_str() {
                 "timestamp" => {
                     job_return.timestamp =
-                        chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S")
-                            .unwrap()
-                            .into()
+                        ResaltTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap()
                 }
                 "jid" => job_return.jid = value,
                 "job_id" => job_return.job_id = value,
@@ -317,33 +307,22 @@ impl Minion {
             match key.as_str() {
                 "last_seen" => {
                     minion.last_seen =
-                        chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S")
-                            .unwrap()
-                            .into()
+                        ResaltTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap()
                 }
                 "grains" => minion.grains = Some(value),
                 "pillars" => minion.pillars = Some(value),
                 "pkgs" => minion.pkgs = Some(value),
                 "last_updated_grains" => {
-                    minion.last_updated_grains = Some(
-                        chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S")
-                            .unwrap()
-                            .into(),
-                    )
+                    minion.last_updated_grains =
+                        Some(ResaltTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap())
                 }
                 "last_updated_pillars" => {
-                    minion.last_updated_pillars = Some(
-                        chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S")
-                            .unwrap()
-                            .into(),
-                    )
+                    minion.last_updated_pillars =
+                        Some(ResaltTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap())
                 }
                 "last_updated_pkgs" => {
-                    minion.last_updated_pkgs = Some(
-                        chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S")
-                            .unwrap()
-                            .into(),
-                    )
+                    minion.last_updated_pkgs =
+                        Some(ResaltTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap())
                 }
                 "conformity" => minion.conformity = Some(value),
                 "conformity_success" => {
@@ -354,11 +333,8 @@ impl Minion {
                 }
                 "conformity_error" => minion.conformity_error = Some(value.parse::<i32>().unwrap()),
                 "last_updated_conformity" => {
-                    minion.last_updated_conformity = Some(
-                        chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S")
-                            .unwrap()
-                            .into(),
-                    )
+                    minion.last_updated_conformity =
+                        Some(ResaltTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap())
                 }
                 "os_type" => minion.os_type = Some(value),
                 _ => (),
@@ -475,11 +451,8 @@ impl User {
                 "password" => user.password = Some(value),
                 "perms" => user.perms = value,
                 "last_login" => {
-                    user.last_login = Some(
-                        chrono::NaiveDateTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S")
-                            .unwrap()
-                            .into(),
-                    )
+                    user.last_login =
+                        Some(ResaltTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap())
                 }
                 "email" => user.email = Some(value),
                 "ldap_sync" => user.ldap_sync = Some(value),
