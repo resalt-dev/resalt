@@ -51,7 +51,6 @@ services:
       - ./docker:/usr/src/app/docker:ro
       - ./src:/usr/src/app/src:ro
       - ./workspace:/usr/src/app/workspace:ro
-      - ./.env:/usr/src/app/.env:ro
       - ./Cargo.toml:/usr/src/app/Cargo.toml:ro
       - ./resalt.default.toml:/usr/src/app/resalt.default.toml:ro
     environment:

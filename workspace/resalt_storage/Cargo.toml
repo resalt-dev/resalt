@@ -1,8 +1,8 @@
 [package]
 name = "resalt_storage"
-version = "0.1.0"
-edition = "2021"
-publish = false
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
 
 [dependencies]
 resalt_config = { path = "../resalt_config" }

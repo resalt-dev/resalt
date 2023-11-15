@@ -1,8 +1,8 @@
 [package]
 name = "resalt_updater"
-version = "0.1.0"
-edition = "2021"
-publish = false
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
 
 [dependencies]
 awc = { version = "3.1.1", features=["openssl", "compress-gzip"], default-features = false }
