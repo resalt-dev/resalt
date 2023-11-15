@@ -30,16 +30,16 @@ services:
       replicas: 3
 
   frontend:
-    image: oven/bun:1.0.7
+    image: oven/bun:1.0.11
     volumes:
-      - ./frontend/.svelte-kit/tsconfig.json:/usr/src/app/.svelte-kit/tsconfig.json
-      - ./frontend/src:/usr/src/app/src
-      - ./frontend/static:/usr/src/app/static
-      - ./frontend/package.json:/usr/src/app/package.json
-      - ./frontend/svelte.config.js:/usr/src/app/svelte.config.js
-      - ./frontend/tsconfig.json:/usr/src/app/tsconfig.json
-      - ./frontend/vite.config.ts:/usr/src/app/vite.config.ts
-    command: /bin/sh -c "cd /usr/src/app && bun install && bun run dev"
+      - ./frontend/.svelte-kit/tsconfig.json:/home/bun/app/.svelte-kit/tsconfig.json
+      - ./frontend/src:/home/bun/app/src
+      - ./frontend/static:/home/bun/app/static
+      - ./frontend/package.json:/home/bun/app/package.json
+      - ./frontend/svelte.config.js:/home/bun/app/svelte.config.js
+      - ./frontend/tsconfig.json:/home/bun/app/tsconfig.json
+      - ./frontend/vite.config.ts:/home/bun/app/vite.config.ts
+    command: /bin/sh -c "bun install && bun run dev"
     restart: always
     ports:
       - "5555:5555"
