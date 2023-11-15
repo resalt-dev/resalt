@@ -10,7 +10,7 @@ RUN bun run build
 #
 # BUILD BACKEND
 #
-FROM rust:1.70-slim as build_backend
+FROM rust:1.73-slim as build_backend
 WORKDIR /usr/src/app
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
