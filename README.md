@@ -22,7 +22,7 @@ Additional needed config in `/etc/salt/master`:
 ```
 external_auth:
   rest:
-    ^url: http://resalt:8000/api/1/auth/token
+    ^url: http://resalt:8000/api/token
 keep_acl_in_token: True
 netapi_enable_clients:
   - local
