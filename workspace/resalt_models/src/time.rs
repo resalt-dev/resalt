@@ -34,6 +34,12 @@ impl ResaltTime {
             time: chrono::Utc::now().naive_utc().into(),
         }
     }
+
+    #[inline]
+    #[must_use]
+    pub fn timestamp(&self) -> i64 {
+        self.time.timestamp()
+    }
 }
 
 impl Default for ResaltTime {
