@@ -50,6 +50,29 @@ async fn init_db() -> Box<dyn StorageImpl> {
     }
 }
 
+fn start_salt_websocket_thread(db: Box<dyn StorageImpl>) -> Arc<Mutex<SaltEventListenerStatus>> {
+    let listener_status: Arc<Mutex<SaltEventListenerStatus>> =
+        Arc::new(Mutex::new(SaltEventListenerStatus { connected: false }));
+    let salt_listener_status = listener_status.clone();
+    std::thread::spawn(move || {
+        let rt = tokio::runtime::Runtime::new().unwrap();
+        let ls = task::LocalSet::new();
+        ls.block_on(&rt, async {
+            // Wait a few seconds before starting SSE, so web server gets time to start
+            tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+            let salt_ws = SaltEventListener::new(db.clone(), salt_listener_status);
+            salt_ws.start().await;
+        });
+    });
+    listener_status
+}
+
+fn start_scheduler(db: Box<dyn StorageImpl>) {
+    let mut scheduler = Scheduler::new(StorageCloneWrapper { storage: db });
+    scheduler.register_system_jobs();
+    scheduler.start();
+}
+
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
     init_from_env(Env::new().default_filter_or("Debug"));
@@ -60,26 +83,11 @@ async fn main() -> std::io::Result<()> {
         storage: db.clone(),
     };
 
-    // Salt WebSocket
-    let salt_listener_db = db.clone();
-    let listener_status: Arc<Mutex<SaltEventListenerStatus>> =
-        Arc::new(Mutex::new(SaltEventListenerStatus { connected: false }));
-    let salt_listener_status = listener_status.clone();
-    std::thread::spawn(move || {
-        let rt = tokio::runtime::Runtime::new().unwrap();
-        let ls = task::LocalSet::new();
-        ls.block_on(&rt, async {
-            // Wait a few seconds before starting SSE, so web server gets time to start
-            tokio::time::sleep(std::time::Duration::from_secs(1)).await;
-            let salt_ws = SaltEventListener::new(salt_listener_db, salt_listener_status);
-            salt_ws.start().await;
-        });
-    });
+    // Salt WebSocket Thread
+    let listener_status = start_salt_websocket_thread(db.clone());
 
     // Scheduler
-    let mut scheduler = Scheduler::new(db_clone_wrapper.clone());
-    scheduler.register_system_jobs();
-    scheduler.start();
+    start_scheduler(db);
 
     HttpServer::new(move || {
         // Salt API
