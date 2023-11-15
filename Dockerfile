@@ -4,7 +4,8 @@
 FROM oven/bun:1.0.11 as build_frontend
 WORKDIR /usr/src/app/frontend
 COPY frontend .
-RUN bun install && bun run build
+RUN bun install
+RUN bun run build
 
 #
 # BUILD BACKEND
