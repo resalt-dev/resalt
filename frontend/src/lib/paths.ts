@@ -58,7 +58,7 @@ export class Path<T = object> {
 	}
 
 	getPath(params?: T | Record<string, string>, searchParams?: Record<string, string>): string {
-		console.log(this.path, params, searchParams);
+		// console.log(this.path, params, searchParams);
 		let { path } = this;
 
 		// Check if any params are REQUIRED (match \/\[([A-Za-z]+])\] in path)
