@@ -176,7 +176,7 @@ pub async fn route_key_reject_put(
     }
 }
 
-#[delete("/keys/{state}/{id}")]
+#[delete("/keys/{state}/{id}/delete")]
 pub async fn route_key_delete_delete(
     salt: web::Data<SaltAPI>,
     data: web::Data<Box<dyn StorageImpl>>,
