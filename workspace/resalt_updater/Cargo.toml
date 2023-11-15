@@ -4,11 +4,9 @@ version = "0.1.0"
 edition = "2021"
 publish = false
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 awc = { version = "3.1.1", features=["openssl", "compress-gzip"], default-features = false }
 toml = { version = "0.8.8", features = ["parse"], default-features = false }
 chrono = "0.4.24"
-log = { version = "0.4.17" }
+log = { workspace = true }
 lazy_static = "1.4.0"

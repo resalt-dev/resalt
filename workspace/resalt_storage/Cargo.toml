@@ -4,8 +4,6 @@ version = "0.1.0"
 edition = "2021"
 publish = false
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 resalt_config = { path = "../resalt_config" }
 resalt_models = { path = "../resalt_models" }
@@ -13,6 +11,6 @@ resalt_security = { path = "../resalt_security" }
 chrono = "0.4.24"
 jsonpath_lib = "0.3.0"
 serde_json = "1.0.82"
-log = { version = "0.4.17" }
+log = { workspace = true }
 version-compare = "0.1.0"
 rand = "0.8.5"

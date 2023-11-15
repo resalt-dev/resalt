@@ -1,4 +1,7 @@
-use std::sync::{Arc, Mutex};
+use std::{
+    error::Error,
+    sync::{Arc, Mutex},
+};
 
 use actix_web::{guard::fn_guard, http::header, middleware::*, web, App, HttpServer};
 use env_logger::{init_from_env, Env};
@@ -73,8 +76,7 @@ fn start_scheduler(db: Box<dyn StorageImpl>) {
     scheduler.start();
 }
 
-#[tokio::main]
-async fn main() -> std::io::Result<()> {
+async fn run() -> Result<(), Box<dyn Error>> {
     init_from_env(Env::new().default_filter_or("Debug"));
 
     // Database
@@ -160,4 +162,12 @@ async fn main() -> std::io::Result<()> {
     .await?;
 
     Ok(())
+}
+
+pub fn start() -> Result<(), Box<dyn Error>> {
+    tokio::runtime::Builder::new_multi_thread()
+        .enable_all()
+        .build()
+        .unwrap()
+        .block_on(run())
 }

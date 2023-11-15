@@ -4,11 +4,9 @@ version = "0.1.0"
 edition = "2021"
 publish = false
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 argon2 = "0.5.0"
-log = { version = "0.4.17" }
+log = { workspace = true }
 regex = "1.8.1"
 resalt_models = { path = "../resalt_models" }
 serde_json = "1.0.82"

@@ -1,0 +1,18 @@
+[package]
+name = "resalt_server"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+actix-web = { workspace = true }
+resalt_config = { path = "../resalt_config" }
+resalt_middleware = { path = "../resalt_middleware" }
+resalt_routes = { path = "../resalt_routes" }
+resalt_salt = { path = "../resalt_salt" }
+resalt_scheduler = { path = "../resalt_scheduler" }
+resalt_storage = { path = "../resalt_storage" }
+resalt_storage_mysql = { path = "../resalt_storage_mysql" }
+resalt_storage_redis = { path = "../resalt_storage_redis" }
+env_logger = "0.10.0"
+tokio = { workspace = true }

@@ -9,50 +9,22 @@ license = "MIT"
 description = "Resalt is a free, open-source, self-hosted, web-based administration and monitoring panel for SaltStack."
 publish = false
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[[bin]]
+name = "resalt-server"
+path = "src/resalt-server.rs"
 
 [workspace]
 members = [
-    "workspace/resalt_auth",
-    "workspace/resalt_config",
-    "workspace/resalt_ldap",
-    "workspace/resalt_middleware",
-    "workspace/resalt_models",
-    "workspace/resalt_routes",
-    "workspace/resalt_salt",
-    "workspace/resalt_scheduler",
-    "workspace/resalt_security",
-    "workspace/resalt_storage",
-    "workspace/resalt_storage_mysql",
-    "workspace/resalt_storage_redis",
-    "workspace/resalt_updater",
+    "workspace/*/src/..",
 ]
 
-[dependencies]
-# Workspace modules
-resalt_auth = { path = "workspace/resalt_auth" }
-resalt_config = { path = "workspace/resalt_config" }
-resalt_ldap = { path = "workspace/resalt_ldap" }
-resalt_middleware = { path = "workspace/resalt_middleware" }
-resalt_models = { path = "workspace/resalt_models" }
-resalt_routes = { path = "workspace/resalt_routes" }
-resalt_salt = { path = "workspace/resalt_salt" }
-resalt_scheduler = { path = "workspace/resalt_scheduler" }
-resalt_security = { path = "workspace/resalt_security" }
-resalt_storage = { path = "workspace/resalt_storage" }
-resalt_storage_mysql = { path = "workspace/resalt_storage_mysql" }
-resalt_storage_redis = { path = "workspace/resalt_storage_redis" }
-resalt_updater = { path = "workspace/resalt_updater" }
-
-# Web
+[workspace.dependencies]
 actix-web = { version = "4.4.0", features=["macros", "compress-gzip"], default-features = false }
-
-# Logging
 log = { version = "0.4.17" }
-env_logger = "0.10.0"
-
-# Threading
 tokio = { version = "1.20.0", features = ["rt-multi-thread"], default-features = false }
+
+[dependencies]
+resalt_server = { path = "workspace/resalt_server" }
 
 [package.metadata.resalt]
 news = [
