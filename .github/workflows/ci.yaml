@@ -17,7 +17,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ./frontend/node_modules
-          key: ${{ runner.os }}-node-v18-${{ hashFiles('./frontend/bun.lockb') }}
+          key: ${{ runner.os }}-bun-1.0.11-${{ hashFiles('./frontend/bun.lockb') }}
       
       - name: "cd into /frontend and lint"
         run: |
@@ -51,7 +51,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ./frontend/node_modules
-          key: ${{ runner.os }}-node-v18-${{ hashFiles('./frontend/bun.lockb') }}
+          key: ${{ runner.os }}-bun-1.0.11-${{ hashFiles('./frontend/bun.lockb') }}
 
       - name: Read version number
         run: |
