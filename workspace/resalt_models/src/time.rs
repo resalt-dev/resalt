@@ -26,6 +26,14 @@ impl ResaltTime {
             Err(e) => Err(e),
         }
     }
+
+    #[inline]
+    #[must_use]
+    pub fn now() -> ResaltTime {
+        ResaltTime {
+            time: chrono::Utc::now().naive_utc().into(),
+        }
+    }
 }
 
 impl Default for ResaltTime {
