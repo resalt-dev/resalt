@@ -1,4 +1,4 @@
-use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
+use actix_web::{get, post, web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 use resalt_auth::renew_token_salt_token;
 use resalt_models::*;
@@ -15,6 +15,7 @@ pub struct JobsListGetQuery {
     offset: Option<i64>,
 }
 
+#[get("/jobs")]
 pub async fn route_jobs_get(
     data: web::Data<Box<dyn StorageImpl>>,
     query: web::Query<JobsListGetQuery>,
@@ -55,6 +56,7 @@ pub struct JobRunRequest {
     batch_size: String,
 }
 
+#[post("/jobs")]
 pub async fn route_jobs_post(
     salt: web::Data<SaltAPI>,
     data: web::Data<Box<dyn StorageImpl>>,
@@ -190,6 +192,7 @@ pub struct JobGetResponse {
     returns: Vec<JobReturn>,
 }
 
+#[get("/jobs/{jid}")]
 pub async fn route_job_get(
     data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<JobGetInfo>,

@@ -1,4 +1,4 @@
-use actix_web::{web, HttpResponse, Responder, Result};
+use actix_web::{post, web, HttpResponse, Responder, Result};
 use log::*;
 use resalt_auth::validate_auth_token;
 use resalt_config::SConfig;
@@ -14,7 +14,8 @@ pub struct TokenValidateRequest {
     password: String,
 }
 
-pub async fn route_auth_token_post(
+#[post("/token")]
+pub async fn route_token_post(
     data: web::Data<Box<dyn StorageImpl>>,
     input: web::Form<TokenValidateRequest>,
 ) -> Result<impl Responder, ApiError> {

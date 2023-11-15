@@ -1,4 +1,4 @@
-use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
+use actix_web::{get, web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 use resalt_models::{ApiError, AuthStatus};
 use resalt_security::*;
@@ -11,6 +11,7 @@ pub struct EventsListGetQuery {
     offset: Option<i64>,
 }
 
+#[get("/events")]
 pub async fn route_events_get(
     data: web::Data<Box<dyn StorageImpl>>,
     query: web::Query<EventsListGetQuery>,

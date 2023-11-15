@@ -1,3 +1,4 @@
+use actix_web::post;
 use actix_web::{web, HttpRequest, Responder, Result};
 use log::*;
 use resalt_auth::auth_login_classic;
@@ -26,7 +27,8 @@ struct LoginResponse {
     expiry: u64,
 }
 
-pub async fn route_auth_login_post(
+#[post("/login")]
+pub async fn route_login_post(
     data: web::Data<Box<dyn StorageImpl>>,
     salt: web::Data<SaltAPI>,
     input: web::Json<LoginRequest>,

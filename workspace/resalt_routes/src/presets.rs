@@ -1,10 +1,11 @@
-use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
+use actix_web::{delete, get, post, put, web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 use resalt_models::{ApiError, AuthStatus, MinionPreset};
 use resalt_security::*;
 use resalt_storage::StorageImpl;
 use serde::{Deserialize, Serialize};
 
+#[get("/presets")]
 pub async fn route_presets_get(
     data: web::Data<Box<dyn StorageImpl>>,
     req: HttpRequest,
@@ -33,6 +34,7 @@ pub struct PresetsCreateRequest {
     filter: String,
 }
 
+#[post("/presets")]
 pub async fn route_presets_post(
     data: web::Data<Box<dyn StorageImpl>>,
     req: HttpRequest,
@@ -74,6 +76,7 @@ pub struct PresetInfo {
     id: String,
 }
 
+#[get("/presets/{id}")]
 pub async fn route_preset_get(
     data: web::Data<Box<dyn StorageImpl>>,
     req: HttpRequest,
@@ -108,6 +111,7 @@ pub struct PresetUpdateRequest {
     filter: String,
 }
 
+#[put("/presets/{id}")]
 pub async fn route_preset_put(
     data: web::Data<Box<dyn StorageImpl>>,
     req: HttpRequest,
@@ -156,6 +160,7 @@ pub async fn route_preset_put(
     Ok(web::Json(preset))
 }
 
+#[delete("/presets/{id}")]
 pub async fn route_preset_delete(
     data: web::Data<Box<dyn StorageImpl>>,
     req: HttpRequest,

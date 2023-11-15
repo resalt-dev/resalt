@@ -1,9 +1,10 @@
-use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
+use actix_web::{get, web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 use resalt_models::{ApiError, AuthStatus};
 use resalt_storage::StorageImpl;
 
-pub async fn route_auth_user_get(
+#[get("/myself")]
+pub async fn route_myself_get(
     data: web::Data<Box<dyn StorageImpl>>,
     req: HttpRequest,
 ) -> Result<impl Responder, ApiError> {

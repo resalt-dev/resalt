@@ -18,10 +18,12 @@ const themeColors = [
 ];
 const githubUrl = 'https://github.com/resalt-dev/resalt';
 
-const apiUrl = '/api/1';
+const apiUrl = '/api';
+const apiAuthUrl = '/api/auth';
 
 export default {
 	apiUrl,
+	apiAuthUrl,
 	appName,
 	themeColors,
 	githubUrl,

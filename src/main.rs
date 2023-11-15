@@ -1,9 +1,9 @@
 use std::sync::{Arc, Mutex};
 
-use actix_web::{http::header, middleware::*, web, App, HttpServer};
+use actix_web::{guard::fn_guard, http::header, middleware::*, web, App, HttpServer};
 use env_logger::{init_from_env, Env};
 use resalt_config::SConfig;
-use resalt_middleware::{RequireAuth, ValidateAuth};
+use resalt_middleware::ValidateAuth;
 use resalt_routes::*;
 use resalt_salt::{SaltAPI, SaltEventListener, SaltEventListenerStatus};
 use resalt_scheduler::Scheduler;
@@ -93,145 +93,64 @@ async fn main() -> std::io::Result<()> {
         // Salt API
         let salt_api = SaltAPI::new();
 
+        let guard_auth = fn_guard(guard_require_auth);
+
         App::new()
-            // Prevent sniffing of content type
             .wrap(DefaultHeaders::new().add((header::X_CONTENT_TYPE_OPTIONS, "nosniff")))
-            // Removes trailing slash in the URL to make is sowe don't need as many services
             .wrap(NormalizePath::trim())
+            .wrap(Logger::default())
             .service(
-                web::scope("/api/1")
+                web::scope("/api")
                     .app_data(web::Data::new(db_clone_wrapper.clone().storage))
                     .app_data(web::Data::new(salt_api.clone()))
                     .app_data(web::Data::new(listener_status.clone()))
-                    // enable logger - always register Actix Web Logger middleware last
-                    .wrap(Logger::default())
-                    // validate auth
                     .wrap(ValidateAuth::new(
                         db_clone_wrapper.clone().storage,
                         salt_api,
                     ))
-                    .route("", web::get().to(route_index_get))
-                    .route("/config", web::get().to(route_config_get))
-                    .route("/metrics", web::get().to(route_metrics_get))
-                    // auth
+                    .service(route_index_get)
+                    .service(route_config_get)
+                    .service(route_metrics_get)
+                    .service(route_login_post)
+                    .service(route_token_post)
                     .service(
                         web::scope("/auth")
-                            .route("/login", web::post().to(route_auth_login_post))
-                            .route("/token", web::post().to(route_auth_token_post))
-                            .service(
-                                web::scope("/user")
-                                    .wrap(RequireAuth::new())
-                                    .route("", web::get().to(route_auth_user_get))
-                                    .default_service(route_fallback_404),
-                            )
+                            .guard(guard_auth)
+                            .service(route_myself_get)
+                            .service(route_status_get)
+                            .service(route_minions_get)
+                            .service(route_minion_get)
+                            .service(route_minion_refresh_post)
+                            .service(route_presets_get)
+                            .service(route_presets_post)
+                            .service(route_preset_get)
+                            .service(route_preset_put)
+                            .service(route_preset_delete)
+                            .service(route_grains_get)
+                            .service(route_jobs_get)
+                            .service(route_jobs_post)
+                            .service(route_job_get)
+                            .service(route_events_get)
+                            .service(route_users_get)
+                            .service(route_users_post)
+                            .service(route_user_get)
+                            .service(route_user_delete)
+                            .service(route_user_password_post)
+                            .service(route_user_permissions_post)
+                            .service(route_user_permissions_delete)
+                            .service(route_keys_get)
+                            .service(route_key_accept_put)
+                            .service(route_key_reject_put)
+                            .service(route_key_delete_delete)
+                            .service(route_permissions_get)
+                            .service(route_permissions_post)
+                            .service(route_permission_get)
+                            .service(route_permission_update)
+                            .service(route_permission_delete)
+                            .service(route_settings_import_post)
+                            .service(route_settings_export_get)
                             .default_service(route_fallback_404),
-                    )
-                    // status
-                    .service(
-                        web::scope("/status")
-                            .wrap(RequireAuth::new())
-                            .route("", web::get().to(route_status_get))
-                            .default_service(route_fallback_404),
-                    )
-                    // minions
-                    .service(
-                        web::scope("/minions")
-                            .wrap(RequireAuth::new())
-                            .route("", web::get().to(route_minions_get))
-                            .route("/{id}", web::get().to(route_minion_get))
-                            .route("/{id}/refresh", web::post().to(route_minion_refresh_post))
-                            .default_service(route_fallback_404),
-                    )
-                    // presets
-                    .service(
-                        web::scope("/presets")
-                            .wrap(RequireAuth::new())
-                            .route("", web::get().to(route_presets_get))
-                            .route("", web::post().to(route_presets_post))
-                            .route("/{id}", web::get().to(route_preset_get))
-                            .route("/{id}", web::put().to(route_preset_put))
-                            .route("/{id}", web::delete().to(route_preset_delete))
-                            .default_service(route_fallback_404),
-                    )
-                    // grains
-                    .service(
-                        web::scope("/grains")
-                            .wrap(RequireAuth::new())
-                            .route("", web::get().to(route_grains_get))
-                            .default_service(route_fallback_404),
-                    )
-                    // jobs
-                    .service(
-                        web::scope("/jobs")
-                            .wrap(RequireAuth::new())
-                            .route("", web::get().to(route_jobs_get))
-                            .route("", web::post().to(route_jobs_post))
-                            .route("/{jid}", web::get().to(route_job_get))
-                            .default_service(route_fallback_404),
-                    )
-                    // events
-                    .service(
-                        web::scope("/events")
-                            .wrap(RequireAuth::new())
-                            .route("", web::get().to(route_events_get))
-                            .default_service(route_fallback_404),
-                    )
-                    // users
-                    .service(
-                        web::scope("/users")
-                            .wrap(RequireAuth::new())
-                            .route("", web::get().to(route_users_get))
-                            .route("", web::post().to(route_users_post))
-                            .route("/{user_id}", web::get().to(route_user_get))
-                            .route("/{user_id}", web::delete().to(route_user_delete))
-                            .route(
-                                "/{user_id}/password",
-                                web::post().to(route_user_password_post),
-                            )
-                            .route(
-                                "/{user_id}/permissions/{group_id}",
-                                web::post().to(route_user_permissions_post),
-                            )
-                            .route(
-                                "/{user_id}/permissions/{group_id}",
-                                web::delete().to(route_user_permissions_delete),
-                            )
-                            .default_service(route_fallback_404),
-                    )
-                    // keys
-                    .service(
-                        web::scope("/keys")
-                            .wrap(RequireAuth::new())
-                            .route("", web::get().to(route_keys_get))
-                            .route("/{state}/{id}/accept", web::put().to(route_key_accept_put))
-                            .route("/{state}/{id}/reject", web::put().to(route_key_reject_put))
-                            .route(
-                                "/{state}/{id}/delete",
-                                web::delete().to(route_key_delete_delete),
-                            )
-                            .default_service(route_fallback_404),
-                    )
-                    // permissions
-                    .service(
-                        web::scope("/permissions")
-                            .wrap(RequireAuth::new())
-                            .route("", web::get().to(route_permissions_get))
-                            .route("", web::post().to(route_permissions_post))
-                            .route("/{id}", web::get().to(route_permission_get))
-                            .route("/{id}", web::put().to(route_permission_update))
-                            .route("/{id}", web::delete().to(route_permission_delete))
-                            .default_service(route_fallback_404),
-                    )
-                    // settings
-                    .service(
-                        web::scope("/settings")
-                            .wrap(RequireAuth::new())
-                            .route("/export", web::get().to(route_settings_export_get))
-                            .route("/import", web::post().to(route_settings_import_post))
-                            .default_service(route_fallback_404),
-                    )
-                    // fallback to 404
-                    .default_service(route_fallback_404),
+                    ),
             )
             // Embed web interface
             .service(web::scope("").default_service(route_frontend_get))

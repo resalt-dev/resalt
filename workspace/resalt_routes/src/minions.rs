@@ -1,4 +1,4 @@
-use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
+use actix_web::{get, post, web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 use resalt_auth::renew_token_salt_token;
 use resalt_models::*;
@@ -15,6 +15,7 @@ pub struct MinionsListGetQuery {
     offset: Option<i64>,
 }
 
+#[get("/minions")]
 pub async fn route_minions_get(
     data: web::Data<Box<dyn StorageImpl>>,
     query: web::Query<MinionsListGetQuery>,
@@ -87,6 +88,7 @@ pub struct MinionGetInfo {
     id: String,
 }
 
+#[get("/minions/{id}")]
 pub async fn route_minion_get(
     data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<MinionGetInfo>,
@@ -117,6 +119,7 @@ pub async fn route_minion_get(
     Ok(web::Json(minion))
 }
 
+#[post("/minions/{id}/refresh")]
 pub async fn route_minion_refresh_post(
     salt: web::Data<SaltAPI>,
     data: web::Data<Box<dyn StorageImpl>>,

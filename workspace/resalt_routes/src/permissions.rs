@@ -1,4 +1,4 @@
-use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
+use actix_web::{delete, get, post, put, web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 use resalt_models::*;
 use resalt_security::*;
@@ -38,7 +38,8 @@ pub struct PermissionGroupsListGetQuery {
     limit: Option<i64>,
     offset: Option<i64>,
 }
-/// # Route: /permissions (GET)
+
+#[get("/permissions")]
 pub async fn route_permissions_get(
     data: web::Data<Box<dyn StorageImpl>>,
     query: web::Query<PermissionGroupsListGetQuery>,
@@ -82,7 +83,7 @@ pub struct PermissionGroupCreateRequest {
     pub name: String,
 }
 
-/// # Route: /permissions (POST)
+#[post("/permissions")]
 pub async fn route_permissions_post(
     data: web::Data<Box<dyn StorageImpl>>,
     input: web::Json<PermissionGroupCreateRequest>,
@@ -127,7 +128,8 @@ pub async fn route_permissions_post(
 pub struct PermissionInfo {
     id: String,
 }
-/// # Route: /permissions/{id} (GET)
+
+#[get("/permissions/{id}")]
 pub async fn route_permission_get(
     data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<PermissionInfo>,
@@ -151,7 +153,8 @@ pub struct PermissionGroupUpdateRequest {
     #[serde(rename = "ldapSync", deserialize_with = "deserialize_null")]
     pub ldap_sync: Option<String>,
 }
-/// # Route: /permissions/{id} (PUT)
+
+#[put("/permissions/{id}")]
 pub async fn route_permission_update(
     data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<PermissionInfo>,
@@ -204,7 +207,7 @@ pub async fn route_permission_update(
     get_group(&data, &info.id).await
 }
 
-/// # Route: /permissions/{id} (DELETE)
+#[delete("/permissions/{id}")]
 pub async fn route_permission_delete(
     data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<PermissionInfo>,

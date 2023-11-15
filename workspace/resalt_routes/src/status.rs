@@ -1,10 +1,11 @@
 use std::sync::{Arc, Mutex};
 
-use actix_web::{web, Responder, Result};
+use actix_web::{get, web, Responder, Result};
 use resalt_models::*;
 use resalt_salt::SaltEventListenerStatus;
 use resalt_storage::{StorageImpl, StorageStatus};
 
+#[get("/status")]
 pub async fn route_status_get(
     listener_status: web::Data<Arc<Mutex<SaltEventListenerStatus>>>,
     data: web::Data<Box<dyn StorageImpl>>,

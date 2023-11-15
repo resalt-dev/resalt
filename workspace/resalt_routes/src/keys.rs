@@ -1,4 +1,4 @@
-use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
+use actix_web::{delete, get, put, web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 use resalt_auth::renew_token_salt_token;
 use resalt_models::*;
@@ -7,6 +7,7 @@ use resalt_security::*;
 use resalt_storage::StorageImpl;
 use serde::Deserialize;
 
+#[get("/keys")]
 pub async fn route_keys_get(
     salt: web::Data<SaltAPI>,
     data: web::Data<Box<dyn StorageImpl>>,
@@ -75,6 +76,7 @@ pub struct KeyInfo {
     id: String,
 }
 
+#[put("/keys/{state}/{id}/accept")]
 pub async fn route_key_accept_put(
     salt: web::Data<SaltAPI>,
     data: web::Data<Box<dyn StorageImpl>>,
@@ -124,6 +126,7 @@ pub async fn route_key_accept_put(
     }
 }
 
+#[put("/keys/{state}/{id}/reject")]
 pub async fn route_key_reject_put(
     salt: web::Data<SaltAPI>,
     data: web::Data<Box<dyn StorageImpl>>,
@@ -173,6 +176,7 @@ pub async fn route_key_reject_put(
     }
 }
 
+#[delete("/keys/{state}/{id}")]
 pub async fn route_key_delete_delete(
     salt: web::Data<SaltAPI>,
     data: web::Data<Box<dyn StorageImpl>>,

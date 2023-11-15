@@ -1,12 +1,13 @@
 use std::sync::{Arc, Mutex};
 
-use actix_web::{web, HttpResponse, Responder, Result};
+use actix_web::{get, web, HttpResponse, Responder, Result};
 use log::*;
 use resalt_config::SConfig;
 use resalt_models::ApiError;
 use resalt_salt::SaltEventListenerStatus;
 use resalt_storage::{StorageImpl, StorageStatus};
 
+#[get("/metrics")]
 pub async fn route_metrics_get(
     listener_status: web::Data<Arc<Mutex<SaltEventListenerStatus>>>,
     data: web::Data<Box<dyn StorageImpl>>,

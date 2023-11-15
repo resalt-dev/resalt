@@ -1,4 +1,4 @@
-use actix_web::{web, Responder, Result};
+use actix_web::{get, web, Responder, Result};
 use log::error;
 use resalt_config::SConfig;
 use resalt_models::ApiError;
@@ -16,6 +16,7 @@ struct ApiConfig {
     themeEnableSwitching: bool,
 }
 
+#[get("/config")]
 pub async fn route_config_get() -> Result<impl Responder, ApiError> {
     let update_info = get_update_cache(false).await;
     let config = ApiConfig {

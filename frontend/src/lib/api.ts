@@ -75,7 +75,7 @@ async function sendAuthenticatedRequest(
 	// console.log('Sending authenticated request', method, path, data);
 	const body = data ? JSON.stringify(data) : undefined;
 	// console.log('Sending body', body);
-	return await sendRequest(constants.apiUrl + path, {
+	return await sendRequest(constants.apiAuthUrl + path, {
 		method,
 		headers: {
 			'Content-Type': 'application/json',
@@ -104,7 +104,7 @@ async function sendUnauthenticatedRequest(
 ///
 
 export async function login(username: string, password: string): Promise<AuthToken> {
-	return await sendUnauthenticatedRequest('POST', '/auth/login', {
+	return await sendUnauthenticatedRequest('POST', '/login', {
 		username,
 		password,
 	}).then((data: unknown) => AuthToken.fromObject(data));
@@ -123,7 +123,7 @@ export async function getSystemStatus(): Promise<SystemStatus> {
 }
 
 export async function getCurrentUser(): Promise<User> {
-	return sendAuthenticatedRequest('GET', '/auth/user').then((data) => User.fromObject(data));
+	return sendAuthenticatedRequest('GET', '/myself').then((data) => User.fromObject(data));
 }
 
 export async function logout(): Promise<void> {

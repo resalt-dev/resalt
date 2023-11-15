@@ -1,4 +1,4 @@
-use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
+use actix_web::{get, web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 use resalt_models::*;
 use resalt_security::*;
@@ -12,6 +12,7 @@ pub struct GrainsGetQuery {
     filter: Option<String>, // URL-encoded JSON
 }
 
+#[get("/grains")]
 pub async fn route_grains_get(
     data: web::Data<Box<dyn StorageImpl>>,
     info: web::Query<GrainsGetQuery>,

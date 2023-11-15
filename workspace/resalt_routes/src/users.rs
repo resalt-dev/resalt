@@ -1,4 +1,4 @@
-use actix_web::{web, HttpMessage, HttpRequest, Responder, Result};
+use actix_web::{delete, get, post, web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 use resalt_models::{ApiError, AuthStatus};
 use resalt_security::*;
@@ -12,6 +12,7 @@ pub struct UsersListGetQuery {
     offset: Option<i64>,
 }
 
+#[get("/users")]
 pub async fn route_users_get(
     data: web::Data<Box<dyn StorageImpl>>,
     query: web::Query<UsersListGetQuery>,
@@ -60,6 +61,7 @@ pub struct UserCreateRequest {
     pub ldap_sync: Option<String>,
 }
 
+#[post("/users")]
 pub async fn route_users_post(
     data: web::Data<Box<dyn StorageImpl>>,
     body: web::Json<UserCreateRequest>,
@@ -117,6 +119,7 @@ pub struct UserGetInfo {
     user_id: String,
 }
 
+#[get("/users/{user_id}")]
 pub async fn route_user_get(
     data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<UserGetInfo>,
@@ -160,6 +163,7 @@ pub async fn route_user_get(
     Ok(web::Json(user))
 }
 
+#[delete("/users/{user_id}")]
 pub async fn route_user_delete(
     data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<UserGetInfo>,
@@ -211,6 +215,7 @@ pub struct UserPostPasswordData {
     password: String,
 }
 
+#[post("/users/{user_id}/password")]
 pub async fn route_user_password_post(
     data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<UserGetInfo>,
@@ -272,7 +277,7 @@ pub struct UserPermissionInfo {
     group_id: String,
 }
 
-/// # Route: /users/{user_id}/permissions/{group_id} (PUT)
+#[post("/users/{user_id}/permissions/{group_id}")]
 pub async fn route_user_permissions_post(
     data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<UserPermissionInfo>,
@@ -342,7 +347,7 @@ pub async fn route_user_permissions_post(
     Ok(web::Json(()))
 }
 
-/// # Route: /users/{user_id}/permissions/{group_id} (DELETE)
+#[delete("/users/{user_id}/permissions/{group_id}")]
 pub async fn route_user_permissions_delete(
     data: web::Data<Box<dyn StorageImpl>>,
     info: web::Path<UserPermissionInfo>,

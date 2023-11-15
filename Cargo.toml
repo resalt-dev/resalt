@@ -45,7 +45,7 @@ resalt_storage_redis = { path = "workspace/resalt_storage_redis" }
 resalt_updater = { path = "workspace/resalt_updater" }
 
 # Web
-actix-web = { version = "4.1.0", features=["compress-gzip"], default-features = false }
+actix-web = { version = "4.4.0", features=["macros", "compress-gzip"], default-features = false }
 
 # Logging
 log = { version = "0.4.17" }
