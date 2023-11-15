@@ -12,6 +12,7 @@ RUN bun run build
 #
 FROM rust:1.70-slim as build_backend
 WORKDIR /usr/src/app
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
   apt-get upgrade -y -o DPkg::Options::=--force-confold && \
   apt-get install -y -o DPkg::Options::=--force-confold build-essential pkg-config libssl-dev mariadb-client libmariadb-dev default-libmysqlclient-dev
@@ -26,7 +27,7 @@ RUN cargo build --release
 #
 FROM debian:bullseye-slim
 
-# Upgrade System and Install dependencies
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
   apt-get upgrade -y -o DPkg::Options::=--force-confold && \
   apt-get install -y -o DPkg::Options::=--force-confold libssl-dev mariadb-client libmariadb-dev default-libmysqlclient-dev ca-certificates
