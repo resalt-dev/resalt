@@ -20,7 +20,14 @@ lazy_static! {
         news: None,
         fetch_time: 0,
     }));
-    pub static ref CURRENT_VERSION: String = env!("CARGO_PKG_VERSION").to_string();
+    pub static ref CURRENT_VERSION: String = include_str!("../../../Cargo.toml")
+        .lines()
+        .find(|line| line.starts_with("version = "))
+        .and_then(|line| line.split('=').nth(1))
+        .and_then(|v| Some(v.trim()))
+        .and_then(|v| Some(v.trim_matches('"')))
+        .unwrap_or("unknown")
+        .to_string();
 }
 
 async fn fetch_remote_info() -> Result<UpdateInfo, String> {
