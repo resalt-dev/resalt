@@ -61,8 +61,8 @@
 					value.result === true
 						? 'success'
 						: value.result === false
-						? 'danger'
-						: 'warning',
+						  ? 'danger'
+						  : 'warning',
 				data: {
 					__id__: value.__id__ ?? parts[1] ?? 'UKNOWN ID',
 					// eslint-disable-next-line camelcase

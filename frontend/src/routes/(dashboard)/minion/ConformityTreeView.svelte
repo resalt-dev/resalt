@@ -12,8 +12,8 @@
 	$: icon = collapsed
 		? 'caret-up-square'
 		: sls === filterNamespace
-		? 'caret-right-square'
-		: 'caret-down-square';
+		  ? 'caret-right-square'
+		  : 'caret-down-square';
 
 	function calculateFullNamespace(node: ConformTreeNode): string {
 		// Traverse parents up
