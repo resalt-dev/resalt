@@ -1,0 +1,24 @@
+[package]
+name = "resalt-salt"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+actix-web = { version = "4.4.0", features=["macros", "compress-gzip"], default-features = false }
+actix-tls = { version = "3.0.3", features=["openssl"], default-features = false }
+openssl = "0.10.55"
+async-stream = "0.3.3"
+awc = { version = "3.1.1", features=["openssl", "compress-gzip"], default-features = false }
+chrono = "0.4.24"
+futures = "0.3.21"
+futures-core = "0.3.21"
+lazy_static = "1.4.0"
+log = { workspace = true }
+regex = "1.6.0"
+resalt-config = { path = "../resalt-config" }
+resalt-models = { path = "../resalt-models" }
+resalt-storage = { path = "../resalt-storage" }
+serde = { version = "1.0.139", features = ["derive"] }
+serde_json = "1.0.82"
+tokio = { workspace = true }

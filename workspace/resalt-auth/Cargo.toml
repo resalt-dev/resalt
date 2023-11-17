@@ -1,0 +1,17 @@
+[package]
+name = "resalt-auth"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+actix-web = { workspace = true }
+chrono = "0.4.24"
+log = { workspace = true }
+resalt-config = { path = "../resalt-config" }
+resalt-ldap = { path = "../resalt-ldap" }
+resalt-models = { path = "../resalt-models" }
+resalt-salt = { path = "../resalt-salt" }
+resalt-security = { path = "../resalt-security" }
+resalt-storage = { path = "../resalt-storage" }
+serde_json = "1.0.82"

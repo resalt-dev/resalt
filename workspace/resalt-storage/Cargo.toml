@@ -1,0 +1,16 @@
+[package]
+name = "resalt-storage"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+resalt-config = { path = "../resalt-config" }
+resalt-models = { path = "../resalt-models" }
+resalt-security = { path = "../resalt-security" }
+chrono = "0.4.24"
+jsonpath_lib = "0.3.0"
+serde_json = "1.0.82"
+log = { workspace = true }
+version-compare = "0.1.0"
+rand = "0.8.5"

@@ -1,5 +1,13 @@
-[package]
-name = "resalt"
+[workspace]
+resolver = "2"
+members = [
+    "workspace/*/src/..",
+]
+default-members = [
+    "workspace/resalt-server",
+]
+
+[workspace.package]
 version = "0.5.5"
 authors = ["Max Faxälv <max@foorack.com>"]
 edition = "2021"
@@ -9,29 +17,12 @@ license = "MIT"
 description = "Resalt is a free, open-source, self-hosted, web-based administration and monitoring panel for SaltStack."
 publish = false
 
-[[bin]]
-name = "resalt-server"
-path = "src/resalt-server.rs"
-
-[workspace]
-members = [
-    "workspace/*/src/..",
-]
-
-[workspace.package]
-version = "0.5.5"
-edition = "2021"
-publish = false
-
 [workspace.dependencies]
 actix-web = { version = "4.4.0", features=["macros", "compress-gzip"], default-features = false }
 log = { version = "0.4.17" }
 tokio = { version = "1.20.0", features = ["rt-multi-thread"], default-features = false }
 
-[dependencies]
-resalt_server = { path = "workspace/resalt_server" }
-
-[package.metadata.resalt]
+[workspace.metadata.resalt]
 news = [
     "Resalt 0.4.1 released§Resalt 0.4.1 is now available. Removed legacy graph system, and implemented optional Prometheus metrics export endpoint.",
     "Resalt 0.4.0 released§Resalt 0.4.0 is now available. Implemented LDAP syncing of groups and email, and several UI and UX improvements.",
