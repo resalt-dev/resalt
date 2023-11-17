@@ -24,7 +24,7 @@ pub struct StorageFiles {
 impl StorageFiles {
     pub fn connect(path: &str) -> Result<StorageFiles, String> {
         log::info!("Connecting to files storage at {}", path);
-        let path = path.trim_end_matches("/");
+        let path = path.trim_end_matches('/');
         let storage = StorageFiles {
             path: path.to_string(),
         };
@@ -188,7 +188,7 @@ impl StorageImpl for StorageFiles {
             username: username.clone(),
             password,
             perms,
-            last_login: last_login.map(|v| v.into()),
+            last_login,
             email: email.clone(),
             ldap_sync: ldap_sync.clone(),
         };
@@ -284,7 +284,7 @@ impl StorageImpl for StorageFiles {
 
         // Update user's last_login
         let mut user = self.get_user_by_id(&user_id)?.unwrap();
-        user.last_login = Some(authtoken.timestamp.into());
+        user.last_login = Some(authtoken.timestamp);
         self.update_user(&user)?;
 
         Ok(authtoken)
@@ -337,7 +337,7 @@ impl StorageImpl for StorageFiles {
         keys.sort();
 
         // QUICK PAGINATION (Skip offset & Limit)
-        if filters.len() == 0 {
+        if filters.is_empty() {
             keys = keys
                 .into_iter()
                 .skip(offset.unwrap_or(0) as usize)
@@ -361,7 +361,7 @@ impl StorageImpl for StorageFiles {
         resalt_storage::sort_minions(&mut minions, &sort);
 
         // SLOW PAGINATION (Skip offset & Limit)
-        if filters.len() != 0 {
+        if !filters.is_empty() {
             let offset = offset.unwrap_or(0) as usize;
             let limit = limit.unwrap_or(100) as usize;
             minions = minions.into_iter().skip(offset).take(limit).collect();

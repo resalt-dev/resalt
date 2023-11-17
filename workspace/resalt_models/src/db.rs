@@ -112,8 +112,7 @@ impl Job {
             "timestamp",
             self.timestamp
                 .format("%Y-%m-%d %H:%M:%S")
-                .to_string()
-                .into(),
+                .to_string(),
         )]);
         if let Some(user) = &self.user {
             values.push(("user", user.clone()));
@@ -409,7 +408,7 @@ impl User {
             .unwrap()
             .insert("perms".to_owned(), perms);
 
-        return result;
+        result
     }
 
     pub fn hash(&self) -> Vec<(&str, String)> {
@@ -533,8 +532,8 @@ pub struct MinionPreset {
 
 impl MinionPreset {
     pub fn hash(&self) -> Vec<(&str, String)> {
-        let values = Vec::from([("name", self.name.clone()), ("filter", self.filter.clone())]);
-        values
+        
+        Vec::from([("name", self.name.clone()), ("filter", self.filter.clone())])
     }
 
     pub fn dehash(id: String, values: Vec<(String, String)>) -> Self {

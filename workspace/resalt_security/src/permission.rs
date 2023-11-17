@@ -57,7 +57,7 @@ pub const P_USER_EMAIL: &str = "user.email";
 pub const P_USER_PASSWORD: &str = "user.password";
 
 #[allow(clippy::borrowed_box)]
-pub fn has_resalt_permission(perms: &String, permission: &str) -> Result<bool, ApiError> {
+pub fn has_resalt_permission(perms: &str, permission: &str) -> Result<bool, ApiError> {
     let perms = match serde_json::from_str(perms) {
         Ok(perms) => perms,
         Err(e) => {

@@ -59,7 +59,7 @@ pub async fn route_settings_import_post(
                 user.username.clone(),
                 user.password.clone(),
                 user.perms.clone(),
-                user.last_login.clone(),
+                user.last_login,
                 user.email.clone(),
                 user.ldap_sync.clone(),
             ) {
@@ -130,7 +130,7 @@ pub async fn route_settings_import_post(
     for minion in &input.minions {
         match data.update_minion(
             minion.id.clone(),
-            minion.last_seen.clone().into(),
+            minion.last_seen.into(),
             minion.grains.clone(),
             minion.pillars.clone(),
             minion.pkgs.clone(),
@@ -138,10 +138,10 @@ pub async fn route_settings_import_post(
             minion.conformity_success,
             minion.conformity_incorrect,
             minion.conformity_error,
-            minion.last_updated_grains.clone(),
-            minion.last_updated_pillars.clone(),
-            minion.last_updated_pkgs.clone(),
-            minion.last_updated_conformity.clone(),
+            minion.last_updated_grains,
+            minion.last_updated_pillars,
+            minion.last_updated_pkgs,
+            minion.last_updated_conformity,
         ) {
             Ok(_) => {}
             Err(e) => {

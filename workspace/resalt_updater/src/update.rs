@@ -23,9 +23,7 @@ lazy_static! {
     pub static ref CURRENT_VERSION: String = include_str!("../../../Cargo.toml")
         .lines()
         .find(|line| line.starts_with("version = "))
-        .and_then(|line| line.split('=').nth(1))
-        .and_then(|v| Some(v.trim()))
-        .and_then(|v| Some(v.trim_matches('"')))
+        .and_then(|line| line.split('=').nth(1)).map(|v| v.trim()).map(|v| v.trim_matches('"'))
         .unwrap_or("unknown")
         .to_string();
 }

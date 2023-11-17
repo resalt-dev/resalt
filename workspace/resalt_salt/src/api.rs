@@ -12,7 +12,7 @@ use resalt_config::SConfig;
 use resalt_models::*;
 use serde::Deserialize;
 use serde_json::{json, Value};
-use std::{collections::HashMap, sync::Arc, time::Duration};
+use std::{collections::HashMap, time::Duration};
 
 const X_AUTH_TOKEN: &str = "X-Auth-Token";
 
@@ -190,7 +190,7 @@ pub fn create_awc_client() -> awc::Client {
 
 #[derive(Clone)]
 pub struct SaltAPI {
-    client: Arc<awc::Client>,
+    client: awc::Client,
 }
 
 impl Default for SaltAPI {
@@ -203,7 +203,7 @@ impl SaltAPI {
     pub fn new() -> Self {
         Self {
             //client: Client::default(),
-            client: Arc::new(create_awc_client()),
+            client: create_awc_client(),
         }
     }
 

@@ -644,14 +644,14 @@ impl StorageImpl for StorageMySQL {
             grains,
             pillars,
             pkgs,
-            last_updated_grains: last_updated_grains.map(|t| t.into()),
-            last_updated_pillars: last_updated_pillars.map(|t| t.into()),
-            last_updated_pkgs: last_updated_pkgs.map(|t| t.into()),
+            last_updated_grains,
+            last_updated_pillars,
+            last_updated_pkgs,
             conformity,
             conformity_success,
             conformity_incorrect,
             conformity_error,
-            last_updated_conformity: last_updated_conformity.map(|t| t.into()),
+            last_updated_conformity,
             os_type,
         }
         .into();

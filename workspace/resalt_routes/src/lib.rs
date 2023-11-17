@@ -43,10 +43,7 @@ use resalt_models::AuthStatus;
 pub fn guard_require_auth(ctx: &guard::GuardContext<'_>) -> bool {
     // Check if req has extension AuthStatus{}
     match ctx.req_data().get::<AuthStatus>() {
-        Some(auth_status) => match auth_status.salt_token {
-            Some(_) => true,
-            None => false,
-        },
+        Some(auth_status) => auth_status.salt_token.is_some(),
         None => false,
     }
 }

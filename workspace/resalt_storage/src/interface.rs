@@ -69,7 +69,7 @@ pub trait StorageImpl: Send {
             }
         }
         // 3. Create $superadmins if not exists
-        if let None = superadmins_group_id {
+        if superadmins_group_id.is_none() {
             superadmins_group_id = Some(
                 self.create_permission_group(
                     None,
@@ -124,6 +124,7 @@ pub trait StorageImpl: Send {
         )
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn create_user_hashed(
         &self,
         id: Option<String>,

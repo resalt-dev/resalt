@@ -122,7 +122,7 @@ impl StorageImpl for StorageRedis {
             username: username.clone(),
             password,
             perms,
-            last_login: last_login.map(|v| v.into()),
+            last_login,
             email: email.clone(),
             ldap_sync: ldap_sync.clone(),
         };
@@ -152,7 +152,7 @@ impl StorageImpl for StorageRedis {
             .collect();
 
         for key in keys {
-            let id: String = key.split(":").last().unwrap().to_string();
+            let id: String = key.split(':').last().unwrap().to_string();
             // Fields are stored as HashMap
             let values = connection
                 .hgetall(key.as_str())
@@ -190,7 +190,7 @@ impl StorageImpl for StorageRedis {
             .map_err(|e| format!("{:?}", e))?;
 
         for key in keys {
-            let id: String = key.split(":").last().unwrap().to_string();
+            let id: String = key.split(':').last().unwrap().to_string();
             let values: Vec<(String, String)> = conn_lookup
                 .hgetall(key.as_str())
                 .map_err(|e| format!("{:?}", e))?;
@@ -317,7 +317,7 @@ impl StorageImpl for StorageRedis {
         keys.sort();
 
         // QUICK PAGINATION (Skip offset & Limit)
-        if filters.len() == 0 {
+        if filters.is_empty() {
             keys = keys
                 .into_iter()
                 .skip(offset.unwrap_or(0) as usize)
@@ -326,7 +326,7 @@ impl StorageImpl for StorageRedis {
         }
 
         for key in keys {
-            let id: String = key.split(":").last().unwrap().to_string();
+            let id: String = key.split(':').last().unwrap().to_string();
             // Fields are stored as HashMap
             let values = connection
                 .hgetall(key.as_str())
@@ -343,7 +343,7 @@ impl StorageImpl for StorageRedis {
         resalt_storage::sort_minions(&mut minions, &sort);
 
         // SLOW PAGINATION (Skip offset & Limit)
-        if filters.len() != 0 {
+        if !filters.is_empty() {
             let offset = offset.unwrap_or(0) as usize;
             let limit = limit.unwrap_or(100) as usize;
             minions = minions.into_iter().skip(offset).take(limit).collect();
@@ -490,7 +490,7 @@ impl StorageImpl for StorageRedis {
             .collect();
 
         for key in keys {
-            let id: String = key.split(":").last().unwrap().to_string();
+            let id: String = key.split(':').last().unwrap().to_string();
             // Fields are stored as HashMap
             let values = connection
                 .hgetall(key.as_str())
@@ -566,7 +566,7 @@ impl StorageImpl for StorageRedis {
             .collect();
 
         for key in keys {
-            let id: String = key.split(":").last().unwrap().to_string();
+            let id: String = key.split(':').last().unwrap().to_string();
             // Fields are stored as HashMap
             let values = connection
                 .hgetall(key.as_str())
@@ -639,7 +639,7 @@ impl StorageImpl for StorageRedis {
         keys.sort();
 
         for key in keys {
-            let id: String = key.split(":").last().unwrap().to_string();
+            let id: String = key.split(':').last().unwrap().to_string();
             // Fields are stored as HashMap
             let values = connection
                 .hgetall(key.as_str())
@@ -700,7 +700,7 @@ impl StorageImpl for StorageRedis {
             .collect();
 
         for key in keys {
-            let id: String = key.split(":").last().unwrap().to_string();
+            let id: String = key.split(':').last().unwrap().to_string();
             // Fields are stored as HashMap
             let values = connection
                 .hgetall(key.as_str())
@@ -741,7 +741,7 @@ impl StorageImpl for StorageRedis {
             .map_err(|e| format!("{:?}", e))?;
 
         for key in keys {
-            let id: String = key.split(":").last().unwrap().to_string();
+            let id: String = key.split(':').last().unwrap().to_string();
             let values: Vec<(String, String)> = conn_lookup
                 .hgetall(key.as_str())
                 .map_err(|e| format!("{:?}", e))?;
@@ -814,7 +814,7 @@ impl StorageImpl for StorageRedis {
             .map_err(|e| format!("{:?}", e))?;
 
         for key in keys {
-            let group_id: String = key.split(":").last().unwrap().to_string();
+            let group_id: String = key.split(':').last().unwrap().to_string();
             let values: Vec<(String, String)> = conn_lookup
                 .hgetall(format!("permission_group:{}", group_id))
                 .map_err(|e| format!("{:?}", e))?;
@@ -840,7 +840,7 @@ impl StorageImpl for StorageRedis {
             .map_err(|e| format!("{:?}", e))?;
 
         for key in keys {
-            let user_id: String = key.split(":").nth(1).unwrap().to_string();
+            let user_id: String = key.split(':').nth(1).unwrap().to_string();
             let values: Vec<(String, String)> = conn_lookup
                 .hgetall(format!("user:{}", user_id))
                 .map_err(|e| format!("{:?}", e))?;
@@ -902,7 +902,7 @@ impl StorageImpl for StorageRedis {
         keys.sort();
 
         for key in keys {
-            let id: String = key.split(":").last().unwrap().to_string();
+            let id: String = key.split(':').last().unwrap().to_string();
             // Fields are stored as HashMap
             let values = connection
                 .hgetall(key.as_str())

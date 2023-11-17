@@ -6,7 +6,7 @@ use chrono::{
 };
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Default)]
 pub struct ResaltTime {
     time: NaiveDateTime,
 }
@@ -19,7 +19,6 @@ impl ResaltTime {
     }
 
     #[inline]
-    #[must_use]
     pub fn parse_from_str(s: &str, fmt: &str) -> Result<ResaltTime, ParseError> {
         match NaiveDateTime::parse_from_str(s, fmt) {
             Ok(time) => Ok(ResaltTime { time }),
@@ -31,7 +30,7 @@ impl ResaltTime {
     #[must_use]
     pub fn now() -> ResaltTime {
         ResaltTime {
-            time: chrono::Utc::now().naive_utc().into(),
+            time: chrono::Utc::now().naive_utc(),
         }
     }
 
@@ -39,14 +38,6 @@ impl ResaltTime {
     #[must_use]
     pub fn timestamp(&self) -> i64 {
         self.time.timestamp()
-    }
-}
-
-impl Default for ResaltTime {
-    fn default() -> Self {
-        ResaltTime {
-            time: chrono::NaiveDateTime::default(),
-        }
     }
 }
 
@@ -64,14 +55,14 @@ impl<'de> Deserialize<'de> for ResaltTime {
     }
 }
 
-impl Into<NaiveDateTime> for ResaltTime {
-    fn into(self) -> NaiveDateTime {
-        self.time
+impl From<ResaltTime> for NaiveDateTime {
+    fn from(val: ResaltTime) -> Self {
+        val.time
     }
 }
 
-impl Into<ResaltTime> for NaiveDateTime {
-    fn into(self) -> ResaltTime {
-        ResaltTime { time: self }
+impl From<NaiveDateTime> for ResaltTime {
+    fn from(val: NaiveDateTime) -> Self {
+        ResaltTime { time: val }
     }
 }

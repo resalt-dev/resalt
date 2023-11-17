@@ -3,7 +3,7 @@ use resalt_models::*;
 use serde_json::Value;
 use version_compare::Cmp;
 
-pub fn sort_minions(minions: &mut Vec<Minion>, sort: &str) {
+pub fn sort_minions(minions: &mut [Minion], sort: &str) {
     minions.sort_by(|a, b| match sort {
         "id.asc" => a.id.cmp(&b.id),
         "id.desc" => b.id.cmp(&a.id),
@@ -37,17 +37,17 @@ pub fn sort_minions(minions: &mut Vec<Minion>, sort: &str) {
             .os_type
             .as_ref()
             .unwrap_or(&String::from(""))
-            .cmp(&b.os_type.as_ref().unwrap_or(&String::from(""))),
+            .cmp(b.os_type.as_ref().unwrap_or(&String::from(""))),
         "osType.desc" => b
             .os_type
             .as_ref()
             .unwrap_or(&String::from(""))
-            .cmp(&a.os_type.as_ref().unwrap_or(&String::from(""))),
+            .cmp(a.os_type.as_ref().unwrap_or(&String::from(""))),
         _ => std::cmp::Ordering::Equal,
     })
 }
 
-pub fn sort_jobs(jobs: &mut Vec<Job>, sort: &str) {
+pub fn sort_jobs(jobs: &mut [Job], sort: &str) {
     jobs.sort_by(|a, b| match sort {
         "id.asc" => a.id.cmp(&b.id),
         "id.desc" => b.id.cmp(&a.id),

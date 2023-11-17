@@ -25,7 +25,7 @@ pub async fn route_frontend_get(
     let path = if path.is_empty() { "index.html" } else { path };
 
     // Fetch using FRONTEND_PUBLIC_DIR.get_file
-    let file = match FRONTEND_PUBLIC_DIR.get_file(&path) {
+    let file = match FRONTEND_PUBLIC_DIR.get_file(path) {
         Some(file) => file,
         None => FRONTEND_PUBLIC_DIR.get_file("index.html").unwrap(),
     };
