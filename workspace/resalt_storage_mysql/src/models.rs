@@ -24,7 +24,7 @@ impl From<AuthToken> for SQLAuthToken {
         SQLAuthToken {
             id: auth_token.id,
             user_id: auth_token.user_id,
-            timestamp: auth_token.timestamp,
+            timestamp: auth_token.timestamp.into(),
             salt_token: auth_token.salt_token,
         }
     }
@@ -35,7 +35,7 @@ impl From<SQLAuthToken> for AuthToken {
         AuthToken {
             id: sql_auth_token.id,
             user_id: sql_auth_token.user_id,
-            timestamp: sql_auth_token.timestamp,
+            timestamp: sql_auth_token.timestamp.into(),
             salt_token: sql_auth_token.salt_token,
         }
     }

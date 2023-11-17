@@ -1,43 +1,110 @@
-use r2d2::{Pool, PooledConnection};
-use redis::{Client, Commands, Iter};
+use serde::{Deserialize, Serialize};
+use std::io::{Read, Write};
+
 use resalt_models::*;
 use resalt_storage::{StorageImpl, StorageStatus};
 
+/// Dev storage which saves everything to filesystem instead of using a database
+/// NOTE! NOT MEANT FOR PRODUCTION!!!
+///
+/// Structure:
+/// e.g. PATH=./files
+///
+/// ./files/users/<user_id>.json
+/// ./files/authtokens/<authtoken_id>.json
+/// ./files/minions/<minion_id>.json
+/// ./files/events/<event_id>.json
+/// etc.
+
 #[derive(Clone)]
-pub struct StorageRedis {
-    pool: Pool<Client>,
+pub struct StorageFiles {
+    path: String, // MUST BE WITHOUT TRAILING SLASH
 }
 
-impl StorageRedis {
-    pub async fn connect(database_url: &str) -> Result<Self, String> {
-        let client = Client::open(database_url).unwrap();
-        let pool = Pool::builder().build(client);
+impl StorageFiles {
+    pub fn connect(path: &str) -> Result<StorageFiles, String> {
+        log::info!("Connecting to files storage at {}", path);
+        let path = path.trim_end_matches("/");
+        let storage = StorageFiles {
+            path: path.to_string(),
+        };
 
-        match pool {
-            Ok(pool) => {
-                let own = Self { pool };
-                own.init();
-                Ok(own)
-            }
-            Err(e) => Err(format!("{:?}", e)),
+        // Create directories if they don't exist
+        let dirs = vec![
+            "users",
+            "authtokens",
+            "minions",
+            "events",
+            "jobs",
+            "job_returns",
+            "permission_groups",
+            "minion_presets",
+        ];
+        for dir in dirs {
+            let path = format!("{}/{}", storage.path, dir);
+            std::fs::create_dir_all(path).map_err(|e| format!("{:?}", e))?;
         }
+
+        Ok(storage)
     }
 
-    fn create_connection(&self) -> Result<PooledConnection<Client>, String> {
-        match self.pool.get() {
-            Ok(conn) => Ok(conn),
-            Err(e) => Err(format!("{:?}", e)),
+    fn save_file(&self, path: &str, data: &impl Serialize) -> Result<(), String> {
+        let path = format!("{}/{}.json", self.path, path);
+        let serialized_data = serde_json::to_string(data).map_err(|e| format!("{:?}", e))?;
+        let mut file = std::fs::File::create(path).map_err(|e| format!("{:?}", e))?;
+        file.write_all(serialized_data.as_bytes())
+            .map_err(|e| format!("{:?}", e))?;
+        Ok(())
+    }
+
+    fn load_file<T>(&self, path: &str) -> Result<T, String>
+    where
+        for<'de> T: Deserialize<'de>,
+    {
+        let path = format!("{}/{}.json", self.path, path);
+        let mut file = std::fs::File::open(path).map_err(|e| format!("{:?}", e))?;
+        let mut serialized_data = String::new();
+        file.read_to_string(&mut serialized_data)
+            .map_err(|e| format!("{:?}", e))?;
+        let data: T = serde_json::from_str(&serialized_data).map_err(|e| format!("{:?}", e))?;
+        Ok(data)
+    }
+
+    fn check_file_exists(&self, path: &str) -> Result<bool, String> {
+        let path = format!("{}/{}.json", self.path, path);
+        let exists = std::path::Path::new(&path).exists();
+        Ok(exists)
+    }
+
+    fn list_file_names(&self, path: &str) -> Result<Vec<String>, String> {
+        let path = format!("{}/{}", self.path, path);
+        let mut file_names: Vec<String> = Vec::new();
+        for entry in std::fs::read_dir(path).map_err(|e| format!("{:?}", e))? {
+            let entry = entry.map_err(|e| format!("{:?}", e))?;
+            let file_name = entry
+                .file_name()
+                .into_string()
+                .map_err(|e| format!("{:?}", e))?;
+            let file_name = file_name.trim_end_matches(".json").to_string();
+            file_names.push(file_name);
         }
+        Ok(file_names)
+    }
+
+    fn delete_file(&self, path: &str) -> Result<(), String> {
+        let path = format!("{}/{}.json", self.path, path);
+        std::fs::remove_file(path).map_err(|e| format!("{:?}", e))?;
+        Ok(())
     }
 }
 
-impl StorageImpl for StorageRedis {
+impl StorageImpl for StorageFiles {
     fn clone(&self) -> Box<dyn StorageImpl> {
         Box::new(Clone::clone(self))
     }
 
     fn get_status(&self) -> Result<resalt_storage::StorageStatus, String> {
-        //        let mut connection = self.create_connection()?;
+        //
 
         //let lifespan = SConfig::auth_session_lifespan() * 1000;
         // let auth_expiry: NaiveDateTime = match NaiveDateTime::from_timestamp_millis(
@@ -115,7 +182,6 @@ impl StorageImpl for StorageRedis {
         email: Option<String>,
         ldap_sync: Option<String>,
     ) -> Result<User, String> {
-        let mut connection = self.create_connection()?;
         let id = id.unwrap_or(format!("usr_{}", uuid::Uuid::new_v4()));
         let user = User {
             id: id.clone(),
@@ -127,21 +193,16 @@ impl StorageImpl for StorageRedis {
             ldap_sync: ldap_sync.clone(),
         };
 
-        let values = user.hash();
-
-        connection
-            .hset_multiple(format!("user:{}", id), values.as_slice())
-            .map_err(|e| format!("{:?}", e))?;
+        let path = format!("users/{}.json", id);
+        self.save_file(&path, &user)?;
 
         Ok(user)
     }
 
     fn list_users(&self, limit: Option<i64>, offset: Option<i64>) -> Result<Vec<User>, String> {
-        let mut connection = self.create_connection()?;
         let mut users: Vec<User> = Vec::new();
 
-        // Loop over user:*, which are HashMaps
-        let mut keys: Vec<String> = connection.keys("user:*").map_err(|e| format!("{:?}", e))?;
+        let mut keys: Vec<String> = self.list_file_names("users")?;
         keys.sort();
 
         // Skip offset & Limit
@@ -152,76 +213,56 @@ impl StorageImpl for StorageRedis {
             .collect();
 
         for key in keys {
-            let id: String = key.split(":").last().unwrap().to_string();
-            // Fields are stored as HashMap
-            let values = connection
-                .hgetall(key.as_str())
-                .map_err(|e| format!("{:?}", e))?;
-            let user: User = User::dehash(id, values);
-            users.push(user);
+            let user = self.get_user_by_id(&key)?;
+            match user {
+                Some(user) => users.push(user),
+                None => continue,
+            }
         }
 
         Ok(users)
     }
 
     fn get_user_by_id(&self, id: &str) -> Result<Option<User>, String> {
-        let mut connection = self.create_connection()?;
         // If user doesn't exist, return None
-        let values: Vec<(String, String)> = connection
-            .hgetall(format!("user:{}", id))
-            .map_err(|e| format!("{:?}", e))?;
-        if values.is_empty() {
+        let exists = self.check_file_exists(&format!("users/{}", id))?;
+        if !exists {
             return Ok(None);
         }
 
-        let user: User = User::dehash(id.to_string(), values);
+        let user: User = self.load_file(&format!("users/{}", id))?;
 
         Ok(Some(user))
     }
 
     fn get_user_by_username(&self, username: &str) -> Result<Option<User>, String> {
-        let mut conn_iter = self.create_connection()?;
-        let mut conn_lookup = self.create_connection()?;
-        // If user doesn't exist, return None
+        let mut users: Vec<User> = Vec::new();
 
-        // Search for Hashmap where user:*.username == username
-        let keys: Iter<'_, String> = conn_iter
-            .scan_match("user:*")
-            .map_err(|e| format!("{:?}", e))?;
+        let mut keys: Vec<String> = self.list_file_names("users")?;
+        keys.sort();
 
         for key in keys {
-            let id: String = key.split(":").last().unwrap().to_string();
-            let values: Vec<(String, String)> = conn_lookup
-                .hgetall(key.as_str())
-                .map_err(|e| format!("{:?}", e))?;
-            if values.is_empty() {
-                continue;
-            }
-
-            let user: User = User::dehash(id, values);
-
-            if user.username == username {
-                return Ok(Some(user));
+            let user = self.get_user_by_id(&key)?;
+            match user {
+                Some(user) => users.push(user),
+                None => continue,
             }
         }
 
-        Ok(None)
+        let user = users.into_iter().find(|u| u.username == username);
+
+        Ok(user)
     }
 
     fn update_user(&self, user: &User) -> Result<(), String> {
-        let mut connection = self.create_connection()?;
-        let values = user.hash();
-        connection
-            .hset_multiple(format!("user:{}", user.id), values.as_slice())
-            .map_err(|e| format!("{:?}", e))?;
+        let path = format!("users/{}", user.id);
+        self.save_file(&path, user)?;
         Ok(())
     }
 
     fn delete_user(&self, id: &str) -> Result<(), String> {
-        let mut connection = self.create_connection()?;
-        connection
-            .del(format!("user:{}", id))
-            .map_err(|e| format!("{:?}", e))?;
+        let path = format!("users/{}", id);
+        self.delete_file(&path)?;
         Ok(())
     }
 
@@ -230,45 +271,33 @@ impl StorageImpl for StorageRedis {
     ///////////////////
 
     fn create_authtoken(&self, user_id: String) -> Result<AuthToken, String> {
-        let mut connection = self.create_connection()?;
         let id = format!("auth_{}", uuid::Uuid::new_v4());
         let authtoken = AuthToken {
-            id,
+            id: id.clone(),
             user_id: user_id.clone(),
             timestamp: ResaltTime::now(),
             salt_token: None,
         };
 
-        let values = authtoken.hash();
-
-        // Insert auth token
-        connection
-            .hset_multiple(format!("authtoken:{}", authtoken.id), values.as_slice())
-            .map_err(|e| format!("{:?}", e))?;
+        let path = format!("authtokens/{}", id);
+        self.save_file(&path, &authtoken)?;
 
         // Update user's last_login
-        connection
-            .hset(
-                format!("user:{}", user_id),
-                "last_login",
-                authtoken.timestamp.format("%Y-%m-%d %H:%M:%S").to_string(),
-            )
-            .map_err(|e| format!("{:?}", e))?;
+        let mut user = self.get_user_by_id(&user_id)?.unwrap();
+        user.last_login = Some(authtoken.timestamp.into());
+        self.update_user(&user)?;
 
         Ok(authtoken)
     }
 
     fn get_authtoken_by_id(&self, id: &str) -> Result<Option<AuthToken>, String> {
-        let mut connection = self.create_connection()?;
         // If authtoken doesn't exist, return None
-        let values: Vec<(String, String)> = connection
-            .hgetall(format!("authtoken:{}", id))
-            .map_err(|e| format!("{:?}", e))?;
-        if values.is_empty() {
+        let exists = self.check_file_exists(&format!("authtokens/{}", id))?;
+        if !exists {
             return Ok(None);
         }
 
-        let authtoken: AuthToken = AuthToken::dehash(id.to_string(), values);
+        let authtoken: AuthToken = self.load_file(&format!("authtokens/{}", id))?;
 
         Ok(Some(authtoken))
     }
@@ -278,20 +307,15 @@ impl StorageImpl for StorageRedis {
         auth_token: &str,
         salt_token: Option<&SaltToken>,
     ) -> Result<(), String> {
-        let mut connection = self.create_connection()?;
-
         let salt_token_str = salt_token
             .as_ref()
             .map(|st| serde_json::to_string(st).unwrap());
 
         // Update authtoken with salt_token
-        connection
-            .hset(
-                format!("authtoken:{}", auth_token),
-                "salt_token",
-                salt_token_str,
-            )
-            .map_err(|e| format!("{:?}", e))?;
+        let mut authtoken = self.get_authtoken_by_id(auth_token)?.unwrap();
+        authtoken.salt_token = salt_token_str;
+        let path = format!("authtokens/{}", auth_token);
+        self.save_file(&path, &authtoken)?;
 
         Ok(())
     }
@@ -307,13 +331,9 @@ impl StorageImpl for StorageRedis {
         limit: Option<i64>,
         offset: Option<i64>,
     ) -> Result<Vec<Minion>, String> {
-        let mut connection = self.create_connection()?;
         let mut minions: Vec<Minion> = Vec::new();
 
-        // Loop over minion:*, which are HashMaps
-        let mut keys: Vec<String> = connection
-            .keys("minion:*")
-            .map_err(|e| format!("{:?}", e))?;
+        let mut keys = self.list_file_names("minions")?;
         keys.sort();
 
         // QUICK PAGINATION (Skip offset & Limit)
@@ -326,13 +346,11 @@ impl StorageImpl for StorageRedis {
         }
 
         for key in keys {
-            let id: String = key.split(":").last().unwrap().to_string();
-            // Fields are stored as HashMap
-            let values = connection
-                .hgetall(key.as_str())
-                .map_err(|e| format!("{:?}", e))?;
-            let minion: Minion = Minion::dehash(id, values);
-            minions.push(minion);
+            let minion = self.get_minion_by_id(&key)?;
+            match minion {
+                Some(minion) => minions.push(minion),
+                None => continue,
+            }
         }
 
         // Filtering
@@ -353,16 +371,13 @@ impl StorageImpl for StorageRedis {
     }
 
     fn get_minion_by_id(&self, id: &str) -> Result<Option<Minion>, String> {
-        let mut connection = self.create_connection()?;
         // If minion doesn't exist, return None
-        let values: Vec<(String, String)> = connection
-            .hgetall(format!("minion:{}", id))
-            .map_err(|e| format!("{:?}", e))?;
-        if values.is_empty() {
+        let exists = self.check_file_exists(&format!("minions/{}", id))?;
+        if !exists {
             return Ok(None);
         }
 
-        let minion: Minion = Minion::dehash(id.to_string(), values);
+        let minion: Minion = self.load_file(&format!("minions/{}", id))?;
 
         Ok(Some(minion))
     }
@@ -383,8 +398,6 @@ impl StorageImpl for StorageRedis {
         last_updated_pkgs: Option<ResaltTime>,
         last_updated_conformity: Option<ResaltTime>,
     ) -> Result<(), String> {
-        let mut connection = self.create_connection()?;
-
         let last_updated_grains = grains
             .as_ref()
             .map(|_| last_updated_grains.unwrap_or(time.into()));
@@ -428,22 +441,17 @@ impl StorageImpl for StorageRedis {
             os_type,
         };
 
-        let values = minion.hash();
-
         // Update if it exists, insert if it doesn't
-        connection
-            .hset_multiple(format!("minion:{}", minion_id), values.as_slice())
-            .map_err(|e| format!("{:?}", e))?;
+        let path = format!("minions/{}", minion_id);
+        self.save_file(&path, &minion)?;
 
         Ok(())
     }
 
     // Delete minion
     fn delete_minion(&self, id: String) -> Result<(), String> {
-        let mut connection = self.create_connection()?;
-        connection
-            .del(format!("minion:{}", id))
-            .map_err(|e| format!("{:?}", e))?;
+        let path = format!("minions/{}", id);
+        self.delete_file(&path)?;
         Ok(())
     }
 
@@ -457,7 +465,6 @@ impl StorageImpl for StorageRedis {
         data: String,
         timestamp: chrono::NaiveDateTime,
     ) -> Result<String, String> {
-        let mut connection = self.create_connection()?;
         let id = format!("evnt_{}", uuid::Uuid::new_v4());
         let event = Event {
             id: id.clone(),
@@ -466,20 +473,17 @@ impl StorageImpl for StorageRedis {
             data,
         };
 
-        let values = event.hash();
+        let path = format!("events/{}", id);
+        self.save_file(&path, &event)?;
 
-        connection
-            .hset_multiple(format!("event:{}", id), values.as_slice())
-            .map_err(|e| format!("{:?}", e))?;
         Ok(id)
     }
 
     fn list_events(&self, limit: Option<i64>, offset: Option<i64>) -> Result<Vec<Event>, String> {
-        let mut connection = self.create_connection()?;
         let mut events: Vec<Event> = Vec::new();
 
         // Loop over event:*, which are HashMaps
-        let mut keys: Vec<String> = connection.keys("event:*").map_err(|e| format!("{:?}", e))?;
+        let mut keys = self.list_file_names("events")?;
         keys.sort();
 
         // Skip offset & Limit
@@ -490,29 +494,24 @@ impl StorageImpl for StorageRedis {
             .collect();
 
         for key in keys {
-            let id: String = key.split(":").last().unwrap().to_string();
-            // Fields are stored as HashMap
-            let values = connection
-                .hgetall(key.as_str())
-                .map_err(|e| format!("{:?}", e))?;
-            let event: Event = Event::dehash(id, values);
-            events.push(event);
+            let event = self.get_event_by_id(&key)?;
+            match event {
+                Some(event) => events.push(event),
+                None => continue,
+            }
         }
 
         Ok(events)
     }
 
     fn get_event_by_id(&self, id: &str) -> Result<Option<Event>, String> {
-        let mut connection = self.create_connection()?;
         // If event doesn't exist, return None
-        let values: Vec<(String, String)> = connection
-            .hgetall(format!("event:{}", id))
-            .map_err(|e| format!("{:?}", e))?;
-        if values.is_empty() {
+        let exists = self.check_file_exists(&format!("events/{}", id))?;
+        if !exists {
             return Ok(None);
         }
 
-        let event: Event = Event::dehash(id.to_string(), values);
+        let event: Event = self.load_file(&format!("events/{}", id))?;
 
         Ok(Some(event))
     }
@@ -528,7 +527,6 @@ impl StorageImpl for StorageRedis {
         event_id: Option<String>,
         timestamp: chrono::NaiveDateTime,
     ) -> Result<(), String> {
-        let mut connection = self.create_connection()?;
         let job = Job {
             id: jid.clone(),
             timestamp: timestamp.into(),
@@ -537,11 +535,9 @@ impl StorageImpl for StorageRedis {
             event_id,
         };
 
-        let values = job.hash();
+        let path = format!("jobs/{}", jid);
+        self.save_file(&path, &job)?;
 
-        connection
-            .hset_multiple(format!("job:{}", jid), values.as_slice())
-            .map_err(|e| format!("{:?}", e))?;
         Ok(())
     }
 
@@ -551,11 +547,10 @@ impl StorageImpl for StorageRedis {
         limit: Option<i64>,
         offset: Option<i64>,
     ) -> Result<Vec<Job>, String> {
-        let mut connection = self.create_connection()?;
         let mut jobs: Vec<Job> = Vec::new();
 
         // Loop over job:*, which are HashMaps
-        let mut keys: Vec<String> = connection.keys("job:*").map_err(|e| format!("{:?}", e))?;
+        let mut keys = self.list_file_names("jobs")?;
         keys.sort();
 
         // Skip offset & Limit
@@ -566,13 +561,11 @@ impl StorageImpl for StorageRedis {
             .collect();
 
         for key in keys {
-            let id: String = key.split(":").last().unwrap().to_string();
-            // Fields are stored as HashMap
-            let values = connection
-                .hgetall(key.as_str())
-                .map_err(|e| format!("{:?}", e))?;
-            let job: Job = Job::dehash(id, values);
-            jobs.push(job);
+            let job = self.get_job_by_jid(&key)?;
+            match job {
+                Some(job) => jobs.push(job),
+                None => continue,
+            }
         }
 
         // Sorting
@@ -583,16 +576,13 @@ impl StorageImpl for StorageRedis {
     }
 
     fn get_job_by_jid(&self, jid: &str) -> Result<Option<Job>, String> {
-        let mut connection = self.create_connection()?;
         // If job doesn't exist, return None
-        let values: Vec<(String, String)> = connection
-            .hgetall(format!("job:{}", jid))
-            .map_err(|e| format!("{:?}", e))?;
-        if values.is_empty() {
+        let exists = self.check_file_exists(&format!("jobs/{}", jid))?;
+        if !exists {
             return Ok(None);
         }
 
-        let job: Job = Job::dehash(jid.to_string(), values);
+        let job: Job = self.load_file(&format!("jobs/{}", jid))?;
 
         Ok(Some(job))
     }
@@ -609,7 +599,6 @@ impl StorageImpl for StorageRedis {
         minion_id: String,
         timestamp: chrono::NaiveDateTime,
     ) -> Result<(), String> {
-        let mut connection = self.create_connection()?;
         let id = format!("jret_{}", uuid::Uuid::new_v4());
         let job_return = JobReturn {
             id: "".to_string(),
@@ -620,31 +609,25 @@ impl StorageImpl for StorageRedis {
             minion_id,
         };
 
-        let values = job_return.hash();
+        let path = format!("job_returns/{}", id);
+        self.save_file(&path, &job_return)?;
 
-        connection
-            .hset_multiple(format!("job_return:{}:{}", jid, id), values.as_slice())
-            .map_err(|e| format!("{:?}", e))?;
         Ok(())
     }
 
     fn get_job_returns_by_job(&self, job: &Job) -> Result<Vec<JobReturn>, String> {
-        let mut connection = self.create_connection()?;
         let mut job_returns: Vec<JobReturn> = Vec::new();
 
         // Loop over job_return:<jid>:*
-        let mut keys: Vec<String> = connection
-            .keys(format!("job_return:{}:*", job.id))
-            .map_err(|e| format!("{:?}", e))?;
+        let mut keys = self.list_file_names("job_returns")?;
         keys.sort();
 
         for key in keys {
-            let id: String = key.split(":").last().unwrap().to_string();
-            // Fields are stored as HashMap
-            let values = connection
-                .hgetall(key.as_str())
-                .map_err(|e| format!("{:?}", e))?;
-            let job_return: JobReturn = JobReturn::dehash(id, values);
+            let path = format!("job_returns/{}", key);
+            let job_return: JobReturn = self.load_file(&path)?;
+            if job_return.job_id != job.id {
+                continue;
+            }
             job_returns.push(job_return);
         }
 
@@ -661,7 +644,6 @@ impl StorageImpl for StorageRedis {
         name: &str,
         perms: Option<String>,
     ) -> Result<String, String> {
-        let mut connection = self.create_connection()?;
         let id = id.unwrap_or(format!("pg_{}", uuid::Uuid::new_v4()));
         let permission_group = PermissionGroup {
             id: id.clone(),
@@ -670,11 +652,9 @@ impl StorageImpl for StorageRedis {
             ldap_sync: None,
         };
 
-        let values = permission_group.hash();
+        let path = format!("permission_groups/{}", id);
+        self.save_file(&path, &permission_group)?;
 
-        connection
-            .hset_multiple(format!("permission_group:{}", id), values.as_slice())
-            .map_err(|e| format!("{:?}", e))?;
         Ok(id)
     }
 
@@ -683,13 +663,9 @@ impl StorageImpl for StorageRedis {
         limit: Option<i64>,
         offset: Option<i64>,
     ) -> Result<Vec<PermissionGroup>, String> {
-        let mut connection = self.create_connection()?;
         let mut permission_groups: Vec<PermissionGroup> = Vec::new();
 
-        // Loop over permission_group:*, which are HashMaps
-        let mut keys: Vec<String> = connection
-            .keys("permission_group:*")
-            .map_err(|e| format!("{:?}", e))?;
+        let mut keys: Vec<String> = self.list_file_names("permission_groups")?;
         keys.sort();
 
         // Skip offset & Limit
@@ -700,103 +676,59 @@ impl StorageImpl for StorageRedis {
             .collect();
 
         for key in keys {
-            let id: String = key.split(":").last().unwrap().to_string();
-            // Fields are stored as HashMap
-            let values = connection
-                .hgetall(key.as_str())
-                .map_err(|e| format!("{:?}", e))?;
-            let permission_group: PermissionGroup = PermissionGroup::dehash(id, values);
-            permission_groups.push(permission_group);
+            let permission_group = self.get_permission_group_by_id(&key)?;
+            match permission_group {
+                Some(permission_group) => permission_groups.push(permission_group),
+                None => continue,
+            }
         }
 
         Ok(permission_groups)
     }
 
     fn get_permission_group_by_id(&self, id: &str) -> Result<Option<PermissionGroup>, String> {
-        let mut connection = self.create_connection()?;
         // If permission_group doesn't exist, return None
-        let values: Vec<(String, String)> = connection
-            .hgetall(format!("permission_group:{}", id))
-            .map_err(|e| format!("{:?}", e))?;
-        if values.is_empty() {
+        let exists = self.check_file_exists(&format!("permission_groups/{}", id))?;
+        if !exists {
             return Ok(None);
         }
 
-        let permission_group: PermissionGroup = PermissionGroup::dehash(id.to_string(), values);
+        let permission_group: PermissionGroup =
+            self.load_file(&format!("permission_groups/{}", id))?;
 
         Ok(Some(permission_group))
     }
 
+    /// DEPRECATED
     fn get_permission_group_by_ldap_sync(
         &self,
-        ldap_sync: &str,
+        _ldap_sync: &str,
     ) -> Result<Option<PermissionGroup>, String> {
-        let mut conn_iter = self.create_connection()?;
-        let mut conn_lookup = self.create_connection()?;
-        // If permission_group doesn't exist, return None
-
-        // Search for Hashmap where permission_group:*.ldap_sync == ldap_sync
-        let keys: Iter<'_, String> = conn_iter
-            .scan_match("permission_group:*")
-            .map_err(|e| format!("{:?}", e))?;
-
-        for key in keys {
-            let id: String = key.split(":").last().unwrap().to_string();
-            let values: Vec<(String, String)> = conn_lookup
-                .hgetall(key.as_str())
-                .map_err(|e| format!("{:?}", e))?;
-            if values.is_empty() {
-                continue;
-            }
-
-            let permission_group: PermissionGroup = PermissionGroup::dehash(id, values);
-
-            if permission_group.ldap_sync == Some(ldap_sync.to_string()) {
-                return Ok(Some(permission_group));
-            }
-        }
-
         Ok(None)
     }
 
     fn is_user_member_of_group(&self, user_id: &str, group_id: &str) -> Result<bool, String> {
-        let mut connection = self.create_connection()?;
-
-        // Search for existance of permission_group_user:<user_id>:<group_id>
-        let key = format!("permission_group_user:{}:{}", user_id, group_id);
-        let exists: bool = connection
-            .exists(key.as_str())
-            .map_err(|e| format!("{:?}", e))?;
+        let path = format!("permission_group_user/{}/{}", user_id, group_id);
+        let exists = self.check_file_exists(&path)?;
 
         Ok(exists)
     }
 
     fn update_permission_group(&self, permission_group: &PermissionGroup) -> Result<(), String> {
-        let mut connection = self.create_connection()?;
-        let values = permission_group.hash();
-        connection
-            .hset_multiple(
-                format!("permission_group:{}", permission_group.id),
-                values.as_slice(),
-            )
-            .map_err(|e| format!("{:?}", e))?;
+        let path = format!("permission_groups/{}", permission_group.id);
+        self.save_file(&path, permission_group)?;
         Ok(())
     }
 
     fn delete_permission_group(&self, id: &str) -> Result<(), String> {
-        let mut connection = self.create_connection()?;
-        connection
-            .del(format!("permission_group:{}", id))
-            .map_err(|e| format!("{:?}", e))?;
+        let path = format!("permission_groups/{}", id);
+        self.delete_file(&path)?;
         Ok(())
     }
 
     fn insert_permission_group_user(&self, user_id: &str, group_id: &str) -> Result<(), String> {
-        let mut connection = self.create_connection()?;
-        let key = format!("permission_group_user:{}:{}", user_id, group_id);
-        connection
-            .set(key.as_str(), "1")
-            .map_err(|e| format!("{:?}", e))?;
+        let path = format!("permission_group_user/{}/{}", user_id, group_id);
+        self.save_file(&path, &())?;
         Ok(())
     }
 
@@ -804,63 +736,48 @@ impl StorageImpl for StorageRedis {
         &self,
         user_id: &str,
     ) -> Result<Vec<PermissionGroup>, String> {
-        let mut conn_iter = self.create_connection()?;
-        let mut conn_lookup = self.create_connection()?;
         let mut permission_groups: Vec<PermissionGroup> = Vec::new();
 
-        // Search for Hashmap where permission_group_user:<user_id>:* exists
-        let keys: Iter<'_, String> = conn_iter
-            .scan_match(format!("permission_group_user:{}:*", user_id).as_str())
-            .map_err(|e| format!("{:?}", e))?;
+        // Loop over permission_group_user:<user_id>:*
+        let keys = self.list_file_names(&format!("permission_group_user/{}", user_id))?;
 
-        for key in keys {
-            let group_id: String = key.split(":").last().unwrap().to_string();
-            let values: Vec<(String, String)> = conn_lookup
-                .hgetall(format!("permission_group:{}", group_id))
-                .map_err(|e| format!("{:?}", e))?;
-            if values.is_empty() {
-                continue;
+        for group_id in keys {
+            let permission_group = self.get_permission_group_by_id(&group_id)?;
+            match permission_group {
+                Some(permission_group) => permission_groups.push(permission_group),
+                None => continue,
             }
-
-            let permission_group: PermissionGroup = PermissionGroup::dehash(group_id, values);
-            permission_groups.push(permission_group);
         }
 
         Ok(permission_groups)
     }
 
     fn list_users_by_permission_group_id(&self, group_id: &str) -> Result<Vec<User>, String> {
-        let mut conn_iter = self.create_connection()?;
-        let mut conn_lookup = self.create_connection()?;
         let mut users: Vec<User> = Vec::new();
 
         // Search for Hashmap where permission_group_user:*:<group_id> exists
-        let keys: Iter<'_, String> = conn_iter
-            .scan_match(format!("permission_group_user:*:{}", group_id).as_str())
-            .map_err(|e| format!("{:?}", e))?;
+        let keys: Vec<String> = self.list_file_names("users")?;
 
-        for key in keys {
-            let user_id: String = key.split(":").nth(1).unwrap().to_string();
-            let values: Vec<(String, String)> = conn_lookup
-                .hgetall(format!("user:{}", user_id))
-                .map_err(|e| format!("{:?}", e))?;
-            if values.is_empty() {
+        for user_id in keys {
+            let key = format!("permission_group_user/{}/{}", user_id, group_id);
+            let exists = self.check_file_exists(&key)?;
+            if !exists {
                 continue;
             }
 
-            let user: User = User::dehash(user_id, values);
-            users.push(user);
+            let user = self.get_user_by_id(&user_id)?;
+            match user {
+                Some(user) => users.push(user),
+                None => continue,
+            }
         }
 
         Ok(users)
     }
 
     fn delete_permission_group_user(&self, user_id: &str, group_id: &str) -> Result<(), String> {
-        let mut connection = self.create_connection()?;
-        let key = format!("permission_group_user:{}:{}", user_id, group_id);
-        connection
-            .del(key.as_str())
-            .map_err(|e| format!("{:?}", e))?;
+        let path = format!("permission_group_user:{}:{}", user_id, group_id);
+        self.delete_file(&path)?;
         Ok(())
     }
 
@@ -874,7 +791,6 @@ impl StorageImpl for StorageRedis {
         name: &str,
         filter: &str,
     ) -> Result<String, String> {
-        let mut connection = self.create_connection()?;
         let id = id.unwrap_or(format!("pre_{}", uuid::Uuid::new_v4()));
         let minion_preset = MinionPreset {
             id: id.clone(),
@@ -882,70 +798,50 @@ impl StorageImpl for StorageRedis {
             filter: filter.to_string(),
         };
 
-        let values = minion_preset.hash();
-
-        connection
-            .hset_multiple(format!("minion_preset:{}", id), values.as_slice())
-            .map_err(|e| format!("{:?}", e))?;
+        let path = format!("minion_presets/{}", id);
+        self.save_file(&path, &minion_preset)?;
 
         Ok(id)
     }
 
     fn list_minion_presets(&self) -> Result<Vec<MinionPreset>, String> {
-        let mut connection = self.create_connection()?;
         let mut minion_presets: Vec<MinionPreset> = Vec::new();
 
-        // Loop over minion_preset:*, which are HashMaps
-        let mut keys: Vec<String> = connection
-            .keys("minion_preset:*")
-            .map_err(|e| format!("{:?}", e))?;
+        let mut keys = self.list_file_names("minion_presets")?;
         keys.sort();
 
         for key in keys {
-            let id: String = key.split(":").last().unwrap().to_string();
-            // Fields are stored as HashMap
-            let values = connection
-                .hgetall(key.as_str())
-                .map_err(|e| format!("{:?}", e))?;
-            let minion_preset: MinionPreset = MinionPreset::dehash(id, values);
-            minion_presets.push(minion_preset);
+            let minion_preset = self.get_minion_preset_by_id(&key)?;
+            match minion_preset {
+                Some(minion_preset) => minion_presets.push(minion_preset),
+                None => continue,
+            }
         }
 
         Ok(minion_presets)
     }
 
     fn get_minion_preset_by_id(&self, id: &str) -> Result<Option<MinionPreset>, String> {
-        let mut connection = self.create_connection()?;
         // If minion_preset doesn't exist, return None
-        let values: Vec<(String, String)> = connection
-            .hgetall(format!("minion_preset:{}", id))
-            .map_err(|e| format!("{:?}", e))?;
-        if values.is_empty() {
+        let exists = self.check_file_exists(&format!("minion_presets/{}", id))?;
+        if !exists {
             return Ok(None);
         }
 
-        let minion_preset: MinionPreset = MinionPreset::dehash(id.to_string(), values);
+        let minion_preset: MinionPreset = self.load_file(&format!("minion_presets/{}", id))?;
 
         Ok(Some(minion_preset))
     }
 
     fn update_minion_preset(&self, minion_preset: &MinionPreset) -> Result<(), String> {
-        let mut connection = self.create_connection()?;
-        let values = minion_preset.hash();
-        connection
-            .hset_multiple(
-                format!("minion_preset:{}", minion_preset.id),
-                values.as_slice(),
-            )
-            .map_err(|e| format!("{:?}", e))?;
+        let path = format!("minion_presets/{}", minion_preset.id);
+        self.save_file(&path, minion_preset)?;
         Ok(())
     }
 
     fn delete_minion_preset(&self, id: &str) -> Result<(), String> {
-        let mut connection = self.create_connection()?;
-        connection
-            .del(format!("minion_preset:{}", id))
-            .map_err(|e| format!("{:?}", e))?;
+        let path = format!("minion_presets/{}", id);
+        self.delete_file(&path)?;
         Ok(())
     }
 }

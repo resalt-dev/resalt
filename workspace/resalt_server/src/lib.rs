@@ -5,6 +5,7 @@ use std::{
 
 use actix_web::{guard::fn_guard, http::header, middleware::*, web, App, HttpServer};
 use env_logger::{init_from_env, Env};
+use log::info;
 use resalt_config::SConfig;
 use resalt_middleware::ValidateAuth;
 use resalt_routes::*;
@@ -16,7 +17,18 @@ use resalt_storage_redis::StorageRedis;
 use tokio::task;
 
 async fn init_db() -> Box<dyn StorageImpl> {
-    match SConfig::database_type().to_lowercase().as_str() {
+    let db_type = SConfig::database_type();
+    let db_type = db_type.to_lowercase();
+    let db_type = db_type.as_str();
+    info!("Database type: {}", db_type);
+    match db_type {
+        "files" => {
+            let path = SConfig::database_host();
+            Box::new(
+                resalt_storage_files::StorageFiles::connect(&path)
+                    .unwrap_or_else(|_| panic!("Error connecting to {}", &path)),
+            )
+        }
         "mysql" => {
             let database_url = format!(
                 "mysql://{}:{}@{}:{}/{}",

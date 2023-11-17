@@ -48,7 +48,7 @@ services:
       context: ./
       dockerfile: Dockerfile-devel
     volumes:
-      - ./docker:/usr/src/app/docker:ro
+      - ./docker:/usr/src/app/docker
       - ./src:/usr/src/app/src:ro
       - ./workspace:/usr/src/app/workspace:ro
       - ./Cargo.toml:/usr/src/app/Cargo.toml:ro
