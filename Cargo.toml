@@ -1,7 +1,22 @@
 [workspace]
 resolver = "2"
 members = [
-    "workspace/*/src/..",
+    "workspace/resalt-*",
+# "resalt-auth"
+# "resalt-config"
+# "resalt-ldap"
+# "resalt-middleware"
+# "resalt-models"
+# "resalt-routes"
+# "resalt-salt"
+# "resalt-scheduler"
+# "resalt-security"
+# "resalt-server"
+# "resalt-storage"
+# "resalt-storage-files"
+# "resalt-storage-mysql"
+# "resalt-storage-redis"
+# "resalt-updater"
 ]
 default-members = [
     "workspace/resalt-server",
@@ -11,11 +26,11 @@ default-members = [
 version = "0.5.5"
 authors = ["Max Faxälv <max@foorack.com>"]
 edition = "2021"
-readme = "README.md"
-repository = "https://github.com/resalt-dev/resalt"
 license = "MIT"
-description = "Resalt is a free, open-source, self-hosted, web-based administration and monitoring panel for SaltStack."
 publish = false
+readme = "README.md"
+description = "Resalt is a free, open-source, self-hosted, web-based administration and monitoring panel for SaltStack."
+repository = "https://github.com/resalt-dev/resalt"
 
 [workspace.dependencies]
 actix-web = { version = "4.4.0", features=["macros", "compress-gzip"], default-features = false }
@@ -33,3 +48,12 @@ news = [
     "Resalt 0.2.0 released§Resalt 0.2.0 is now available. This release includes a fix where compliance data wasn't stored when triggered from minion, improved permission checking, and several UI fixes.",
     "Resalt 0.1.6 released§Resalt 0.1.6 is now available. This release includes large UI updates, continued implementation of the permission system, the ability to see grains of offline minions, dependency updates, accessibility updates, enforcement of code linting, a severe improvement of compilation times for the frontend, and a lot of bug fixes.",
 ]
+
+[profile.dev]
+# Disabling debug info speeds up builds a bunch and we don't rely on it for debugging that much.
+debug = 0
+
+[profile.release]
+lto = true
+opt-level = 3
+codegen-units = 1
