@@ -1,154 +1,17 @@
+use super::model::*;
 use actix_tls::connect::openssl::reexports::{SslConnector, SslMethod};
 use async_stream::stream;
-use awc::{
-    error::{JsonPayloadError, SendRequestError},
-    Connector,
-};
+use awc::Connector;
 use futures::StreamExt;
 use http::StatusCode;
 use log::*;
 use openssl::ssl::SslVerifyMode;
 use resalt_config::SConfig;
 use resalt_models::*;
-use serde::Deserialize;
 use serde_json::{json, Value};
 use std::{collections::HashMap, time::Duration};
 
 const X_AUTH_TOKEN: &str = "X-Auth-Token";
-
-#[derive(Clone, Debug, Default)]
-pub struct SaltEvent {
-    pub tag: String,
-    pub data: String,
-}
-
-#[derive(Debug)]
-pub enum SaltError {
-    Unauthorized,  // 401
-    Forbidden,     // 403
-    FailedRequest, // Anything NOT 200
-    RequestError(SendRequestError),
-    ResponseParseError(Option<JsonPayloadError>),
-    MissingExpectedDataError(String),
-}
-
-#[derive(Clone, Default, Deserialize)]
-pub enum SaltTgtType {
-    #[default]
-    #[serde(rename = "glob")]
-    Glob,
-    #[serde(rename = "pcre")]
-    PCRE,
-    #[serde(rename = "list")]
-    List,
-    #[serde(rename = "grain")]
-    Grain,
-    #[serde(rename = "grain_pcre")]
-    GrainPCRE,
-    #[serde(rename = "pillar")]
-    Pillar,
-    #[serde(rename = "pillar_pcre")]
-    PillarPCRE,
-    #[serde(rename = "nodegroup")]
-    NodeGroup,
-    #[serde(rename = "range")]
-    Range,
-    #[serde(rename = "compound")]
-    Compound,
-    #[serde(rename = "ipcidr")]
-    IPCIDR,
-}
-
-impl ToString for SaltTgtType {
-    fn to_string(&self) -> String {
-        match self {
-            SaltTgtType::Glob => "glob".to_string(),
-            SaltTgtType::PCRE => "pcre".to_string(),
-            SaltTgtType::List => "list".to_string(),
-            SaltTgtType::Grain => "grain".to_string(),
-            SaltTgtType::GrainPCRE => "grain_pcre".to_string(),
-            SaltTgtType::Pillar => "pillar".to_string(),
-            SaltTgtType::PillarPCRE => "pillar_pcre".to_string(),
-            SaltTgtType::NodeGroup => "nodegroup".to_string(),
-            SaltTgtType::Range => "range".to_string(),
-            SaltTgtType::Compound => "compound".to_string(),
-            SaltTgtType::IPCIDR => "ipcidr".to_string(),
-        }
-    }
-}
-
-#[derive(Default, Deserialize)]
-pub enum SaltClientType {
-    #[default]
-    #[serde(rename = "local")]
-    Local,
-    #[serde(rename = "local_async")]
-    LocalAsync,
-    #[serde(rename = "local_batch")]
-    LocalBatch,
-    #[serde(rename = "runner")]
-    Runner,
-    #[serde(rename = "runner_async")]
-    RunnerAsync,
-    #[serde(rename = "wheel")]
-    Wheel,
-    #[serde(rename = "wheel_async")]
-    WheelAsync,
-}
-
-impl ToString for SaltClientType {
-    fn to_string(&self) -> String {
-        match self {
-            SaltClientType::Local => "local".to_string(),
-            SaltClientType::LocalAsync => "local_async".to_string(),
-            SaltClientType::LocalBatch => "local_batch".to_string(),
-            SaltClientType::Runner => "runner".to_string(),
-            SaltClientType::RunnerAsync => "runner_async".to_string(),
-            SaltClientType::Wheel => "wheel".to_string(),
-            SaltClientType::WheelAsync => "wheel_async".to_string(),
-        }
-    }
-}
-
-#[derive(Default, Deserialize)]
-pub enum SaltKeyState {
-    #[default]
-    #[serde(rename = "minions")]
-    Accepted,
-    #[serde(rename = "minions_pre")]
-    Pending,
-    #[serde(rename = "minions_rejected")]
-    Rejected,
-    #[serde(rename = "minions_denied")]
-    Denied,
-}
-
-impl ToString for SaltKeyState {
-    fn to_string(&self) -> String {
-        match self {
-            SaltKeyState::Accepted => "minions".to_string(),
-            SaltKeyState::Pending => "minions_pre".to_string(),
-            SaltKeyState::Rejected => "minions_rejected".to_string(),
-            SaltKeyState::Denied => "minions_denied".to_string(),
-        }
-    }
-}
-
-pub enum SV {
-    S(String),
-    V(Value),
-}
-
-impl SV {
-    pub fn as_value(&self) -> Value {
-        match self {
-            SV::S(s) => json!(s),
-            SV::V(v) => v.clone(),
-        }
-    }
-}
-
-pub type Dictionary = HashMap<String, String>;
 
 lazy_static::lazy_static! {
     static ref AWC_CONFIG: SslConnector = {
@@ -478,7 +341,7 @@ impl SaltAPI {
         fun: S,
         arg: Option<Vec<SV>>,
         tgt_type: Option<SaltTgtType>,
-        kwarg: Option<Dictionary>,
+        kwarg: Option<HashMap<String, String>>,
     ) -> Result<Value, SaltError> {
         let data = json!({
             "client": SaltClientType::Local.to_string(),
@@ -505,7 +368,7 @@ impl SaltAPI {
         fun: S,
         arg: Option<Vec<SV>>,
         tgt_type: Option<SaltTgtType>,
-        kwarg: Option<Dictionary>,
+        kwarg: Option<HashMap<String, String>>,
     ) -> Result<Value, SaltError> {
         let data = json!({
             "client": SaltClientType::LocalAsync.to_string(),
@@ -532,7 +395,7 @@ impl SaltAPI {
         fun: S,
         arg: Option<Vec<SV>>,
         tgt_type: Option<SaltTgtType>,
-        kwarg: Option<Dictionary>,
+        kwarg: Option<HashMap<String, String>>,
         batch: S,
     ) -> Result<Value, SaltError> {
         let data = json!({
@@ -558,7 +421,7 @@ impl SaltAPI {
         salt_token: &SaltToken,
         fun: S,
         arg: Option<Vec<SV>>,
-        kwarg: Option<Dictionary>,
+        kwarg: Option<HashMap<String, String>>,
     ) -> Result<Value, SaltError> {
         let data = json!({
             "client": SaltClientType::Runner.to_string(),
@@ -580,7 +443,7 @@ impl SaltAPI {
         salt_token: &SaltToken,
         fun: S,
         arg: Option<Vec<SV>>,
-        kwarg: Option<Dictionary>,
+        kwarg: Option<HashMap<String, String>>,
     ) -> Result<Value, SaltError> {
         let data = json!({
             "client": SaltClientType::RunnerAsync.to_string(),
@@ -602,7 +465,7 @@ impl SaltAPI {
         salt_token: &SaltToken,
         fun: S,
         arg: Option<Vec<SV>>,
-        kwarg: Option<Dictionary>,
+        kwarg: Option<HashMap<String, String>>,
     ) -> Result<Value, SaltError> {
         let data = json!({
             "client": SaltClientType::Wheel.to_string(),
@@ -638,7 +501,7 @@ impl SaltAPI {
         salt_token: &SaltToken,
         fun: S,
         arg: Option<Vec<SV>>,
-        kwarg: Option<Dictionary>,
+        kwarg: Option<HashMap<String, String>>,
     ) -> Result<Value, SaltError> {
         let data = json!({
             "client": SaltClientType::WheelAsync.to_string(),

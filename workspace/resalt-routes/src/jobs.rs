@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use actix_web::{get, post, web, HttpMessage, HttpRequest, Responder, Result};
 use log::*;
 use resalt_auth::renew_token_salt_token;
@@ -51,7 +53,7 @@ pub struct JobRunRequest {
     tgt: String,
     fun: String,
     arg: Vec<String>,
-    kwarg: Dictionary,
+    kwarg: HashMap<String, String>,
     #[serde(rename = "batchSize")]
     batch_size: String,
 }
@@ -90,7 +92,7 @@ pub async fn route_jobs_post(
                     input.tgt.clone(),
                     input.fun.clone(),
                     Some(input.arg.clone().into_iter().map(SV::S).collect()),
-                    Some(input.tgt_type.clone()),
+                    Some(input.tgt_type),
                     Some(input.kwarg.clone()),
                 )
                 .await
@@ -101,7 +103,7 @@ pub async fn route_jobs_post(
                     input.tgt.clone(),
                     input.fun.clone(),
                     Some(input.arg.clone().into_iter().map(SV::S).collect()),
-                    Some(input.tgt_type.clone()),
+                    Some(input.tgt_type),
                     Some(input.kwarg.clone()),
                 )
                 .await
@@ -112,7 +114,7 @@ pub async fn route_jobs_post(
                     input.tgt.clone(),
                     input.fun.clone(),
                     Some(input.arg.clone().into_iter().map(SV::S).collect()),
-                    Some(input.tgt_type.clone()),
+                    Some(input.tgt_type),
                     Some(input.kwarg.clone()),
                     input.batch_size.clone(),
                 )
