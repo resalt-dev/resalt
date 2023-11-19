@@ -1,11 +1,11 @@
 use actix_tls::connect::openssl::reexports::{SslConnector, SslMethod};
-use actix_web::http::StatusCode;
 use async_stream::stream;
 use awc::{
-    error::{JsonPayloadError, PayloadError, SendRequestError},
-    ClientResponse, Connector,
+    error::{JsonPayloadError, SendRequestError},
+    Connector,
 };
 use futures::StreamExt;
+use http::StatusCode;
 use log::*;
 use openssl::ssl::SslVerifyMode;
 use resalt_config::SConfig;
@@ -24,27 +24,12 @@ pub struct SaltEvent {
 
 #[derive(Debug)]
 pub enum SaltError {
-    Unauthorized, // 401
-    Forbidden,    // 403
+    Unauthorized,  // 401
+    Forbidden,     // 403
+    FailedRequest, // Anything NOT 200
     RequestError(SendRequestError),
     ResponseParseError(Option<JsonPayloadError>),
     MissingExpectedDataError(String),
-    #[allow(clippy::type_complexity)]
-    FailedRequest(
-        ClientResponse<
-            actix_web::dev::Decompress<
-                actix_web::dev::Payload<
-                    std::pin::Pin<
-                        Box<
-                            dyn futures_core::Stream<
-                                Item = Result<actix_web::web::Bytes, PayloadError>,
-                            >,
-                        >,
-                    >,
-                >,
-            >,
-        >,
-    ),
 }
 
 #[derive(Clone, Default, Deserialize)]
@@ -229,12 +214,12 @@ impl SaltAPI {
         };
 
         // If access denied (e.g. missing permissions)
-        if res.status() == StatusCode::FORBIDDEN {
+        if res.status().as_u16() == StatusCode::FORBIDDEN.as_u16() {
             return Err(SaltError::Forbidden);
         }
         // If status != 200, something went wrong
-        if res.status() != StatusCode::OK {
-            return Err(SaltError::FailedRequest(res));
+        if res.status().as_u16() != StatusCode::OK.as_u16() {
+            return Err(SaltError::FailedRequest);
         }
 
         // Parse response from JSON stored as {return: [SaltToken]}
@@ -446,16 +431,16 @@ impl SaltAPI {
         };
 
         // If access denied (e.g. missing permissions)
-        if res.status() == StatusCode::FORBIDDEN {
+        if res.status().as_u16() == StatusCode::FORBIDDEN.as_u16() {
             return Err(SaltError::Forbidden);
         }
         // If unauthorized (e.g. invalid token)
-        if res.status() == StatusCode::UNAUTHORIZED {
+        if res.status().as_u16() == StatusCode::UNAUTHORIZED.as_u16() {
             return Err(SaltError::Unauthorized);
         }
         // If status != 200, something went wrong
-        if res.status() != StatusCode::OK {
-            return Err(SaltError::FailedRequest(res));
+        if res.status().as_u16() != StatusCode::OK.as_u16() {
+            return Err(SaltError::FailedRequest);
         }
 
         let body = match res.json::<serde_json::Value>().await {

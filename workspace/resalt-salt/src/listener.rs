@@ -1,5 +1,3 @@
-use std::sync::{Arc, Mutex};
-
 use super::SaltAPI;
 use chrono::NaiveDateTime;
 use futures::{pin_mut, StreamExt};
@@ -9,6 +7,7 @@ use resalt_config::SConfig;
 use resalt_models::SaltToken;
 use resalt_storage::StorageImpl;
 use serde_json::Value;
+use std::sync::{Arc, Mutex};
 
 pub const RESALT_SALT_SYSTEM_SERVICE_USERNAME: &str = "$superadmin/svc/resalt$";
 
