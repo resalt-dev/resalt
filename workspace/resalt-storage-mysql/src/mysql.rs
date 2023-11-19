@@ -609,18 +609,14 @@ impl StorageImpl for StorageMySQL {
     ) -> Result<(), String> {
         let mut connection = self.create_connection()?;
 
-        let last_updated_grains = grains
-            .as_ref()
-            .map(|_| last_updated_grains.unwrap_or(time.into()));
+        let last_updated_grains = grains.as_ref().map(|_| last_updated_grains.unwrap_or(time));
         let last_updated_pillars = pillars
             .as_ref()
-            .map(|_| last_updated_pillars.unwrap_or(time.into()));
-        let last_updated_pkgs = pkgs
-            .as_ref()
-            .map(|_| last_updated_pkgs.unwrap_or(time.into()));
+            .map(|_| last_updated_pillars.unwrap_or(time));
+        let last_updated_pkgs = pkgs.as_ref().map(|_| last_updated_pkgs.unwrap_or(time));
         let last_updated_conformity = conformity
             .as_ref()
-            .map(|_| last_updated_conformity.unwrap_or(time.into()));
+            .map(|_| last_updated_conformity.unwrap_or(time));
 
         // Parse grains as JSON, and fetch osfullname+osrelease as os_type.
         let parsed_grains = grains
@@ -637,7 +633,7 @@ impl StorageImpl for StorageMySQL {
 
         let changeset: SQLMinion = Minion {
             id: minion_id.clone(),
-            last_seen: time.into(),
+            last_seen: time,
             grains,
             pillars,
             pkgs,
@@ -846,7 +842,7 @@ impl StorageImpl for StorageMySQL {
         let id = format!("jret_{}", uuid::Uuid::new_v4());
         let job_return: SQLJobReturn = JobReturn {
             id,
-            timestamp: timestamp,
+            timestamp,
             jid,
             job_id,
             event_id,

@@ -108,6 +108,7 @@ pub fn validate_auth_token(
     }))
 }
 
+#[allow(clippy::borrowed_box)]
 pub fn auth_login_classic(
     data: &Box<dyn StorageImpl>,
     username: &str,
@@ -142,6 +143,7 @@ pub fn auth_login_classic(
     Ok(Some(user))
 }
 
+#[allow(clippy::borrowed_box)]
 pub async fn auth_login_ldap(
     data: &Box<dyn StorageImpl>,
     username: &str,

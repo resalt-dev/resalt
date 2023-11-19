@@ -207,7 +207,7 @@ fn filter_minion(minion: &Minion, filters: &[Filter]) -> bool {
                         }
                         String::new()
                     }
-                    1 => value_to_simple_str(&selected[0]),
+                    1 => value_to_simple_str(selected[0]),
                     _ => selected
                         .iter()
                         .map(|s| value_to_simple_str(s))

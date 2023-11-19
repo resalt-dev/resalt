@@ -130,7 +130,7 @@ pub async fn route_settings_import_post(
     for minion in &input.minions {
         match data.update_minion(
             minion.id.clone(),
-            minion.last_seen.into(),
+            minion.last_seen,
             minion.grains.clone(),
             minion.pillars.clone(),
             minion.pkgs.clone(),

@@ -61,7 +61,7 @@ async fn init_db() -> Box<dyn StorageImpl> {
                     .unwrap_or_else(|_| panic!("Error connecting to {}", &database_url)),
             )
         }
-        _ => todo!(),
+        _ => panic!(),
     }
 }
 

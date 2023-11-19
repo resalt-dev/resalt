@@ -598,7 +598,7 @@ impl StorageImpl for StorageFiles {
         let id = format!("jret_{}", uuid::Uuid::new_v4());
         let job_return = JobReturn {
             id: "".to_string(),
-            timestamp: timestamp,
+            timestamp,
             jid: jid.clone(),
             job_id,
             event_id,
