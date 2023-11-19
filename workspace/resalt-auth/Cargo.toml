@@ -5,8 +5,6 @@ edition.workspace = true
 publish.workspace = true
 
 [dependencies]
-actix-web = { workspace = true }
-chrono = "0.4.24"
 log = { workspace = true }
 resalt-config = { path = "../resalt-config" }
 resalt-ldap = { path = "../resalt-ldap" }

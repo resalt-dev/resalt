@@ -1,4 +1,3 @@
-use actix_web::{web, Result};
 use log::*;
 use resalt_config::SConfig;
 use resalt_ldap::{sync_ldap_groups, LdapHandler};
@@ -6,6 +5,7 @@ use resalt_models::*;
 use resalt_salt::SaltAPI;
 use resalt_security::verify_password;
 use resalt_storage::StorageImpl;
+use serde_json::from_str;
 
 #[allow(clippy::borrowed_box)]
 pub async fn renew_token_salt_token(
@@ -75,7 +75,7 @@ pub fn validate_auth_token(
     let session_lifespan = SConfig::auth_session_lifespan();
 
     if (authtoken.timestamp.timestamp() as u64) + session_lifespan
-        < chrono::Utc::now().timestamp() as u64
+        < ResaltTime::now().timestamp() as u64
     {
         return Ok(None);
     }
@@ -96,7 +96,7 @@ pub fn validate_auth_token(
         perms: user.perms,
         auth_token: authtoken.id,
         salt_token: match authtoken.salt_token {
-            Some(v) => match serde_json::from_str::<SaltToken>(&v) {
+            Some(v) => match from_str::<SaltToken>(&v) {
                 Ok(v) => Some(v),
                 Err(e) => {
                     error!("Failed parsing authtoken.salt_token {:?}", e);
@@ -109,7 +109,7 @@ pub fn validate_auth_token(
 }
 
 pub fn auth_login_classic(
-    data: &web::Data<Box<dyn StorageImpl>>,
+    data: &Box<dyn StorageImpl>,
     username: &str,
     password: &str,
 ) -> Result<Option<User>, ApiError> {
@@ -143,7 +143,7 @@ pub fn auth_login_classic(
 }
 
 pub async fn auth_login_ldap(
-    data: &web::Data<Box<dyn StorageImpl>>,
+    data: &Box<dyn StorageImpl>,
     username: &str,
     password: &str,
 ) -> Result<Option<User>, ApiError> {
