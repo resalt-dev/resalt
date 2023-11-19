@@ -1,20 +1,13 @@
 use super::SaltAPI;
-use chrono::NaiveDateTime;
 use futures::{pin_mut, StreamExt};
 use log::*;
-use regex::Regex;
 use resalt_config::SConfig;
-use resalt_models::SaltToken;
+use resalt_models::{ResaltTime, SaltToken};
 use resalt_storage::StorageImpl;
 use serde_json::Value;
 use std::sync::{Arc, Mutex};
 
 pub const RESALT_SALT_SYSTEM_SERVICE_USERNAME: &str = "$superadmin/svc/resalt$";
-
-lazy_static::lazy_static! {
-    static ref REGEX_JOB_NEW: Regex = Regex::new("salt/job/([0-9]+)/new").unwrap();
-    static ref REGEX_JOB_RETURN: Regex = Regex::new("salt/job/([0-9]+)/ret/(.+)").unwrap();
-}
 
 const TIME_FMT: &str = "%Y-%m-%dT%H:%M:%S.%f";
 
@@ -100,7 +93,7 @@ impl SaltEventListener {
             // Unpack timestamp
             let time = match data.get("_stamp") {
                 Some(time) => match time.as_str() {
-                    Some(time) => match NaiveDateTime::parse_from_str(time, TIME_FMT) {
+                    Some(time) => match ResaltTime::parse_from_str(time, TIME_FMT) {
                         Ok(time) => time,
                         Err(err) => {
                             error!("Failed to parse timestamp: {:?}", err);
@@ -131,15 +124,13 @@ impl SaltEventListener {
             };
 
             // Check tag type
-            if let Some(capture) = REGEX_JOB_NEW.captures(&event.tag) {
-                // Assumed always present
-                let jid = match capture.get(1) {
-                    Some(jid) => jid.as_str().to_string(),
-                    None => {
-                        error!("Failed to get JID from event tag");
-                        continue;
-                    }
-                };
+            let tag_parts: Vec<&str> = event.tag.split('/').collect();
+            if tag_parts.len() == 4
+                && tag_parts[0] == "salt"
+                && tag_parts[1] == "job"
+                && tag_parts[3] == "new"
+            {
+                let jid = tag_parts[2].to_string();
                 let user = match data.get("user") {
                     Some(user) => user.as_str().map(|s| s.to_string()),
                     None => {
@@ -153,22 +144,13 @@ impl SaltEventListener {
                     Ok(_) => (),
                     Err(err) => error!("Failed to insert job: {:?}", err),
                 }
-            } else if let Some(capture) = REGEX_JOB_RETURN.captures(&event.tag) {
-                // Assumed always present
-                let jid = match capture.get(1) {
-                    Some(jid) => jid.as_str().to_string(),
-                    None => {
-                        error!("Failed to get JID from event tag");
-                        continue;
-                    }
-                };
-                let minion_id = match capture.get(2) {
-                    Some(minion_id) => minion_id.as_str().to_string(),
-                    None => {
-                        error!("Failed to get minion ID from event tag");
-                        continue;
-                    }
-                };
+            } else if tag_parts.len() == 5
+                && tag_parts[0] == "salt"
+                && tag_parts[1] == "job"
+                && tag_parts[3] == "ret"
+            {
+                let jid = tag_parts[2].to_string();
+                let minion_id = tag_parts[4].to_string();
                 let fun = match data.get("fun") {
                     Some(fun) => match fun.as_str() {
                         Some(fun) => fun,
@@ -517,7 +499,7 @@ impl SaltEventListener {
                 // Make sure lock is released after setting status
                 self.status.lock().unwrap().connected = false;
             }
-            tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+            std::thread::sleep(std::time::Duration::from_secs(1));
         }
     }
 }

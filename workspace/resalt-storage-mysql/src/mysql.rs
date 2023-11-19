@@ -594,7 +594,7 @@ impl StorageImpl for StorageMySQL {
     fn update_minion(
         &self,
         minion_id: String,
-        time: chrono::NaiveDateTime,
+        time: ResaltTime,
         grains: Option<String>,
         pillars: Option<String>,
         pkgs: Option<String>,
@@ -705,13 +705,13 @@ impl StorageImpl for StorageMySQL {
         &self,
         tag: String,
         data: String,
-        timestamp: chrono::NaiveDateTime,
+        timestamp: ResaltTime,
     ) -> Result<String, String> {
         let mut connection = self.create_connection()?;
         let id = format!("evnt_{}", uuid::Uuid::new_v4());
         let event: SQLEvent = Event {
             id: id.clone(),
-            timestamp: timestamp.into(),
+            timestamp,
             tag,
             data,
         }
@@ -765,13 +765,13 @@ impl StorageImpl for StorageMySQL {
         jid: String,
         user: Option<String>,
         event_id: Option<String>,
-        timestamp: chrono::NaiveDateTime,
+        timestamp: ResaltTime,
     ) -> Result<(), String> {
         let mut connection = self.create_connection()?;
         let id = format!("job_{}", uuid::Uuid::new_v4());
         let job: SQLJob = Job {
             id,
-            timestamp: timestamp.into(),
+            timestamp,
             jid,
             user,
             event_id,
@@ -840,13 +840,13 @@ impl StorageImpl for StorageMySQL {
         job_id: String,
         event_id: String,
         minion_id: String,
-        timestamp: chrono::NaiveDateTime,
+        timestamp: ResaltTime,
     ) -> Result<(), String> {
         let mut connection = self.create_connection()?;
         let id = format!("jret_{}", uuid::Uuid::new_v4());
         let job_return: SQLJobReturn = JobReturn {
             id,
-            timestamp: timestamp.into(),
+            timestamp: timestamp,
             jid,
             job_id,
             event_id,

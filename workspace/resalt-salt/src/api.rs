@@ -3,6 +3,7 @@ use actix_tls::connect::openssl::reexports::{SslConnector, SslMethod};
 use async_stream::stream;
 use awc::Connector;
 use futures::StreamExt;
+use futures_core::stream;
 use http::StatusCode;
 use log::*;
 use openssl::ssl::SslVerifyMode;
@@ -13,8 +14,8 @@ use std::{collections::HashMap, time::Duration};
 
 const X_AUTH_TOKEN: &str = "X-Auth-Token";
 
-lazy_static::lazy_static! {
-    static ref AWC_CONFIG: SslConnector = {
+pub fn create_awc_client() -> awc::Client {
+    let awc_config: SslConnector = {
         let mut config = SslConnector::builder(SslMethod::tls_client()).unwrap();
 
         if SConfig::salt_api_tls_skipverify() {
@@ -23,13 +24,11 @@ lazy_static::lazy_static! {
 
         config.build()
     };
-}
 
-pub fn create_awc_client() -> awc::Client {
     awc::Client::builder()
         .connector(
             Connector::new()
-                .openssl(AWC_CONFIG.to_owned())
+                .openssl(awc_config)
                 .timeout(Duration::from_secs(3)), // Connector timeout, 3 seconds
         )
         .timeout(Duration::from_secs(60 * 20)) // Request timeout, 20 minutes
@@ -129,10 +128,7 @@ impl SaltAPI {
         Ok(salt_token)
     }
 
-    pub fn listen_events(
-        &self,
-        salt_token: &SaltToken,
-    ) -> impl futures_core::stream::Stream<Item = SaltEvent> {
+    pub fn listen_events(&self, salt_token: &SaltToken) -> impl stream::Stream<Item = SaltEvent> {
         let url = format!(
             "{}/events?salt_token={}",
             SConfig::salt_api_url(),

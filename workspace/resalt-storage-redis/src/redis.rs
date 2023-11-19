@@ -370,7 +370,7 @@ impl StorageImpl for StorageRedis {
     fn update_minion(
         &self,
         minion_id: String,
-        time: chrono::NaiveDateTime,
+        time: ResaltTime,
         grains: Option<String>,
         pillars: Option<String>,
         pkgs: Option<String>,
@@ -385,18 +385,14 @@ impl StorageImpl for StorageRedis {
     ) -> Result<(), String> {
         let mut connection = self.create_connection()?;
 
-        let last_updated_grains = grains
-            .as_ref()
-            .map(|_| last_updated_grains.unwrap_or(time.into()));
+        let last_updated_grains = grains.as_ref().map(|_| last_updated_grains.unwrap_or(time));
         let last_updated_pillars = pillars
             .as_ref()
-            .map(|_| last_updated_pillars.unwrap_or(time.into()));
-        let last_updated_pkgs = pkgs
-            .as_ref()
-            .map(|_| last_updated_pkgs.unwrap_or(time.into()));
+            .map(|_| last_updated_pillars.unwrap_or(time));
+        let last_updated_pkgs = pkgs.as_ref().map(|_| last_updated_pkgs.unwrap_or(time));
         let last_updated_conformity = conformity
             .as_ref()
-            .map(|_| last_updated_conformity.unwrap_or(time.into()));
+            .map(|_| last_updated_conformity.unwrap_or(time));
 
         // Parse grains as JSON, and fetch osfullname+osrelease as os_type.
         let parsed_grains = grains
@@ -413,7 +409,7 @@ impl StorageImpl for StorageRedis {
 
         let minion = Minion {
             id: minion_id.clone(),
-            last_seen: time.into(),
+            last_seen: time,
             grains,
             pillars,
             pkgs,
@@ -455,13 +451,13 @@ impl StorageImpl for StorageRedis {
         &self,
         tag: String,
         data: String,
-        timestamp: chrono::NaiveDateTime,
+        timestamp: ResaltTime,
     ) -> Result<String, String> {
         let mut connection = self.create_connection()?;
         let id = format!("evnt_{}", uuid::Uuid::new_v4());
         let event = Event {
             id: id.clone(),
-            timestamp: timestamp.into(),
+            timestamp,
             tag,
             data,
         };
@@ -526,12 +522,12 @@ impl StorageImpl for StorageRedis {
         jid: String,
         user: Option<String>,
         event_id: Option<String>,
-        timestamp: chrono::NaiveDateTime,
+        timestamp: ResaltTime,
     ) -> Result<(), String> {
         let mut connection = self.create_connection()?;
         let job = Job {
             id: jid.clone(),
-            timestamp: timestamp.into(),
+            timestamp,
             jid: jid.clone(), // TODO: remove, id = jid
             user,
             event_id,
@@ -607,13 +603,13 @@ impl StorageImpl for StorageRedis {
         job_id: String,
         event_id: String,
         minion_id: String,
-        timestamp: chrono::NaiveDateTime,
+        timestamp: ResaltTime,
     ) -> Result<(), String> {
         let mut connection = self.create_connection()?;
         let id = format!("jret_{}", uuid::Uuid::new_v4());
         let job_return = JobReturn {
             id: "".to_string(),
-            timestamp: timestamp.into(),
+            timestamp,
             jid: jid.clone(),
             job_id,
             event_id,

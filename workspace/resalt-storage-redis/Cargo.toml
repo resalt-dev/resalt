@@ -9,7 +9,6 @@ resalt-config = { path = "../resalt-config" }
 resalt-models = { path = "../resalt-models" }
 resalt-security = { path = "../resalt-security" }
 resalt-storage = { path = "../resalt-storage" }
-chrono = "0.4.24"
 redis = { version = "0.23.1", features = ['r2d2'] }
 r2d2 = "0.8.10"
 log = { workspace = true }
