@@ -1,4 +1,3 @@
-use awc::error::{JsonPayloadError, SendRequestError};
 use serde::Deserialize;
 use serde_json::{json, Value};
 
@@ -46,8 +45,8 @@ pub enum SaltError {
     Unauthorized,  // 401
     Forbidden,     // 403
     FailedRequest, // Anything NOT 200
-    RequestError(SendRequestError),
-    ResponseParseError(Option<JsonPayloadError>),
+    RequestError(String),
+    ResponseParseError(Option<String>),
     MissingExpectedDataError(String),
 }
 

@@ -1,12 +1,9 @@
 use super::model::*;
-use actix_tls::connect::openssl::reexports::{SslConnector, SslMethod};
 use async_stream::stream;
-use awc::Connector;
 use futures::StreamExt;
 use futures_core::stream;
-use http::StatusCode;
 use log::*;
-use openssl::ssl::SslVerifyMode;
+use reqwest::StatusCode;
 use resalt_config::SConfig;
 use resalt_models::*;
 use serde_json::{json, Value};
@@ -14,30 +11,20 @@ use std::{collections::HashMap, time::Duration};
 
 const X_AUTH_TOKEN: &str = "X-Auth-Token";
 
-pub fn create_awc_client() -> awc::Client {
-    let awc_config: SslConnector = {
-        let mut config = SslConnector::builder(SslMethod::tls_client()).unwrap();
-
-        if SConfig::salt_api_tls_skipverify() {
-            config.set_verify(SslVerifyMode::NONE);
-        }
-
-        config.build()
-    };
-
-    awc::Client::builder()
-        .connector(
-            Connector::new()
-                .openssl(awc_config)
-                .timeout(Duration::from_secs(3)), // Connector timeout, 3 seconds
-        )
-        .timeout(Duration::from_secs(60 * 20)) // Request timeout, 20 minutes
-        .finish()
+pub fn create_reqwest_client() -> reqwest::Client {
+    let mut builder = reqwest::ClientBuilder::new();
+    if SConfig::salt_api_tls_skipverify() {
+        builder = builder.danger_accept_invalid_certs(true);
+    }
+    builder
+        .timeout(Duration::from_secs(3)) // Connector timeout, 3 seconds
+        .build()
+        .unwrap()
 }
 
 #[derive(Clone)]
 pub struct SaltAPI {
-    client: awc::Client,
+    client: reqwest::Client,
 }
 
 impl Default for SaltAPI {
@@ -49,38 +36,37 @@ impl Default for SaltAPI {
 impl SaltAPI {
     pub fn new() -> Self {
         Self {
-            //client: Client::default(),
-            client: create_awc_client(),
+            client: create_reqwest_client(),
         }
     }
-
     pub async fn login(&self, username: &str, authtoken: &str) -> Result<SaltToken, SaltError> {
         let url = format!("{}/login", &SConfig::salt_api_url());
         // Send POST request to Salt API for auth token
         // This will contact us back on the /token endpoint to validate auth token
-        let mut res = match self
+        let res = match self
             .client
-            .post(url)
-            .send_json(&serde_json::json!({
+            .post(&url)
+            .json(&json!({
                 "eauth": "rest",
                 "username": username,
                 "password": authtoken,
             }))
+            .send()
             .await
         {
             Ok(res) => res,
             Err(e) => {
                 error!("login_err {:?}", e);
-                return Err(SaltError::RequestError(e));
+                return Err(SaltError::RequestError(e.to_string()));
             }
         };
 
         // If access denied (e.g. missing permissions)
-        if res.status().as_u16() == StatusCode::FORBIDDEN.as_u16() {
+        if res.status() == StatusCode::FORBIDDEN {
             return Err(SaltError::Forbidden);
         }
         // If status != 200, something went wrong
-        if res.status().as_u16() != StatusCode::OK.as_u16() {
+        if res.status() != StatusCode::OK {
             return Err(SaltError::FailedRequest);
         }
 
@@ -89,7 +75,7 @@ impl SaltAPI {
             Ok(body) => body,
             Err(e) => {
                 error!("{:?}", e);
-                return Err(SaltError::ResponseParseError(Some(e)));
+                return Err(SaltError::ResponseParseError(Some(e.to_string())));
             }
         };
 
@@ -138,12 +124,13 @@ impl SaltAPI {
         let client = self.client.clone();
         stream! {
             debug!("Connecting to SSE stream: {}", &url);
-            let mut stream = match client
-                .get(url)
-                .insert_header(("Accept", "text/event-stream"))
+            let res = match client
+                .get(&url)
+                .header("Accept", "text/event-stream")
                 .send()
-                .await {
-                Ok(stream) => stream,
+                .await
+            {
+                Ok(res) => res,
                 Err(e) => {
                     error!("Failed to connect to SSE stream: {}", e);
                     return;
@@ -181,18 +168,20 @@ impl SaltAPI {
             let mut mode = SSEParsingState::Action;
             let mut actionbuffer = String::new();
 
-            while let Some(line) = stream.next().await {
-                let line = match line {
-                    Ok(line) => line,
+            // let mut stream = res.
+            let mut stream = res.bytes_stream();
+            while let Some(chunk) = stream.next().await {
+                let chunk = match chunk {
+                    Ok(d) => d,
                     Err(e) => {
                         error!("{:?}", e);
                         break;
                     }
                 };
-                trace!("LINE {:?}", line);
+                trace!("LINE {:?}", chunk);
 
                 // Loop through every byte in line
-                for byte in line {
+                for byte in chunk {
                     let mode_text = match mode {
                         SSEParsingState::Action => "Action",
                         SSEParsingState::Retry => "Retry",
@@ -276,36 +265,37 @@ impl SaltAPI {
 
         // debug!("run_job data {:?}", data);
 
-        let mut res = match self
+        let res = match self
             .client
             .post(url)
-            .append_header((X_AUTH_TOKEN, salt_token.token.clone()))
-            .send_json(&data)
+            .header(X_AUTH_TOKEN, salt_token.token.clone())
+            .json(&data)
+            .send()
             .await
         {
             Ok(res) => res,
             Err(e) => {
-                return Err(SaltError::RequestError(e));
+                return Err(SaltError::RequestError(e.to_string()));
             }
         };
 
         // If access denied (e.g. missing permissions)
-        if res.status().as_u16() == StatusCode::FORBIDDEN.as_u16() {
+        if res.status() == StatusCode::FORBIDDEN {
             return Err(SaltError::Forbidden);
         }
         // If unauthorized (e.g. invalid token)
-        if res.status().as_u16() == StatusCode::UNAUTHORIZED.as_u16() {
+        if res.status() == StatusCode::UNAUTHORIZED {
             return Err(SaltError::Unauthorized);
         }
         // If status != 200, something went wrong
-        if res.status().as_u16() != StatusCode::OK.as_u16() {
+        if res.status() != StatusCode::OK {
             return Err(SaltError::FailedRequest);
         }
 
         let body = match res.json::<serde_json::Value>().await {
             Ok(body) => body,
             Err(e) => {
-                return Err(SaltError::ResponseParseError(Some(e)));
+                return Err(SaltError::ResponseParseError(Some(e.to_string())));
             }
         };
         debug!("run_job run body {:?}", body);
@@ -514,7 +504,6 @@ impl SaltAPI {
         self.run_job(salt_token, data).await
     }
 
-    /// Returns host:status:finger pair
     pub async fn get_keys(&self, salt_token: &SaltToken) -> Result<Vec<SaltMinionKey>, SaltError> {
         let data = match self
             .run_job_wheel(
