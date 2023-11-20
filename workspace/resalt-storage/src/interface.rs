@@ -1,8 +1,8 @@
 use log::*;
 use rand::Rng;
 use resalt_models::{
-    ApiError, AuthToken, Event, Filter, Job, JobReturn, Minion, MinionPreset, PermissionGroup,
-    ResaltTime, SaltToken, User,
+    AuthToken, Event, Filter, Job, JobReturn, Minion, MinionPreset, PermissionGroup, ResaltTime,
+    SaltToken, User,
 };
 use serde_json::{json, Value};
 
@@ -146,12 +146,12 @@ pub trait StorageImpl: Send {
     fn delete_user(&self, id: &str) -> Result<(), String>;
 
     #[allow(clippy::borrowed_box)]
-    fn refresh_user_permissions(&self, user: &User) -> Result<(), ApiError> {
+    fn refresh_user_permissions(&self, user: &User) -> Result<(), ()> {
         let groups = match self.list_permission_groups_by_user_id(&user.id) {
             Ok(groups) => groups,
             Err(e) => {
                 error!("{:?}", e);
-                return Err(ApiError::DatabaseError);
+                return Err(());
             }
         };
         let mut perms: Vec<Value> = Vec::new();
@@ -161,7 +161,7 @@ pub trait StorageImpl: Send {
                 Ok(serdegroup) => serdegroup,
                 Err(e) => {
                     error!("{:?}", e);
-                    return Err(ApiError::DatabaseError);
+                    return Err(());
                 }
             };
             let group_perms = match serdegroup.as_array() {
@@ -180,7 +180,7 @@ pub trait StorageImpl: Send {
             Ok(_) => Ok(()),
             Err(e) => {
                 error!("{:?}", e);
-                Err(ApiError::DatabaseError)
+                Err(())
             }
         }
     }

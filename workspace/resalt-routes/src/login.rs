@@ -118,7 +118,13 @@ pub async fn route_login_post(
     debug!("User {} found, generating token", &user.username);
 
     // Refresh their user-cached permissions before doing anything else
-    data.refresh_user_permissions(&user)?;
+    match data.refresh_user_permissions(&user) {
+        Ok(_) => {}
+        Err(e) => {
+            error!("{:?}", e);
+            return Err(ApiError::DatabaseError);
+        }
+    }
 
     // Create token
     let authtoken = match data.create_authtoken(user.id.clone()) {

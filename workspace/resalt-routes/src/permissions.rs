@@ -195,7 +195,13 @@ pub async fn route_permission_update(
     match data.list_users_by_permission_group_id(&info.id) {
         Ok(users) => {
             for user in users {
-                data.refresh_user_permissions(&user)?;
+                match data.refresh_user_permissions(&user) {
+                    Ok(_) => (),
+                    Err(e) => {
+                        error!("{:?}", e);
+                        return Err(ApiError::DatabaseError);
+                    }
+                }
             }
         }
         Err(e) => {
@@ -243,7 +249,13 @@ pub async fn route_permission_delete(
 
     // Update ex-members
     for user in users {
-        data.refresh_user_permissions(&user)?;
+        match data.refresh_user_permissions(&user) {
+            Ok(_) => (),
+            Err(e) => {
+                error!("{:?}", e);
+                return Err(ApiError::DatabaseError);
+            }
+        }
     }
 
     Ok(group)

@@ -290,7 +290,7 @@ pub fn sync_ldap_groups(
                     "Failed to update user {} permissions: {:?}",
                     user.username, e
                 );
-                return Err(e);
+                return Err(ApiError::DatabaseError);
             }
         }
     }

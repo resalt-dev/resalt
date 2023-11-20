@@ -341,7 +341,13 @@ pub async fn route_user_permissions_post(
         }
 
         // Update user-cached permissions
-        data.refresh_user_permissions(&user)?;
+        match data.refresh_user_permissions(&user) {
+            Ok(_) => (),
+            Err(e) => {
+                error!("{:?}", e);
+                return Err(ApiError::DatabaseError);
+            }
+        }
     }
 
     Ok(web::Json(()))
@@ -400,7 +406,13 @@ pub async fn route_user_permissions_delete(
     }
 
     // Update user-cached permissions
-    data.refresh_user_permissions(&user)?;
+    match data.refresh_user_permissions(&user) {
+        Ok(_) => (),
+        Err(e) => {
+            error!("{:?}", e);
+            return Err(ApiError::DatabaseError);
+        }
+    }
 
     Ok(web::Json(()))
 }
