@@ -11,18 +11,19 @@ pub const RESALT_SALT_SYSTEM_SERVICE_USERNAME: &str = "$superadmin/svc/resalt$";
 
 const TIME_FMT: &str = "%Y-%m-%dT%H:%M:%S.%f";
 
+#[derive(Debug, Clone)]
 pub struct SaltEventListenerStatus {
-    pub connected: bool,
+    pub connected: Arc<Mutex<bool>>,
 }
 
 pub struct SaltEventListener {
     api: SaltAPI,
     storage: Box<dyn StorageImpl>,
-    status: Arc<Mutex<SaltEventListenerStatus>>,
+    status: SaltEventListenerStatus,
 }
 
 impl SaltEventListener {
-    pub fn new(storage: Box<dyn StorageImpl>, status: Arc<Mutex<SaltEventListenerStatus>>) -> Self {
+    pub fn new(storage: Box<dyn StorageImpl>, status: SaltEventListenerStatus) -> Self {
         Self {
             api: SaltAPI::new(),
             storage,
@@ -61,7 +62,7 @@ impl SaltEventListener {
 
         {
             // Make sure lock is released after setting status
-            self.status.lock().unwrap().connected = true;
+            *self.status.connected.lock().unwrap() = true;
         }
 
         while let Some(event) = stream.next().await {
@@ -497,7 +498,7 @@ impl SaltEventListener {
             self.listen().await;
             {
                 // Make sure lock is released after setting status
-                self.status.lock().unwrap().connected = false;
+                *self.status.connected.lock().unwrap() = false;
             }
             std::thread::sleep(std::time::Duration::from_secs(1));
         }

@@ -1,4 +1,8 @@
-use actix_web::{get, post, web, HttpMessage, HttpRequest, Responder, Result};
+use axum::{
+    extract::{Path, Query, State},
+    response::IntoResponse,
+    Extension, Json,
+};
 use log::*;
 use resalt_auth::renew_token_salt_token;
 use resalt_models::*;
@@ -15,14 +19,11 @@ pub struct MinionsListGetQuery {
     offset: Option<i64>,
 }
 
-#[get("/minions")]
 pub async fn route_minions_get(
-    data: web::Data<Box<dyn StorageImpl>>,
-    query: web::Query<MinionsListGetQuery>,
-    req: HttpRequest,
-) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    query: Query<MinionsListGetQuery>,
+    State(data): State<Box<dyn StorageImpl>>,
+    Extension(auth): Extension<AuthStatus>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_MINION_LIST)? {
         return Err(ApiError::Forbidden);
@@ -80,28 +81,20 @@ pub async fn route_minions_get(
         }
     }
 
-    Ok(web::Json(minions))
+    Ok(Json(minions))
 }
 
-#[derive(Deserialize)]
-pub struct MinionGetInfo {
-    id: String,
-}
-
-#[get("/minions/{id}")]
 pub async fn route_minion_get(
-    data: web::Data<Box<dyn StorageImpl>>,
-    info: web::Path<MinionGetInfo>,
-    req: HttpRequest,
-) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    Path(minion_id): Path<String>,
+    State(data): State<Box<dyn StorageImpl>>,
+    Extension(auth): Extension<AuthStatus>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_MINION_LIST)? {
         return Err(ApiError::Forbidden);
     }
 
-    let minion = match data.get_minion_by_id(&info.id) {
+    let minion = match data.get_minion_by_id(&minion_id) {
         Ok(minion) => minion,
         Err(e) => {
             error!("{:?}", e);
@@ -116,18 +109,15 @@ pub async fn route_minion_get(
         }
     };
 
-    Ok(web::Json(minion))
+    Ok(Json(minion))
 }
 
-#[post("/minions/{id}/refresh")]
 pub async fn route_minion_refresh_post(
-    salt: web::Data<SaltAPI>,
-    data: web::Data<Box<dyn StorageImpl>>,
-    info: web::Path<MinionGetInfo>,
-    req: HttpRequest,
-) -> Result<impl Responder, ApiError> {
-    let mut auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    Path(minion_id): Path<String>,
+    State(salt): State<SaltAPI>,
+    State(data): State<Box<dyn StorageImpl>>,
+    Extension(mut auth): Extension<AuthStatus>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_MINION_REFRESH)? {
         return Err(ApiError::Forbidden);
@@ -140,7 +130,7 @@ pub async fn route_minion_refresh_post(
             return Err(ApiError::Unauthorized);
         }
     };
-    match salt.refresh_minion(salt_token, &info.id).await {
+    match salt.refresh_minion(salt_token, &minion_id).await {
         Ok(_) => (),
         Err(SaltError::Unauthorized) => {
             if !salt_token.matured() {
@@ -150,7 +140,7 @@ pub async fn route_minion_refresh_post(
             error!("Salt token expired, renewing and retrying");
             auth = renew_token_salt_token(&data, &salt, &auth.user_id, &auth.auth_token).await?;
             match salt
-                .refresh_minion(&auth.salt_token.unwrap(), &info.id)
+                .refresh_minion(&auth.salt_token.unwrap(), &minion_id)
                 .await
             {
                 Ok(_) => (),
@@ -166,5 +156,5 @@ pub async fn route_minion_refresh_post(
         }
     };
 
-    Ok(web::Json(()))
+    Ok(Json(()))
 }

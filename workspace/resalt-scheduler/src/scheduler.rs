@@ -9,7 +9,6 @@ use resalt_config::SConfig;
 use resalt_ldap::{sync_ldap_groups, LdapHandler, LdapUser};
 use resalt_models::User;
 use resalt_storage::StorageCloneWrapper;
-use resalt_updater::get_update_cache;
 use tokio::task;
 
 #[derive(Clone)]
@@ -30,16 +29,6 @@ impl Scheduler {
         // self.scheduler.lock().unwrap().every(5.minutes()).run(|| {
         //     println!("system job");
         // });
-
-        // Run update check
-        self.scheduler.lock().unwrap().every(1.hour()).run(|| {
-            info!("Running update checker");
-            let rt = tokio::runtime::Runtime::new().unwrap();
-            let ls = task::LocalSet::new();
-            ls.block_on(&rt, async {
-                get_update_cache(true).await;
-            });
-        });
 
         if SConfig::auth_ldap_enabled() {
             // Run LDAP sync

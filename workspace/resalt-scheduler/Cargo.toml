@@ -11,5 +11,4 @@ resalt-config = { path = "../resalt-config" }
 resalt-ldap = { path = "../resalt-ldap" }
 resalt-models = { path = "../resalt-models" }
 resalt-storage = { path = "../resalt-storage" }
-resalt-updater = { path = "../resalt-updater" }
 tokio = { workspace = true }

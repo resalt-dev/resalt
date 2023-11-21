@@ -1,5 +1,7 @@
-use actix_web::post;
-use actix_web::{web, HttpRequest, Responder, Result};
+use axum::extract::State;
+use axum::http::HeaderMap;
+use axum::response::IntoResponse;
+use axum::Json;
 use log::*;
 use resalt_auth::auth_login_classic;
 use resalt_auth::auth_login_ldap;
@@ -27,16 +29,15 @@ struct LoginResponse {
     expiry: u64,
 }
 
-#[post("/login")]
 pub async fn route_login_post(
-    data: web::Data<Box<dyn StorageImpl>>,
-    salt: web::Data<SaltAPI>,
-    input: web::Json<LoginRequest>,
-    req: HttpRequest,
-) -> Result<impl Responder, ApiError> {
+    headers: HeaderMap,
+    State(data): State<Box<dyn StorageImpl>>,
+    State(salt): State<SaltAPI>,
+    Json(input): Json<LoginRequest>,
+) -> Result<impl IntoResponse, ApiError> {
     let user: User = if SConfig::auth_forward_enabled() {
         // Use X-Forwarded-User header as username
-        let mut username = match req.headers().get("X-Forwarded-User") {
+        let mut username = match headers.get("X-Forwarded-User") {
             Some(forwarded_user) => forwarded_user.to_str().unwrap().to_string(),
             None => return Err(ApiError::Unauthorized),
         };
@@ -80,12 +81,18 @@ pub async fn route_login_post(
                 };
 
                 if let Some(ldap_user) = ldap_user {
-                    sync_ldap_groups(&data, &user, Some(&ldap_user))?;
+                    match sync_ldap_groups(&data, &user, Some(&ldap_user)) {
+                        Ok(_) => {}
+                        Err(e) => {
+                            error!("Failed syncing LDAP groups {:?}", e);
+                            return Err(ApiError::LdapError);
+                        }
+                    }
                 }
 
                 user
             }
-            // ERROR from Database, which is critical, so return error
+            // Error from Database, which is critical, so return error
             Err(e) => {
                 error!("{:?}", e);
                 return Err(ApiError::DatabaseError);
@@ -151,5 +158,5 @@ pub async fn route_login_post(
         token: authtoken.id,
         expiry: (authtoken.timestamp.timestamp() as u64) + session_lifespan,
     };
-    Ok(web::Json(response))
+    Ok(Json(response))
 }

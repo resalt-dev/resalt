@@ -1,17 +1,14 @@
-use std::sync::{Arc, Mutex};
-
-use actix_web::{get, web, HttpResponse, Responder, Result};
+use axum::{extract::State, response::IntoResponse};
 use log::*;
 use resalt_config::SConfig;
 use resalt_models::ApiError;
 use resalt_salt::SaltEventListenerStatus;
 use resalt_storage::{StorageImpl, StorageStatus};
 
-#[get("/metrics")]
 pub async fn route_metrics_get(
-    listener_status: web::Data<Arc<Mutex<SaltEventListenerStatus>>>,
-    data: web::Data<Box<dyn StorageImpl>>,
-) -> Result<impl Responder, ApiError> {
+    State(listener_status): State<SaltEventListenerStatus>,
+    State(data): State<Box<dyn StorageImpl>>,
+) -> Result<impl IntoResponse, ApiError> {
     if !SConfig::metrics_enabled() {
         return Err(ApiError::NotFound);
     }
@@ -26,7 +23,7 @@ pub async fn route_metrics_get(
 
     let salt: bool;
     {
-        salt = listener_status.lock().unwrap().connected;
+        salt = *listener_status.connected.lock().unwrap();
     }
 
     // Print Prometheus metrics
@@ -137,7 +134,5 @@ pub async fn route_metrics_get(
         db_status.map(|s| s.users_total).unwrap_or(0)
     ));
 
-    Ok(HttpResponse::Ok()
-        .content_type("text/plain; version=0.0.4")
-        .body(result))
+    Ok(format!("{}\n", result))
 }

@@ -1,15 +1,12 @@
-use std::sync::{Arc, Mutex};
-
-use actix_web::{get, web, Responder, Result};
+use axum::{extract::State, response::IntoResponse, Json};
 use resalt_models::*;
 use resalt_salt::SaltEventListenerStatus;
 use resalt_storage::{StorageImpl, StorageStatus};
 
-#[get("/status")]
 pub async fn route_status_get(
-    listener_status: web::Data<Arc<Mutex<SaltEventListenerStatus>>>,
-    data: web::Data<Box<dyn StorageImpl>>,
-) -> Result<impl Responder, ApiError> {
+    State(listener_status): State<SaltEventListenerStatus>,
+    State(data): State<Box<dyn StorageImpl>>,
+) -> Result<impl IntoResponse, ApiError> {
     let db_status: Option<StorageStatus> = match data.get_status() {
         Ok(s) => Some(s),
         Err(e) => {
@@ -20,7 +17,7 @@ pub async fn route_status_get(
 
     let salt: bool;
     {
-        salt = listener_status.lock().unwrap().connected;
+        salt = *listener_status.connected.lock().unwrap();
     }
 
     #[allow(clippy::redundant_clone)]
@@ -40,5 +37,5 @@ pub async fn route_status_get(
         db_users_total: db_status.clone().map(|s| s.users_total),
     };
 
-    Ok(web::Json(status))
+    Ok(Json(status))
 }

@@ -1,15 +1,13 @@
-use actix_web::{get, web, HttpMessage, HttpRequest, Responder, Result};
+use axum::{extract::State, response::IntoResponse, Extension, Json};
 use log::*;
 use resalt_models::{ApiError, AuthStatus};
 use resalt_storage::StorageImpl;
 
-#[get("/myself")]
 pub async fn route_myself_get(
-    data: web::Data<Box<dyn StorageImpl>>,
-    req: HttpRequest,
-) -> Result<impl Responder, ApiError> {
+    State(data): State<Box<dyn StorageImpl>>,
+    Extension(auth): Extension<AuthStatus>,
+) -> Result<impl IntoResponse, ApiError> {
     let db = data;
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
 
     let user = match db.get_user_by_id(&auth.user_id) {
         Ok(user) => match user {
@@ -29,5 +27,5 @@ pub async fn route_myself_get(
             return Err(ApiError::DatabaseError);
         }
     };
-    Ok(web::Json(user.public(permission_groups)))
+    Ok(Json(user.public(permission_groups)))
 }

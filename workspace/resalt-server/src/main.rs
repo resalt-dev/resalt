@@ -1,9 +1,8 @@
-use std::{
-    error::Error,
-    sync::{Arc, Mutex},
-};
-
 use actix_web::{guard::fn_guard, http::header, middleware::*, web, App, HttpServer};
+use axum::{
+    routing::{get, post},
+    Router, Server,
+};
 use env_logger::{init_from_env, Env};
 use log::info;
 use resalt_config::SConfig;
@@ -14,6 +13,11 @@ use resalt_scheduler::Scheduler;
 use resalt_storage::{StorageCloneWrapper, StorageImpl};
 use resalt_storage_mysql::StorageMySQL;
 use resalt_storage_redis::StorageRedis;
+use std::{
+    error::Error,
+    net::SocketAddr,
+    sync::{Arc, Mutex},
+};
 use tokio::task;
 
 async fn init_db() -> Box<dyn StorageImpl> {
@@ -65,9 +69,10 @@ async fn init_db() -> Box<dyn StorageImpl> {
     }
 }
 
-fn start_salt_websocket_thread(db: Box<dyn StorageImpl>) -> Arc<Mutex<SaltEventListenerStatus>> {
-    let listener_status: Arc<Mutex<SaltEventListenerStatus>> =
-        Arc::new(Mutex::new(SaltEventListenerStatus { connected: false }));
+fn start_salt_websocket_thread(db: Box<dyn StorageImpl>) -> SaltEventListenerStatus {
+    let listener_status: SaltEventListenerStatus = SaltEventListenerStatus {
+        connected: Arc::new(Mutex::new(false)),
+    };
     let salt_listener_status = listener_status.clone();
     std::thread::spawn(move || {
         let rt = tokio::runtime::Runtime::new().unwrap();
@@ -88,20 +93,54 @@ fn start_scheduler(db: Box<dyn StorageImpl>) {
     scheduler.start();
 }
 
-async fn run() -> Result<(), Box<dyn Error>> {
-    init_from_env(Env::new().default_filter_or("Debug"));
-
-    // Database
-    let db: Box<dyn StorageImpl> = init_db().await;
-    let db_clone_wrapper = StorageCloneWrapper {
-        storage: db.clone(),
+async fn start_server(
+    db_clone_wrapper: StorageCloneWrapper,
+    listener_status: SaltEventListenerStatus,
+) -> Result<(), Box<dyn Error>> {
+    let salt_api = SaltAPI::new();
+    let shared_state = AppState {
+        data: db_clone_wrapper.clone().storage,
+        salt_api: salt_api.clone(),
+        listener_status: listener_status.clone(),
     };
 
-    // Salt WebSocket Thread
-    let listener_status = start_salt_websocket_thread(db.clone());
+    let router_auth = Router::new()
+        .route("/myself", get(route_myself_get))
+        .route("/status", get(route_status_get))
+        .route("/minions", get(route_minions_get))
+        .route("/minions/:minion_id", get(route_minion_get))
+        .route(
+            "/minions/:minion_id/refresh",
+            post(route_minion_refresh_post),
+        )
+        .route_layer(axum::middleware::from_fn_with_state(
+            shared_state.clone(),
+            middleware_auth,
+        ));
 
-    // Scheduler
-    start_scheduler(db);
+    let router_noauth = Router::new()
+        .route("/", get(route_index_get))
+        .route("/config", get(route_config_get))
+        .route("/metrics", get(route_metrics_get))
+        .route("/login", post(route_login_post))
+        .route("/token", post(route_token_post));
+
+    let app = Router::new()
+        .nest("/api", router_noauth)
+        .nest("/api/auth", router_auth)
+        .with_state(shared_state);
+
+    // TODO remove +1 from port
+    let socket = SocketAddr::from(([0, 0, 0, 0], SConfig::http_port() + 1));
+    Server::bind(&socket).serve(app.into_make_service()).await?;
+
+    //axum::middleware::from_fn_with_state(state, f)
+
+    //.
+
+    //.
+
+    //.
 
     HttpServer::new(move || {
         // Salt API
@@ -122,19 +161,9 @@ async fn run() -> Result<(), Box<dyn Error>> {
                         db_clone_wrapper.clone().storage,
                         salt_api,
                     ))
-                    .service(route_index_get)
-                    .service(route_config_get)
-                    .service(route_metrics_get)
-                    .service(route_login_post)
-                    .service(route_token_post)
                     .service(
                         web::scope("/auth")
                             .guard(guard_auth)
-                            .service(route_myself_get)
-                            .service(route_status_get)
-                            .service(route_minions_get)
-                            .service(route_minion_get)
-                            .service(route_minion_refresh_post)
                             .service(route_presets_get)
                             .service(route_presets_post)
                             .service(route_preset_get)
@@ -172,6 +201,26 @@ async fn run() -> Result<(), Box<dyn Error>> {
     .bind(("0.0.0.0", SConfig::http_port()))?
     .run()
     .await?;
+    Ok(())
+}
+
+async fn run() -> Result<(), Box<dyn Error>> {
+    init_from_env(Env::new().default_filter_or("Debug"));
+
+    // Database
+    let db: Box<dyn StorageImpl> = init_db().await;
+    let db_clone_wrapper = StorageCloneWrapper {
+        storage: db.clone(),
+    };
+
+    // Salt WebSocket Thread
+    let listener_status = start_salt_websocket_thread(db.clone());
+
+    // Scheduler
+    start_scheduler(db);
+
+    // Web Server
+    start_server(db_clone_wrapper, listener_status).await?;
 
     Ok(())
 }

@@ -33,8 +33,10 @@ description = "Resalt is a free, open-source, self-hosted, web-based administrat
 repository = "https://github.com/resalt-dev/resalt"
 
 [workspace.dependencies]
-actix-web = { version = "4.4.0", features=["macros", "compress-gzip"], default-features = false }
+axum = { version = "0.6.20" , features = ["json"], default-features = true }
+actix-web = { version = "4.4.0", features = ["macros", "compress-gzip"], default-features = false }
 log = { version = "0.4.17" }
+once_cell = "1.18.0"
 tokio = { version = "1.20.0", features = ["rt-multi-thread"], default-features = false }
 
 [workspace.metadata.resalt]

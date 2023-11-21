@@ -73,6 +73,12 @@ impl Display for ApiError {
     }
 }
 
+impl axum::response::IntoResponse for ApiError {
+    fn into_response(self) -> axum::response::Response {
+        (self.code(), self.message()).into_response()
+    }
+}
+
 impl actix_web::error::ResponseError for ApiError {
     fn status_code(&self) -> StatusCode {
         self.code()

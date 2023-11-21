@@ -1,4 +1,6 @@
 use std::sync::{Arc, Mutex};
+use std::thread;
+use std::time::Duration;
 
 use awc::Client;
 use lazy_static::lazy_static;
@@ -7,18 +9,16 @@ use toml::Table;
 
 const UPDATE_URL: &str = "https://secure.resalt.dev/Cargo.toml";
 
-#[derive(Debug, Clone)]
+#[derive(Default, Debug, Clone)]
 pub struct UpdateInfo {
     pub version: Option<String>,
     pub news: Option<Vec<String>>,
-    fetch_time: i64,
 }
 
 lazy_static! {
     static ref CACHE: Arc<Mutex<UpdateInfo>> = Arc::new(Mutex::new(UpdateInfo {
         version: None,
         news: None,
-        fetch_time: 0,
     }));
     pub static ref CURRENT_VERSION: String = include_str!("../../../Cargo.toml")
         .lines()
@@ -30,7 +30,7 @@ lazy_static! {
         .to_string();
 }
 
-async fn fetch_remote_info() -> Result<UpdateInfo, String> {
+async fn fetch_update_info() -> Result<UpdateInfo, String> {
     // Use awc client
     let client = Client::new();
 
@@ -121,37 +121,28 @@ async fn fetch_remote_info() -> Result<UpdateInfo, String> {
     Ok(UpdateInfo {
         version: Some(version),
         news: Some(news),
-        // current timestamp
-        fetch_time: chrono::Utc::now().timestamp(),
     })
 }
 
-pub async fn get_update_cache(force: bool) -> UpdateInfo {
-    // Drop CACHE MutexGuard lock inbetween of fetching remote version and setting it in the cache
-    if !force {
-        let update_info = CACHE.lock().unwrap();
-        let current_time = chrono::Utc::now().timestamp();
-        let time_diff = current_time - update_info.fetch_time;
-        // Check if 1 hour + 5 minutes has passed
-        if update_info.version.is_some() && update_info.news.is_some() && time_diff < 3900 {
-            return update_info.clone();
+pub async fn update_loop() {
+    loop {
+        let update_info = match fetch_update_info().await {
+            Ok(update_info) => update_info,
+            Err(e) => {
+                error!("Error fetching remote version: {}", e);
+                UpdateInfo::default()
+            }
+        };
+        {
+            let mut cache = CACHE.lock().unwrap();
+            cache.version = update_info.version.clone();
+            cache.news = update_info.news.clone();
         }
+        thread::sleep(Duration::from_secs(3600)); // Sleep for 1 hour
     }
-    let update_info = match fetch_remote_info().await {
-        Ok(update_info) => update_info,
-        Err(e) => {
-            error!("Error fetching remote version: {}", e);
-            return UpdateInfo {
-                version: None,
-                news: None,
-                fetch_time: 0,
-            };
-        }
-    };
-    {
-        let mut cache = CACHE.lock().unwrap();
-        cache.version = update_info.version.clone();
-        cache.news = update_info.news.clone();
-    }
-    update_info
+}
+
+pub fn get_update_cache() -> UpdateInfo {
+    let update_info = CACHE.lock().unwrap();
+    update_info.clone()
 }

@@ -8,7 +8,7 @@ use serde_json::{json, Value};
 
 use crate::StorageStatus;
 
-pub trait StorageImpl: Send {
+pub trait StorageImpl: Send + Sync {
     fn init(&self) {
         //
         // Create default admin user
@@ -102,6 +102,10 @@ pub trait StorageImpl: Send {
     }
 
     fn clone(&self) -> Box<dyn StorageImpl>;
+
+    fn clone_self(&self) -> Box<dyn StorageImpl> {
+        self.clone()
+    }
 
     fn get_status(&self) -> Result<StorageStatus, String>;
 
@@ -416,4 +420,10 @@ pub trait StorageImpl: Send {
     fn update_minion_preset(&self, minion_preset: &MinionPreset) -> Result<(), String>;
 
     fn delete_minion_preset(&self, id: &str) -> Result<(), String>;
+}
+
+impl Clone for Box<dyn StorageImpl> {
+    fn clone(&self) -> Box<dyn StorageImpl> {
+        self.clone_self()
+    }
 }

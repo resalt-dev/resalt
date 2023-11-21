@@ -1,4 +1,4 @@
-use actix_web::{post, web, HttpResponse, Responder, Result};
+use axum::{extract::State, response::IntoResponse, Json};
 use log::*;
 use resalt_auth::validate_auth_token;
 use resalt_config::SConfig;
@@ -6,7 +6,7 @@ use resalt_models::ApiError;
 use resalt_salt::RESALT_SALT_SYSTEM_SERVICE_USERNAME;
 use resalt_storage::StorageImpl;
 use serde::Deserialize;
-use serde_json::Value;
+use serde_json::{json, Value};
 
 #[derive(Deserialize, Debug)]
 pub struct TokenValidateRequest {
@@ -14,11 +14,10 @@ pub struct TokenValidateRequest {
     password: String,
 }
 
-#[post("/token")]
 pub async fn route_token_post(
-    data: web::Data<Box<dyn StorageImpl>>,
-    input: web::Form<TokenValidateRequest>,
-) -> Result<impl Responder, ApiError> {
+    State(data): State<Box<dyn StorageImpl>>,
+    Json(input): Json<TokenValidateRequest>,
+) -> Result<impl IntoResponse, ApiError> {
     let db = data;
     let username = input.username.to_lowercase();
     let token = input.password.clone();
@@ -28,11 +27,11 @@ pub async fn route_token_post(
     if username == RESALT_SALT_SYSTEM_SERVICE_USERNAME {
         if token == SConfig::salt_api_system_service_token() {
             info!("System service token OK");
-            return Ok(HttpResponse::Ok().json([
+            return Ok(Json(json!([
                 ".*".to_string(),
                 "@runner".to_string(),
                 "@wheel".to_string(),
-            ]));
+            ])));
         } else {
             return Err(ApiError::Unauthorized);
         }
@@ -58,7 +57,7 @@ pub async fn route_token_post(
             let perms: Result<Value, serde_json::Error> = serde_json::from_str(&user.perms);
 
             match perms {
-                Ok(perms) => Ok(HttpResponse::Ok().json(perms)),
+                Ok(perms) => Ok(Json(perms)),
                 Err(e) => {
                     error!("Error parsing permissions: {:?}", e);
                     Err(ApiError::InternalError)
