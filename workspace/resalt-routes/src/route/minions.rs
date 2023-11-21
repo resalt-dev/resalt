@@ -116,7 +116,7 @@ pub async fn route_minion_refresh_post(
     Path(minion_id): Path<String>,
     State(salt): State<SaltAPI>,
     State(data): State<Box<dyn StorageImpl>>,
-    Extension(mut auth): Extension<AuthStatus>,
+    Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_MINION_REFRESH)? {
@@ -138,7 +138,8 @@ pub async fn route_minion_refresh_post(
                 return Err(ApiError::InternalError);
             }
             error!("Salt token expired, renewing and retrying");
-            auth = renew_token_salt_token(&data, &salt, &auth.user_id, &auth.auth_token).await?;
+            let auth =
+                renew_token_salt_token(&data, &salt, &auth.user_id, &auth.auth_token).await?;
             match salt
                 .refresh_minion(&auth.salt_token.unwrap(), &minion_id)
                 .await

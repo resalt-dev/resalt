@@ -1,4 +1,8 @@
-use actix_web::{get, web, HttpMessage, HttpRequest, Responder, Result};
+use axum::{
+    extract::{Query, State},
+    response::IntoResponse,
+    Extension, Json,
+};
 use log::*;
 use resalt_models::*;
 use resalt_security::*;
@@ -12,33 +16,30 @@ pub struct GrainsGetQuery {
     filter: Option<String>, // URL-encoded JSON
 }
 
-#[get("/grains")]
 pub async fn route_grains_get(
-    data: web::Data<Box<dyn StorageImpl>>,
-    info: web::Query<GrainsGetQuery>,
-    req: HttpRequest,
-) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    query: Query<GrainsGetQuery>,
+    State(data): State<Box<dyn StorageImpl>>,
+    Extension(auth): Extension<AuthStatus>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_MINION_GRAINEXPLORER)? {
         return Err(ApiError::Forbidden);
     }
 
     // Args
-    let query = match urlencoding::decode(info.query.as_str()) {
-        Ok(query) => query.to_string(),
+    let path = match urlencoding::decode(query.query.as_str()) {
+        Ok(q) => q.to_string(),
         Err(e) => {
-            error!("Failed to decode query: {}", e);
+            error!("Failed to decode q: {}", e);
             return Err(ApiError::InvalidRequest);
         }
     };
-    let query = query
+    let path = path
         .starts_with('$')
-        .then(|| query.clone())
-        .unwrap_or(format!("$.{}", query));
+        .then(|| path.clone())
+        .unwrap_or(format!("$.{}", path));
 
-    let filter = match info.filter.clone() {
+    let filter = match &query.filter {
         Some(filter) => Some(match urlencoding::decode(filter.as_str()) {
             Ok(filter) => filter.to_string(),
             Err(e) => {
@@ -85,7 +86,7 @@ pub async fn route_grains_get(
             }
         };
 
-        let grains: Vec<Value> = match jsonpath_lib::select(&grains, &query) {
+        let grains: Vec<Value> = match jsonpath_lib::select(&grains, &path) {
             Ok(grains) => grains.into_iter().map(|v| v.to_owned()).collect(),
             Err(e) => {
                 warn!("Failed to extract grains: {}", e);
@@ -107,5 +108,5 @@ pub async fn route_grains_get(
         ));
     }
 
-    Ok(web::Json(results))
+    Ok(Json(results))
 }

@@ -1,17 +1,18 @@
-use actix_web::{delete, get, post, put, web, HttpMessage, HttpRequest, Responder, Result};
+use axum::{
+    extract::{Path, State},
+    response::IntoResponse,
+    Extension, Json,
+};
 use log::*;
 use resalt_models::{ApiError, AuthStatus, MinionPreset};
 use resalt_security::*;
 use resalt_storage::StorageImpl;
 use serde::{Deserialize, Serialize};
 
-#[get("/presets")]
 pub async fn route_presets_get(
-    data: web::Data<Box<dyn StorageImpl>>,
-    req: HttpRequest,
-) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    State(data): State<Box<dyn StorageImpl>>,
+    Extension(auth): Extension<AuthStatus>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_MINION_PRESETS_LIST)? {
         return Err(ApiError::Forbidden);
@@ -25,7 +26,7 @@ pub async fn route_presets_get(
         }
     };
 
-    Ok(web::Json(presets))
+    Ok(Json(presets))
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -34,21 +35,18 @@ pub struct PresetsCreateRequest {
     filter: String,
 }
 
-#[post("/presets")]
 pub async fn route_presets_post(
-    data: web::Data<Box<dyn StorageImpl>>,
-    req: HttpRequest,
-    body: web::Json<PresetsCreateRequest>,
-) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    State(data): State<Box<dyn StorageImpl>>,
+    Extension(auth): Extension<AuthStatus>,
+    Json(input): Json<PresetsCreateRequest>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_MINION_PRESETS_MANAGE)? {
         return Err(ApiError::Forbidden);
     }
 
-    let name = body.name.clone();
-    let filter = body.filter.clone();
+    let name = input.name.clone();
+    let filter = input.filter.clone();
 
     if name.is_empty() || filter.is_empty() || name.len() > 100 || filter.len() > 65535 {
         return Err(ApiError::InvalidRequest);
@@ -68,30 +66,20 @@ pub async fn route_presets_post(
         filter,
     };
 
-    Ok(web::Json(preset))
+    Ok(Json(preset))
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct PresetInfo {
-    id: String,
-}
-
-#[get("/presets/{id}")]
 pub async fn route_preset_get(
-    data: web::Data<Box<dyn StorageImpl>>,
-    req: HttpRequest,
-    info: web::Path<PresetInfo>,
-) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    Path(preset_id): Path<String>,
+    State(data): State<Box<dyn StorageImpl>>,
+    Extension(auth): Extension<AuthStatus>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_MINION_PRESETS_LIST)? {
         return Err(ApiError::Forbidden);
     }
 
-    let id = info.id.clone();
-
-    let preset = match data.get_minion_preset_by_id(&id) {
+    let preset = match data.get_minion_preset_by_id(&preset_id) {
         Ok(preset) => preset,
         Err(e) => {
             error!("{:?}", e);
@@ -100,7 +88,7 @@ pub async fn route_preset_get(
     };
 
     match preset {
-        Some(preset) => Ok(web::Json(preset)),
+        Some(preset) => Ok(Json(preset)),
         None => Err(ApiError::NotFound),
     }
 }
@@ -111,23 +99,20 @@ pub struct PresetUpdateRequest {
     filter: String,
 }
 
-#[put("/presets/{id}")]
 pub async fn route_preset_put(
-    data: web::Data<Box<dyn StorageImpl>>,
-    req: HttpRequest,
-    info: web::Path<PresetInfo>,
-    body: web::Json<PresetUpdateRequest>,
-) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    Path(preset_id): Path<String>,
+    State(data): State<Box<dyn StorageImpl>>,
+    Extension(auth): Extension<AuthStatus>,
+    Json(input): Json<PresetUpdateRequest>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_MINION_PRESETS_MANAGE)? {
         return Err(ApiError::Forbidden);
     }
 
-    let id = info.id.clone();
-    let name = body.name.clone();
-    let filter = body.filter.clone();
+    let id = preset_id.clone();
+    let name = input.name.clone();
+    let filter = input.filter.clone();
 
     if name.is_empty() || filter.is_empty() || name.len() > 100 || filter.len() > 65535 {
         return Err(ApiError::InvalidRequest);
@@ -157,26 +142,21 @@ pub async fn route_preset_put(
         }
     };
 
-    Ok(web::Json(preset))
+    Ok(Json(preset))
 }
 
-#[delete("/presets/{id}")]
 pub async fn route_preset_delete(
-    data: web::Data<Box<dyn StorageImpl>>,
-    req: HttpRequest,
-    info: web::Path<PresetInfo>,
-) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    Path(preset_id): Path<String>,
+    State(data): State<Box<dyn StorageImpl>>,
+    Extension(auth): Extension<AuthStatus>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_MINION_PRESETS_MANAGE)? {
         return Err(ApiError::Forbidden);
     }
 
-    let id = info.id.clone();
-
     // Check if it exists
-    let preset = match data.get_minion_preset_by_id(&id) {
+    let preset = match data.get_minion_preset_by_id(&preset_id) {
         Ok(preset) => preset,
         Err(e) => {
             error!("{:?}", e);
@@ -189,7 +169,7 @@ pub async fn route_preset_delete(
         None => return Err(ApiError::NotFound),
     }
 
-    match data.delete_minion_preset(&id) {
+    match data.delete_minion_preset(&preset_id) {
         Ok(_) => {}
         Err(e) => {
             error!("{:?}", e);
@@ -197,5 +177,5 @@ pub async fn route_preset_delete(
         }
     };
 
-    Ok(web::Json(()))
+    Ok(Json(()))
 }

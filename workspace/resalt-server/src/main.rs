@@ -1,6 +1,6 @@
 use actix_web::{guard::fn_guard, http::header, middleware::*, web, App, HttpServer};
 use axum::{
-    routing::{get, post},
+    routing::{delete, get, post, put},
     Router, Server,
 };
 use env_logger::{init_from_env, Env};
@@ -113,6 +113,15 @@ async fn start_server(
             "/minions/:minion_id/refresh",
             post(route_minion_refresh_post),
         )
+        .route("/presets", get(route_presets_get))
+        .route("/presets", post(route_presets_post))
+        .route("/presets/:preset_id", get(route_preset_get))
+        .route("/presets/:preset_id", put(route_preset_put))
+        .route("/presets/:preset_id", delete(route_preset_delete))
+        .route("/grains", get(route_grains_get))
+        .route("/jobs", get(route_jobs_get))
+        .route("/jobs", post(route_jobs_post))
+        .route("/jobs/:jid", get(route_job_get))
         .route_layer(axum::middleware::from_fn_with_state(
             shared_state.clone(),
             middleware_auth,
@@ -164,15 +173,6 @@ async fn start_server(
                     .service(
                         web::scope("/auth")
                             .guard(guard_auth)
-                            .service(route_presets_get)
-                            .service(route_presets_post)
-                            .service(route_preset_get)
-                            .service(route_preset_put)
-                            .service(route_preset_delete)
-                            .service(route_grains_get)
-                            .service(route_jobs_get)
-                            .service(route_jobs_post)
-                            .service(route_job_get)
                             .service(route_events_get)
                             .service(route_users_get)
                             .service(route_users_post)

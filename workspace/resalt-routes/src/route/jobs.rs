@@ -1,6 +1,8 @@
-use std::collections::HashMap;
-
-use actix_web::{get, post, web, HttpMessage, HttpRequest, Responder, Result};
+use axum::{
+    extract::{Path, Query, State},
+    response::IntoResponse,
+    Extension, Json,
+};
 use log::*;
 use resalt_auth::renew_token_salt_token;
 use resalt_models::*;
@@ -9,6 +11,7 @@ use resalt_security::*;
 use resalt_storage::StorageImpl;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use std::collections::HashMap;
 
 #[derive(Deserialize)]
 pub struct JobsListGetQuery {
@@ -17,14 +20,11 @@ pub struct JobsListGetQuery {
     offset: Option<i64>,
 }
 
-#[get("/jobs")]
 pub async fn route_jobs_get(
-    data: web::Data<Box<dyn StorageImpl>>,
-    query: web::Query<JobsListGetQuery>,
-    req: HttpRequest,
-) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    query: Query<JobsListGetQuery>,
+    State(data): State<Box<dyn StorageImpl>>,
+    Extension(auth): Extension<AuthStatus>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_JOB_LIST)? {
         return Err(ApiError::Forbidden);
@@ -42,7 +42,7 @@ pub async fn route_jobs_get(
         }
     };
 
-    Ok(web::Json(jobs))
+    Ok(Json(jobs))
 }
 
 #[derive(Deserialize)]
@@ -58,15 +58,12 @@ pub struct JobRunRequest {
     batch_size: String,
 }
 
-#[post("/jobs")]
 pub async fn route_jobs_post(
-    salt: web::Data<SaltAPI>,
-    data: web::Data<Box<dyn StorageImpl>>,
-    input: web::Json<JobRunRequest>,
-    req: HttpRequest,
-) -> Result<impl Responder, ApiError> {
-    let mut auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    State(salt): State<SaltAPI>,
+    State(data): State<Box<dyn StorageImpl>>,
+    Extension(auth): Extension<AuthStatus>,
+    Json(input): Json<JobRunRequest>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_RUN_LIVE)? {
         return Err(ApiError::Forbidden);
@@ -81,8 +78,8 @@ pub async fn route_jobs_post(
     };
 
     async fn run(
-        salt: web::Data<SaltAPI>,
-        input: &web::Json<JobRunRequest>,
+        salt: SaltAPI,
+        input: &JobRunRequest,
         salt_token: &SaltToken,
     ) -> Result<Value, SaltError> {
         match input.client {
@@ -160,16 +157,17 @@ pub async fn route_jobs_post(
     }
 
     match run(salt.clone(), &input, salt_token).await {
-        Ok(job) => Ok(web::Json(job)),
+        Ok(job) => Ok(Json(job)),
         Err(SaltError::Unauthorized) => {
             if !salt_token.matured() {
                 error!("Salt token unauthorized, but not matured");
                 return Err(ApiError::InternalError);
             }
             error!("Salt token expired, renewing and retrying");
-            auth = renew_token_salt_token(&data, &salt, &auth.user_id, &auth.auth_token).await?;
+            let auth =
+                renew_token_salt_token(&data, &salt, &auth.user_id, &auth.auth_token).await?;
             match run(salt, &input, &auth.salt_token.unwrap()).await {
-                Ok(job) => Ok(web::Json(job)),
+                Ok(job) => Ok(Json(job)),
                 Err(e) => {
                     error!("{:?}", e);
                     Err(ApiError::InternalError)
@@ -183,31 +181,23 @@ pub async fn route_jobs_post(
     }
 }
 
-#[derive(Deserialize)]
-pub struct JobGetInfo {
-    jid: String,
-}
-
 #[derive(Serialize)]
 pub struct JobGetResponse {
     job: Job,
     returns: Vec<JobReturn>,
 }
 
-#[get("/jobs/{jid}")]
 pub async fn route_job_get(
-    data: web::Data<Box<dyn StorageImpl>>,
-    info: web::Path<JobGetInfo>,
-    req: HttpRequest,
-) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    Path(jid): Path<String>,
+    State(data): State<Box<dyn StorageImpl>>,
+    Extension(auth): Extension<AuthStatus>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_JOB_LIST)? {
         return Err(ApiError::Forbidden);
     }
 
-    let job = match data.get_job_by_jid(&info.jid) {
+    let job = match data.get_job_by_jid(&jid) {
         Ok(job) => job,
         Err(e) => {
             error!("{:?}", e);
@@ -230,5 +220,5 @@ pub async fn route_job_get(
         }
     };
 
-    Ok(web::Json(JobGetResponse { job, returns }))
+    Ok(Json(JobGetResponse { job, returns }))
 }
