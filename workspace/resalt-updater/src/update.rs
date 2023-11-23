@@ -2,10 +2,9 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
 
-use awc::Client;
 use lazy_static::lazy_static;
 use log::*;
-use toml::Table;
+use reqwest::Client;
 
 const UPDATE_URL: &str = "https://secure.resalt.dev/Cargo.toml";
 
@@ -31,14 +30,14 @@ lazy_static! {
 }
 
 async fn fetch_update_info() -> Result<UpdateInfo, String> {
-    // Use awc client
     let client = Client::new();
+    let resp = client
+        .get(UPDATE_URL)
+        .send()
+        .await
+        .map_err(|e| format!("Error sending request: {}", e))?;
 
-    let mut resp = match client.get(UPDATE_URL).send().await {
-        Ok(resp) => resp,
-        Err(e) => return Err(format!("Error checking latest version: {}", e)),
-    };
-    let body = match resp.body().await {
+    let body = match resp.text().await {
         Ok(body) => body,
         Err(e) => {
             return Err(format!(
@@ -47,32 +46,22 @@ async fn fetch_update_info() -> Result<UpdateInfo, String> {
             ))
         }
     };
-    let body_str = match String::from_utf8(body.to_vec()) {
-        Ok(body_str) => body_str,
-        Err(e) => {
-            return Err(format!(
-                "Error decoding body when checking latest version: {}",
-                e
-            ))
-        }
-    };
-    // Parse TOML
-    let cargo = match body_str.parse::<Table>() {
+
+    let cargo = match toml::from_str::<toml::Value>(&body) {
         Ok(cargo) => cargo,
         Err(e) => return Err(format!("Error parsing TOML: {}", e)),
     };
 
-    // Get workspae
     let workspace = match cargo.get("workspace") {
         Some(v) => v,
         None => return Err("Error parsing TOML: no workspace".to_string()),
     };
-    // Get package
+
     let package = match cargo.get("package") {
         Some(v) => v,
         None => return Err("Error parsing TOML: no package".to_string()),
     };
-    // get version
+
     let version: String = match package.get("version") {
         Some(version) => match version.as_str() {
             Some(version) => version.to_string(),
@@ -81,24 +70,26 @@ async fn fetch_update_info() -> Result<UpdateInfo, String> {
         None => return Err("Error parsing TOML: no version".to_string()),
     };
 
-    // Get news (workspace.metadata.resalt.news)
     let metadata = match workspace.get("metadata") {
         Some(metadata) => metadata,
         None => return Err("Error parsing TOML: no metadata".to_string()),
     };
+
     let resalt = match metadata.get("resalt") {
         Some(resalt) => resalt,
         None => return Err("Error parsing TOML: no \"resalt\" metadata".to_string()),
     };
+
     let news = match resalt.get("news") {
         Some(news) => news,
         None => return Err("Error parsing TOML: no \"resalt.news\" metadata".to_string()),
     };
-    // News is a string array
+
     let news = match news.as_array() {
         Some(news) => news,
         None => return Err("Error parsing TOML: \"resalt.news\" is not an array".to_string()),
     };
+
     let news: Vec<String> = news
         .iter()
         .map(|news| match news.as_str() {
@@ -133,12 +124,13 @@ pub async fn update_loop() {
                 UpdateInfo::default()
             }
         };
-        {
-            let mut cache = CACHE.lock().unwrap();
-            cache.version = update_info.version.clone();
-            cache.news = update_info.news.clone();
-        }
-        thread::sleep(Duration::from_secs(3600)); // Sleep for 1 hour
+
+        // Update the cache
+        let mut cache = CACHE.lock().unwrap();
+        *cache = update_info;
+
+        // Sleep for some time before checking for updates again
+        thread::sleep(Duration::from_secs(60 * 60));
     }
 }
 
