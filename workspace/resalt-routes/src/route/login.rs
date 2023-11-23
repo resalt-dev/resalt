@@ -55,6 +55,8 @@ pub async fn route_login_post(
                     }
                 };
 
+                info!("Created user: {}", &user.username);
+
                 user
             }
             // Error from Database, which is critical, so return error

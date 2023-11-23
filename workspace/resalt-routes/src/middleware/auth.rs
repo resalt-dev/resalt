@@ -12,6 +12,7 @@ use resalt_models::{ApiError, AuthStatus};
 use resalt_salt::SaltAPI;
 use resalt_storage::StorageImpl;
 
+#[allow(clippy::let_and_return)]
 pub async fn middleware_auth<B>(
     State(data): State<Box<dyn StorageImpl>>,
     State(salt): State<SaltAPI>,
@@ -79,7 +80,7 @@ async fn resolve_auth_status(
         Ok(auth_status) => auth_status,
         Err(e) => {
             error!("{:?}", e);
-            return Err(e.into());
+            return Err(e);
         }
     };
 
@@ -109,7 +110,7 @@ async fn resolve_auth_status(
                 Ok(_) => {}
                 Err(e) => {
                     error!("{:?}", e);
-                    return Err(e.into());
+                    return Err(e);
                 }
             }
 
@@ -118,7 +119,7 @@ async fn resolve_auth_status(
                 Ok(auth_status) => auth_status,
                 Err(e) => {
                     error!("{:?}", e);
-                    return Err(e.into());
+                    return Err(e);
                 }
             };
 

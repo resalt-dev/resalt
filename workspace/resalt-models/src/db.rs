@@ -478,8 +478,7 @@ impl PermissionGroup {
     }
 
     pub fn hash(&self) -> Vec<(&str, String)> {
-        let values = Vec::from([("name", self.name.clone()), ("perms", self.perms.clone())]);
-        values
+        Vec::from([("name", self.name.clone()), ("perms", self.perms.clone())])
     }
 
     pub fn dehash(id: String, values: Vec<(String, String)>) -> Self {

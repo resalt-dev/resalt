@@ -10,6 +10,7 @@ use resalt_storage::StorageImpl;
 use serde::Deserialize;
 use serde_json::Value;
 
+#[allow(clippy::borrowed_box)]
 async fn get_group(
     data: &Box<dyn StorageImpl>,
     group_id: &str,

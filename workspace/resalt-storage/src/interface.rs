@@ -142,12 +142,12 @@ pub trait StorageImpl: Send + Sync {
     fn delete_user(&self, id: &str) -> Result<(), String>;
 
     #[allow(clippy::borrowed_box)]
-    fn refresh_user_permissions(&self, user: &User) -> Result<(), ()> {
+    fn refresh_user_permissions(&self, user: &User) -> Result<(), String> {
         let groups = match self.list_permission_groups_by_user_id(&user.id) {
             Ok(groups) => groups,
             Err(e) => {
                 error!("{:?}", e);
-                return Err(());
+                return Err(e);
             }
         };
         let mut perms: Vec<Value> = Vec::new();
@@ -157,7 +157,7 @@ pub trait StorageImpl: Send + Sync {
                 Ok(serdegroup) => serdegroup,
                 Err(e) => {
                     error!("{:?}", e);
-                    return Err(());
+                    return Err(e.to_string());
                 }
             };
             let group_perms = match serdegroup.as_array() {
@@ -176,7 +176,7 @@ pub trait StorageImpl: Send + Sync {
             Ok(_) => Ok(()),
             Err(e) => {
                 error!("{:?}", e);
-                Err(())
+                Err(e)
             }
         }
     }
