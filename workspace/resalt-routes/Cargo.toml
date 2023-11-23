@@ -6,7 +6,6 @@ publish.workspace = true
 
 [dependencies]
 axum = { workspace = true }
-actix-web = { version = "4.4.0", features=["macros", "compress-gzip"], default-features = false }
 include_dir = "0.7.2"
 jsonpath_lib = "0.3.0"
 log = { workspace = true }
@@ -21,3 +20,4 @@ resalt-updater = { path = "../resalt-updater" }
 serde = { version = "1.0.139", features = ["derive"] }
 serde_json = "1.0.82"
 urlencoding = "2.1.2"
+tower-http = { workspace = true }

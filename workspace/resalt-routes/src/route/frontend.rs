@@ -1,18 +1,14 @@
-use actix_web::{
-    dev::{ServiceRequest, ServiceResponse},
-    HttpResponse,
-};
+use axum::{extract::OriginalUri, response::IntoResponse};
 use include_dir::{include_dir, Dir};
+use resalt_models::ApiError;
 
 static FRONTEND_PUBLIC_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/../../frontend/build");
 
 pub async fn route_frontend_get(
-    service_request: ServiceRequest,
-) -> Result<ServiceResponse, actix_web::Error> {
-    let (req, _payload) = service_request.into_parts();
-
+    OriginalUri(uri): OriginalUri,
+) -> Result<impl IntoResponse, ApiError> {
     // Fetch file from FRONTEND_PUBLIC_DIR based on request URL
-    let path = req.uri().path();
+    let path = uri.path();
 
     // If path starts with /, trim it
     let path = if let Some(path) = path.strip_prefix('/') {
@@ -37,10 +33,14 @@ pub async fn route_frontend_get(
     // log::debug!("Serving file {} with mime type {}", file_path, mime_type);
 
     // Add content type header
-    let mut response = HttpResponse::build(actix_web::http::StatusCode::OK);
-    response.insert_header((actix_web::http::header::CONTENT_TYPE, mime_type));
-    let response = response.body(body);
-    Ok(ServiceResponse::new(req.clone(), response))
+    Ok((
+        [
+            (axum::http::header::CONTENT_TYPE, mime_type),
+            (axum::http::header::CACHE_CONTROL, "no-cache".to_owned()),
+        ],
+        body,
+    )
+        .into_response())
 }
 
 fn match_mime(filename: &str) -> String {

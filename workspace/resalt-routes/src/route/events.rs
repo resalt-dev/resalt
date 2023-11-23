@@ -1,4 +1,8 @@
-use actix_web::{get, web, HttpMessage, HttpRequest, Responder, Result};
+use axum::{
+    extract::{Query, State},
+    response::IntoResponse,
+    Extension, Json,
+};
 use log::*;
 use resalt_models::{ApiError, AuthStatus};
 use resalt_security::*;
@@ -11,14 +15,11 @@ pub struct EventsListGetQuery {
     offset: Option<i64>,
 }
 
-#[get("/events")]
 pub async fn route_events_get(
-    data: web::Data<Box<dyn StorageImpl>>,
-    query: web::Query<EventsListGetQuery>,
-    req: HttpRequest,
-) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    query: Query<EventsListGetQuery>,
+    State(data): State<Box<dyn StorageImpl>>,
+    Extension(auth): Extension<AuthStatus>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_EVENT_LIST)? {
         return Err(ApiError::Forbidden);
@@ -35,5 +36,5 @@ pub async fn route_events_get(
         }
     };
 
-    Ok(web::Json(events))
+    Ok(Json(events))
 }

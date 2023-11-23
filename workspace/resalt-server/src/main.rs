@@ -1,12 +1,11 @@
-use actix_web::{guard::fn_guard, http::header, middleware::*, web, App, HttpServer};
 use axum::{
+    middleware::{from_fn, from_fn_with_state},
     routing::{delete, get, post, put},
-    Router, Server,
+    Router, Server, ServiceExt,
 };
 use env_logger::{init_from_env, Env};
 use log::info;
 use resalt_config::SConfig;
-use resalt_middleware::ValidateAuth;
 use resalt_routes::*;
 use resalt_salt::{SaltAPI, SaltEventListener, SaltEventListenerStatus};
 use resalt_scheduler::Scheduler;
@@ -19,6 +18,7 @@ use std::{
     sync::{Arc, Mutex},
 };
 use tokio::task;
+use tower::Layer;
 
 async fn init_db() -> Box<dyn StorageImpl> {
     let db_type = SConfig::database_type();
@@ -122,89 +122,67 @@ async fn start_server(
         .route("/jobs", get(route_jobs_get))
         .route("/jobs", post(route_jobs_post))
         .route("/jobs/:jid", get(route_job_get))
-        .route_layer(axum::middleware::from_fn_with_state(
-            shared_state.clone(),
-            middleware_auth,
-        ));
+        .route("/events", get(route_events_get))
+        .route("/users", get(route_users_get))
+        .route("/users", post(route_users_post))
+        .route("/users/:user_id", get(route_user_get))
+        .route("/users/:user_id", delete(route_user_delete))
+        .route("/users/:user_id/password", post(route_user_password_post))
+        .route(
+            "/users/:user_id/permissions/:group_id",
+            post(route_user_permissions_post),
+        )
+        .route(
+            "/users/:user_id/permissions/:group_id",
+            delete(route_user_permissions_delete),
+        )
+        .route("/keys", get(route_keys_get))
+        .route("/keys/:state/:id/accept", put(route_key_accept_put))
+        .route("/keys/:state/:id/reject", put(route_key_reject_put))
+        .route("/keys/:state/:id/delete", delete(route_key_delete_delete))
+        .route("/permissions", get(route_permissions_get))
+        .route("/permissions", post(route_permissions_post))
+        .route("/permissions/:id", get(route_permission_get))
+        .route("/permissions/:id", put(route_permission_put))
+        .route("/permissions/:id", delete(route_permission_delete))
+        .route("/settings/import", post(route_settings_import_post))
+        .route("/settings/export", get(route_settings_export_get))
+        .route_layer(from_fn_with_state(shared_state.clone(), middleware_auth))
+        .fallback(route_fallback_404);
 
     let router_noauth = Router::new()
         .route("/", get(route_index_get))
         .route("/config", get(route_config_get))
         .route("/metrics", get(route_metrics_get))
         .route("/login", post(route_login_post))
-        .route("/token", post(route_token_post));
+        .route("/token", post(route_token_post))
+        .fallback(route_fallback_404);
 
     let app = Router::new()
-        .nest("/api", router_noauth)
         .nest("/api/auth", router_auth)
-        .with_state(shared_state);
+        .nest("/api", router_noauth)
+        // Embed web interface
+        .fallback(route_frontend_get)
+        .with_state(shared_state.clone());
 
-    // TODO remove +1 from port
-    let socket = SocketAddr::from(([0, 0, 0, 0], SConfig::http_port() + 1));
+    // Normalize path
+    let normalize_path = from_fn(middleware_normalize_path);
+    let app = normalize_path.layer(app);
+    // Defalt Headers
+    let default_headers = from_fn(middleware_default_headers);
+    let app = default_headers.layer(app);
+    // Logging
+    let logging = from_fn_with_state(shared_state, middleware_logging);
+    let app = logging.layer(app);
+
+    let socket = SocketAddr::from(([0, 0, 0, 0], SConfig::http_port()));
     Server::bind(&socket).serve(app.into_make_service()).await?;
 
-    //axum::middleware::from_fn_with_state(state, f)
-
-    //.
-
-    //.
-
-    //.
-
-    HttpServer::new(move || {
-        // Salt API
-        let salt_api = SaltAPI::new();
-
-        let guard_auth = fn_guard(guard_require_auth);
-
-        App::new()
-            .wrap(DefaultHeaders::new().add((header::X_CONTENT_TYPE_OPTIONS, "nosniff")))
-            .wrap(NormalizePath::trim())
-            .wrap(Logger::default())
-            .service(
-                web::scope("/api")
-                    .app_data(web::Data::new(db_clone_wrapper.clone().storage))
-                    .app_data(web::Data::new(salt_api.clone()))
-                    .app_data(web::Data::new(listener_status.clone()))
-                    .wrap(ValidateAuth::new(
-                        db_clone_wrapper.clone().storage,
-                        salt_api,
-                    ))
-                    .service(
-                        web::scope("/auth")
-                            .guard(guard_auth)
-                            .service(route_events_get)
-                            .service(route_users_get)
-                            .service(route_users_post)
-                            .service(route_user_get)
-                            .service(route_user_delete)
-                            .service(route_user_password_post)
-                            .service(route_user_permissions_post)
-                            .service(route_user_permissions_delete)
-                            .service(route_keys_get)
-                            .service(route_key_accept_put)
-                            .service(route_key_reject_put)
-                            .service(route_key_delete_delete)
-                            .service(route_permissions_get)
-                            .service(route_permissions_post)
-                            .service(route_permission_get)
-                            .service(route_permission_update)
-                            .service(route_permission_delete)
-                            .service(route_settings_import_post)
-                            .service(route_settings_export_get)
-                            .default_service(route_fallback_404),
-                    ),
-            )
-            // Embed web interface
-            .service(web::scope("").default_service(route_frontend_get))
-    })
-    .bind(("0.0.0.0", SConfig::http_port()))?
-    .run()
-    .await?;
     Ok(())
 }
 
 async fn run() -> Result<(), Box<dyn Error>> {
+    // Logging
     init_from_env(Env::new().default_filter_or("Debug"));
 
     // Database

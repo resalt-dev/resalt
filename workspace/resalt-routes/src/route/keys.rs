@@ -1,20 +1,20 @@
-use actix_web::{delete, get, put, web, HttpMessage, HttpRequest, Responder, Result};
+use axum::{
+    extract::{Path, State},
+    response::IntoResponse,
+    Extension, Json,
+};
 use log::*;
 use resalt_auth::renew_token_salt_token;
 use resalt_models::*;
 use resalt_salt::{SaltAPI, SaltError, SaltKeyState};
 use resalt_security::*;
 use resalt_storage::StorageImpl;
-use serde::Deserialize;
 
-#[get("/keys")]
 pub async fn route_keys_get(
-    salt: web::Data<SaltAPI>,
-    data: web::Data<Box<dyn StorageImpl>>,
-    req: HttpRequest,
-) -> Result<impl Responder, ApiError> {
-    let mut auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    State(data): State<Box<dyn StorageImpl>>,
+    State(salt): State<SaltAPI>,
+    Extension(auth): Extension<AuthStatus>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_SALTKEY_LIST)? {
         return Err(ApiError::Forbidden);
@@ -36,7 +36,8 @@ pub async fn route_keys_get(
                 return Err(ApiError::InternalError);
             }
             error!("Salt token expired, renewing and retrying");
-            auth = renew_token_salt_token(&data, &salt, &auth.user_id, &auth.auth_token).await?;
+            let auth =
+                renew_token_salt_token(&data, &salt, &auth.user_id, &auth.auth_token).await?;
             match salt.get_keys(&auth.salt_token.unwrap()).await {
                 Ok(keys) => keys,
                 Err(e) => {
@@ -67,24 +68,16 @@ pub async fn route_keys_get(
         };
     }
 
-    Ok(web::Json(keys))
+    Ok(Json(keys))
 }
 
-#[derive(Deserialize)]
-pub struct KeyInfo {
-    state: SaltKeyState,
-    id: String,
-}
-
-#[put("/keys/{state}/{id}/accept")]
 pub async fn route_key_accept_put(
-    salt: web::Data<SaltAPI>,
-    data: web::Data<Box<dyn StorageImpl>>,
-    info: web::Path<KeyInfo>,
-    req: HttpRequest,
-) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    Path(state): Path<SaltKeyState>,
+    Path(id): Path<String>,
+    State(data): State<Box<dyn StorageImpl>>,
+    State(salt): State<SaltAPI>,
+    Extension(auth): Extension<AuthStatus>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_SALTKEY_ACCEPT)? {
         return Err(ApiError::Forbidden);
@@ -98,8 +91,8 @@ pub async fn route_key_accept_put(
         }
     };
 
-    match salt.accept_key(salt_token, &info.state, &info.id).await {
-        Ok(()) => Ok(web::Json(())),
+    match salt.accept_key(salt_token, &state, &id).await {
+        Ok(()) => Ok(Json(())),
         Err(SaltError::Unauthorized) => {
             if !salt_token.matured() {
                 error!("Salt token unauthorized, but not matured");
@@ -109,10 +102,10 @@ pub async fn route_key_accept_put(
             let auth =
                 renew_token_salt_token(&data, &salt, &auth.user_id, &auth.auth_token).await?;
             match salt
-                .accept_key(&auth.salt_token.unwrap(), &info.state, &info.id)
+                .accept_key(&auth.salt_token.unwrap(), &state, &id)
                 .await
             {
-                Ok(()) => Ok(web::Json(())),
+                Ok(()) => Ok(Json(())),
                 Err(e) => {
                     error!("{:?}", e);
                     Err(ApiError::InternalError)
@@ -126,15 +119,13 @@ pub async fn route_key_accept_put(
     }
 }
 
-#[put("/keys/{state}/{id}/reject")]
 pub async fn route_key_reject_put(
-    salt: web::Data<SaltAPI>,
-    data: web::Data<Box<dyn StorageImpl>>,
-    info: web::Path<KeyInfo>,
-    req: HttpRequest,
-) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    Path(state): Path<SaltKeyState>,
+    Path(id): Path<String>,
+    State(data): State<Box<dyn StorageImpl>>,
+    State(salt): State<SaltAPI>,
+    Extension(auth): Extension<AuthStatus>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_SALTKEY_REJECT)? {
         return Err(ApiError::Forbidden);
@@ -148,8 +139,8 @@ pub async fn route_key_reject_put(
         }
     };
 
-    match salt.reject_key(salt_token, &info.state, &info.id).await {
-        Ok(()) => Ok(web::Json(())),
+    match salt.reject_key(salt_token, &state, &id).await {
+        Ok(()) => Ok(Json(())),
         Err(SaltError::Unauthorized) => {
             if !salt_token.matured() {
                 error!("Salt token unauthorized, but not matured");
@@ -159,10 +150,10 @@ pub async fn route_key_reject_put(
             let auth =
                 renew_token_salt_token(&data, &salt, &auth.user_id, &auth.auth_token).await?;
             match salt
-                .reject_key(&auth.salt_token.unwrap(), &info.state, &info.id)
+                .reject_key(&auth.salt_token.unwrap(), &state, &id)
                 .await
             {
-                Ok(()) => Ok(web::Json(())),
+                Ok(()) => Ok(Json(())),
                 Err(e) => {
                     error!("{:?}", e);
                     Err(ApiError::InternalError)
@@ -176,15 +167,13 @@ pub async fn route_key_reject_put(
     }
 }
 
-#[delete("/keys/{state}/{id}/delete")]
 pub async fn route_key_delete_delete(
-    salt: web::Data<SaltAPI>,
-    data: web::Data<Box<dyn StorageImpl>>,
-    info: web::Path<KeyInfo>,
-    req: HttpRequest,
-) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    Path(state): Path<SaltKeyState>,
+    Path(id): Path<String>,
+    State(data): State<Box<dyn StorageImpl>>,
+    State(salt): State<SaltAPI>,
+    Extension(auth): Extension<AuthStatus>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_SALTKEY_DELETE)? {
         return Err(ApiError::Forbidden);
@@ -198,8 +187,8 @@ pub async fn route_key_delete_delete(
         }
     };
 
-    match salt.delete_key(salt_token, &info.state, &info.id).await {
-        Ok(()) => Ok(web::Json(())),
+    match salt.delete_key(salt_token, &state, &id).await {
+        Ok(()) => Ok(Json(())),
         Err(SaltError::Unauthorized) => {
             if !salt_token.matured() {
                 error!("Salt token unauthorized, but not matured");
@@ -209,10 +198,10 @@ pub async fn route_key_delete_delete(
             let auth =
                 renew_token_salt_token(&data, &salt, &auth.user_id, &auth.auth_token).await?;
             match salt
-                .delete_key(&auth.salt_token.unwrap(), &info.state, &info.id)
+                .delete_key(&auth.salt_token.unwrap(), &state, &id)
                 .await
             {
-                Ok(()) => Ok(web::Json(())),
+                Ok(()) => Ok(Json(())),
                 Err(e) => {
                     error!("{:?}", e);
                     Err(ApiError::InternalError)

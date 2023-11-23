@@ -1,4 +1,8 @@
-use actix_web::{delete, get, post, web, HttpMessage, HttpRequest, Responder, Result};
+use axum::{
+    extract::{Path, Query, State},
+    response::IntoResponse,
+    Extension, Json,
+};
 use log::*;
 use resalt_models::{ApiError, AuthStatus};
 use resalt_security::*;
@@ -12,14 +16,11 @@ pub struct UsersListGetQuery {
     offset: Option<i64>,
 }
 
-#[get("/users")]
 pub async fn route_users_get(
-    data: web::Data<Box<dyn StorageImpl>>,
-    query: web::Query<UsersListGetQuery>,
-    req: HttpRequest,
-) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    query: Query<UsersListGetQuery>,
+    State(data): State<Box<dyn StorageImpl>>,
+    Extension(auth): Extension<AuthStatus>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_USER_LIST)? {
         return Err(ApiError::Forbidden);
@@ -50,7 +51,7 @@ pub async fn route_users_get(
         results.push(user.public(permission_groups));
     }
 
-    Ok(web::Json(results))
+    Ok(Json(results))
 }
 
 #[derive(Deserialize)]
@@ -61,21 +62,18 @@ pub struct UserCreateRequest {
     pub ldap_sync: Option<String>,
 }
 
-#[post("/users")]
 pub async fn route_users_post(
-    data: web::Data<Box<dyn StorageImpl>>,
-    body: web::Json<UserCreateRequest>,
-    req: HttpRequest,
-) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    State(data): State<Box<dyn StorageImpl>>,
+    Extension(auth): Extension<AuthStatus>,
+    Json(input): Json<UserCreateRequest>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_USER_ADMIN)? {
         return Err(ApiError::Forbidden);
     }
 
     // Check if username is taken
-    let user = match data.get_user_by_username(&body.username) {
+    let user = match data.get_user_by_username(&input.username) {
         Ok(user) => user,
         Err(e) => {
             error!("{:?}", e);
@@ -89,10 +87,10 @@ pub async fn route_users_post(
 
     // Create user
     let user = match data.create_user(
-        body.username.clone(),
+        input.username.clone(),
         None,
-        body.email.clone(),
-        body.ldap_sync.clone(),
+        input.email.clone(),
+        input.ldap_sync.clone(),
     ) {
         Ok(user) => user,
         Err(e) => {
@@ -111,24 +109,16 @@ pub async fn route_users_post(
     };
     let user = user.public(permission_group);
 
-    Ok(web::Json(user))
+    Ok(Json(user))
 }
 
-#[derive(Deserialize)]
-pub struct UserGetInfo {
-    user_id: String,
-}
-
-#[get("/users/{user_id}")]
 pub async fn route_user_get(
-    data: web::Data<Box<dyn StorageImpl>>,
-    info: web::Path<UserGetInfo>,
-    req: HttpRequest,
-) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    Path(user_id): Path<String>,
+    State(data): State<Box<dyn StorageImpl>>,
+    Extension(auth): Extension<AuthStatus>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if auth.user_id == info.user_id {
+    if auth.user_id == user_id {
         // Always allow fetching self
     } else {
         #[allow(clippy::collapsible_else_if)]
@@ -137,7 +127,7 @@ pub async fn route_user_get(
         }
     }
 
-    let user = match data.get_user_by_id(&info.user_id) {
+    let user = match data.get_user_by_id(&user_id) {
         Ok(user) => user,
         Err(e) => {
             error!("{:?}", e);
@@ -160,29 +150,26 @@ pub async fn route_user_get(
     };
     let user = user.public(permission_group);
 
-    Ok(web::Json(user))
+    Ok(Json(user))
 }
 
-#[delete("/users/{user_id}")]
 pub async fn route_user_delete(
-    data: web::Data<Box<dyn StorageImpl>>,
-    info: web::Path<UserGetInfo>,
-    req: HttpRequest,
-) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    Path(user_id): Path<String>,
+    State(data): State<Box<dyn StorageImpl>>,
+    Extension(auth): Extension<AuthStatus>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_USER_ADMIN)? {
         return Err(ApiError::Forbidden);
     }
 
     // Don't allow deleting self
-    if auth.user_id == info.user_id {
+    if auth.user_id == user_id {
         return Err(ApiError::Forbidden);
     }
 
     // Don't allow deleting user with name "admin"
-    let user = match data.get_user_by_id(&info.user_id) {
+    let user = match data.get_user_by_id(&user_id) {
         Ok(user) => user,
         Err(e) => {
             error!("{:?}", e);
@@ -199,7 +186,7 @@ pub async fn route_user_delete(
     }
 
     // Delete user
-    match data.delete_user(&info.user_id) {
+    match data.delete_user(&user_id) {
         Ok(_) => (),
         Err(e) => {
             error!("{:?}", e);
@@ -207,7 +194,7 @@ pub async fn route_user_delete(
         }
     };
 
-    Ok(web::Json(()))
+    Ok(Json(()))
 }
 
 #[derive(Deserialize)]
@@ -215,17 +202,14 @@ pub struct UserPostPasswordData {
     password: String,
 }
 
-#[post("/users/{user_id}/password")]
 pub async fn route_user_password_post(
-    data: web::Data<Box<dyn StorageImpl>>,
-    info: web::Path<UserGetInfo>,
-    req: HttpRequest,
-    body: web::Json<UserPostPasswordData>,
-) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    Path(user_id): Path<String>,
+    State(data): State<Box<dyn StorageImpl>>,
+    Extension(auth): Extension<AuthStatus>,
+    Json(input): Json<UserPostPasswordData>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if auth.user_id == info.user_id {
+    if auth.user_id == user_id {
         if !has_resalt_permission(&auth.perms, P_USER_PASSWORD)? {
             return Err(ApiError::Forbidden);
         }
@@ -237,12 +221,12 @@ pub async fn route_user_password_post(
     }
 
     // Minimum password check
-    if body.password.len() < 8 {
+    if input.password.len() < 8 {
         return Err(ApiError::InvalidRequest);
     }
 
     // Check if user exists
-    let user = match data.get_user_by_id(&info.user_id) {
+    let user = match data.get_user_by_id(&user_id) {
         Ok(user) => user,
         Err(e) => {
             error!("{:?}", e);
@@ -258,7 +242,7 @@ pub async fn route_user_password_post(
     };
 
     // Update password
-    user.password = Some(hash_password(&body.password));
+    user.password = Some(hash_password(&input.password));
 
     match data.update_user(&user) {
         Ok(_) => {}
@@ -268,30 +252,22 @@ pub async fn route_user_password_post(
         }
     }
 
-    Ok(web::Json(()))
+    Ok(Json(()))
 }
 
-#[derive(Deserialize)]
-pub struct UserPermissionInfo {
-    user_id: String,
-    group_id: String,
-}
-
-#[post("/users/{user_id}/permissions/{group_id}")]
 pub async fn route_user_permissions_post(
-    data: web::Data<Box<dyn StorageImpl>>,
-    info: web::Path<UserPermissionInfo>,
-    req: HttpRequest,
-) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    Path(user_id): Path<String>,
+    Path(group_id): Path<String>,
+    State(data): State<Box<dyn StorageImpl>>,
+    Extension(auth): Extension<AuthStatus>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_ADMIN_GROUP)? {
         return Err(ApiError::Forbidden);
     }
 
     // Check if user exists
-    let user = match data.get_user_by_id(&info.user_id) {
+    let user = match data.get_user_by_id(&user_id) {
         Ok(user) => user,
         Err(e) => {
             error!("{:?}", e);
@@ -307,7 +283,7 @@ pub async fn route_user_permissions_post(
     };
 
     // Check if group exists
-    let permission_group = match data.get_permission_group_by_id(&info.group_id) {
+    let permission_group = match data.get_permission_group_by_id(&group_id) {
         Ok(permission_group) => permission_group,
         Err(e) => {
             error!("{:?}", e);
@@ -323,7 +299,7 @@ pub async fn route_user_permissions_post(
     };
 
     // Check if user is already member of that group
-    let user_is_already_member = match data.is_user_member_of_group(&info.user_id, &info.group_id) {
+    let user_is_already_member = match data.is_user_member_of_group(&user_id, &group_id) {
         Ok(user_permission) => user_permission,
         Err(e) => {
             error!("{:?}", e);
@@ -350,24 +326,22 @@ pub async fn route_user_permissions_post(
         }
     }
 
-    Ok(web::Json(()))
+    Ok(Json(()))
 }
 
-#[delete("/users/{user_id}/permissions/{group_id}")]
 pub async fn route_user_permissions_delete(
-    data: web::Data<Box<dyn StorageImpl>>,
-    info: web::Path<UserPermissionInfo>,
-    req: HttpRequest,
-) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    Path(user_id): Path<String>,
+    Path(group_id): Path<String>,
+    State(data): State<Box<dyn StorageImpl>>,
+    Extension(auth): Extension<AuthStatus>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_ADMIN_GROUP)? {
         return Err(ApiError::Forbidden);
     }
 
     // Check if user exists
-    let user = match data.get_user_by_id(&info.user_id) {
+    let user = match data.get_user_by_id(&user_id) {
         Ok(user) => user,
         Err(e) => {
             error!("{:?}", e);
@@ -382,7 +356,7 @@ pub async fn route_user_permissions_delete(
         }
     };
 
-    let permission_group = match data.get_permission_group_by_id(&info.group_id) {
+    let permission_group = match data.get_permission_group_by_id(&group_id) {
         Ok(permission_group) => permission_group,
         Err(e) => {
             error!("{:?}", e);
@@ -414,5 +388,5 @@ pub async fn route_user_permissions_delete(
         }
     }
 
-    Ok(web::Json(()))
+    Ok(Json(()))
 }

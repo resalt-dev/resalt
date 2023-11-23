@@ -1,9 +1,6 @@
 use std::fmt::Display;
 
-use actix_web::{
-    http::{header::ContentType, StatusCode},
-    HttpResponse,
-};
+use axum::http::StatusCode;
 use serde_json::json;
 
 #[allow(dead_code)]
@@ -76,17 +73,5 @@ impl Display for ApiError {
 impl axum::response::IntoResponse for ApiError {
     fn into_response(self) -> axum::response::Response {
         (self.code(), self.message()).into_response()
-    }
-}
-
-impl actix_web::error::ResponseError for ApiError {
-    fn status_code(&self) -> StatusCode {
-        self.code()
-    }
-
-    fn error_response(&self) -> HttpResponse {
-        HttpResponse::build(self.status_code())
-            .insert_header(ContentType::json())
-            .body(self.to_string())
     }
 }

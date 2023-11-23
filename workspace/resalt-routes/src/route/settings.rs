@@ -1,8 +1,4 @@
-use actix_web::{
-    get, post,
-    web::{self},
-    HttpMessage, HttpRequest, Responder, Result,
-};
+use axum::{extract::State, response::IntoResponse, Extension, Json};
 use log::error;
 use resalt_models::{ApiError, AuthStatus, Minion, MinionPreset, PermissionGroup, User};
 use resalt_security::{has_resalt_permission, P_ADMIN_SUPERADMIN};
@@ -20,14 +16,11 @@ pub struct DataDump {
     pub minion_presets: Vec<MinionPreset>,
 }
 
-#[post("/settings/import")]
 pub async fn route_settings_import_post(
-    data: web::Data<Box<dyn StorageImpl>>,
-    input: web::Json<DataDump>,
-    req: HttpRequest,
-) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    State(data): State<Box<dyn StorageImpl>>,
+    Extension(auth): Extension<AuthStatus>,
+    Json(input): Json<DataDump>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_ADMIN_SUPERADMIN)? {
         return Err(ApiError::Forbidden);
@@ -162,16 +155,13 @@ pub async fn route_settings_import_post(
         };
     }
 
-    Ok(web::Json(()))
+    Ok(Json(()))
 }
 
-#[get("/settings/export")]
 pub async fn route_settings_export_get(
-    data: web::Data<Box<dyn StorageImpl>>,
-    req: HttpRequest,
-) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    State(data): State<Box<dyn StorageImpl>>,
+    Extension(auth): Extension<AuthStatus>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_ADMIN_SUPERADMIN)? {
         return Err(ApiError::Forbidden);
@@ -218,5 +208,5 @@ pub async fn route_settings_export_get(
         minions,
         minion_presets,
     };
-    Ok(web::Json(config))
+    Ok(Json(config))
 }

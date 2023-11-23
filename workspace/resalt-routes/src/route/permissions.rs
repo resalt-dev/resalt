@@ -1,4 +1,8 @@
-use actix_web::{delete, get, post, put, web, HttpMessage, HttpRequest, Responder, Result};
+use axum::{
+    extract::{Path, Query, State},
+    response::IntoResponse,
+    Extension, Json,
+};
 use log::*;
 use resalt_models::*;
 use resalt_security::*;
@@ -7,9 +11,9 @@ use serde::{Deserialize, Deserializer};
 use serde_json::Value;
 
 async fn get_group(
-    data: &web::Data<Box<dyn StorageImpl>>,
+    data: &Box<dyn StorageImpl>,
     group_id: &str,
-) -> Result<impl Responder, ApiError> {
+) -> Result<impl IntoResponse, ApiError> {
     let permission_group = match data.get_permission_group_by_id(group_id) {
         Ok(permission_group) => permission_group,
         Err(e) => {
@@ -30,7 +34,7 @@ async fn get_group(
             return Err(ApiError::DatabaseError);
         }
     };
-    Ok(web::Json(permission_group.public(users)))
+    Ok(Json(permission_group.public(users)))
 }
 
 #[derive(Deserialize)]
@@ -39,14 +43,11 @@ pub struct PermissionGroupsListGetQuery {
     offset: Option<i64>,
 }
 
-#[get("/permissions")]
 pub async fn route_permissions_get(
-    data: web::Data<Box<dyn StorageImpl>>,
-    query: web::Query<PermissionGroupsListGetQuery>,
-    req: HttpRequest,
-) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    query: Query<PermissionGroupsListGetQuery>,
+    State(data): State<Box<dyn StorageImpl>>,
+    Extension(auth): Extension<AuthStatus>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_ADMIN_GROUP)? {
         return Err(ApiError::Forbidden);
@@ -75,7 +76,7 @@ pub async fn route_permissions_get(
         };
         results.push(group.public(users));
     }
-    Ok(web::Json(results))
+    Ok(Json(results))
 }
 
 #[derive(Deserialize)]
@@ -83,14 +84,11 @@ pub struct PermissionGroupCreateRequest {
     pub name: String,
 }
 
-#[post("/permissions")]
 pub async fn route_permissions_post(
-    data: web::Data<Box<dyn StorageImpl>>,
-    input: web::Json<PermissionGroupCreateRequest>,
-    req: HttpRequest,
-) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    State(data): State<Box<dyn StorageImpl>>,
+    Extension(auth): Extension<AuthStatus>,
+    Json(input): Json<PermissionGroupCreateRequest>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_ADMIN_GROUP)? {
         return Err(ApiError::Forbidden);
@@ -121,28 +119,20 @@ pub async fn route_permissions_post(
             return Err(ApiError::DatabaseError);
         }
     };
-    Ok(web::Json(permission_group.public(permission_group_users)))
+    Ok(Json(permission_group.public(permission_group_users)))
 }
 
-#[derive(Deserialize)]
-pub struct PermissionInfo {
-    id: String,
-}
-
-#[get("/permissions/{id}")]
 pub async fn route_permission_get(
-    data: web::Data<Box<dyn StorageImpl>>,
-    info: web::Path<PermissionInfo>,
-    req: HttpRequest,
-) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    Path(id): Path<String>,
+    State(data): State<Box<dyn StorageImpl>>,
+    Extension(auth): Extension<AuthStatus>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_ADMIN_GROUP)? {
         return Err(ApiError::Forbidden);
     }
 
-    get_group(&data, &info.id).await
+    get_group(&data, &id).await
 }
 
 #[derive(Deserialize)]
@@ -154,22 +144,19 @@ pub struct PermissionGroupUpdateRequest {
     pub ldap_sync: Option<String>,
 }
 
-#[put("/permissions/{id}")]
-pub async fn route_permission_update(
-    data: web::Data<Box<dyn StorageImpl>>,
-    info: web::Path<PermissionInfo>,
-    input: web::Json<PermissionGroupUpdateRequest>,
-    req: HttpRequest,
-) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+pub async fn route_permission_put(
+    Path(id): Path<String>,
+    State(data): State<Box<dyn StorageImpl>>,
+    Extension(auth): Extension<AuthStatus>,
+    Json(input): Json<PermissionGroupUpdateRequest>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_ADMIN_GROUP)? {
         return Err(ApiError::Forbidden);
     }
 
     // Get permission group
-    let mut permission_group = match data.get_permission_group_by_id(&info.id) {
+    let mut permission_group = match data.get_permission_group_by_id(&id) {
         Ok(Some(permission_group)) => permission_group,
         Ok(None) => return Err(ApiError::NotFound),
         Err(e) => {
@@ -192,7 +179,7 @@ pub async fn route_permission_update(
     };
 
     // Update members
-    match data.list_users_by_permission_group_id(&info.id) {
+    match data.list_users_by_permission_group_id(&id) {
         Ok(users) => {
             for user in users {
                 match data.refresh_user_permissions(&user) {
@@ -210,27 +197,24 @@ pub async fn route_permission_update(
         }
     };
 
-    get_group(&data, &info.id).await
+    get_group(&data, &id).await
 }
 
-#[delete("/permissions/{id}")]
 pub async fn route_permission_delete(
-    data: web::Data<Box<dyn StorageImpl>>,
-    info: web::Path<PermissionInfo>,
-    req: HttpRequest,
-) -> Result<impl Responder, ApiError> {
-    let auth = req.extensions_mut().get::<AuthStatus>().unwrap().clone();
-
+    Path(id): Path<String>,
+    State(data): State<Box<dyn StorageImpl>>,
+    Extension(auth): Extension<AuthStatus>,
+) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if !has_resalt_permission(&auth.perms, P_ADMIN_GROUP)? {
         return Err(ApiError::Forbidden);
     }
 
     // Get the group so we can return it as result
-    let group = get_group(&data, &info.id).await?;
+    let group = get_group(&data, &id).await?;
 
     // Get list of all users, so we can update them after deleting the group
-    let users = match data.list_users_by_permission_group_id(&info.id) {
+    let users = match data.list_users_by_permission_group_id(&id) {
         Ok(users) => users,
         Err(e) => {
             error!("{:?}", e);
@@ -239,7 +223,7 @@ pub async fn route_permission_delete(
     };
 
     // Delete group
-    match &data.delete_permission_group(&info.id) {
+    match &data.delete_permission_group(&id) {
         Ok(()) => (),
         Err(e) => {
             error!("{:?}", e);
@@ -261,6 +245,7 @@ pub async fn route_permission_delete(
     Ok(group)
 }
 
+// This is necessary for "deserialize_null" to work
 fn deserialize_null<'de, D>(d: D) -> Result<Option<String>, D::Error>
 where
     D: Deserializer<'de>,

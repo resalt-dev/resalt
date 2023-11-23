@@ -6,11 +6,9 @@ publish.workspace = true
 
 [dependencies]
 axum = { workspace = true }
-actix-web = { workspace = true }
 env_logger = "0.10.0"
 log = { workspace = true }
 resalt-config = { path = "../resalt-config" }
-resalt-middleware = { path = "../resalt-middleware" }
 resalt-routes = { path = "../resalt-routes" }
 resalt-salt = { path = "../resalt-salt" }
 resalt-scheduler = { path = "../resalt-scheduler" }
@@ -19,3 +17,4 @@ resalt-storage_files = { path = "../resalt-storage-files" }
 resalt-storage_mysql = { path = "../resalt-storage-mysql" }
 resalt-storage_redis = { path = "../resalt-storage-redis" }
 tokio = { workspace = true }
+tower = { workspace = true }
