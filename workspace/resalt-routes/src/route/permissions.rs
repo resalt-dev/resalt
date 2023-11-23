@@ -7,7 +7,7 @@ use log::*;
 use resalt_models::*;
 use resalt_security::*;
 use resalt_storage::StorageImpl;
-use serde::{Deserialize, Deserializer};
+use serde::Deserialize;
 use serde_json::Value;
 
 async fn get_group(
@@ -139,9 +139,6 @@ pub async fn route_permission_get(
 pub struct PermissionGroupUpdateRequest {
     pub name: String,
     pub perms: String, // JSON encoded array
-    // allow ldapSync(string) to be null
-    #[serde(rename = "ldapSync", deserialize_with = "deserialize_null")]
-    pub ldap_sync: Option<String>,
 }
 
 pub async fn route_permission_put(
@@ -168,7 +165,6 @@ pub async fn route_permission_put(
     // Update permission group
     permission_group.name = input.name.clone();
     permission_group.perms = input.perms.clone(); // TODO: Validate JSON
-    permission_group.ldap_sync = input.ldap_sync.clone(); // TODO: Validate LDAP
 
     match data.update_permission_group(&permission_group) {
         Ok(()) => (),
@@ -243,12 +239,4 @@ pub async fn route_permission_delete(
     }
 
     Ok(group)
-}
-
-// This is necessary for "deserialize_null" to work
-fn deserialize_null<'de, D>(d: D) -> Result<Option<String>, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    Deserialize::deserialize(d).map(|x: Option<_>| x.unwrap_or(None))
 }

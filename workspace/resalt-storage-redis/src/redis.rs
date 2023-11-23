@@ -113,7 +113,6 @@ impl StorageImpl for StorageRedis {
         perms: String,
         last_login: Option<ResaltTime>,
         email: Option<String>,
-        ldap_sync: Option<String>,
     ) -> Result<User, String> {
         let mut connection = self.create_connection()?;
         let id = id.unwrap_or(format!("usr_{}", uuid::Uuid::new_v4()));
@@ -124,7 +123,6 @@ impl StorageImpl for StorageRedis {
             perms,
             last_login,
             email: email.clone(),
-            ldap_sync: ldap_sync.clone(),
         };
 
         let values = user.hash();
@@ -663,7 +661,6 @@ impl StorageImpl for StorageRedis {
             id: id.clone(),
             name: name.to_owned(),
             perms: perms.unwrap_or("[]".to_string()),
-            ldap_sync: None,
         };
 
         let values = permission_group.hash();
@@ -721,38 +718,6 @@ impl StorageImpl for StorageRedis {
         let permission_group: PermissionGroup = PermissionGroup::dehash(id.to_string(), values);
 
         Ok(Some(permission_group))
-    }
-
-    fn get_permission_group_by_ldap_sync(
-        &self,
-        ldap_sync: &str,
-    ) -> Result<Option<PermissionGroup>, String> {
-        let mut conn_iter = self.create_connection()?;
-        let mut conn_lookup = self.create_connection()?;
-        // If permission_group doesn't exist, return None
-
-        // Search for Hashmap where permission_group:*.ldap_sync == ldap_sync
-        let keys: Iter<'_, String> = conn_iter
-            .scan_match("permission_group:*")
-            .map_err(|e| format!("{:?}", e))?;
-
-        for key in keys {
-            let id: String = key.split(':').last().unwrap().to_string();
-            let values: Vec<(String, String)> = conn_lookup
-                .hgetall(key.as_str())
-                .map_err(|e| format!("{:?}", e))?;
-            if values.is_empty() {
-                continue;
-            }
-
-            let permission_group: PermissionGroup = PermissionGroup::dehash(id, values);
-
-            if permission_group.ldap_sync == Some(ldap_sync.to_string()) {
-                return Ok(Some(permission_group));
-            }
-        }
-
-        Ok(None)
     }
 
     fn is_user_member_of_group(&self, user_id: &str, group_id: &str) -> Result<bool, String> {

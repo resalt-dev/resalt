@@ -79,7 +79,6 @@ diesel::table! {
         id -> Varchar,
         name -> Varchar,
         perms -> Text,
-        ldap_sync -> Nullable<Varchar>,
     }
 }
 
@@ -91,7 +90,6 @@ diesel::table! {
         perms -> Text,
         last_login -> Nullable<Timestamp>,
         email -> Nullable<Varchar>,
-        ldap_sync -> Nullable<Varchar>,
     }
 }
 

@@ -60,44 +60,6 @@ static SETTINGS: Lazy<RwLock<Config>> = Lazy::new(|| {
 static AUTH_FORWARD_ENABLED: Lazy<bool> =
     Lazy::new(|| conf!("auth.forward.enabled").parse().unwrap());
 
-static AUTH_LDAP_ENABLED: Lazy<bool> = Lazy::new(|| conf!("auth.ldap.enabled").parse().unwrap());
-static AUTH_LDAP_HOST: Lazy<String> = Lazy::new(|| conf!("auth.ldap.host"));
-static AUTH_LDAP_PORT: Lazy<u16> = Lazy::new(|| conf!("auth.ldap.port").parse().unwrap());
-static AUTH_LDAP_URL: Lazy<String> = Lazy::new(|| {
-    format!(
-        "{}://{}:{}",
-        if *AUTH_LDAP_TLS_LDAPS {
-            "ldaps"
-        } else {
-            "ldap"
-        },
-        *AUTH_LDAP_HOST,
-        *AUTH_LDAP_PORT
-    )
-});
-static AUTH_LDAP_BASE_DN: Lazy<String> = Lazy::new(|| conf!("auth.ldap.basedn"));
-
-static AUTH_LDAP_TLS_LDAPS: Lazy<bool> =
-    Lazy::new(|| conf!("auth.ldap.tls.ldaps").parse().unwrap());
-static AUTH_LDAP_TLS_STARTTLS: Lazy<bool> =
-    Lazy::new(|| conf!("auth.ldap.tls.starttls").parse().unwrap());
-static AUTH_LDAP_TLS_SKIPVERIFY: Lazy<bool> =
-    Lazy::new(|| conf!("auth.ldap.tls.skipverify").parse().unwrap());
-
-static AUTH_LDAP_BIND_DN: Lazy<String> = Lazy::new(|| conf!("auth.ldap.bind.dn"));
-static AUTH_LDAP_BIND_PASSWORDFILE: Lazy<String> =
-    Lazy::new(|| conf!("auth.ldap.bind.passwordfile"));
-static AUTH_LDAP_BIND_PASSWORD: Lazy<String> =
-    Lazy::new(|| match AUTH_LDAP_BIND_PASSWORDFILE.clone().len() {
-        0 => conf!("auth.ldap.bind.password"),
-        _ => std::fs::read_to_string(AUTH_LDAP_BIND_PASSWORDFILE.clone())
-            .unwrap()
-            .trim()
-            .to_string(),
-    });
-static AUTH_LDAP_USER_FILTER: Lazy<String> = Lazy::new(|| conf!("auth.ldap.user.filter"));
-static AUTH_LDAP_USER_ATTR: Lazy<String> = Lazy::new(|| conf!("auth.ldap.user.attribute"));
-
 static AUTH_SESSION_LIFESPAN: Lazy<u64> =
     Lazy::new(|| conf!("auth.session.lifespan").parse().unwrap());
 
@@ -138,42 +100,6 @@ pub struct SConfig {}
 impl SConfig {
     pub fn auth_forward_enabled() -> bool {
         *AUTH_FORWARD_ENABLED
-    }
-
-    pub fn auth_ldap_enabled() -> bool {
-        *AUTH_LDAP_ENABLED
-    }
-
-    pub fn auth_ldap_url() -> String {
-        AUTH_LDAP_URL.clone()
-    }
-
-    pub fn auth_ldap_base_dn() -> String {
-        AUTH_LDAP_BASE_DN.clone()
-    }
-
-    pub fn auth_ldap_start_tls() -> bool {
-        *AUTH_LDAP_TLS_STARTTLS
-    }
-
-    pub fn auth_ldap_skip_tls_verify() -> bool {
-        *AUTH_LDAP_TLS_SKIPVERIFY
-    }
-
-    pub fn auth_ldap_bind_dn() -> String {
-        AUTH_LDAP_BIND_DN.clone()
-    }
-
-    pub fn auth_ldap_bind_password() -> String {
-        AUTH_LDAP_BIND_PASSWORD.clone()
-    }
-
-    pub fn auth_ldap_user_filter() -> String {
-        AUTH_LDAP_USER_FILTER.clone()
-    }
-
-    pub fn auth_ldap_user_attribute() -> String {
-        AUTH_LDAP_USER_ATTR.clone()
     }
 
     pub fn auth_session_lifespan() -> u64 {
@@ -242,15 +168,6 @@ mod tests {
         // Ensure all the default configs parsed without error.
         // If this test fails, it means the config file is missing a default value.
         SConfig::auth_forward_enabled();
-        SConfig::auth_ldap_enabled();
-        SConfig::auth_ldap_url();
-        SConfig::auth_ldap_base_dn();
-        SConfig::auth_ldap_start_tls();
-        SConfig::auth_ldap_skip_tls_verify();
-        SConfig::auth_ldap_bind_dn();
-        SConfig::auth_ldap_bind_password();
-        SConfig::auth_ldap_user_filter();
-        SConfig::auth_ldap_user_attribute();
         SConfig::auth_session_lifespan();
         SConfig::database_type();
         SConfig::database_username();

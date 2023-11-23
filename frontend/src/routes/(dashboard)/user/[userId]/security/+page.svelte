@@ -105,7 +105,6 @@
 								id="password1"
 								type="password"
 								class="form-control {passwordFieldError ? 'is-invalid' : ''}"
-								disabled={$user.ldapSync !== null}
 								bind:value={passwordFieldValue}
 								on:blur={validatePasswordField}
 							/>
@@ -119,18 +118,11 @@
 								repeatPasswordFieldValue.length > 0
 									? 'is-invalid'
 									: ''}"
-								disabled={$user.ldapSync !== null}
 								bind:value={repeatPasswordFieldValue}
 								on:keyup={validateRepeatPasswordField}
 							/>
 							<label class="form-label" for="password2">Confirm password</label>
 						</div>
-						{#if $user.ldapSync !== null}
-							<p class="text-muted mt-3">
-								This user is synced with LDAP. Passwords can only be changed in
-								LDAP.
-							</p>
-						{/if}
 						{#if passwordFieldError}
 							<p class="text-danger mt-3">
 								Password must be at least {PASSWORD_MIN_LENGTH} characters long.
@@ -139,10 +131,8 @@
 						{#if repeatPasswordFieldError}
 							<p class="text-danger mt-3">Passwords do not match.</p>
 						{/if}
-						<button
-							disabled={$user.ldapSync !== null}
-							class="btn btn-{$theme.color}"
-							on:click={updatePassword}>Update</button
+						<button class="btn btn-{$theme.color}" on:click={updatePassword}
+							>Update</button
 						>
 					</div>
 				</div>

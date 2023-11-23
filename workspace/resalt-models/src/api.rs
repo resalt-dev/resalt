@@ -13,7 +13,6 @@ pub enum ApiError {
     InvalidRequest,               // Invalid request
     InternalError,                // Internal error
     InternalErrorMessage(String), // Internal error with custom message
-    LdapError,                    // LDAP error
     DatabaseError,                // Database error
 }
 
@@ -30,7 +29,6 @@ impl ApiError {
             // Internal server errors
             ApiError::InternalError => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::InternalErrorMessage(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::LdapError => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::DatabaseError => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
@@ -46,9 +44,6 @@ impl ApiError {
                 String::from("Internal error, please contact the system administrator")
             }
             ApiError::InternalErrorMessage(str) => str.clone(),
-            ApiError::LdapError => {
-                String::from("LDAP error, please contact the system administrator")
-            }
             ApiError::DatabaseError => {
                 String::from("Database error, please contact the system administrator")
             }

@@ -75,16 +75,6 @@
 							{/if}
 						</span>
 					</li>
-					<li class="list-group-item">
-						<strong>LDAP Sync DN</strong>
-						<span class="float-end">
-							{#if $user.ldapSync}
-								{$user.ldapSync}
-							{:else}
-								<em>Not set</em>
-							{/if}
-						</span>
-					</li>
 				</ul>
 			</div>
 		</div>

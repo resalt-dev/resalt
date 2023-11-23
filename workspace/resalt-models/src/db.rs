@@ -110,9 +110,7 @@ impl Job {
     pub fn hash(&self) -> Vec<(&str, String)> {
         let mut values = Vec::from([(
             "timestamp",
-            self.timestamp
-                .format("%Y-%m-%d %H:%M:%S")
-                .to_string(),
+            self.timestamp.format("%Y-%m-%d %H:%M:%S").to_string(),
         )]);
         if let Some(user) = &self.user {
             values.push(("user", user.clone()));
@@ -373,8 +371,6 @@ pub struct User {
     #[serde(rename = "lastLogin")]
     pub last_login: Option<ResaltTime>,
     pub email: Option<String>,
-    #[serde(rename = "ldapSync")]
-    pub ldap_sync: Option<String>,
 }
 
 impl User {
@@ -428,9 +424,6 @@ impl User {
         if let Some(email) = &self.email {
             values.push(("email", email.clone()));
         }
-        if let Some(ldap_sync) = &self.ldap_sync {
-            values.push(("ldap_sync", ldap_sync.clone()));
-        }
         values
     }
 
@@ -442,7 +435,6 @@ impl User {
             perms: "[]".to_string(),
             last_login: None,
             email: None,
-            ldap_sync: None,
         };
         for (key, value) in values {
             match key.as_str() {
@@ -454,7 +446,6 @@ impl User {
                         Some(ResaltTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap())
                 }
                 "email" => user.email = Some(value),
-                "ldap_sync" => user.ldap_sync = Some(value),
                 _ => (),
             }
         }
@@ -467,8 +458,6 @@ pub struct PermissionGroup {
     pub id: String,
     pub name: String,
     pub perms: String,
-    #[serde(rename = "ldapSync")]
-    pub ldap_sync: Option<String>,
 }
 
 impl PermissionGroup {
@@ -481,7 +470,6 @@ impl PermissionGroup {
             "id": self.id,
             "name": self.name,
             "perms": perms,
-            "ldapSync": self.ldap_sync,
             "users": users.iter().map(|u| json!({
                 "id": u.id,
                 "username": u.username,
@@ -490,10 +478,7 @@ impl PermissionGroup {
     }
 
     pub fn hash(&self) -> Vec<(&str, String)> {
-        let mut values = Vec::from([("name", self.name.clone()), ("perms", self.perms.clone())]);
-        if let Some(ldap_sync) = &self.ldap_sync {
-            values.push(("ldap_sync", ldap_sync.clone()));
-        }
+        let values = Vec::from([("name", self.name.clone()), ("perms", self.perms.clone())]);
         values
     }
 
@@ -502,13 +487,11 @@ impl PermissionGroup {
             id,
             name: "".to_string(),
             perms: "[]".to_string(),
-            ldap_sync: None,
         };
         for (key, value) in values {
             match key.as_str() {
                 "name" => permission_group.name = value,
                 "perms" => permission_group.perms = value,
-                "ldap_sync" => permission_group.ldap_sync = Some(value),
                 _ => (),
             }
         }
@@ -532,7 +515,6 @@ pub struct MinionPreset {
 
 impl MinionPreset {
     pub fn hash(&self) -> Vec<(&str, String)> {
-        
         Vec::from([("name", self.name.clone()), ("filter", self.filter.clone())])
     }
 

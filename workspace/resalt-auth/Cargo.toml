@@ -7,7 +7,6 @@ publish.workspace = true
 [dependencies]
 log = { workspace = true }
 resalt-config = { path = "../resalt-config" }
-resalt-ldap = { path = "../resalt-ldap" }
 resalt-models = { path = "../resalt-models" }
 resalt-salt = { path = "../resalt-salt" }
 resalt-security = { path = "../resalt-security" }

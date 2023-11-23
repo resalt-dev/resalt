@@ -1,6 +1,5 @@
 use log::*;
 use resalt_config::SConfig;
-use resalt_ldap::{sync_ldap_groups, LdapHandler};
 use resalt_models::*;
 use resalt_salt::SaltAPI;
 use resalt_security::verify_password;
@@ -126,11 +125,6 @@ pub fn auth_login_classic(
         }
     };
 
-    // Check if they are local user
-    if user.ldap_sync.is_some() {
-        return Ok(None);
-    }
-
     // Check password
     let user_pass = match &user.password {
         Some(user_pass) => user_pass,
@@ -141,51 +135,4 @@ pub fn auth_login_classic(
     }
 
     Ok(Some(user))
-}
-
-#[allow(clippy::borrowed_box)]
-pub async fn auth_login_ldap(
-    data: &Box<dyn StorageImpl>,
-    username: &str,
-    password: &str,
-) -> Result<Option<User>, ApiError> {
-    let ldap_user = match LdapHandler::authenticate(username, password).await {
-        Ok(Some(user)) => user,
-        Ok(None) => return Ok(None),
-        Err(e) => {
-            error!("auth_login_ldap {:?}", e);
-            return Err(ApiError::LdapError);
-        }
-    };
-
-    // Fetch user in Database
-    let user = match data.get_user_by_username(&ldap_user.username) {
-        Ok(Some(user)) => Some(user),
-        Ok(None) => {
-            // Create user if doesn't exist in DB, as LDAP auth was successful.
-            match data.create_user(
-                ldap_user.username.clone(),
-                None,
-                Some(ldap_user.email.clone()),
-                Some(ldap_user.dn.clone()),
-            ) {
-                Ok(user) => Some(user),
-                Err(e) => {
-                    error!("{:?}", e);
-                    return Err(ApiError::DatabaseError);
-                }
-            }
-        }
-        Err(e) => {
-            error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
-        }
-    };
-
-    if let Some(user) = &user {
-        // Sync LDAP groups
-        sync_ldap_groups(data, user, Some(&ldap_user))?;
-    }
-
-    Ok(user)
 }

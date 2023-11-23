@@ -167,7 +167,6 @@ impl StorageImpl for StorageMySQL {
         perms: String,
         last_login: Option<ResaltTime>,
         email: Option<String>,
-        ldap_sync: Option<String>,
     ) -> Result<User, String> {
         let mut connection = self.create_connection()?;
         let id = id.unwrap_or(format!("usr_{}", uuid::Uuid::new_v4()));
@@ -178,7 +177,6 @@ impl StorageImpl for StorageMySQL {
             perms,
             last_login: last_login.map(|rt| rt.into()),
             email,
-            ldap_sync,
         };
 
         diesel::insert_into(users::table)
@@ -882,7 +880,6 @@ impl StorageImpl for StorageMySQL {
             id: id.clone(),
             name: name.to_owned(),
             perms: perms.unwrap_or("[]".to_string()),
-            ldap_sync: None,
         }
         .into();
         diesel::insert_into(permission_groups::table)
@@ -924,19 +921,6 @@ impl StorageImpl for StorageMySQL {
             .map(|v| v.map(|v| v.into()))
     }
 
-    fn get_permission_group_by_ldap_sync(
-        &self,
-        ldap_sync: &str,
-    ) -> Result<Option<PermissionGroup>, String> {
-        let mut connection = self.create_connection()?;
-        permission_groups::table
-            .filter(permission_groups::ldap_sync.eq(ldap_sync))
-            .first::<SQLPermissionGroup>(&mut connection)
-            .optional()
-            .map_err(|e| format!("{:?}", e))
-            .map(|v| v.map(|v| v.into()))
-    }
-
     fn is_user_member_of_group(&self, user_id: &str, group_id: &str) -> Result<bool, String> {
         let mut connection = self.create_connection()?;
         permission_group_users::table
@@ -952,11 +936,10 @@ impl StorageImpl for StorageMySQL {
         let mut connection = self.create_connection()?;
         diesel::update(permission_groups::table)
             .filter(permission_groups::id.eq(&permission_group.id))
-            // set name, perms, ldap_sync
+            // set name, perms
             .set((
                 permission_groups::name.eq(&permission_group.name),
                 permission_groups::perms.eq(&permission_group.perms),
-                permission_groups::ldap_sync.eq(&permission_group.ldap_sync),
             ))
             .execute(&mut connection)
             .map_err(|e| format!("{:?}", e))?;

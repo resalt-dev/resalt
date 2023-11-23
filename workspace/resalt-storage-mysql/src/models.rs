@@ -221,7 +221,6 @@ pub struct SQLUser {
     pub perms: String,
     pub last_login: Option<chrono::NaiveDateTime>,
     pub email: Option<String>,
-    pub ldap_sync: Option<String>,
 }
 
 impl From<User> for SQLUser {
@@ -233,7 +232,6 @@ impl From<User> for SQLUser {
             perms: user.perms,
             last_login: user.last_login.map(|rt| rt.into()),
             email: user.email,
-            ldap_sync: user.ldap_sync,
         }
     }
 }
@@ -247,7 +245,6 @@ impl From<SQLUser> for User {
             perms: sql_user.perms,
             last_login: sql_user.last_login.map(|rt| rt.into()),
             email: sql_user.email,
-            ldap_sync: sql_user.ldap_sync,
         }
     }
 }
@@ -258,7 +255,6 @@ pub struct SQLPermissionGroup {
     pub id: String,
     pub name: String,
     pub perms: String,
-    pub ldap_sync: Option<String>,
 }
 
 impl From<PermissionGroup> for SQLPermissionGroup {
@@ -267,7 +263,6 @@ impl From<PermissionGroup> for SQLPermissionGroup {
             id: permission_group.id,
             name: permission_group.name,
             perms: permission_group.perms,
-            ldap_sync: permission_group.ldap_sync,
         }
     }
 }
@@ -278,7 +273,6 @@ impl From<SQLPermissionGroup> for PermissionGroup {
             id: sql_permission_group.id,
             name: sql_permission_group.name,
             perms: sql_permission_group.perms,
-            ldap_sync: sql_permission_group.ldap_sync,
         }
     }
 }

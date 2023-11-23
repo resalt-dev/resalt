@@ -54,7 +54,6 @@ pub async fn route_settings_import_post(
                 user.perms.clone(),
                 user.last_login,
                 user.email.clone(),
-                user.ldap_sync.clone(),
             ) {
                 Ok(_) => {}
                 Err(e) => {

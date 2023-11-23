@@ -180,7 +180,6 @@ impl StorageImpl for StorageFiles {
         perms: String,
         last_login: Option<ResaltTime>,
         email: Option<String>,
-        ldap_sync: Option<String>,
     ) -> Result<User, String> {
         let id = id.unwrap_or(format!("usr_{}", uuid::Uuid::new_v4()));
         let user = User {
@@ -190,7 +189,6 @@ impl StorageImpl for StorageFiles {
             perms,
             last_login,
             email: email.clone(),
-            ldap_sync: ldap_sync.clone(),
         };
 
         let path = format!("users/{}.json", id);
@@ -645,7 +643,6 @@ impl StorageImpl for StorageFiles {
             id: id.clone(),
             name: name.to_owned(),
             perms: perms.unwrap_or("[]".to_string()),
-            ldap_sync: None,
         };
 
         let path = format!("permission_groups/{}", id);
@@ -693,14 +690,6 @@ impl StorageImpl for StorageFiles {
             self.load_file(&format!("permission_groups/{}", id))?;
 
         Ok(Some(permission_group))
-    }
-
-    /// DEPRECATED
-    fn get_permission_group_by_ldap_sync(
-        &self,
-        _ldap_sync: &str,
-    ) -> Result<Option<PermissionGroup>, String> {
-        Ok(None)
     }
 
     fn is_user_member_of_group(&self, user_id: &str, group_id: &str) -> Result<bool, String> {

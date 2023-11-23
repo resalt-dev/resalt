@@ -4,12 +4,8 @@ use axum::response::IntoResponse;
 use axum::Json;
 use log::*;
 use resalt_auth::auth_login_classic;
-use resalt_auth::auth_login_ldap;
 use resalt_auth::renew_token_salt_token;
 use resalt_config::SConfig;
-use resalt_ldap::sync_ldap_groups;
-use resalt_ldap::LdapHandler;
-use resalt_ldap::LdapUser;
 use resalt_models::{ApiError, User};
 use resalt_salt::SaltAPI;
 use resalt_storage::StorageImpl;
@@ -37,7 +33,7 @@ pub async fn route_login_post(
 ) -> Result<impl IntoResponse, ApiError> {
     let user: User = if SConfig::auth_forward_enabled() {
         // Use X-Forwarded-User header as username
-        let mut username = match headers.get("X-Forwarded-User") {
+        let username = match headers.get("X-Forwarded-User") {
             Some(forwarded_user) => forwarded_user.to_str().unwrap().to_string(),
             None => return Err(ApiError::Unauthorized),
         };
@@ -48,47 +44,16 @@ pub async fn route_login_post(
             Ok(Some(user)) => user,
             // User DOES NOT exist, but we are in AuthForward, so create user
             Ok(None) => {
-                // Check if we are in LDAP or not
-                let mut ldap_user: Option<LdapUser> = None;
-                let mut email: Option<String> = None;
-                let mut ldap_sync: Option<String> = None;
-                if SConfig::auth_ldap_enabled() {
-                    // Fetch user from LDAP
-                    ldap_user = match LdapHandler::lookup_user_by_username(&username).await {
-                        // User was found in LDAP, lets link
-                        Ok(Some(ldap_user)) => {
-                            username = ldap_user.username.clone();
-                            email = Some(ldap_user.email.clone());
-                            ldap_sync = Some(ldap_user.dn.clone());
-                            Some(ldap_user)
-                        }
-                        // User was NOT found in LDAP,
-                        Ok(None) => return Err(ApiError::Unauthorized),
-                        Err(e) => {
-                            error!("route_auth_login_post {:?}", e);
-                            return Err(ApiError::LdapError);
-                        }
-                    };
-                }
+                let email: Option<String> = None;
 
                 // Create user
-                let user = match data.create_user(username, None, email, ldap_sync) {
+                let user = match data.create_user(username, None, email) {
                     Ok(user) => user,
                     Err(e) => {
                         error!("Failed creating user {:?}", e);
                         return Err(ApiError::DatabaseError);
                     }
                 };
-
-                if let Some(ldap_user) = ldap_user {
-                    match sync_ldap_groups(&data, &user, Some(&ldap_user)) {
-                        Ok(_) => {}
-                        Err(e) => {
-                            error!("Failed syncing LDAP groups {:?}", e);
-                            return Err(ApiError::LdapError);
-                        }
-                    }
-                }
 
                 user
             }
@@ -110,14 +75,8 @@ pub async fn route_login_post(
         match user {
             Some(user) => user,
             None => {
-                debug!("Classic user not found, testing LDAP");
-                match auth_login_ldap(&data, &username, &password).await {
-                    Ok(user) => match user {
-                        Some(user) => user,
-                        None => return Err(ApiError::Unauthorized),
-                    },
-                    Err(e) => return Err(e),
-                }
+                info!("User not found: {}", &username);
+                return Err(ApiError::Unauthorized);
             }
         }
     };

@@ -5,17 +5,10 @@
 	import { theme, toasts } from '$lib/stores';
 	import { MessageType } from '$model/MessageType';
 
-	// Depending on if creating LOCAL or LDAP user, different fields are shown.
-	// Email is only shown if creating LOCAL user, as otherwise synced from LDAP.
-	// LDAP Sync is only shown if creating LDAP user.
-
-	let userLDAPFieldValue = false;
 	let userUsernameFieldValue = '';
 	let userUsernameFieldError = false;
 	let userEmailFieldValue = '';
 	let userEmailFieldError = false;
-	let userLDAPSyncFieldValue = '';
-	let userLDAPSyncFieldError = false;
 
 	function _create(): void {
 		if (!_validate()) {
@@ -25,7 +18,6 @@
 		createUser(
 			userUsernameFieldValue,
 			userEmailFieldValue.length === 0 ? null : userEmailFieldValue,
-			userLDAPSyncFieldValue.length === 0 ? null : userLDAPSyncFieldValue,
 		)
 			.then((user) => {
 				goto(paths.user_info.getPath({ userId: user.id }));
@@ -43,17 +35,8 @@
 	function _validate(): boolean {
 		validateUserUsernameField();
 		validateUserEmailField();
-		validateUserLDAPSyncField();
 
-		if (userLDAPFieldValue) {
-			return !userUsernameFieldError && !userLDAPSyncFieldError;
-		} else {
-			return !userUsernameFieldError && !userEmailFieldError;
-		}
-	}
-
-	function validateUserLDAPField(): void {
-		//
+		return !userUsernameFieldError && !userEmailFieldError;
 	}
 
 	function validateUserUsernameField(): void {
@@ -62,10 +45,6 @@
 
 	function validateUserEmailField(): void {
 		userEmailFieldError = false;
-	}
-
-	function validateUserLDAPSyncField(): void {
-		userLDAPSyncFieldError = false;
 	}
 </script>
 
@@ -89,52 +68,18 @@
 					<label class="form-label" for="userUsername">Username</label>
 				</div>
 			</div>
-			<div class="col col-md-2 col-lg-1 mb-0">
-				<div class="d-flex justify-content-center">
-					<label class="form-label mb-0 me-2" for="userLDAP">LDAP</label>
-				</div>
-				<div class="clearfix" />
-				<div class="d-flex justify-content-center">
-					<div class="form-floating mb-3 ps-0">
-						<div class="fs-3 mt-0 form-check form-switch">
-							<input
-								id="userLDAP"
-								type="checkbox"
-								class="form-check-input"
-								bind:checked={userLDAPFieldValue}
-								on:blur={validateUserLDAPField}
-							/>
-						</div>
-					</div>
+			<div class="col col-md-5 col-lg-3 mb-0">
+				<div class="form-floating mb-3">
+					<input
+						id="userEmail"
+						type="email"
+						class="form-control {userEmailFieldError ? 'is-invalid' : ''}"
+						bind:value={userEmailFieldValue}
+						on:blur={validateUserEmailField}
+					/>
+					<label class="form-label" for="userEmail">Email (optional)</label>
 				</div>
 			</div>
-			{#if userLDAPFieldValue}
-				<div class="col col-md-5 col-lg-5 mb-0">
-					<div class="form-floating mb-3">
-						<input
-							id="userLDAPSync"
-							type="text"
-							class="form-control {userLDAPSyncFieldError ? 'is-invalid' : ''}"
-							bind:value={userLDAPSyncFieldValue}
-							on:blur={validateUserLDAPSyncField}
-						/>
-						<label class="form-label" for="userLDAPSync">LDAP Sync DN</label>
-					</div>
-				</div>
-			{:else}
-				<div class="col col-md-5 col-lg-3 mb-0">
-					<div class="form-floating mb-3">
-						<input
-							id="userEmail"
-							type="email"
-							class="form-control {userEmailFieldError ? 'is-invalid' : ''}"
-							bind:value={userEmailFieldValue}
-							on:blur={validateUserEmailField}
-						/>
-						<label class="form-label" for="userEmail">Email (optional)</label>
-					</div>
-				</div>
-			{/if}
 		</div>
 
 		<button type="button" class="btn btn-{$theme.color}" on:click={_create}>Create User</button>

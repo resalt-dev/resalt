@@ -58,8 +58,6 @@ pub async fn route_users_get(
 pub struct UserCreateRequest {
     pub username: String,
     pub email: Option<String>,
-    #[serde(rename = "ldapSync")]
-    pub ldap_sync: Option<String>,
 }
 
 pub async fn route_users_post(
@@ -86,12 +84,7 @@ pub async fn route_users_post(
     }
 
     // Create user
-    let user = match data.create_user(
-        input.username.clone(),
-        None,
-        input.email.clone(),
-        input.ldap_sync.clone(),
-    ) {
+    let user = match data.create_user(input.username.clone(), None, input.email.clone()) {
         Ok(user) => user,
         Err(e) => {
             error!("{:?}", e);

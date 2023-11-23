@@ -23,12 +23,7 @@ pub trait StorageImpl: Send + Sync {
 
             // Create initial admin user
             let mut user = self
-                .create_user(
-                    "admin".to_string(),
-                    Some(random_password.to_string()),
-                    None,
-                    None,
-                )
+                .create_user("admin".to_string(), Some(random_password.to_string()), None)
                 .unwrap();
 
             // Give permissions to admin
@@ -114,7 +109,6 @@ pub trait StorageImpl: Send + Sync {
         username: String,
         password: Option<String>,
         email: Option<String>,
-        ldap_sync: Option<String>,
     ) -> Result<User, String> {
         self.create_user_hashed(
             None,
@@ -123,7 +117,6 @@ pub trait StorageImpl: Send + Sync {
             "[]".to_string(),
             None,
             email,
-            ldap_sync,
         )
     }
 
@@ -136,7 +129,6 @@ pub trait StorageImpl: Send + Sync {
         perms: String,
         last_login: Option<ResaltTime>,
         email: Option<String>,
-        ldap_sync: Option<String>,
     ) -> Result<User, String>;
 
     fn list_users(&self, limit: Option<i64>, offset: Option<i64>) -> Result<Vec<User>, String>;
@@ -383,11 +375,6 @@ pub trait StorageImpl: Send + Sync {
     ) -> Result<Vec<PermissionGroup>, String>;
 
     fn get_permission_group_by_id(&self, id: &str) -> Result<Option<PermissionGroup>, String>;
-
-    fn get_permission_group_by_ldap_sync(
-        &self,
-        ldap_sync: &str,
-    ) -> Result<Option<PermissionGroup>, String>;
 
     fn is_user_member_of_group(&self, user_id: &str, group_id: &str) -> Result<bool, String>;
 

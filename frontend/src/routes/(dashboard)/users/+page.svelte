@@ -68,11 +68,6 @@ Search box here.
 						<div class="col-auto align-self-center">ID</div>
 					</div>
 				</th>
-				<th class="border-secondary bg-dark text-white">
-					<div class="row g-1">
-						<div class="col-auto align-self-center">LDAP</div>
-					</div>
-				</th>
 				<th class="border-secondary bg-dark text-white" />
 			</tr>
 		</thead>
@@ -99,13 +94,6 @@ Search box here.
 							</a>
 						</Clickable>
 						<td>{user.id}</td>
-						<td>
-							{#if user.ldapSync !== null}
-								<span class="badge bg-{$theme.color}"> Yes </span>
-							{:else}
-								<span class="badge bg-dark"> No </span>
-							{/if}
-						</td>
 						<td>
 							<a
 								href={paths.user_info.getPath({ userId: user.id })}

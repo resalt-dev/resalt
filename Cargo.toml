@@ -4,8 +4,6 @@ members = [
     "workspace/resalt-*",
 # "resalt-auth"
 # "resalt-config"
-# "resalt-ldap"
-# "resalt-middleware"
 # "resalt-models"
 # "resalt-routes"
 # "resalt-salt"
