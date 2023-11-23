@@ -1,9 +1,8 @@
-use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
 
-use lazy_static::lazy_static;
 use log::*;
+use once_cell::sync::Lazy;
 use reqwest::Client;
 
 const UPDATE_URL: &str = "https://secure.resalt.dev/Cargo.toml";
@@ -14,23 +13,25 @@ pub struct UpdateInfo {
     pub news: Option<Vec<String>>,
 }
 
-lazy_static! {
-    static ref CACHE: Arc<Mutex<UpdateInfo>> = Arc::new(Mutex::new(UpdateInfo {
+static CACHE: Lazy<std::sync::Mutex<UpdateInfo>> = Lazy::new(|| {
+    std::sync::Mutex::new(UpdateInfo {
         version: None,
         news: None,
-    }));
-    pub static ref CURRENT_VERSION: String = include_str!("../../../Cargo.toml")
+    })
+});
+
+pub static CURRENT_VERSION: Lazy<String> = Lazy::new(|| {
+    include_str!("../../../Cargo.toml")
         .lines()
         .find(|line| line.starts_with("version = "))
         .and_then(|line| line.split('=').nth(1))
         .map(|v| v.trim())
         .map(|v| v.trim_matches('"'))
         .unwrap_or("unknown")
-        .to_string();
-}
+        .to_string()
+});
 
-async fn fetch_update_info() -> Result<UpdateInfo, String> {
-    let client = Client::new();
+async fn fetch_update_info(client: &Client) -> Result<UpdateInfo, String> {
     let resp = client
         .get(UPDATE_URL)
         .send()
@@ -116,8 +117,9 @@ async fn fetch_update_info() -> Result<UpdateInfo, String> {
 }
 
 pub async fn update_loop() {
+    let client = Client::new();
     loop {
-        let update_info = match fetch_update_info().await {
+        let update_info = match fetch_update_info(&client).await {
             Ok(update_info) => update_info,
             Err(e) => {
                 error!("Error fetching remote version: {}", e);

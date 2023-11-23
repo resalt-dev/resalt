@@ -1,5 +1,6 @@
 use ldap3::{Ldap, LdapConnAsync, LdapConnSettings, LdapError, Scope, SearchEntry};
 use log::*;
+use once_cell::sync::Lazy;
 use resalt_config::SConfig;
 use resalt_models::{ApiError, User};
 use resalt_storage::StorageImpl;
@@ -11,11 +12,11 @@ pub struct LdapUser {
     pub groups: Vec<String>,
 }
 
-lazy_static::lazy_static! {
-    static ref LDAP_SETTINGS: LdapConnSettings = LdapConnSettings::new()
+static LDAP_SETTINGS: Lazy<LdapConnSettings> = Lazy::new(|| {
+    LdapConnSettings::new()
         .set_starttls(SConfig::auth_ldap_start_tls())
-        .set_no_tls_verify(SConfig::auth_ldap_skip_tls_verify());
-}
+        .set_no_tls_verify(SConfig::auth_ldap_skip_tls_verify())
+});
 
 pub struct LdapHandler {}
 

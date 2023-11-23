@@ -13,5 +13,5 @@ reqwest = { workspace = true }
 resalt-config = { path = "../resalt-config" }
 resalt-models = { path = "../resalt-models" }
 resalt-storage = { path = "../resalt-storage" }
-serde = { version = "1.0.139", features = ["derive"] }
-serde_json = "1.0.82"
+serde = { workspace = true }
+serde_json = { workspace = true }

@@ -5,13 +5,13 @@ edition.workspace = true
 publish.workspace = true
 
 [dependencies]
+log = { workspace = true }
+r2d2 = "0.8.10"
+rand = "0.8.5"
+redis = { version = "0.23.1", features = ['r2d2'] }
 resalt-config = { path = "../resalt-config" }
 resalt-models = { path = "../resalt-models" }
 resalt-security = { path = "../resalt-security" }
 resalt-storage = { path = "../resalt-storage" }
-redis = { version = "0.23.1", features = ['r2d2'] }
-r2d2 = "0.8.10"
-log = { workspace = true }
-rand = "0.8.5"
-serde_json = "1.0.82"
-uuid = { version = "1.1.2", features = ["serde", "v4"] }
+serde_json = { workspace = true }
+uuid = { workspace = true }

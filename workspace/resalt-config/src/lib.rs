@@ -1,6 +1,7 @@
 use std::sync::RwLock;
 
 use config::{Config, Environment, File, FileFormat};
+use once_cell::sync::Lazy;
 use rand::Rng;
 
 /// Strip beginning and ending quote if both exist
@@ -24,81 +25,114 @@ macro_rules! conf {
     };
 }
 
-lazy_static::lazy_static! {
-    static ref SYSTEM_TOKEN_FALLBACK: String = rand::thread_rng()
-                .sample_iter(&rand::distributions::Alphanumeric)
-                .take(512)
-                .map(|c| c.to_string())
-                .collect::<String>();
-    static ref SETTINGS: RwLock<Config> = RwLock::new(Config::builder()
-    // load defaults from resalt.default.toml via include_str!
-    .add_source(File::from_str(include_str!("../../../resalt.default.toml"), FileFormat::Toml))
-    .add_source(File::with_name("/etc/resalt/resalt").required(false))
-    .add_source(File::with_name("resalt").required(false))
-    // Add in settings from the environment (with a prefix of RESALT)
-    // Eg.. `RESALT_DEBUG=1 ./target/app` would set the `debug` key
-    .add_source(Environment::with_prefix("resalt").separator("_").ignore_empty(true))
-    .set_default("salt.api.token", SYSTEM_TOKEN_FALLBACK.clone()).unwrap()
-    .build()
-    .unwrap());
+static SYSTEM_TOKEN_FALLBACK: Lazy<String> = Lazy::new(|| {
+    rand::thread_rng()
+        .sample_iter(&rand::distributions::Alphanumeric)
+        .take(512)
+        .map(|c| c.to_string())
+        .collect::<String>()
+});
 
-    static ref AUTH_FORWARD_ENABLED: bool = conf!("auth.forward.enabled").parse().unwrap();
+static SETTINGS: Lazy<RwLock<Config>> = Lazy::new(|| {
+    RwLock::new(
+        Config::builder()
+            // load defaults from resalt.default.toml via include_str!
+            .add_source(File::from_str(
+                include_str!("../../../resalt.default.toml"),
+                FileFormat::Toml,
+            ))
+            .add_source(File::with_name("/etc/resalt/resalt").required(false))
+            .add_source(File::with_name("resalt").required(false))
+            // Add in settings from the environment (with a prefix of RESALT)
+            // Eg.. `RESALT_DEBUG=1 ./target/app` would set the `debug` key
+            .add_source(
+                Environment::with_prefix("resalt")
+                    .separator("_")
+                    .ignore_empty(true),
+            )
+            .set_default("salt.api.token", SYSTEM_TOKEN_FALLBACK.clone())
+            .unwrap()
+            .build()
+            .unwrap(),
+    )
+});
 
-    static ref AUTH_LDAP_ENABLED: bool = conf!("auth.ldap.enabled").parse().unwrap();
-    static ref AUTH_LDAP_HOST: String = conf!("auth.ldap.host");
-    static ref AUTH_LDAP_PORT: u16 = conf!("auth.ldap.port").parse().unwrap();
-    static ref AUTH_LDAP_URL: String = format!("{}://{}:{}", if *AUTH_LDAP_TLS_LDAPS { "ldaps" } else { "ldap" }, *AUTH_LDAP_HOST, *AUTH_LDAP_PORT);
-    static ref AUTH_LDAP_BASE_DN: String = conf!("auth.ldap.basedn");
+static AUTH_FORWARD_ENABLED: Lazy<bool> =
+    Lazy::new(|| conf!("auth.forward.enabled").parse().unwrap());
 
-    static ref AUTH_LDAP_TLS_LDAPS: bool = conf!("auth.ldap.tls.ldaps").parse().unwrap();
-    static ref AUTH_LDAP_TLS_STARTTLS: bool = conf!("auth.ldap.tls.starttls").parse().unwrap();
-    static ref AUTH_LDAP_TLS_SKIPVERIFY: bool = conf!("auth.ldap.tls.skipverify").parse().unwrap();
+static AUTH_LDAP_ENABLED: Lazy<bool> = Lazy::new(|| conf!("auth.ldap.enabled").parse().unwrap());
+static AUTH_LDAP_HOST: Lazy<String> = Lazy::new(|| conf!("auth.ldap.host"));
+static AUTH_LDAP_PORT: Lazy<u16> = Lazy::new(|| conf!("auth.ldap.port").parse().unwrap());
+static AUTH_LDAP_URL: Lazy<String> = Lazy::new(|| {
+    format!(
+        "{}://{}:{}",
+        if *AUTH_LDAP_TLS_LDAPS {
+            "ldaps"
+        } else {
+            "ldap"
+        },
+        *AUTH_LDAP_HOST,
+        *AUTH_LDAP_PORT
+    )
+});
+static AUTH_LDAP_BASE_DN: Lazy<String> = Lazy::new(|| conf!("auth.ldap.basedn"));
 
-    static ref AUTH_LDAP_BIND_DN: String = conf!("auth.ldap.bind.dn");
-    static ref AUTH_LDAP_BIND_PASSWORDFILE: String = conf!("auth.ldap.bind.passwordfile");
-    static ref AUTH_LDAP_BIND_PASSWORD: String = match AUTH_LDAP_BIND_PASSWORDFILE.clone().len() {
+static AUTH_LDAP_TLS_LDAPS: Lazy<bool> =
+    Lazy::new(|| conf!("auth.ldap.tls.ldaps").parse().unwrap());
+static AUTH_LDAP_TLS_STARTTLS: Lazy<bool> =
+    Lazy::new(|| conf!("auth.ldap.tls.starttls").parse().unwrap());
+static AUTH_LDAP_TLS_SKIPVERIFY: Lazy<bool> =
+    Lazy::new(|| conf!("auth.ldap.tls.skipverify").parse().unwrap());
+
+static AUTH_LDAP_BIND_DN: Lazy<String> = Lazy::new(|| conf!("auth.ldap.bind.dn"));
+static AUTH_LDAP_BIND_PASSWORDFILE: Lazy<String> =
+    Lazy::new(|| conf!("auth.ldap.bind.passwordfile"));
+static AUTH_LDAP_BIND_PASSWORD: Lazy<String> =
+    Lazy::new(|| match AUTH_LDAP_BIND_PASSWORDFILE.clone().len() {
         0 => conf!("auth.ldap.bind.password"),
         _ => std::fs::read_to_string(AUTH_LDAP_BIND_PASSWORDFILE.clone())
             .unwrap()
             .trim()
             .to_string(),
-    };
-    static ref AUTH_LDAP_USER_FILTER: String = conf!("auth.ldap.user.filter");
-    static ref AUTH_LDAP_USER_ATTR: String = conf!("auth.ldap.user.attribute");
+    });
+static AUTH_LDAP_USER_FILTER: Lazy<String> = Lazy::new(|| conf!("auth.ldap.user.filter"));
+static AUTH_LDAP_USER_ATTR: Lazy<String> = Lazy::new(|| conf!("auth.ldap.user.attribute"));
 
-    static ref AUTH_SESSION_LIFESPAN: u64 = conf!("auth.session.lifespan").parse().unwrap();
+static AUTH_SESSION_LIFESPAN: Lazy<u64> =
+    Lazy::new(|| conf!("auth.session.lifespan").parse().unwrap());
 
-    static ref DATABASE_TYPE: String = conf!("database.type");
-    static ref DATABASE_USERNAME: String = conf!("database.username");
-    static ref DATABASE_PASSWORDFILE: String = conf!("database.passwordfile");
-    static ref DATABASE_PASSWORD: String = match DATABASE_PASSWORDFILE.clone().len() {
-        0 => conf!("database.password"),
-        _ => std::fs::read_to_string(DATABASE_PASSWORDFILE.clone())
-            .unwrap()
-            .trim()
-            .to_string(),
-    };
-    static ref DATABASE_HOST: String = conf!("database.host");
-    static ref DATABASE_PORT: u16 = conf!("database.port").parse().unwrap();
-    static ref DATABASE_DATABASE: String = conf!("database.database");
+static DATABASE_TYPE: Lazy<String> = Lazy::new(|| conf!("database.type"));
+static DATABASE_USERNAME: Lazy<String> = Lazy::new(|| conf!("database.username"));
+static DATABASE_PASSWORDFILE: Lazy<String> = Lazy::new(|| conf!("database.passwordfile"));
+static DATABASE_PASSWORD: Lazy<String> = Lazy::new(|| match DATABASE_PASSWORDFILE.clone().len() {
+    0 => conf!("database.password"),
+    _ => std::fs::read_to_string(DATABASE_PASSWORDFILE.clone())
+        .unwrap()
+        .trim()
+        .to_string(),
+});
+static DATABASE_HOST: Lazy<String> = Lazy::new(|| conf!("database.host"));
+static DATABASE_PORT: Lazy<u16> = Lazy::new(|| conf!("database.port").parse().unwrap());
+static DATABASE_DATABASE: Lazy<String> = Lazy::new(|| conf!("database.database"));
 
-    static ref METRICS_ENABLED: bool = conf!("metrics.enabled").parse().unwrap();
+static METRICS_ENABLED: Lazy<bool> = Lazy::new(|| conf!("metrics.enabled").parse().unwrap());
 
-    static ref SALT_API_URL: String = conf!("salt.api.url");
-    static ref SALT_API_TLS_SKIPVERIFY: bool = conf!("salt.api.tls.skipverify").parse().unwrap();
-    // salt.api.token
-    static ref SALT_API_TOKENFILE: String = conf!("salt.api.tokenfile");
-    static ref SALT_API_TOKEN: String = match SALT_API_TOKENFILE.clone().len() {
-        0 => conf!("salt.api.token"),
-        _ => std::fs::read_to_string(SALT_API_TOKENFILE.clone())
-            .unwrap()
-            .trim()
-            .to_string(),
-    };
-    static ref HTTP_PORT: u16 = conf!("http.port").parse().unwrap();
-    static ref HTTP_FRONTEND_THEME_ENABLED: bool = conf!("http.frontend.theme.enabled").parse().unwrap();
-    static ref HTTP_FRONTEND_THEME_COLOR: String = conf!("http.frontend.theme.color");
-}
+static SALT_API_URL: Lazy<String> = Lazy::new(|| conf!("salt.api.url"));
+static SALT_API_TLS_SKIPVERIFY: Lazy<bool> =
+    Lazy::new(|| conf!("salt.api.tls.skipverify").parse().unwrap());
+// salt.api.token
+static SALT_API_TOKENFILE: Lazy<String> = Lazy::new(|| conf!("salt.api.tokenfile"));
+static SALT_API_TOKEN: Lazy<String> = Lazy::new(|| match SALT_API_TOKENFILE.clone().len() {
+    0 => conf!("salt.api.token"),
+    _ => std::fs::read_to_string(SALT_API_TOKENFILE.clone())
+        .unwrap()
+        .trim()
+        .to_string(),
+});
+static HTTP_PORT: Lazy<u16> = Lazy::new(|| conf!("http.port").parse().unwrap());
+static HTTP_FRONTEND_THEME_ENABLED: Lazy<bool> =
+    Lazy::new(|| conf!("http.frontend.theme.enabled").parse().unwrap());
+static HTTP_FRONTEND_THEME_COLOR: Lazy<String> = Lazy::new(|| conf!("http.frontend.theme.color"));
 
 pub struct SConfig {}
 impl SConfig {

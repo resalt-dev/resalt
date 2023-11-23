@@ -6,6 +6,6 @@ publish.workspace = true
 
 [dependencies]
 config = { version = "0.13.1", features = ["toml"],  default-features = false }
-lazy_static = "1.4.0"
 log = { workspace = true }
+once_cell = { workspace = true }
 rand = "0.8.5"
