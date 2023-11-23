@@ -8,7 +8,6 @@ use log::info;
 use resalt_config::SConfig;
 use resalt_routes::*;
 use resalt_salt::{SaltAPI, SaltEventListener, SaltEventListenerStatus};
-use resalt_scheduler::Scheduler;
 use resalt_storage::{StorageCloneWrapper, StorageImpl};
 use resalt_storage_mysql::StorageMySQL;
 use resalt_storage_redis::StorageRedis;
@@ -85,12 +84,6 @@ fn start_salt_websocket_thread(db: Box<dyn StorageImpl>) -> SaltEventListenerSta
         });
     });
     listener_status
-}
-
-fn start_scheduler(db: Box<dyn StorageImpl>) {
-    let mut scheduler = Scheduler::new(StorageCloneWrapper { storage: db });
-    scheduler.register_system_jobs();
-    scheduler.start();
 }
 
 async fn start_server(
@@ -193,9 +186,6 @@ async fn run() -> Result<(), Box<dyn Error>> {
 
     // Salt WebSocket Thread
     let listener_status = start_salt_websocket_thread(db.clone());
-
-    // Scheduler
-    start_scheduler(db);
 
     // Web Server
     start_server(db_clone_wrapper, listener_status).await?;

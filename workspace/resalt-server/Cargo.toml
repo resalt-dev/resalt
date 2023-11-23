@@ -11,7 +11,6 @@ log = { workspace = true }
 resalt-config = { path = "../resalt-config" }
 resalt-routes = { path = "../resalt-routes" }
 resalt-salt = { path = "../resalt-salt" }
-resalt-scheduler = { path = "../resalt-scheduler" }
 resalt-storage = { path = "../resalt-storage" }
 resalt-storage_files = { path = "../resalt-storage-files" }
 resalt-storage_mysql = { path = "../resalt-storage-mysql" }
