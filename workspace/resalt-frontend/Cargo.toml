@@ -1,0 +1,9 @@
+[package]
+name = "resalt-frontend"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+build = "build.rs"
+
+[lib]
+#path = "lib.rs"

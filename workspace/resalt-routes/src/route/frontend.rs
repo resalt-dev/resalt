@@ -2,7 +2,8 @@ use axum::{extract::OriginalUri, response::IntoResponse};
 use include_dir::{include_dir, Dir};
 use resalt_models::ApiError;
 
-static FRONTEND_PUBLIC_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/../../frontend/build");
+static FRONTEND_PUBLIC_DIR: Dir =
+    include_dir!("$CARGO_MANIFEST_DIR/../resalt-frontend/frontend/build");
 
 pub async fn route_frontend_get(
     OriginalUri(uri): OriginalUri,
