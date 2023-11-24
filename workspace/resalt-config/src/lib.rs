@@ -2,6 +2,7 @@ use once_cell::sync::Lazy;
 use rand::Rng;
 
 pub fn strip_quotes(s: &str) -> String {
+    #[allow(clippy::if_same_then_else)]
     if s.starts_with('"') && s.ends_with('"') {
         s[1..s.len() - 1].to_string()
     } else if s.starts_with('\'') && s.ends_with('\'') {
@@ -27,9 +28,9 @@ where
 {
     std::env::var(key)
         .ok()
-        .and_then(|value| Some(strip_quotes(&value)))
+        .map(|value| strip_quotes(&value))
         .and_then(|value| value.parse().ok())
-        .unwrap_or_else(|| fallback)
+        .unwrap_or(fallback)
 }
 
 pub struct SConfig {}
