@@ -21,7 +21,7 @@ jobs:
       
       - name: "cd into /resalt-frontend and lint"
         run: |
-          cd resalt-
+          cd resalt-frontend
           bun install
           bun run lint
 
@@ -31,6 +31,7 @@ jobs:
     # Setup Rust and run "cargo clippy"
     steps:
       - uses: actions/checkout@v3
+      - uses: oven-sh/setup-bun@v1
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
@@ -48,6 +49,7 @@ jobs:
     # Setup Rust and run "cargo test"
     steps:
       - uses: actions/checkout@v3
+      - uses: oven-sh/setup-bun@v1
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
