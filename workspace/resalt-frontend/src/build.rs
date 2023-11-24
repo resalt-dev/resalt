@@ -1,12 +1,11 @@
 use std::process::Command;
 
 fn main() {
-    println!("cargo:rerun-if-changed=NULL");
+    // println!("cargo:rerun-if-changed=NULL");
 
     println!("cargo:rerun-if-changed=src/");
     println!("cargo:rerun-if-changed=static/");
     println!("cargo:rerun-if-changed=package.json");
-    println!("cargo:rerun-if-changed=bun.lockb");
 
     // Check if Bun is installed (usually installed in ~/.bun/bin/bun)
     let home = std::env::var("HOME").unwrap();
