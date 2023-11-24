@@ -3,7 +3,7 @@
 #
 FROM oven/bun:1.0.14 as build_frontend
 WORKDIR /usr/src/app/frontend
-COPY frontend .
+COPY resalt-frontend .
 RUN bun install
 RUN bun run build
 
