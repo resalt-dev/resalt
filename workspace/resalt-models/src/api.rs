@@ -3,7 +3,6 @@ use std::fmt::Display;
 use axum::http::StatusCode;
 use serde_json::json;
 
-#[allow(dead_code)]
 #[derive(Clone, Debug)]
 pub enum ApiError {
     Unauthorized,                 // Missing credentials
