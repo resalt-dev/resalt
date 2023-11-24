@@ -7,7 +7,7 @@ publish.workspace = true
 [dependencies]
 log = { workspace = true }
 r2d2 = "0.8.10"
-rand = "0.8.5"
+rand = { workspace = true }
 redis = { version = "0.23.1", features = ['r2d2'] }
 resalt-config = { path = "../resalt-config" }
 resalt-models = { path = "../resalt-models" }

@@ -62,12 +62,12 @@ pub fn sort_jobs(jobs: &mut [Job], sort: &str) {
 }
 fn value_to_simple_str(value: &Value) -> String {
     match value {
-        Value::String(s) => strip_quotes!(s.to_string()),
+        Value::String(s) => strip_quotes(&s.to_string()),
         Value::Number(n) => n.to_string(),
         Value::Bool(b) => b.to_string(),
         Value::Array(a) => a
             .iter()
-            .map(|v| strip_quotes!(v.to_string()))
+            .map(|v| strip_quotes(&v.to_string()))
             .collect::<Vec<String>>()
             .join(", "),
         Value::Object(_) => String::from("<OBJECT>"),

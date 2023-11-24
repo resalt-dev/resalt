@@ -1,28 +1,14 @@
-use std::sync::RwLock;
-
-use config::{Config, Environment, File, FileFormat};
 use once_cell::sync::Lazy;
 use rand::Rng;
 
-/// Strip beginning and ending quote if both exist
-#[macro_export]
-macro_rules! inner_strip_quotes {
-    ($s:expr) => {
-        if $s.starts_with('"') && $s.ends_with('"') {
-            $s[1..$s.len() - 1].to_string()
-        } else if $s.starts_with('\'') && $s.ends_with('\'') {
-            $s[1..$s.len() - 1].to_string()
-        } else {
-            $s.to_string()
-        }
-    };
-}
-pub use inner_strip_quotes as strip_quotes;
-
-macro_rules! conf {
-    ($s:expr) => {
-        strip_quotes!(SETTINGS.read().unwrap().get_string($s).unwrap())
-    };
+pub fn strip_quotes(s: &str) -> String {
+    if s.starts_with('"') && s.ends_with('"') {
+        s[1..s.len() - 1].to_string()
+    } else if s.starts_with('\'') && s.ends_with('\'') {
+        s[1..s.len() - 1].to_string()
+    } else {
+        s.to_string()
+    }
 }
 
 static SYSTEM_TOKEN_FALLBACK: Lazy<String> = Lazy::new(|| {
@@ -33,129 +19,100 @@ static SYSTEM_TOKEN_FALLBACK: Lazy<String> = Lazy::new(|| {
         .collect::<String>()
 });
 
-static SETTINGS: Lazy<RwLock<Config>> = Lazy::new(|| {
-    RwLock::new(
-        Config::builder()
-            // load defaults from resalt.default.toml via include_str!
-            .add_source(File::from_str(
-                include_str!("../../../resalt.default.toml"),
-                FileFormat::Toml,
-            ))
-            .add_source(File::with_name("/etc/resalt/resalt").required(false))
-            .add_source(File::with_name("resalt").required(false))
-            // Add in settings from the environment (with a prefix of RESALT)
-            // Eg.. `RESALT_DEBUG=1 ./target/app` would set the `debug` key
-            .add_source(
-                Environment::with_prefix("resalt")
-                    .separator("_")
-                    .ignore_empty(true),
-            )
-            .set_default("salt.api.token", SYSTEM_TOKEN_FALLBACK.clone())
-            .unwrap()
-            .build()
-            .unwrap(),
-    )
-});
-
-static AUTH_FORWARD_ENABLED: Lazy<bool> =
-    Lazy::new(|| conf!("auth.forward.enabled").parse().unwrap());
-
-static AUTH_SESSION_LIFESPAN: Lazy<u64> =
-    Lazy::new(|| conf!("auth.session.lifespan").parse().unwrap());
-
-static DATABASE_TYPE: Lazy<String> = Lazy::new(|| conf!("database.type"));
-static DATABASE_USERNAME: Lazy<String> = Lazy::new(|| conf!("database.username"));
-static DATABASE_PASSWORDFILE: Lazy<String> = Lazy::new(|| conf!("database.passwordfile"));
-static DATABASE_PASSWORD: Lazy<String> = Lazy::new(|| match DATABASE_PASSWORDFILE.clone().len() {
-    0 => conf!("database.password"),
-    _ => std::fs::read_to_string(DATABASE_PASSWORDFILE.clone())
-        .unwrap()
-        .trim()
-        .to_string(),
-});
-static DATABASE_HOST: Lazy<String> = Lazy::new(|| conf!("database.host"));
-static DATABASE_PORT: Lazy<u16> = Lazy::new(|| conf!("database.port").parse().unwrap());
-static DATABASE_DATABASE: Lazy<String> = Lazy::new(|| conf!("database.database"));
-
-static METRICS_ENABLED: Lazy<bool> = Lazy::new(|| conf!("metrics.enabled").parse().unwrap());
-
-static SALT_API_URL: Lazy<String> = Lazy::new(|| conf!("salt.api.url"));
-static SALT_API_TLS_SKIPVERIFY: Lazy<bool> =
-    Lazy::new(|| conf!("salt.api.tls.skipverify").parse().unwrap());
-// salt.api.token
-static SALT_API_TOKENFILE: Lazy<String> = Lazy::new(|| conf!("salt.api.tokenfile"));
-static SALT_API_TOKEN: Lazy<String> = Lazy::new(|| match SALT_API_TOKENFILE.clone().len() {
-    0 => conf!("salt.api.token"),
-    _ => std::fs::read_to_string(SALT_API_TOKENFILE.clone())
-        .unwrap()
-        .trim()
-        .to_string(),
-});
-static HTTP_PORT: Lazy<u16> = Lazy::new(|| conf!("http.port").parse().unwrap());
-static HTTP_FRONTEND_THEME_ENABLED: Lazy<bool> =
-    Lazy::new(|| conf!("http.frontend.theme.enabled").parse().unwrap());
-static HTTP_FRONTEND_THEME_COLOR: Lazy<String> = Lazy::new(|| conf!("http.frontend.theme.color"));
+#[inline]
+#[must_use]
+fn abc<T: std::str::FromStr>(key: &str, fallback: T) -> T
+where
+    T::Err: std::fmt::Debug,
+{
+    std::env::var(key)
+        .ok()
+        .and_then(|value| Some(strip_quotes(&value)))
+        .and_then(|value| value.parse().ok())
+        .unwrap_or_else(|| fallback)
+}
 
 pub struct SConfig {}
 impl SConfig {
     pub fn auth_forward_enabled() -> bool {
-        *AUTH_FORWARD_ENABLED
+        abc("RESALT_AUTH_FORWARD_ENABLED", false)
     }
 
     pub fn auth_session_lifespan() -> u64 {
-        *AUTH_SESSION_LIFESPAN
+        abc("RESALT_AUTH_SESSION_LIFESPAN", 43200)
     }
 
     pub fn database_type() -> String {
-        DATABASE_TYPE.clone()
+        abc("RESALT_DATABASE_TYPE", "redis".to_string())
     }
 
     pub fn database_username() -> String {
-        DATABASE_USERNAME.clone()
+        abc("RESALT_DATABASE_USERNAME", "default".to_string())
     }
 
     pub fn database_password() -> String {
-        DATABASE_PASSWORD.clone()
+        let password_file = abc("RESALT_DATABASE_PASSWORDFILE", "".to_string());
+        match password_file.len() {
+            0 => abc("RESALT_DATABASE_PASSWORD", "resalt".to_string()),
+            _ => std::fs::read_to_string(password_file)
+                .unwrap()
+                .trim()
+                .to_string(),
+        }
     }
 
     pub fn database_host() -> String {
-        DATABASE_HOST.clone()
+        abc("RESALT_DATABASE_HOST", "".to_string())
     }
 
     pub fn database_port() -> u16 {
-        *DATABASE_PORT
+        abc("RESALT_DATABASE_PORT", 6379)
     }
 
     pub fn database_database() -> String {
-        DATABASE_DATABASE.clone()
+        abc("RESALT_DATABASE_DATABASE", "0".to_string())
     }
 
     pub fn metrics_enabled() -> bool {
-        *METRICS_ENABLED
+        abc("RESALT_METRICS_ENABLED", false)
     }
 
     pub fn salt_api_url() -> String {
-        SALT_API_URL.clone()
+        abc("RESALT_SALT_API_URL", "https://master:8080".to_string())
     }
 
     pub fn salt_api_tls_skipverify() -> bool {
-        *SALT_API_TLS_SKIPVERIFY
+        abc("RESALT_SALT_API_TLS_SKIPVERIFY", true)
     }
 
     pub fn salt_api_system_service_token() -> String {
-        SALT_API_TOKEN.clone()
+        let token_file = abc("RESALT_SALT_API_TOKEN_FILE", "".to_string());
+        match token_file.clone().len() {
+            0 => {
+                let token = abc("RESALT_SALT_API_TOKEN", "".to_string());
+                if token.is_empty() {
+                    SYSTEM_TOKEN_FALLBACK.clone()
+                } else {
+                    token
+                }
+            }
+            _ => std::fs::read_to_string(token_file)
+                .unwrap()
+                .trim()
+                .to_string(),
+        }
     }
 
     pub fn http_port() -> u16 {
-        *HTTP_PORT
+        abc("RESALT_HTTP_PORT", 8000)
     }
 
     pub fn http_frontend_theme_enabled() -> bool {
-        *HTTP_FRONTEND_THEME_ENABLED
+        abc("RESALT_HTTP_FRONTEND_THEME_ENABLED", true)
     }
 
     pub fn http_frontend_theme_color() -> String {
-        HTTP_FRONTEND_THEME_COLOR.clone()
+        abc("RESALT_HTTP_FRONTEND_THEME_COLOR", "primary".to_string())
     }
 }
 

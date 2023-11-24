@@ -7,9 +7,9 @@ publish.workspace = true
 [dependencies]
 jsonpath_lib = "0.3.0"
 log = { workspace = true }
-rand = "0.8.5"
+rand = { workspace = true }
 resalt-config = { path = "../resalt-config" }
 resalt-models = { path = "../resalt-models" }
 resalt-security = { path = "../resalt-security" }
 serde_json = { workspace = true }
-version-compare = "0.1.0"
+version-compare = "0.1.1"

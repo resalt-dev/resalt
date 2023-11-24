@@ -11,6 +11,4 @@
 
 **/*.env
 
-resalt.toml
-
 /docs/docker/filesdb/*/
