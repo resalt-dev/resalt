@@ -210,14 +210,12 @@ export const resaltWebPermissions: {
 	{
 		permission: P_USER_EMAIL,
 		title: '[User] Email',
-		description:
-			'Allow user to change their own email.',
+		description: 'Allow user to change their own email.',
 	},
 	{
 		permission: P_USER_PASSWORD,
 		title: '[User] Password',
-		description:
-			'Allow user to change their own password.',
+		description: 'Allow user to change their own password.',
 	},
 ];
 

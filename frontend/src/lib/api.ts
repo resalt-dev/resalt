@@ -147,10 +147,7 @@ export async function getUsers(limit: number | null, offset: number | null): Pro
 	});
 }
 
-export async function createUser(
-	username: string,
-	email: string | null,
-): Promise<User> {
+export async function createUser(username: string, email: string | null): Promise<User> {
 	return sendAuthenticatedRequest('POST', '/users', {
 		username,
 		email,
