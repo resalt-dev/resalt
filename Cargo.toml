@@ -1,37 +1,51 @@
-[package]
-name = "resalt"
-version = "0.5.5"
-authors = ["Max Faxälv <max@foorack.com>"]
-edition = "2021"
-readme = "README.md"
-repository = "https://github.com/resalt-dev/resalt"
-license = "MIT"
-description = "Resalt is a free, open-source, self-hosted, web-based administration and monitoring panel for SaltStack."
-publish = false
-
-[[bin]]
-name = "resalt-server"
-path = "src/resalt-server.rs"
-
 [workspace]
+resolver = "2"
 members = [
-    "workspace/*/src/..",
+    "workspace/resalt-*",
+# "resalt-auth"
+# "resalt-config"
+# "resalt-models"
+# "resalt-routes"
+# "resalt-salt"
+# "resalt-scheduler"
+# "resalt-security"
+# "resalt-server"
+# "resalt-storage"
+# "resalt-storage-files"
+# "resalt-storage-mysql"
+# "resalt-storage-redis"
+# "resalt-updater"
+]
+default-members = [
+    "workspace/resalt-server",
 ]
 
 [workspace.package]
 version = "0.5.5"
+authors = ["Max Faxälv <max@foorack.com>"]
 edition = "2021"
+license = "MIT"
 publish = false
+readme = "README.md"
+description = "Resalt is a free, open-source, self-hosted, web-based administration and monitoring panel for SaltStack."
+repository = "https://github.com/resalt-dev/resalt"
 
 [workspace.dependencies]
-actix-web = { version = "4.4.0", features=["macros", "compress-gzip"], default-features = false }
-log = { version = "0.4.17" }
+axum = { version = "0.6.20" , features = ["json", "original-uri", "query", "tokio"], default-features = false }
+chrono = { version = "0.4.31", features = [], default-features = false }
+jsonpath_lib = "0.3.0"
+log = { version = "0.4.17", default-features = false }
+once_cell = { version = "1.18.0", default-features = false }
+rand = { version = "0.8.5" }
+reqwest = { version = "0.11.22", features = ["json", "stream", "default-tls"], default-features = false }
+serde = { version = "1.0.139", features = ["derive"], default-features = false }
+serde_json = { version = "1.0.82", default-features = false }
 tokio = { version = "1.20.0", features = ["rt-multi-thread"], default-features = false }
+tower = { version = "0.4.13", default-features = false }
+tower-http = { version = "0.5.0", features=["normalize-path"], default-features = false }
+uuid = { version = "1.1.2", features = ["serde", "v4"], default-features = false }
 
-[dependencies]
-resalt_server = { path = "workspace/resalt_server" }
-
-[package.metadata.resalt]
+[workspace.metadata.resalt]
 news = [
     "Resalt 0.4.1 released§Resalt 0.4.1 is now available. Removed legacy graph system, and implemented optional Prometheus metrics export endpoint.",
     "Resalt 0.4.0 released§Resalt 0.4.0 is now available. Implemented LDAP syncing of groups and email, and several UI and UX improvements.",
@@ -42,3 +56,12 @@ news = [
     "Resalt 0.2.0 released§Resalt 0.2.0 is now available. This release includes a fix where compliance data wasn't stored when triggered from minion, improved permission checking, and several UI fixes.",
     "Resalt 0.1.6 released§Resalt 0.1.6 is now available. This release includes large UI updates, continued implementation of the permission system, the ability to see grains of offline minions, dependency updates, accessibility updates, enforcement of code linting, a severe improvement of compilation times for the frontend, and a lot of bug fixes.",
 ]
+
+[profile.dev]
+# Disabling debug info speeds up builds a bunch and we don't rely on it for debugging that much.
+debug = 0
+
+[profile.release]
+lto = true
+opt-level = 3
+codegen-units = 1

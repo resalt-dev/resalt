@@ -1,0 +1,22 @@
+[package]
+name = "resalt-routes"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+axum = { workspace = true }
+include_dir = "0.7.3"
+jsonpath_lib = { workspace = true }
+log = { workspace = true }
+resalt-auth = { path = "../resalt-auth" }
+resalt-config = { path = "../resalt-config" }
+resalt-models = { path = "../resalt-models" }
+resalt-salt = { path = "../resalt-salt" }
+resalt-security = { path = "../resalt-security" }
+resalt-storage = { path = "../resalt-storage" }
+resalt-updater = { path = "../resalt-updater" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tower-http = { workspace = true }
+urlencoding = "2.1.3"

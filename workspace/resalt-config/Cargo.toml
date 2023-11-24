@@ -1,0 +1,9 @@
+[package]
+name = "resalt-config"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+once_cell = { workspace = true }
+rand = { workspace = true }

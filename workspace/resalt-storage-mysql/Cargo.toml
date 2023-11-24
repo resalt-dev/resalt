@@ -1,0 +1,16 @@
+[package]
+name = "resalt-storage_mysql"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+chrono = { workspace = true }
+diesel = { version = "2.1.4", features = ["mysql", "chrono", "r2d2"], default-features = false }
+diesel_migrations = { version = "2.1.0", features = ["mysql"], default-features = false }
+log = { workspace = true }
+resalt-config = { path = "../resalt-config" }
+resalt-models = { path = "../resalt-models" }
+resalt-storage = { path = "../resalt-storage" }
+serde_json = { workspace = true }
+uuid = { workspace = true }

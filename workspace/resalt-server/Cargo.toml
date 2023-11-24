@@ -1,0 +1,19 @@
+[package]
+name = "resalt-server"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[dependencies]
+axum = { workspace = true }
+env_logger = { version = "0.10.1", features = ["auto-color"], default-features = false }
+log = { workspace = true }
+resalt-config = { path = "../resalt-config" }
+resalt-routes = { path = "../resalt-routes" }
+resalt-salt = { path = "../resalt-salt" }
+resalt-storage = { path = "../resalt-storage" }
+resalt-storage_files = { path = "../resalt-storage-files" }
+resalt-storage_mysql = { path = "../resalt-storage-mysql" }
+resalt-storage_redis = { path = "../resalt-storage-redis" }
+tokio = { workspace = true }
+tower = { workspace = true }

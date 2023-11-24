@@ -12,7 +12,6 @@
 	} from '$lib/api';
 	import { resaltWebPermissions } from '$lib/perms';
 	import { theme, toasts } from '$lib/stores';
-	import { validateLdapDN } from '$lib/utils';
 	import { MessageType } from '$model/MessageType';
 	import type PermissionGroup from '$model/PermissionGroup';
 	import type { fPerm } from '$model/PermissionGroup';
@@ -41,8 +40,6 @@
 
 	let groupNameFieldValue = '';
 	let groupNameFieldError = false;
-	let groupLdapSyncFieldValue = '';
-	let groupLdapSyncFieldError = false;
 	let addUserFieldValue = '';
 	let addUserFieldError = false;
 	let permissionWebFields: { [key: string]: boolean } = {};
@@ -81,8 +78,6 @@
 		selectedGroup.set(group);
 		groupNameFieldValue = group.name;
 		groupNameFieldError = false;
-		groupLdapSyncFieldValue = group.ldapSync ?? '';
-		groupLdapSyncFieldError = false;
 		addUserFieldValue = '';
 		addUserFieldError = false;
 		permissionWebFields = {};
@@ -218,20 +213,14 @@
 		}
 
 		validateGroupNameField();
-		validateGroupLdapSyncField();
 		validatePermissionMinionTargetsFields();
-		if (groupNameFieldError || groupLdapSyncFieldError || permissionMinionsFieldsError) {
+		if (groupNameFieldError || permissionMinionsFieldsError) {
 			return;
 		}
 
 		let perms: fPerm[] = localCalculateSaltPermissions();
 		console.log('perms', perms);
-		updatePermissionGroup(
-			$selectedGroup.id,
-			groupNameFieldValue,
-			perms,
-			groupLdapSyncFieldValue.length > 0 ? groupLdapSyncFieldValue : null,
-		)
+		updatePermissionGroup($selectedGroup.id, groupNameFieldValue, perms)
 			.then(() => {
 				updateData();
 				toasts.add(MessageType.SUCCESS, 'Update group', 'Updated group!');
@@ -376,25 +365,6 @@
 		}
 		if (groupNameFieldValue === '$superadmins') {
 			groupNameFieldError = true;
-			return;
-		}
-	}
-
-	function validateGroupLdapSyncField(): void {
-		groupLdapSyncFieldError = false;
-		if (groupLdapSyncFieldValue.length === 0) {
-			// Allow empty
-			return;
-		}
-
-		if (!groupLdapSyncFieldValue.toLocaleLowerCase().startsWith('cn=')) {
-			groupLdapSyncFieldError = true;
-			return;
-		}
-
-		if (!validateLdapDN(groupLdapSyncFieldValue)) {
-			console.log('Invalid LDAP sync string', groupLdapSyncFieldValue);
-			groupLdapSyncFieldError = true;
 			return;
 		}
 	}
@@ -616,23 +586,6 @@
 								<label class="form-label" for="selectedGroupName">Group Name</label>
 							</div>
 						</div>
-						<div class="col-12 col-lg-6 col-xxl-7 ps-3 mb-0">
-							<div class="form-floating mb-3">
-								<input
-									id="selectedGroupLdapSync"
-									type="text"
-									class="form-control {groupLdapSyncFieldError
-										? 'is-invalid'
-										: ''}"
-									disabled={$selectedGroup.name === '$superadmins'}
-									bind:value={groupLdapSyncFieldValue}
-									on:blur={validateGroupLdapSyncField}
-								/>
-								<label class="form-label" for="selectedGroupLdapSync"
-									>LDAP Sync DN (optional)</label
-								>
-							</div>
-						</div>
 						<div class="col-12 ps-3 mb-0">
 							<button
 								type="button"
@@ -667,8 +620,7 @@
 													type="button"
 													class="btn btn-sm btn-danger float-end"
 													disabled={$selectedGroup.name ===
-														'$superadmins' ||
-														groupLdapSyncFieldValue.length > 0}
+														'$superadmins'}
 													on:click={() => {
 														removeUserFromSelectedGroup(user.id);
 													}}
@@ -689,8 +641,7 @@
 										type="text"
 										class="form-control {addUserFieldError ? 'is-invalid' : ''}"
 										style="height: 2.5rem;"
-										disabled={$selectedGroup.name === '$superadmins' ||
-											groupLdapSyncFieldValue.length > 0}
+										disabled={$selectedGroup.name === '$superadmins'}
 										bind:value={addUserFieldValue}
 										on:blur={validateAddUserField}
 									/>
@@ -699,19 +650,13 @@
 										for="addUserField"
 										style="padding-top: 0.4rem;"
 									>
-										{#if groupLdapSyncFieldValue.length > 0}
-											Manually managing users is disabled because LDAP Sync is
-											active.
-										{:else}
-											Add by User ID
-										{/if}
+										Add by User ID
 									</label>
 								</div>
 								<button
 									type="button"
 									class="btn btn-primary float-end text-nowrap px-4"
-									disabled={$selectedGroup.name === '$superadmins' ||
-										groupLdapSyncFieldValue.length > 0}
+									disabled={$selectedGroup.name === '$superadmins'}
 									on:click={addUserToSelectedGroup}
 								>
 									Add user
@@ -1020,11 +965,6 @@
 							{#if groupNameFieldError}
 								<div class="alert alert-danger" role="alert">
 									<strong>Invalid group name.</strong>
-								</div>
-							{/if}
-							{#if groupLdapSyncFieldError}
-								<div class="alert alert-danger" role="alert">
-									<strong>Invalid LDAP sync DN.</strong>
 								</div>
 							{/if}
 							{#if permissionMinionsFieldsError}

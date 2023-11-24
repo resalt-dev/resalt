@@ -11,9 +11,9 @@ services:
     image: saltstack/salt:3006.4
     hostname: master
     volumes:
-      - ./docker/saltconfig/etc/master:/etc/salt/master:ro
-      - ./docker/saltconfig/pillar:/srv/pillar:ro
-      - ./docker/saltconfig/salt:/srv/salt:ro
+      - ./docs/docker/saltconfig/etc/master:/etc/salt/master:ro
+      - ./docs/docker/saltconfig/pillar:/srv/pillar:ro
+      - ./docs/docker/saltconfig/salt:/srv/salt:ro
     environment:
       - PYTHONUNBUFFERED=true
       - SALT_API_CONFIG={}
@@ -23,7 +23,7 @@ services:
     image: saltstack/salt:3006.4
     command: salt-minion -l info
     volumes:
-      - ./docker/saltconfig/etc/minion:/etc/salt/minion:ro
+      - ./docs/docker/saltconfig/etc/minion:/etc/salt/minion:ro
     depends_on:
       - master
     deploy:
@@ -46,27 +46,15 @@ services:
   backend:
     build:
       context: ./
-      dockerfile: Dockerfile-devel
+      dockerfile: ./docs/docker/Dockerfile-devel
     volumes:
-      - ./docker:/usr/src/app/docker
+      - ./docs/docker:/usr/src/app/docker
       - ./src:/usr/src/app/src:ro
       - ./workspace:/usr/src/app/workspace:ro
       - ./Cargo.toml:/usr/src/app/Cargo.toml:ro
       - ./resalt.default.toml:/usr/src/app/resalt.default.toml:ro
     environment:
       RESALT_AUTH_FORWARD_ENABLED: ${RESALT_AUTH_FORWARD_ENABLED:-}
-      RESALT_AUTH_LDAP_ENABLED: ${RESALT_AUTH_LDAP_ENABLED:-}
-      RESALT_AUTH_LDAP_HOST: ${RESALT_AUTH_LDAP_HOST:-}
-      RESALT_AUTH_LDAP_PORT: ${RESALT_AUTH_LDAP_PORT:-}
-      RESALT_AUTH_LDAP_BASEDN: ${RESALT_AUTH_LDAP_BASEDN:-}
-      RESALT_AUTH_LDAP_TLS_LDAPS: ${RESALT_AUTH_LDAP_TLS_LDAPS:-}
-      RESALT_AUTH_LDAP_TLS_STARTTLS: ${RESALT_AUTH_LDAP_TLS_STARTTLS:-}
-      RESALT_AUTH_LDAP_TLS_SKIPVERIFY: ${RESALT_AUTH_LDAP_TLS_SKIPVERIFY:-}
-      RESALT_AUTH_LDAP_BIND_DN: ${RESALT_AUTH_LDAP_BIND_DN:-}
-      RESALT_AUTH_LDAP_BIND_PASSWORD: ${RESALT_AUTH_LDAP_BIND_PASSWORD:-}
-      RESALT_AUTH_LDAP_BIND_PASSWORDFILE: ${RESALT_AUTH_LDAP_BIND_PASSWORDFILE:-}
-      RESALT_AUTH_LDAP_USER_FILTER: ${RESALT_AUTH_LDAP_USER_FILTER:-}
-      RESALT_AUTH_LDAP_USER_ATTRIBUTE: ${RESALT_AUTH_LDAP_USER_ATTRIBUTE:-}
       RESALT_AUTH_SESSION_LIFESPAN: ${RESALT_AUTH_SESSION_LIFESPAN:-}
       RESALT_DATABASE_TYPE: ${RESALT_DATABASE_TYPE:-}
       RESALT_DATABASE_USERNAME: ${RESALT_DATABASE_USERNAME:-}
@@ -92,13 +80,6 @@ services:
   proxy:
     image: nginx:alpine-slim
     volumes:
-      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docs/docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
     - "1234:80"
-
-#  ldap-server:
-#    image: osixia/openldap:1.3.0
-#    restart: always
-#    ports:
-#      - "389:389"
-#      - "636:636"

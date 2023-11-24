@@ -211,13 +211,13 @@ export const resaltWebPermissions: {
 		permission: P_USER_EMAIL,
 		title: '[User] Email',
 		description:
-			'Allow user to change their own email. (LDAP users cannot change their email as it is synced via LDAP)',
+			'Allow user to change their own email.',
 	},
 	{
 		permission: P_USER_PASSWORD,
 		title: '[User] Password',
 		description:
-			'Allow user to change their own password. (LDAP users cannot set or log in with local password)',
+			'Allow user to change their own password.',
 	},
 ];
 

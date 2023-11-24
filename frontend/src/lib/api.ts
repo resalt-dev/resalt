@@ -150,12 +150,10 @@ export async function getUsers(limit: number | null, offset: number | null): Pro
 export async function createUser(
 	username: string,
 	email: string | null,
-	ldapSync: string | null,
 ): Promise<User> {
 	return sendAuthenticatedRequest('POST', '/users', {
 		username,
 		email,
-		ldapSync,
 	}).then((data: unknown) => User.fromObject(data));
 }
 
@@ -392,12 +390,10 @@ export async function updatePermissionGroup(
 	id: string,
 	name: string,
 	perms: fPerm[],
-	ldapSync: string | null,
 ): Promise<void> {
 	await sendAuthenticatedRequest('PUT', `/permissions/${id}`, {
 		name,
 		perms: JSON.stringify(perms),
-		ldapSync,
 	});
 }
 
