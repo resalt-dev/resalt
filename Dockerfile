@@ -1,7 +1,7 @@
 #
 # BUILD FRONTEND
 #
-FROM oven/bun:1.0.11 as build_frontend
+FROM oven/bun:1.0.14 as build_frontend
 WORKDIR /usr/src/app/frontend
 COPY frontend .
 RUN bun install
@@ -10,7 +10,7 @@ RUN bun run build
 #
 # BUILD BACKEND
 #
-FROM rust:1.73-slim as build_backend
+FROM rust:1.74-slim as build_backend
 WORKDIR /usr/src/app
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
