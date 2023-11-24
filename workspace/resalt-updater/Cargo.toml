@@ -6,7 +6,6 @@ publish.workspace = true
 
 [dependencies]
 reqwest = { workspace = true }
-chrono = { workspace = true }
 log = { workspace = true }
 once_cell = { workspace = true }
 toml = { version = "0.8.8", features = ["parse"], default-features = false }

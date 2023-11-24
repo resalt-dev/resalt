@@ -5,8 +5,8 @@ edition.workspace = true
 publish.workspace = true
 
 [dependencies]
-argon2 = "0.5.0"
+argon2 = { version = "0.5.2", features = ["alloc", "password-hash"], default-features = false }
 log = { workspace = true }
-regex = "1.8.1"
+regex = { version = "1.10.2", features = [], default-features = false }
 resalt-models = { path = "../resalt-models" }
 serde_json = { workspace = true }

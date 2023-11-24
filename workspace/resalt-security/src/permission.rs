@@ -79,22 +79,28 @@ pub fn evaluate_resalt_permission(permissions: &Value, permission: &str) -> bool
     }
 }
 
+#[inline]
+#[must_use]
 fn salt_wrapped_regex(regex: &str) -> String {
     format!("^{}$", regex.replace("([a-zA-Z0-9])\\*", "$1.*"))
 }
 
 fn evaluate_function(
-    fun_section: &Value,
+    fun_section_perm: &Value,
     fun: &str,
     args: &Vec<String>,
     kwargs: &HashMap<String, String>,
 ) -> bool {
-    if let Some(fun_section) = fun_section.as_str() {
+    if let Some(fun_section) = fun_section_perm.as_str() {
         let regex = salt_wrapped_regex(fun_section);
         let re = Regex::new(&regex).unwrap();
         return re.is_match(fun);
     }
-    let keys = fun_section.as_object().unwrap().keys().collect::<Vec<_>>();
+    let keys = fun_section_perm
+        .as_object()
+        .unwrap()
+        .keys()
+        .collect::<Vec<_>>();
     if keys.len() != 1 {
         return false;
     }
@@ -102,7 +108,7 @@ fn evaluate_function(
         let regex = salt_wrapped_regex(key);
         let re = Regex::new(&regex).unwrap();
         if re.is_match(fun) {
-            let value = &fun_section[key];
+            let value = &fun_section_perm[key];
             if let Some(_value) = value.as_str() {
                 return true;
             }
@@ -162,18 +168,18 @@ fn evaluate_function(
 }
 
 fn evaluate_target(
-    target_section: &Value,
+    target_section_perm: &Value,
     target: &str,
     fun: &str,
     args: &Vec<String>,
     kwargs: &HashMap<String, String>,
 ) -> bool {
-    if let Some(target_section) = target_section.as_str() {
+    if let Some(target_section) = target_section_perm.as_str() {
         let regex = salt_wrapped_regex(target_section);
         let re = Regex::new(&regex).unwrap();
         return re.is_match(fun);
     }
-    let keys = target_section
+    let keys = target_section_perm
         .as_object()
         .unwrap()
         .keys()
@@ -185,9 +191,9 @@ fn evaluate_target(
         let regex = salt_wrapped_regex(key);
         let re = Regex::new(&regex).unwrap();
         if re.is_match(target) {
-            let fun_sections = target_section[key].as_array().unwrap();
-            for fun_section in fun_sections {
-                if evaluate_function(fun_section, fun, args, kwargs) {
+            let fun_sections = target_section_perm[key].as_array().unwrap();
+            for fun_section_perm in fun_sections {
+                if evaluate_function(fun_section_perm, fun, args, kwargs) {
                     return true;
                 }
             }

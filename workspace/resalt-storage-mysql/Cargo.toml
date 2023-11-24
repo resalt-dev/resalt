@@ -6,8 +6,8 @@ publish.workspace = true
 
 [dependencies]
 chrono = { workspace = true }
-diesel = { version = "2.1.0", features = ["mysql", "chrono", "r2d2"] }
-diesel_migrations = "2.1.0"
+diesel = { version = "2.1.4", features = ["mysql", "chrono", "r2d2"], default-features = false }
+diesel_migrations = { version = "2.1.0", features = ["mysql"], default-features = false }
 log = { workspace = true }
 resalt-config = { path = "../resalt-config" }
 resalt-models = { path = "../resalt-models" }

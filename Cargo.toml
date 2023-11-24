@@ -33,16 +33,17 @@ repository = "https://github.com/resalt-dev/resalt"
 [workspace.dependencies]
 axum = { version = "0.6.20" , features = ["json", "original-uri", "query", "tokio"], default-features = false }
 chrono = { version = "0.4.31", features = [], default-features = false }
-log = { version = "0.4.17" }
+jsonpath_lib = "0.3.0"
+log = { version = "0.4.17", default-features = false }
 once_cell = { version = "1.18.0", default-features = false }
 rand = { version = "0.8.5" }
-reqwest = { version = "0.11.22", features = ["json", "stream"] }
-serde = { version = "1.0.139", features = ["derive"] }
-serde_json = { version = "1.0.82" }
+reqwest = { version = "0.11.22", features = ["json", "stream", "default-tls"], default-features = false }
+serde = { version = "1.0.139", features = ["derive"], default-features = false }
+serde_json = { version = "1.0.82", default-features = false }
 tokio = { version = "1.20.0", features = ["rt-multi-thread"], default-features = false }
 tower = { version = "0.4.13", default-features = false }
 tower-http = { version = "0.5.0", features=["normalize-path"], default-features = false }
-uuid = { version = "1.1.2", features = ["serde", "v4"] }
+uuid = { version = "1.1.2", features = ["serde", "v4"], default-features = false }
 
 [workspace.metadata.resalt]
 news = [

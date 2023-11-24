@@ -5,13 +5,9 @@ edition.workspace = true
 publish.workspace = true
 
 [dependencies]
-log = { workspace = true }
 r2d2 = "0.8.10"
-rand = { workspace = true }
-redis = { version = "0.23.1", features = ['r2d2'] }
-resalt-config = { path = "../resalt-config" }
+redis = { version = "0.23.3", features = ["r2d2", "streams", "keep-alive", "json"], default-features = false }
 resalt-models = { path = "../resalt-models" }
-resalt-security = { path = "../resalt-security" }
 resalt-storage = { path = "../resalt-storage" }
 serde_json = { workspace = true }
 uuid = { workspace = true }

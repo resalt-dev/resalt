@@ -6,8 +6,8 @@ publish.workspace = true
 
 [dependencies]
 async-stream = "0.3.5"
-futures = "0.3.21"
-futures-core = "0.3.21"
+futures = { version = "0.3.29", features = [], default-features = false }
+futures-core = { version = "0.3.29", features = [], default-features = false }
 log = { workspace = true }
 reqwest = { workspace = true }
 resalt-config = { path = "../resalt-config" }
