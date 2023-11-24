@@ -16,12 +16,12 @@ jobs:
       - name: 'Cache node_modules'
         uses: actions/cache@v3
         with:
-          path: ./frontend/node_modules
-          key: ${{ runner.os }}-bun-1.0.11-${{ hashFiles('./frontend/bun.lockb') }}
+          path: ./resalt-frontend/node_modules
+          key: ${{ runner.os }}-bun-1.0.11-${{ hashFiles('./resalt-frontend/bun.lockb') }}
       
-      - name: "cd into /frontend and lint"
+      - name: "cd into /resalt-frontend and lint"
         run: |
-          cd frontend
+          cd resalt-
           bun install
           bun run lint
 
