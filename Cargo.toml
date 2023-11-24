@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
 members = [
-    "workspace/resalt-*",
+    "resalt-*",
 # "resalt-auth"
 # "resalt-config"
 # "resalt-models"
@@ -17,7 +17,7 @@ members = [
 # "resalt-updater"
 ]
 default-members = [
-    "workspace/resalt-server",
+    "resalt-server",
 ]
 
 [workspace.package]

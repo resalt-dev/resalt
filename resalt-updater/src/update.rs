@@ -21,7 +21,7 @@ static CACHE: Lazy<std::sync::Mutex<UpdateInfo>> = Lazy::new(|| {
 });
 
 pub static CURRENT_VERSION: Lazy<String> = Lazy::new(|| {
-    include_str!("../../../Cargo.toml")
+    include_str!("../../Cargo.toml")
         .lines()
         .find(|line| line.starts_with("version = "))
         .and_then(|line| line.split('=').nth(1))

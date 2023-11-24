@@ -11,6 +11,6 @@ updates:
       interval: "weekly"
 
   - package-ecosystem: "npm" # See documentation for possible values
-    directory: "/frontend" # Location of package manifests
+    directory: "/resalt-frontend" # Location of package manifests
     schedule:
       interval: "weekly"
