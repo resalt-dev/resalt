@@ -21,18 +21,6 @@ pub struct StorageStatus {
     pub users_total: i64,
 }
 
-pub struct StorageCloneWrapper {
-    pub storage: Box<dyn StorageImpl>,
-}
-
-impl Clone for StorageCloneWrapper {
-    fn clone(&self) -> Self {
-        StorageCloneWrapper {
-            storage: self.storage.clone(),
-        }
-    }
-}
-
 // #[cfg(test)]
 // mod tests {
 //     use super::*;

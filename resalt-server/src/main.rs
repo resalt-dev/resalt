@@ -8,7 +8,7 @@ use log::info;
 use resalt_config::SConfig;
 use resalt_routes::*;
 use resalt_salt::{SaltAPI, SaltEventListener, SaltEventListenerStatus};
-use resalt_storage::{StorageCloneWrapper, StorageImpl};
+use resalt_storage::StorageImpl;
 use resalt_storage_mysql::StorageMySQL;
 use resalt_storage_redis::StorageRedis;
 use std::{
@@ -87,12 +87,12 @@ fn start_salt_websocket_thread(db: Box<dyn StorageImpl>) -> SaltEventListenerSta
 }
 
 async fn start_server(
-    db_clone_wrapper: StorageCloneWrapper,
+    db: Box<dyn StorageImpl>,
     listener_status: SaltEventListenerStatus,
 ) -> Result<(), Box<dyn Error>> {
     let salt_api = SaltAPI::new();
     let shared_state = AppState {
-        data: db_clone_wrapper.clone().storage,
+        data: db,
         salt_api: salt_api.clone(),
         listener_status: listener_status.clone(),
     };
@@ -180,15 +180,12 @@ async fn run() -> Result<(), Box<dyn Error>> {
 
     // Database
     let db: Box<dyn StorageImpl> = init_db().await;
-    let db_clone_wrapper = StorageCloneWrapper {
-        storage: db.clone(),
-    };
 
     // Salt WebSocket Thread
     let listener_status = start_salt_websocket_thread(db.clone());
 
     // Web Server
-    start_server(db_clone_wrapper, listener_status).await?;
+    start_server(db, listener_status).await?;
 
     Ok(())
 }
