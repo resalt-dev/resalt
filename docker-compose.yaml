@@ -48,11 +48,7 @@ services:
       context: ./
       dockerfile: ./docs/docker/Dockerfile-devel
     volumes:
-      - ./docs/docker:/usr/src/app/docker
-      - ./src:/usr/src/app/src:ro
-      - ./workspace:/usr/src/app/workspace:ro
-      - ./Cargo.toml:/usr/src/app/Cargo.toml:ro
-      - ./resalt.default.toml:/usr/src/app/resalt.default.toml:ro
+      - .:/usr/src/app
     environment:
       RESALT_AUTH_FORWARD_ENABLED: ${RESALT_AUTH_FORWARD_ENABLED:-}
       RESALT_AUTH_SESSION_LIFESPAN: ${RESALT_AUTH_SESSION_LIFESPAN:-}

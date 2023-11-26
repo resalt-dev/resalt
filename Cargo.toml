@@ -2,19 +2,18 @@
 resolver = "2"
 members = [
     "resalt-*",
-# "resalt-auth"
-# "resalt-config"
-# "resalt-models"
-# "resalt-routes"
-# "resalt-salt"
-# "resalt-scheduler"
-# "resalt-security"
-# "resalt-server"
-# "resalt-storage"
-# "resalt-storage-files"
-# "resalt-storage-mysql"
-# "resalt-storage-redis"
-# "resalt-updater"
+    # "resalt-auth",
+    # "resalt-config",
+    # "resalt-models",
+    # "resalt-routes",
+    # "resalt-salt",
+    # "resalt-security",
+    # "resalt-server",
+    # "resalt-storage",
+    # "resalt-storage-files",
+    # "resalt-storage-mysql",
+    # "resalt-storage-redis",
+    # "resalt-updater"
 ]
 default-members = [
     "resalt-server",
