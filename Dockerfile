@@ -1,14 +1,5 @@
 #
-# BUILD FRONTEND
-#
-FROM oven/bun:1.0.14 as build_frontend
-WORKDIR /usr/src/app/frontend
-COPY resalt-frontend .
-RUN bun install
-RUN bun run build
-
-#
-# BUILD BACKEND
+# BUILD
 #
 FROM rust:1.74-slim as build_backend
 WORKDIR /usr/src/app
@@ -17,7 +8,7 @@ RUN apt-get update && \
   apt-get upgrade -y -o DPkg::Options::=--force-confold && \
   apt-get install -y -o DPkg::Options::=--force-confold build-essential pkg-config libssl-dev mariadb-client libmariadb-dev default-libmysqlclient-dev
 COPY . .
-COPY --from=build_frontend /usr/src/app/frontend/build /usr/src/app/frontend/build
+RUN curl -fsSL https://bun.sh/install | bash
 RUN cargo build --release
 
 
