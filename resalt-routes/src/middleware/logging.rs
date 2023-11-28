@@ -1,7 +1,6 @@
 use std::net::SocketAddr;
 
 use axum::{
-    extract::ConnectInfo,
     http::{header, Request},
     middleware::Next,
     response::Response,
@@ -11,7 +10,7 @@ use log::*;
 use resalt_models::{AuthStatus, ResaltTime};
 
 pub async fn middleware_logging<B>(
-    ConnectInfo(socket): ConnectInfo<SocketAddr>,
+    Extension(socket): Extension<SocketAddr>,
     Extension(auth): Extension<Option<AuthStatus>>,
     // you can add more extractors here but the last
     // extractor must implement `FromRequest` which

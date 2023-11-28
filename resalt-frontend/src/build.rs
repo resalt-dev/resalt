@@ -15,10 +15,13 @@ fn main() {
             r#"
             ----------------------------------------
             Bun is not installed. Please install Bun from bun.sh and try again.
+
+            HOME: {}
             
             curl -fsSL https://bun.sh/install | bash
             ----------------------------------------
-        "#
+        "#,
+            home
         );
     }
 
