@@ -32,13 +32,13 @@ services:
   frontend:
     image: oven/bun:1.0.11
     volumes:
-      - ./frontend/.svelte-kit/tsconfig.json:/home/bun/app/.svelte-kit/tsconfig.json
-      - ./frontend/src:/home/bun/app/src
-      - ./frontend/static:/home/bun/app/static
-      - ./frontend/package.json:/home/bun/app/package.json
-      - ./frontend/svelte.config.js:/home/bun/app/svelte.config.js
-      - ./frontend/tsconfig.json:/home/bun/app/tsconfig.json
-      - ./frontend/vite.config.ts:/home/bun/app/vite.config.ts
+      - ./resalt-frontend/.svelte-kit/tsconfig.json:/home/bun/app/.svelte-kit/tsconfig.json
+      - ./resalt-frontend/src:/home/bun/app/src
+      - ./resalt-frontend/static:/home/bun/app/static
+      - ./resalt-frontend/package.json:/home/bun/app/package.json
+      - ./resalt-frontend/svelte.config.js:/home/bun/app/svelte.config.js
+      - ./resalt-frontend/tsconfig.json:/home/bun/app/tsconfig.json
+      - ./resalt-frontend/vite.config.ts:/home/bun/app/vite.config.ts
     command: /bin/sh -c "bun install && bun run dev"
     restart: always
     ports:
@@ -48,7 +48,33 @@ services:
       context: ./
       dockerfile: ./docs/docker/Dockerfile-devel
     volumes:
-      - .:/usr/src/app
+      - ./.cargo:/usr/src/app/.cargo:ro
+      - ./Cargo.toml:/usr/src/app/Cargo.toml:ro
+      - ./docs:/usr/src/app/docs:ro
+      - ./gitignore:/usr/src/app/gitignore:ro
+      - ./resalt-auth:/usr/src/app/resalt-auth:ro
+      - ./resalt-config:/usr/src/app/resalt-config:ro
+      - ./resalt-models:/usr/src/app/resalt-models:ro
+      - ./resalt-routes:/usr/src/app/resalt-routes:ro
+      - ./resalt-salt:/usr/src/app/resalt-salt:ro
+      - ./resalt-security:/usr/src/app/resalt-security:ro
+      - ./resalt-server:/usr/src/app/resalt-server:ro
+      - ./resalt-storage:/usr/src/app/resalt-storage:ro
+      - ./resalt-storage-files:/usr/src/app/resalt-storage-files:ro
+      - ./resalt-storage-mysql:/usr/src/app/resalt-storage-mysql:ro
+      - ./resalt-storage-redis:/usr/src/app/resalt-storage-redis:ro
+      - ./resalt-updater:/usr/src/app/resalt-updater:ro
+      # The following is because Bun does not support reading files which are mounted as read-only
+      # Same as frontend, except /home/bun/app -> /usr/src/app/resalt-frontend
+      - ./resalt-frontend/.svelte-kit/tsconfig.json:/usr/src/app/resalt-frontend/.svelte-kit/tsconfig.json
+      - ./resalt-frontend/src:/usr/src/app/resalt-frontend/src
+      - ./resalt-frontend/static:/usr/src/app/resalt-frontend/static
+      - ./resalt-frontend/package.json:/usr/src/app/resalt-frontend/package.json
+      - ./resalt-frontend/svelte.config.js:/usr/src/app/resalt-frontend/svelte.config.js
+      - ./resalt-frontend/tsconfig.json:/usr/src/app/resalt-frontend/tsconfig.json
+      - ./resalt-frontend/vite.config.ts:/usr/src/app/resalt-frontend/vite.config.ts
+      # + extra
+      - ./resalt-frontend/Cargo.toml:/usr/src/app/resalt-frontend/Cargo.toml:ro
     environment:
       RESALT_AUTH_FORWARD_ENABLED: ${RESALT_AUTH_FORWARD_ENABLED:-}
       RESALT_AUTH_SESSION_LIFESPAN: ${RESALT_AUTH_SESSION_LIFESPAN:-}

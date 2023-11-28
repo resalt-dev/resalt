@@ -1,6 +1,7 @@
 use std::net::SocketAddr;
 
 use axum::{
+    extract::ConnectInfo,
     http::{header, Request},
     middleware::Next,
     response::Response,
@@ -10,8 +11,8 @@ use log::*;
 use resalt_models::{AuthStatus, ResaltTime};
 
 pub async fn middleware_logging<B>(
-    Extension(socket): Extension<SocketAddr>,
-    Extension(auth): Extension<Option<AuthStatus>>,
+    ConnectInfo(socket): ConnectInfo<SocketAddr>,
+    auth: Option<Extension<AuthStatus>>,
     // you can add more extractors here but the last
     // extractor must implement `FromRequest` which
     // `Request` does
@@ -29,7 +30,7 @@ pub async fn middleware_logging<B>(
     let path = req.uri().path().to_string();
     let proto = req.version();
     let user = match auth {
-        Some(auth) => auth.user_id,
+        Some(auth) => auth.user_id.clone(),
         None => "-".to_string(),
     };
 

@@ -26,35 +26,62 @@ fn main() {
     }
 
     // Run "bun install"
-    let output = Command::new(bun_path)
-        .arg("install")
-        .output()
-        .expect("Failed to run bun install");
+    let output = Command::new(&bun_path).arg("install").output();
 
-    if !output.status.success() {
+    let output = match output {
+        Ok(output) => output,
+        Err(e) => panic!(
+            r#"
+            ----------------------------------------
+            Failed to execute Bun binary during install.
+
+            Error: {}
+            ----------------------------------------
+        "#,
+            e
+        ),
+    };
+    if output.status.code().unwrap() != 0 {
         panic!(
             r#"
             ----------------------------------------
             Bun failed to install dependencies. Please try again.
+
+            Status: {}
+            Error: {}
             ----------------------------------------
-        "#
+        "#,
+            output.status.code().unwrap(),
+            String::from_utf8_lossy(&output.stderr)
         );
     }
 
     // Run "bun build"
-    let output = Command::new("bun")
-        .arg("run")
-        .arg("build")
-        .output()
-        .expect("Failed to run bun build");
+    let output = Command::new(&bun_path).arg("run").arg("build").output();
 
-    if !output.status.success() {
+    let output = match output {
+        Ok(output) => output,
+        Err(e) => panic!(
+            r#"
+            ----------------------------------------
+            Failed to execute Bun binary during build.
+
+            Error: {}
+            ----------------------------------------
+        "#,
+            e
+        ),
+    };
+    if output.status.success() {
         panic!(
             r#"
             ----------------------------------------
             Bun failed to build. Please try again.
+
+            Error: {}
             ----------------------------------------
-        "#
+        "#,
+            String::from_utf8_lossy(&output.stderr)
         );
     }
 }

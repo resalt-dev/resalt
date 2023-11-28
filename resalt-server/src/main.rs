@@ -169,7 +169,9 @@ async fn start_server(
     let app = logging.layer(app);
 
     let socket = SocketAddr::from(([0, 0, 0, 0], SConfig::http_port()));
-    Server::bind(&socket).serve(app.into_make_service()).await?;
+    Server::bind(&socket)
+        .serve(app.into_make_service_with_connect_info::<SocketAddr>())
+        .await?;
 
     Ok(())
 }

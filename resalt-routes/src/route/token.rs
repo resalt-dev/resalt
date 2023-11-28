@@ -1,4 +1,4 @@
-use axum::{extract::State, response::IntoResponse, Json};
+use axum::{extract::State, response::IntoResponse, Form, Json};
 use log::*;
 use resalt_auth::validate_auth_token;
 use resalt_config::SConfig;
@@ -16,7 +16,7 @@ pub struct TokenValidateRequest {
 
 pub async fn route_token_post(
     State(data): State<Box<dyn StorageImpl>>,
-    Json(input): Json<TokenValidateRequest>,
+    Form(input): Form<TokenValidateRequest>,
 ) -> Result<impl IntoResponse, ApiError> {
     let db = data;
     let username = input.username.to_lowercase();

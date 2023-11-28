@@ -21,4 +21,20 @@ EXPOSE 8000
 WORKDIR /usr/src/app
 
 # Remember to mount source code to the container as volume!
-CMD cargo watch --poll -w . -x run
+CMD cargo watch --poll --why \
+      -w resalt-auth  \
+      -w resalt-config \
+      -w resalt-frontend/src/lib.rs \
+      -w resalt-frontend/src/build.rs \
+      -w resalt-models \
+      -w resalt-routes \
+      -w resalt-salt \
+      -w resalt-security \
+      -w resalt-server \
+      -w resalt-storage \
+      -w resalt-storage-files \
+      -w resalt-storage-mysql \
+      -w resalt-storage-redis \
+      -w resalt-updater \
+      -w Cargo.toml \
+      -x run
