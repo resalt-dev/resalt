@@ -22,13 +22,14 @@ static SYSTEM_TOKEN_FALLBACK: Lazy<String> = Lazy::new(|| {
 
 #[inline]
 #[must_use]
-fn abc<T: std::str::FromStr>(key: &str, fallback: T) -> T
+fn conf<T: std::str::FromStr>(key: &str, fallback: T) -> T
 where
     T::Err: std::fmt::Debug,
 {
     std::env::var(key)
         .ok()
         .map(|value| strip_quotes(&value))
+        .filter(|value| !value.is_empty())
         .and_then(|value| value.parse().ok())
         .unwrap_or(fallback)
 }
@@ -36,25 +37,25 @@ where
 pub struct SConfig {}
 impl SConfig {
     pub fn auth_forward_enabled() -> bool {
-        abc("RESALT_AUTH_FORWARD_ENABLED", false)
+        conf("RESALT_AUTH_FORWARD_ENABLED", false)
     }
 
     pub fn auth_session_lifespan() -> u64 {
-        abc("RESALT_AUTH_SESSION_LIFESPAN", 43200)
+        conf("RESALT_AUTH_SESSION_LIFESPAN", 43200)
     }
 
     pub fn database_type() -> String {
-        abc("RESALT_DATABASE_TYPE", "redis".to_string())
+        conf("RESALT_DATABASE_TYPE", "redis".to_string())
     }
 
     pub fn database_username() -> String {
-        abc("RESALT_DATABASE_USERNAME", "default".to_string())
+        conf("RESALT_DATABASE_USERNAME", "default".to_string())
     }
 
     pub fn database_password() -> String {
-        let password_file = abc("RESALT_DATABASE_PASSWORDFILE", "".to_string());
+        let password_file = conf("RESALT_DATABASE_PASSWORDFILE", "".to_string());
         match password_file.len() {
-            0 => abc("RESALT_DATABASE_PASSWORD", "resalt".to_string()),
+            0 => conf("RESALT_DATABASE_PASSWORD", "resalt".to_string()),
             _ => std::fs::read_to_string(password_file)
                 .unwrap()
                 .trim()
@@ -63,34 +64,34 @@ impl SConfig {
     }
 
     pub fn database_host() -> String {
-        abc("RESALT_DATABASE_HOST", "".to_string())
+        conf("RESALT_DATABASE_HOST", "redis".to_string())
     }
 
     pub fn database_port() -> u16 {
-        abc("RESALT_DATABASE_PORT", 6379)
+        conf("RESALT_DATABASE_PORT", 6379)
     }
 
     pub fn database_database() -> String {
-        abc("RESALT_DATABASE_DATABASE", "0".to_string())
+        conf("RESALT_DATABASE_DATABASE", "0".to_string())
     }
 
     pub fn metrics_enabled() -> bool {
-        abc("RESALT_METRICS_ENABLED", false)
+        conf("RESALT_METRICS_ENABLED", false)
     }
 
     pub fn salt_api_url() -> String {
-        abc("RESALT_SALT_API_URL", "https://master:8080".to_string())
+        conf("RESALT_SALT_API_URL", "https://master:8080".to_string())
     }
 
     pub fn salt_api_tls_skipverify() -> bool {
-        abc("RESALT_SALT_API_TLS_SKIPVERIFY", true)
+        conf("RESALT_SALT_API_TLS_SKIPVERIFY", true)
     }
 
     pub fn salt_api_system_service_token() -> String {
-        let token_file = abc("RESALT_SALT_API_TOKEN_FILE", "".to_string());
+        let token_file = conf("RESALT_SALT_API_TOKEN_FILE", "".to_string());
         match token_file.clone().len() {
             0 => {
-                let token = abc("RESALT_SALT_API_TOKEN", "".to_string());
+                let token = conf("RESALT_SALT_API_TOKEN", "".to_string());
                 if token.is_empty() {
                     SYSTEM_TOKEN_FALLBACK.clone()
                 } else {
@@ -105,15 +106,15 @@ impl SConfig {
     }
 
     pub fn http_port() -> u16 {
-        abc("RESALT_HTTP_PORT", 8000)
+        conf("RESALT_HTTP_PORT", 8000)
     }
 
     pub fn http_frontend_theme_enabled() -> bool {
-        abc("RESALT_HTTP_FRONTEND_THEME_ENABLED", true)
+        conf("RESALT_HTTP_FRONTEND_THEME_ENABLED", true)
     }
 
     pub fn http_frontend_theme_color() -> String {
-        abc("RESALT_HTTP_FRONTEND_THEME_COLOR", "primary".to_string())
+        conf("RESALT_HTTP_FRONTEND_THEME_COLOR", "primary".to_string())
     }
 }
 

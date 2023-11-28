@@ -77,7 +77,7 @@ pub async fn route_login_post(
         match user {
             Some(user) => user,
             None => {
-                info!("User not found: {}", &username);
+                info!("User login failed for: {}", &username);
                 return Err(ApiError::Unauthorized);
             }
         }
