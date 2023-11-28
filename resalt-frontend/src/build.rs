@@ -1,7 +1,32 @@
 use std::process::Command;
 
+fn run_command(command: &str) {
+    let output = Command::new("bash")
+        .arg("-c")
+        .arg(format!("source ~/.bashrc && {}", command))
+        .output()
+        .expect("Failed to execute command");
+
+    if output.status.success() {
+        println!("cargo:warning={}", String::from_utf8_lossy(&output.stderr));
+    } else {
+        panic!(
+            r#"
+            ----------------------------------------
+            Failed to execute command.
+
+            Command: {}
+            Error: {}
+            ----------------------------------------
+        "#,
+            command,
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+}
+
 fn main() {
-    // println!("cargo:rerun-if-changed=NULL");
+    println!("cargo:rerun-if-changed=NULL");
 
     println!("cargo:rerun-if-changed=src/");
     println!("cargo:rerun-if-changed=static/");
@@ -26,62 +51,19 @@ fn main() {
     }
 
     // Run "bun install"
-    let output = Command::new(&bun_path).arg("install").output();
+    run_command("bun install");
 
-    let output = match output {
-        Ok(output) => output,
-        Err(e) => panic!(
-            r#"
-            ----------------------------------------
-            Failed to execute Bun binary during install.
+    // Run "bun run build"
+    run_command("bun run build");
 
-            Error: {}
-            ----------------------------------------
-        "#,
-            e
-        ),
-    };
-    if output.status.code().unwrap() != 0 {
+    // Check if "build" directory exists
+    if !std::path::Path::new("build").exists() {
         panic!(
             r#"
             ----------------------------------------
-            Bun failed to install dependencies. Please try again.
-
-            Status: {}
-            Error: {}
+            Bun failed to build. Output "build" folder is missing.
             ----------------------------------------
-        "#,
-            output.status.code().unwrap(),
-            String::from_utf8_lossy(&output.stderr)
-        );
-    }
-
-    // Run "bun build"
-    let output = Command::new(&bun_path).arg("run").arg("build").output();
-
-    let output = match output {
-        Ok(output) => output,
-        Err(e) => panic!(
-            r#"
-            ----------------------------------------
-            Failed to execute Bun binary during build.
-
-            Error: {}
-            ----------------------------------------
-        "#,
-            e
-        ),
-    };
-    if output.status.success() {
-        panic!(
-            r#"
-            ----------------------------------------
-            Bun failed to build. Please try again.
-
-            Error: {}
-            ----------------------------------------
-        "#,
-            String::from_utf8_lossy(&output.stderr)
+        "#
         );
     }
 }
