@@ -26,7 +26,7 @@ fn run_command(command: &str) {
 }
 
 fn main() {
-    println!("cargo:rerun-if-changed=NULL");
+    // println!("cargo:rerun-if-changed=NULL");
 
     println!("cargo:rerun-if-changed=src/");
     println!("cargo:rerun-if-changed=static/");
