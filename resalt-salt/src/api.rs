@@ -74,7 +74,7 @@ impl SaltAPI {
         let body = match res.json::<serde_json::Value>().await {
             Ok(body) => body,
             Err(e) => {
-                error!("{:?}", e);
+                error!("res.json: {:?}", e);
                 return Err(SaltError::ResponseParseError(Some(e.to_string())));
             }
         };
@@ -97,7 +97,7 @@ impl SaltAPI {
         let mut salt_token: SaltToken = match serde_json::from_value(salt_token.clone()) {
             Ok(salt_token) => salt_token,
             Err(e) => {
-                error!("{:?}", e);
+                error!("Convert to SaltToken: {:?}", e);
                 return Err(SaltError::ResponseParseError(None));
             }
         };
@@ -174,7 +174,7 @@ impl SaltAPI {
                 let chunk = match chunk {
                     Ok(d) => d,
                     Err(e) => {
-                        error!("{:?}", e);
+                        error!("stream.next: {:?}", e);
                         break;
                     }
                 };
