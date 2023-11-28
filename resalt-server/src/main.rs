@@ -23,7 +23,7 @@ async fn init_db() -> Box<dyn StorageImpl> {
     let db_type = SConfig::database_type();
     let db_type = db_type.to_lowercase();
     let db_type = db_type.as_str();
-    info!("Database type: {}", db_type);
+    info!("Database type: \"{}\"", db_type);
     match db_type {
         "files" => {
             let path = SConfig::database_host();
