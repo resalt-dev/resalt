@@ -26,7 +26,7 @@ fn main() {
     }
 
     // Run "bun install"
-    let output = Command::new("bun")
+    let output = Command::new(bun_path)
         .arg("install")
         .output()
         .expect("Failed to run bun install");
