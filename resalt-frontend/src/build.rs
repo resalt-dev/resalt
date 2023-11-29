@@ -8,7 +8,7 @@ fn run_command(command: &str) {
         .expect("Failed to execute command");
 
     if output.status.success() {
-        println!("cargo:warning={}", String::from_utf8_lossy(&output.stderr));
+        // println!("cargo:warning={}", String::from_utf8_lossy(&output.stderr));
     } else {
         panic!(
             r#"
