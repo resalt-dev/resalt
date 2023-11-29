@@ -25,7 +25,7 @@ pub async fn route_token_post(
     debug!("Token validation for {:?} with token {:?}", username, token);
 
     if username == RESALT_SALT_SYSTEM_SERVICE_USERNAME {
-        if token == ResaltConfig::salt_api_system_service_token() {
+        if token == *ResaltConfig::SALT_API_SYSTEM_SERVICE_TOKEN {
             info!("System service token OK");
             return Ok(Json(json!([
                 ".*".to_string(),

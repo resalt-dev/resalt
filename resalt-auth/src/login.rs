@@ -71,7 +71,7 @@ pub fn validate_auth_token(
         }
     };
 
-    let session_lifespan = ResaltConfig::auth_session_lifespan();
+    let session_lifespan = *ResaltConfig::AUTH_SESSION_LIFESPAN;
 
     if (authtoken.timestamp.timestamp() as u64) + session_lifespan
         < ResaltTime::now().timestamp() as u64

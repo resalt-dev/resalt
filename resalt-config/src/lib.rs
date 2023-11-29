@@ -5,140 +5,204 @@ pub use util::strip_quotes;
 
 static SYSTEM_TOKEN_FALLBACK: Lazy<String> = Lazy::new(generate_random_token);
 
-// enum ResaltConfigKey {
-//     AuthForwardEnabled,
-//     AuthSessionLifespan,
-//     DatabaseType,
-//     DatabaseUsername,
-//     DatabasePassword,
-//     DatabaseHost,
-//     DatabasePort,
-//     DatabaseDatabase,
-//     MetricsEnabled,
-//     SaltApiUrl,
-//     SaltApiTlsSkipverify,
-//     SaltApiSystemServiceToken,
-//     HttpPort,
-//     HttpFrontendThemeEnabled,
-//     HttpFrontendThemeColor,
-// }
+enum ResaltConfigKey {
+    AuthForwardEnabled,
+    AuthSessionLifespan,
+    DatabaseType,
+    DatabaseUsername,
+    DatabasePassword,
+    DatabaseHost,
+    DatabasePort,
+    DatabaseDatabase,
+    MetricsEnabled,
+    SaltApiUrl,
+    SaltApiTlsSkipverify,
+    SaltApiSystemServiceToken,
+    HttpPort,
+    HttpFrontendThemeEnabled,
+    HttpFrontendThemeColor,
+}
 
-// impl ResaltConfigKey {
-//     fn key(&self) -> &'static str {
-//         match self {
-//             ResaltConfigKey::AuthForwardEnabled => "RESALT_AUTH_FORWARD_ENABLED",
-//             ResaltConfigKey::AuthSessionLifespan => "RESALT_AUTH_SESSION_LIFESPAN",
-//             ResaltConfigKey::DatabaseType => "RESALT_DATABASE_TYPE",
-//             ResaltConfigKey::DatabaseUsername => "RESALT_DATABASE_USERNAME",
-//             ResaltConfigKey::DatabasePassword => "RESALT_DATABASE_PASSWORD",
-//             ResaltConfigKey::DatabaseHost => "RESALT_DATABASE_HOST",
-//             ResaltConfigKey::DatabasePort => "RESALT_DATABASE_PORT",
-//             ResaltConfigKey::DatabaseDatabase => "RESALT_DATABASE_DATABASE",
-//             ResaltConfigKey::MetricsEnabled => "RESALT_METRICS_ENABLED",
-//             ResaltConfigKey::SaltApiUrl => "RESALT_SALT_API_URL",
-//             ResaltConfigKey::SaltApiTlsSkipverify => "RESALT_SALT_API_TLS_SKIPVERIFY",
-//             ResaltConfigKey::SaltApiSystemServiceToken => "RESALT_SALT_API_TOKEN",
-//             ResaltConfigKey::HttpPort => "RESALT_HTTP_PORT",
-//             ResaltConfigKey::HttpFrontendThemeEnabled => "RESALT_HTTP_FRONTEND_THEME_ENABLED",
-//             ResaltConfigKey::HttpFrontendThemeColor => "RESALT_HTTP_FRONTEND_THEME_COLOR",
-//         }
-//     }
-// }
+impl ResaltConfigKey {
+    fn key(&self) -> &'static str {
+        match self {
+            ResaltConfigKey::AuthForwardEnabled => "RESALT_AUTH_FORWARD_ENABLED",
+            ResaltConfigKey::AuthSessionLifespan => "RESALT_AUTH_SESSION_LIFESPAN",
+            ResaltConfigKey::DatabaseType => "RESALT_DATABASE_TYPE",
+            ResaltConfigKey::DatabaseUsername => "RESALT_DATABASE_USERNAME",
+            ResaltConfigKey::DatabasePassword => "RESALT_DATABASE_PASSWORD",
+            ResaltConfigKey::DatabaseHost => "RESALT_DATABASE_HOST",
+            ResaltConfigKey::DatabasePort => "RESALT_DATABASE_PORT",
+            ResaltConfigKey::DatabaseDatabase => "RESALT_DATABASE_DATABASE",
+            ResaltConfigKey::MetricsEnabled => "RESALT_METRICS_ENABLED",
+            ResaltConfigKey::SaltApiUrl => "RESALT_SALT_API_URL",
+            ResaltConfigKey::SaltApiTlsSkipverify => "RESALT_SALT_API_TLS_SKIPVERIFY",
+            ResaltConfigKey::SaltApiSystemServiceToken => "RESALT_SALT_API_TOKEN",
+            ResaltConfigKey::HttpPort => "RESALT_HTTP_PORT",
+            ResaltConfigKey::HttpFrontendThemeEnabled => "RESALT_HTTP_FRONTEND_THEME_ENABLED",
+            ResaltConfigKey::HttpFrontendThemeColor => "RESALT_HTTP_FRONTEND_THEME_COLOR",
+        }
+    }
+
+    fn fallback(&self) -> &'static str {
+        match self {
+            ResaltConfigKey::AuthForwardEnabled => "false",
+            ResaltConfigKey::AuthSessionLifespan => "43200",
+            ResaltConfigKey::DatabaseType => "files",
+            ResaltConfigKey::DatabaseUsername => "default",
+            ResaltConfigKey::DatabasePassword => "resalt",
+            ResaltConfigKey::DatabaseHost => "docs/docker/filesdb",
+            ResaltConfigKey::DatabasePort => "6379",
+            ResaltConfigKey::DatabaseDatabase => "0",
+            ResaltConfigKey::MetricsEnabled => "true",
+            ResaltConfigKey::SaltApiUrl => "http://localhost:8080",
+            ResaltConfigKey::SaltApiTlsSkipverify => "false",
+            ResaltConfigKey::SaltApiSystemServiceToken => SYSTEM_TOKEN_FALLBACK.as_str(),
+            ResaltConfigKey::HttpPort => "8000",
+            ResaltConfigKey::HttpFrontendThemeEnabled => "true",
+            ResaltConfigKey::HttpFrontendThemeColor => "primary",
+        }
+    }
+}
 
 #[inline]
 #[must_use]
-fn conf<T: std::str::FromStr>(key: &str, fallback: T) -> T
+fn conf<T: std::str::FromStr>(rck: ResaltConfigKey) -> T
 where
     T::Err: std::fmt::Debug,
 {
+    // Check if key_FILE env variable is set
+    let key = rck.key();
+    let key_file = format!("{}_FILE", key);
+    let key_file = std::env::var(key_file).ok();
+    if let Some(key_file) = key_file {
+        if !key_file.is_empty() {
+            return std::fs::read_to_string(strip_quotes(&key_file))
+                .unwrap()
+                .trim()
+                .parse()
+                .unwrap();
+        }
+    }
+    // Fallback to key env variable
+    let fallback = rck.fallback();
     std::env::var(key)
         .ok()
         .map(|value| strip_quotes(&value))
         .filter(|value| !value.is_empty())
         .and_then(|value| value.parse().ok())
-        .unwrap_or(fallback)
+        .unwrap_or(fallback.parse().unwrap())
 }
 
 pub struct ResaltConfig {}
 impl ResaltConfig {
-    pub fn auth_forward_enabled() -> bool {
-        conf("RESALT_AUTH_FORWARD_ENABLED", false)
+    fn auth_forward_enabled() -> bool {
+        conf::<bool>(ResaltConfigKey::AuthForwardEnabled)
     }
 
-    pub fn auth_session_lifespan() -> u64 {
-        conf("RESALT_AUTH_SESSION_LIFESPAN", 43200)
+    fn auth_session_lifespan() -> u64 {
+        conf::<u64>(ResaltConfigKey::AuthSessionLifespan)
     }
 
-    pub fn database_type() -> String {
-        conf("RESALT_DATABASE_TYPE", "files".to_string())
+    fn database_type() -> String {
+        conf::<String>(ResaltConfigKey::DatabaseType)
     }
 
-    pub fn database_username() -> String {
-        conf("RESALT_DATABASE_USERNAME", "default".to_string())
+    fn database_username() -> String {
+        conf::<String>(ResaltConfigKey::DatabaseUsername)
     }
 
-    pub fn database_password() -> String {
-        let password_file = conf("RESALT_DATABASE_PASSWORDFILE", "".to_string());
-        match password_file.len() {
-            0 => conf("RESALT_DATABASE_PASSWORD", "resalt".to_string()),
-            _ => std::fs::read_to_string(password_file)
-                .unwrap()
-                .trim()
-                .to_string(),
-        }
+    fn database_password() -> String {
+        conf::<String>(ResaltConfigKey::DatabasePassword)
     }
 
-    pub fn database_host() -> String {
-        conf("RESALT_DATABASE_HOST", "docs/docker/filesdb".to_string())
+    fn database_host() -> String {
+        conf::<String>(ResaltConfigKey::DatabaseHost)
     }
 
-    pub fn database_port() -> u16 {
-        conf("RESALT_DATABASE_PORT", 6379)
+    fn database_port() -> u16 {
+        conf::<u16>(ResaltConfigKey::DatabasePort)
     }
 
-    pub fn database_database() -> String {
-        conf("RESALT_DATABASE_DATABASE", "0".to_string())
+    fn database_database() -> String {
+        conf::<String>(ResaltConfigKey::DatabaseDatabase)
     }
 
-    pub fn metrics_enabled() -> bool {
-        conf("RESALT_METRICS_ENABLED", false)
+    fn metrics_enabled() -> bool {
+        conf::<bool>(ResaltConfigKey::MetricsEnabled)
     }
 
-    pub fn salt_api_url() -> String {
-        conf("RESALT_SALT_API_URL", "http://127.0.0.1:8080".to_string())
+    fn salt_api_url() -> String {
+        conf::<String>(ResaltConfigKey::SaltApiUrl)
     }
 
-    pub fn salt_api_tls_skipverify() -> bool {
-        conf("RESALT_SALT_API_TLS_SKIPVERIFY", true)
+    fn salt_api_tls_skipverify() -> bool {
+        conf::<bool>(ResaltConfigKey::SaltApiTlsSkipverify)
     }
 
-    pub fn salt_api_system_service_token() -> String {
-        let token_file = conf("RESALT_SALT_API_TOKEN_FILE", "".to_string());
-        match token_file.clone().len() {
-            0 => {
-                let token = conf("RESALT_SALT_API_TOKEN", "".to_string());
-                if token.is_empty() {
-                    SYSTEM_TOKEN_FALLBACK.clone()
-                } else {
-                    token
-                }
-            }
-            _ => std::fs::read_to_string(token_file)
-                .unwrap()
-                .trim()
-                .to_string(),
-        }
+    fn salt_api_system_service_token() -> String {
+        conf::<String>(ResaltConfigKey::SaltApiSystemServiceToken)
     }
 
-    pub fn http_port() -> u16 {
-        conf("RESALT_HTTP_PORT", 8000)
+    fn http_port() -> u16 {
+        conf::<u16>(ResaltConfigKey::HttpPort)
     }
 
-    pub fn http_frontend_theme_enabled() -> bool {
-        conf("RESALT_HTTP_FRONTEND_THEME_ENABLED", true)
+    fn http_frontend_theme_enabled() -> bool {
+        conf::<bool>(ResaltConfigKey::HttpFrontendThemeEnabled)
     }
 
-    pub fn http_frontend_theme_color() -> String {
-        conf("RESALT_HTTP_FRONTEND_THEME_COLOR", "primary".to_string())
+    fn http_frontend_theme_color() -> String {
+        conf::<String>(ResaltConfigKey::HttpFrontendThemeColor)
+    }
+
+    pub const AUTH_FORWARD_ENABLED: Lazy<bool> = Lazy::new(ResaltConfig::auth_forward_enabled);
+    pub const AUTH_SESSION_LIFESPAN: Lazy<u64> = Lazy::new(ResaltConfig::auth_session_lifespan);
+    pub const DATABASE_TYPE: Lazy<String> = Lazy::new(ResaltConfig::database_type);
+    pub const DATABASE_USERNAME: Lazy<String> = Lazy::new(ResaltConfig::database_username);
+    pub const DATABASE_PASSWORD: Lazy<String> = Lazy::new(ResaltConfig::database_password);
+    pub const DATABASE_HOST: Lazy<String> = Lazy::new(ResaltConfig::database_host);
+    pub const DATABASE_PORT: Lazy<u16> = Lazy::new(ResaltConfig::database_port);
+    pub const DATABASE_DATABASE: Lazy<String> = Lazy::new(ResaltConfig::database_database);
+    pub const METRICS_ENABLED: Lazy<bool> = Lazy::new(ResaltConfig::metrics_enabled);
+    pub const SALT_API_URL: Lazy<String> = Lazy::new(ResaltConfig::salt_api_url);
+    pub const SALT_API_TLS_SKIPVERIFY: Lazy<bool> =
+        Lazy::new(ResaltConfig::salt_api_tls_skipverify);
+    pub const SALT_API_SYSTEM_SERVICE_TOKEN: Lazy<String> =
+        Lazy::new(ResaltConfig::salt_api_system_service_token);
+    pub const HTTP_PORT: Lazy<u16> = Lazy::new(ResaltConfig::http_port);
+    pub const HTTP_FRONTEND_THEME_ENABLED: Lazy<bool> =
+        Lazy::new(ResaltConfig::http_frontend_theme_enabled);
+    pub const HTTP_FRONTEND_THEME_COLOR: Lazy<String> =
+        Lazy::new(ResaltConfig::http_frontend_theme_color);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_basic() {
+        assert_eq!(*ResaltConfig::AUTH_FORWARD_ENABLED, false);
+        assert_eq!(*ResaltConfig::AUTH_SESSION_LIFESPAN, 43200);
+        assert_eq!(*ResaltConfig::DATABASE_TYPE, "files");
+    }
+
+    #[test]
+    fn test_file_override() {
+        let tmp_path = "/tmp/resalt-config-test";
+        std::env::set_var("RESALT_AUTH_FORWARD_ENABLED", "true");
+        std::env::set_var("RESALT_AUTH_FORWARD_ENABLED_FILE", tmp_path);
+        std::fs::write(tmp_path, "false").unwrap();
+        assert_eq!(*ResaltConfig::AUTH_FORWARD_ENABLED, false);
+        std::fs::write(tmp_path, "true").unwrap();
+        assert_eq!(*ResaltConfig::AUTH_FORWARD_ENABLED, true);
+        std::fs::remove_file(tmp_path).unwrap();
+    }
+
+    #[test]
+    fn test_fallback() {
+        std::env::remove_var("RESALT_AUTH_FORWARD_ENABLED");
+        assert_eq!(*ResaltConfig::AUTH_FORWARD_ENABLED, false);
     }
 }

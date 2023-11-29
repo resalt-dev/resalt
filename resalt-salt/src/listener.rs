@@ -36,7 +36,7 @@ impl SaltEventListener {
             .api
             .login(
                 RESALT_SALT_SYSTEM_SERVICE_USERNAME,
-                &ResaltConfig::salt_api_system_service_token(),
+                &ResaltConfig::SALT_API_SYSTEM_SERVICE_TOKEN,
             )
             .await
         {

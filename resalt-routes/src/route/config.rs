@@ -24,7 +24,7 @@ pub struct ApiConfig {
 pub async fn route_config_get() -> Result<impl IntoResponse, ApiError> {
     let update_info = get_update_cache();
     let config = ApiConfig {
-        auth_forward_enabled: ResaltConfig::auth_forward_enabled(),
+        auth_forward_enabled: *ResaltConfig::AUTH_FORWARD_ENABLED,
         current_version: CURRENT_VERSION.to_string(),
         latest_version: match update_info.version {
             Some(version) => version,
@@ -40,8 +40,8 @@ pub async fn route_config_get() -> Result<impl IntoResponse, ApiError> {
                 Vec::new()
             }
         },
-        theme_default_color: ResaltConfig::http_frontend_theme_color(),
-        theme_enable_switching: ResaltConfig::http_frontend_theme_enabled(),
+        theme_default_color: ResaltConfig::HTTP_FRONTEND_THEME_COLOR.clone(),
+        theme_enable_switching: ResaltConfig::HTTP_FRONTEND_THEME_ENABLED.clone(),
     };
     Ok(Json(config))
 }

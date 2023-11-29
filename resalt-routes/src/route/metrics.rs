@@ -9,7 +9,7 @@ pub async fn route_metrics_get(
     State(listener_status): State<SaltEventListenerStatus>,
     State(data): State<Box<dyn StorageImpl>>,
 ) -> Result<impl IntoResponse, ApiError> {
-    if !ResaltConfig::metrics_enabled() {
+    if !*ResaltConfig::METRICS_ENABLED {
         return Err(ApiError::NotFound);
     }
 
