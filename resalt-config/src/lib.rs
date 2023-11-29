@@ -45,7 +45,7 @@ impl SConfig {
     }
 
     pub fn database_type() -> String {
-        conf("RESALT_DATABASE_TYPE", "redis".to_string())
+        conf("RESALT_DATABASE_TYPE", "files".to_string())
     }
 
     pub fn database_username() -> String {
@@ -64,7 +64,7 @@ impl SConfig {
     }
 
     pub fn database_host() -> String {
-        conf("RESALT_DATABASE_HOST", "redis".to_string())
+        conf("RESALT_DATABASE_HOST", "docs/docker/filesdb".to_string())
     }
 
     pub fn database_port() -> u16 {
@@ -80,7 +80,7 @@ impl SConfig {
     }
 
     pub fn salt_api_url() -> String {
-        conf("RESALT_SALT_API_URL", "https://master:8080".to_string())
+        conf("RESALT_SALT_API_URL", "http://127.0.0.1:8080".to_string())
     }
 
     pub fn salt_api_tls_skipverify() -> bool {
