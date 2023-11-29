@@ -43,7 +43,7 @@ pub struct SaltMinionKey {
     pub finger: String,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub enum SaltKeyState {
     #[default]
     #[serde(rename = "minions")]
@@ -62,7 +62,7 @@ impl ToString for SaltKeyState {
     }
 }
 
-#[derive(Debug, Default, Serialize, Deserialize)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub enum SaltClientType {
     #[default]
     #[serde(rename = "local")]
@@ -82,6 +82,39 @@ pub enum SaltClientType {
 }
 
 impl ToString for SaltClientType {
+    fn to_string(&self) -> String {
+        strip_quotes(serde_json::to_string(self).unwrap())
+    }
+}
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+pub enum SaltTgtType {
+    #[default]
+    #[serde(rename = "glob")]
+    Glob,
+    #[serde(rename = "pcre")]
+    PCRE,
+    #[serde(rename = "list")]
+    List,
+    #[serde(rename = "grain")]
+    Grain,
+    #[serde(rename = "grain_pcre")]
+    GrainPCRE,
+    #[serde(rename = "pillar")]
+    Pillar,
+    #[serde(rename = "pillar_pcre")]
+    PillarPCRE,
+    #[serde(rename = "nodegroup")]
+    NodeGroup,
+    #[serde(rename = "range")]
+    Range,
+    #[serde(rename = "compound")]
+    Compound,
+    #[serde(rename = "ipcidr")]
+    IPCIDR,
+}
+
+impl ToString for SaltTgtType {
     fn to_string(&self) -> String {
         strip_quotes(serde_json::to_string(self).unwrap())
     }

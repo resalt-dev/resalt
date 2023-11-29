@@ -13,5 +13,4 @@ reqwest = { workspace = true }
 resalt-config = { path = "../resalt-config" }
 resalt-models = { path = "../resalt-models" }
 resalt-storage = { path = "../resalt-storage" }
-serde = { workspace = true }
 serde_json = { workspace = true }
