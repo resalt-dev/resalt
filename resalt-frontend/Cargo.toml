@@ -6,5 +6,4 @@ publish.workspace = true
 build = "src/build.rs"
 
 [dependencies]
-axum = { workspace = true }
 include_dir = "0.7.3"

@@ -192,14 +192,7 @@ async fn run() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-pub fn start() -> Result<(), Box<dyn Error>> {
-    tokio::runtime::Builder::new_multi_thread()
-        .enable_all()
-        .build()
-        .unwrap()
-        .block_on(run())
-}
-
-pub fn main() {
-    start().unwrap();
+#[tokio::main]
+pub async fn main() {
+    run().await.unwrap();
 }

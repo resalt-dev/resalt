@@ -39,7 +39,7 @@ rand = { version = "0.8.5", features = ["alloc", "std", "std_rng"], default-feat
 reqwest = { version = "0.11.22", features = ["json", "stream", "default-tls"], default-features = false }
 serde = { version = "1.0.139", features = ["derive"], default-features = false }
 serde_json = { version = "1.0.82", default-features = false }
-tokio = { version = "1.20.0", features = ["rt-multi-thread"], default-features = false }
+tokio = { version = "1.20.0", features = ["macros", "rt-multi-thread"], default-features = false }
 tower = { version = "0.4.13", default-features = false }
 tower-http = { version = "0.5.0", features=["normalize-path"], default-features = false }
 uuid = { version = "1.1.2", features = ["serde", "v4"], default-features = false }

@@ -65,7 +65,6 @@ impl ResaltConfigKey {
     }
 }
 
-#[inline]
 #[must_use]
 fn conf<T: std::str::FromStr>(rck: ResaltConfigKey) -> T
 where
@@ -77,11 +76,19 @@ where
     let key_file = std::env::var(key_file).ok();
     if let Some(key_file) = key_file {
         if !key_file.is_empty() {
-            return std::fs::read_to_string(strip_quotes(&key_file))
-                .unwrap()
-                .trim()
-                .parse()
-                .unwrap();
+            let data = match std::fs::read_to_string(strip_quotes(&key_file)) {
+                Ok(data) => data,
+                Err(e) => {
+                    panic!("Error reading {}: {}", &key_file, e);
+                }
+            };
+            let data = data.trim();
+            return match data.parse() {
+                Ok(data) => data,
+                Err(e) => {
+                    panic!("Error parsing \"{}\": {:?}", data, e);
+                }
+            };
         }
     }
     // Fallback to key env variable
@@ -179,6 +186,7 @@ impl ResaltConfig {
 
 #[cfg(test)]
 mod tests {
+
     use super::*;
 
     #[test]
@@ -190,19 +198,30 @@ mod tests {
 
     #[test]
     fn test_file_override() {
-        let tmp_path = "/tmp/resalt-config-test";
+        let time = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_millis();
+        let tmp_path = &format!("/tmp/resalt-config-test-{}", time);
         std::env::set_var("RESALT_AUTH_FORWARD_ENABLED", "true");
         std::env::set_var("RESALT_AUTH_FORWARD_ENABLED_FILE", tmp_path);
+
         std::fs::write(tmp_path, "false").unwrap();
-        assert_eq!(*ResaltConfig::AUTH_FORWARD_ENABLED, false);
-        std::fs::write(tmp_path, "true").unwrap();
-        assert_eq!(*ResaltConfig::AUTH_FORWARD_ENABLED, true);
+        std::thread::sleep(std::time::Duration::from_millis(100)); // Wait for file to be written
+        assert_eq!(ResaltConfig::auth_forward_enabled(), false);
         std::fs::remove_file(tmp_path).unwrap();
+
+        std::fs::write(tmp_path, "true").unwrap();
+        std::thread::sleep(std::time::Duration::from_millis(100)); // Wait for file to be written
+        assert_eq!(ResaltConfig::auth_forward_enabled(), true);
+        std::fs::remove_file(tmp_path).unwrap();
+
+        std::env::remove_var("RESALT_AUTH_FORWARD_ENABLED_FILE");
     }
 
     #[test]
     fn test_fallback() {
         std::env::remove_var("RESALT_AUTH_FORWARD_ENABLED");
-        assert_eq!(*ResaltConfig::AUTH_FORWARD_ENABLED, false);
+        assert_eq!(ResaltConfig::auth_forward_enabled(), false);
     }
 }
