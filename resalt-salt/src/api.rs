@@ -16,10 +16,9 @@ pub fn create_reqwest_client() -> reqwest::Client {
     if SConfig::salt_api_tls_skipverify() {
         builder = builder.danger_accept_invalid_certs(true);
     }
-    builder
-        .timeout(Duration::from_secs(3)) // Connector timeout, 3 seconds
-        .build()
-        .unwrap()
+    builder = builder.connect_timeout(Duration::from_secs(5));
+    // builder = builder.timeout(Duration::from_secs(5)); // No timeout, as it breaks SSE
+    builder.build().unwrap()
 }
 
 #[derive(Clone)]
@@ -178,7 +177,7 @@ impl SaltAPI {
                         break;
                     }
                 };
-                trace!("LINE {:?}", chunk);
+                trace!("SSE line {:?}", chunk);
 
                 // Loop through every byte in line
                 for byte in chunk {
