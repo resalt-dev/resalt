@@ -249,8 +249,7 @@ pub async fn route_user_password_post(
 }
 
 pub async fn route_user_permissions_post(
-    Path(user_id): Path<String>,
-    Path(group_id): Path<String>,
+    Path((user_id, group_id)): Path<(String, String)>,
     State(data): State<Box<dyn StorageImpl>>,
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
@@ -323,8 +322,7 @@ pub async fn route_user_permissions_post(
 }
 
 pub async fn route_user_permissions_delete(
-    Path(user_id): Path<String>,
-    Path(group_id): Path<String>,
+    Path((user_id, group_id)): Path<(String, String)>,
     State(data): State<Box<dyn StorageImpl>>,
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
