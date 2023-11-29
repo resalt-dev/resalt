@@ -1,6 +1,6 @@
 use axum::response::{IntoResponse, Json};
 use log::error;
-use resalt_config::SConfig;
+use resalt_config::ResaltConfig;
 use resalt_models::ApiError;
 use resalt_updater::{get_update_cache, CURRENT_VERSION};
 use serde::Serialize;
@@ -24,7 +24,7 @@ pub struct ApiConfig {
 pub async fn route_config_get() -> Result<impl IntoResponse, ApiError> {
     let update_info = get_update_cache();
     let config = ApiConfig {
-        auth_forward_enabled: SConfig::auth_forward_enabled(),
+        auth_forward_enabled: ResaltConfig::auth_forward_enabled(),
         current_version: CURRENT_VERSION.to_string(),
         latest_version: match update_info.version {
             Some(version) => version,
@@ -40,8 +40,8 @@ pub async fn route_config_get() -> Result<impl IntoResponse, ApiError> {
                 Vec::new()
             }
         },
-        theme_default_color: SConfig::http_frontend_theme_color(),
-        theme_enable_switching: SConfig::http_frontend_theme_enabled(),
+        theme_default_color: ResaltConfig::http_frontend_theme_color(),
+        theme_enable_switching: ResaltConfig::http_frontend_theme_enabled(),
     };
     Ok(Json(config))
 }

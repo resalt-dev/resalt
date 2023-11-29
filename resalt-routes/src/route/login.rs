@@ -5,7 +5,7 @@ use axum::Json;
 use log::*;
 use resalt_auth::auth_login_classic;
 use resalt_auth::renew_token_salt_token;
-use resalt_config::SConfig;
+use resalt_config::ResaltConfig;
 use resalt_models::{ApiError, User};
 use resalt_salt::SaltAPI;
 use resalt_storage::StorageImpl;
@@ -31,7 +31,7 @@ pub async fn route_login_post(
     State(salt): State<SaltAPI>,
     Json(input): Json<LoginRequest>,
 ) -> Result<impl IntoResponse, ApiError> {
-    let user: User = if SConfig::auth_forward_enabled() {
+    let user: User = if ResaltConfig::auth_forward_enabled() {
         // Use X-Forwarded-User header as username
         let username = match headers.get("X-Forwarded-User") {
             Some(forwarded_user) => forwarded_user.to_str().unwrap().to_string(),
@@ -113,7 +113,7 @@ pub async fn route_login_post(
     };
 
     // Return
-    let session_lifespan = SConfig::auth_session_lifespan();
+    let session_lifespan = ResaltConfig::auth_session_lifespan();
     let response = LoginResponse {
         user_id: user.id,
         token: authtoken.id,

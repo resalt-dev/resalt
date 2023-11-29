@@ -1,7 +1,7 @@
 use axum::{extract::State, response::IntoResponse, Form, Json};
 use log::*;
 use resalt_auth::validate_auth_token;
-use resalt_config::SConfig;
+use resalt_config::ResaltConfig;
 use resalt_models::ApiError;
 use resalt_salt::RESALT_SALT_SYSTEM_SERVICE_USERNAME;
 use resalt_storage::StorageImpl;
@@ -25,7 +25,7 @@ pub async fn route_token_post(
     debug!("Token validation for {:?} with token {:?}", username, token);
 
     if username == RESALT_SALT_SYSTEM_SERVICE_USERNAME {
-        if token == SConfig::salt_api_system_service_token() {
+        if token == ResaltConfig::salt_api_system_service_token() {
             info!("System service token OK");
             return Ok(Json(json!([
                 ".*".to_string(),

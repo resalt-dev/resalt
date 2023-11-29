@@ -1,7 +1,7 @@
 use super::SaltAPI;
 use futures::{pin_mut, StreamExt};
 use log::*;
-use resalt_config::SConfig;
+use resalt_config::ResaltConfig;
 use resalt_models::{ResaltTime, SaltToken};
 use resalt_storage::StorageImpl;
 use serde_json::Value;
@@ -36,7 +36,7 @@ impl SaltEventListener {
             .api
             .login(
                 RESALT_SALT_SYSTEM_SERVICE_USERNAME,
-                &SConfig::salt_api_system_service_token(),
+                &ResaltConfig::salt_api_system_service_token(),
             )
             .await
         {

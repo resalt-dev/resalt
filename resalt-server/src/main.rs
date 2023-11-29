@@ -5,7 +5,7 @@ use axum::{
 };
 use env_logger::{init_from_env, Env};
 use log::info;
-use resalt_config::SConfig;
+use resalt_config::ResaltConfig;
 use resalt_routes::*;
 use resalt_salt::{SaltAPI, SaltEventListener, SaltEventListenerStatus};
 use resalt_storage::StorageImpl;
@@ -20,13 +20,13 @@ use tokio::task;
 use tower::Layer;
 
 async fn init_db() -> Box<dyn StorageImpl> {
-    let db_type = SConfig::database_type();
+    let db_type = ResaltConfig::database_type();
     let db_type = db_type.to_lowercase();
     let db_type = db_type.as_str();
     info!("Database type: \"{}\"", db_type);
     match db_type {
         "files" => {
-            let path = SConfig::database_host();
+            let path = ResaltConfig::database_host();
             Box::new(
                 resalt_storage_files::StorageFiles::connect(&path)
                     .unwrap_or_else(|_| panic!("Error connecting to {}", &path)),
@@ -35,11 +35,11 @@ async fn init_db() -> Box<dyn StorageImpl> {
         "mysql" => {
             let database_url = format!(
                 "mysql://{}:{}@{}:{}/{}",
-                SConfig::database_username(),
-                SConfig::database_password(),
-                SConfig::database_host(),
-                SConfig::database_port(),
-                SConfig::database_database()
+                ResaltConfig::database_username(),
+                ResaltConfig::database_password(),
+                ResaltConfig::database_host(),
+                ResaltConfig::database_port(),
+                ResaltConfig::database_database()
             );
             Box::new(
                 StorageMySQL::connect(&database_url)
@@ -50,11 +50,11 @@ async fn init_db() -> Box<dyn StorageImpl> {
         "redis" => {
             let database_url = format!(
                 "redis://{}:{}@{}:{}/{}",
-                SConfig::database_username(),
-                SConfig::database_password(),
-                SConfig::database_host(),
-                SConfig::database_port(),
-                SConfig::database_database()
+                ResaltConfig::database_username(),
+                ResaltConfig::database_password(),
+                ResaltConfig::database_host(),
+                ResaltConfig::database_port(),
+                ResaltConfig::database_database()
             );
 
             println!("Connecting to {}", &database_url);
@@ -168,7 +168,7 @@ async fn start_server(
     let logging = from_fn_with_state(shared_state, middleware_logging);
     let app = logging.layer(app);
 
-    let socket = SocketAddr::from(([0, 0, 0, 0], SConfig::http_port()));
+    let socket = SocketAddr::from(([0, 0, 0, 0], ResaltConfig::http_port()));
     Server::bind(&socket)
         .serve(app.into_make_service_with_connect_info::<SocketAddr>())
         .await?;

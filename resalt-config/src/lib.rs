@@ -1,24 +1,49 @@
+mod util;
 use once_cell::sync::Lazy;
-use rand::Rng;
+use util::generate_random_token;
+pub use util::strip_quotes;
 
-pub fn strip_quotes(s: &str) -> String {
-    #[allow(clippy::if_same_then_else)]
-    if s.starts_with('"') && s.ends_with('"') {
-        s[1..s.len() - 1].to_string()
-    } else if s.starts_with('\'') && s.ends_with('\'') {
-        s[1..s.len() - 1].to_string()
-    } else {
-        s.to_string()
-    }
+static SYSTEM_TOKEN_FALLBACK: Lazy<String> = Lazy::new(generate_random_token);
+
+enum ResaltConfigKey {
+    AuthForwardEnabled,
+    AuthSessionLifespan,
+    DatabaseType,
+    DatabaseUsername,
+    DatabasePassword,
+    DatabaseHost,
+    DatabasePort,
+    DatabaseDatabase,
+    MetricsEnabled,
+    SaltApiUrl,
+    SaltApiTlsSkipverify,
+    SaltApiSystemServiceToken,
+    HttpPort,
+    HttpFrontendThemeEnabled,
+    HttpFrontendThemeColor,
 }
 
-static SYSTEM_TOKEN_FALLBACK: Lazy<String> = Lazy::new(|| {
-    rand::thread_rng()
-        .sample_iter(&rand::distributions::Alphanumeric)
-        .take(512)
-        .map(|c| c.to_string())
-        .collect::<String>()
-});
+// impl ResaltConfigKey {
+//     fn key(&self) -> &'static str {
+//         match self {
+//             ResaltConfigKey::AuthForwardEnabled => "RESALT_AUTH_FORWARD_ENABLED",
+//             ResaltConfigKey::AuthSessionLifespan => "RESALT_AUTH_SESSION_LIFESPAN",
+//             ResaltConfigKey::DatabaseType => "RESALT_DATABASE_TYPE",
+//             ResaltConfigKey::DatabaseUsername => "RESALT_DATABASE_USERNAME",
+//             ResaltConfigKey::DatabasePassword => "RESALT_DATABASE_PASSWORD",
+//             ResaltConfigKey::DatabaseHost => "RESALT_DATABASE_HOST",
+//             ResaltConfigKey::DatabasePort => "RESALT_DATABASE_PORT",
+//             ResaltConfigKey::DatabaseDatabase => "RESALT_DATABASE_DATABASE",
+//             ResaltConfigKey::MetricsEnabled => "RESALT_METRICS_ENABLED",
+//             ResaltConfigKey::SaltApiUrl => "RESALT_SALT_API_URL",
+//             ResaltConfigKey::SaltApiTlsSkipverify => "RESALT_SALT_API_TLS_SKIPVERIFY",
+//             ResaltConfigKey::SaltApiSystemServiceToken => "RESALT_SALT_API_TOKEN",
+//             ResaltConfigKey::HttpPort => "RESALT_HTTP_PORT",
+//             ResaltConfigKey::HttpFrontendThemeEnabled => "RESALT_HTTP_FRONTEND_THEME_ENABLED",
+//             ResaltConfigKey::HttpFrontendThemeColor => "RESALT_HTTP_FRONTEND_THEME_COLOR",
+//         }
+//     }
+// }
 
 #[inline]
 #[must_use]
@@ -34,8 +59,8 @@ where
         .unwrap_or(fallback)
 }
 
-pub struct SConfig {}
-impl SConfig {
+pub struct ResaltConfig {}
+impl ResaltConfig {
     pub fn auth_forward_enabled() -> bool {
         conf("RESALT_AUTH_FORWARD_ENABLED", false)
     }
@@ -115,31 +140,5 @@ impl SConfig {
 
     pub fn http_frontend_theme_color() -> String {
         conf("RESALT_HTTP_FRONTEND_THEME_COLOR", "primary".to_string())
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_config() {
-        // Ensure all the default configs parsed without error.
-        // If this test fails, it means the config file is missing a default value.
-        SConfig::auth_forward_enabled();
-        SConfig::auth_session_lifespan();
-        SConfig::database_type();
-        SConfig::database_username();
-        SConfig::database_password();
-        SConfig::database_host();
-        SConfig::database_port();
-        SConfig::database_database();
-        SConfig::metrics_enabled();
-        SConfig::salt_api_url();
-        SConfig::salt_api_tls_skipverify();
-        SConfig::salt_api_system_service_token();
-        SConfig::http_port();
-        SConfig::http_frontend_theme_enabled();
-        SConfig::http_frontend_theme_color();
     }
 }

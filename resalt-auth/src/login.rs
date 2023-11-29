@@ -1,5 +1,5 @@
 use log::*;
-use resalt_config::SConfig;
+use resalt_config::ResaltConfig;
 use resalt_models::*;
 use resalt_salt::SaltAPI;
 use resalt_security::verify_password;
@@ -71,7 +71,7 @@ pub fn validate_auth_token(
         }
     };
 
-    let session_lifespan = SConfig::auth_session_lifespan();
+    let session_lifespan = ResaltConfig::auth_session_lifespan();
 
     if (authtoken.timestamp.timestamp() as u64) + session_lifespan
         < ResaltTime::now().timestamp() as u64

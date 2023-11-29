@@ -7,7 +7,7 @@ use chrono::Utc;
 use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
 use diesel_migrations::EmbeddedMigrations;
 use log::*;
-use resalt_config::SConfig;
+use resalt_config::ResaltConfig;
 use resalt_models::*;
 use resalt_storage::{StorageImpl, StorageStatus};
 
@@ -67,7 +67,7 @@ impl StorageImpl for StorageMySQL {
     fn get_status(&self) -> Result<resalt_storage::StorageStatus, String> {
         let mut connection = self.create_connection()?;
 
-        let lifespan = SConfig::auth_session_lifespan() * 1000;
+        let lifespan = ResaltConfig::auth_session_lifespan() * 1000;
         let auth_expiry: NaiveDateTime = match NaiveDateTime::from_timestamp_millis(
             Utc::now().timestamp_millis() - (lifespan as i64),
         ) {

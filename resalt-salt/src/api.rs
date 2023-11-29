@@ -4,7 +4,7 @@ use futures::StreamExt;
 use futures_core::stream;
 use log::*;
 use reqwest::StatusCode;
-use resalt_config::SConfig;
+use resalt_config::ResaltConfig;
 use resalt_models::*;
 use serde_json::{json, Value};
 use std::{collections::HashMap, time::Duration};
@@ -13,7 +13,7 @@ const X_AUTH_TOKEN: &str = "X-Auth-Token";
 
 pub fn create_reqwest_client() -> reqwest::Client {
     let mut builder = reqwest::ClientBuilder::new();
-    if SConfig::salt_api_tls_skipverify() {
+    if ResaltConfig::salt_api_tls_skipverify() {
         builder = builder.danger_accept_invalid_certs(true);
     }
     builder = builder.connect_timeout(Duration::from_secs(5));
@@ -39,7 +39,7 @@ impl SaltAPI {
         }
     }
     pub async fn login(&self, username: &str, authtoken: &str) -> Result<SaltToken, SaltError> {
-        let url = format!("{}/login", &SConfig::salt_api_url());
+        let url = format!("{}/login", &ResaltConfig::salt_api_url());
         // Send POST request to Salt API for auth token
         // This will contact us back on the /token endpoint to validate auth token
         let res = match self
@@ -116,7 +116,7 @@ impl SaltAPI {
     pub fn listen_events(&self, salt_token: &SaltToken) -> impl stream::Stream<Item = SaltEvent> {
         let url = format!(
             "{}/events?salt_token={}",
-            SConfig::salt_api_url(),
+            ResaltConfig::salt_api_url(),
             salt_token.token.clone()
         );
 
@@ -260,7 +260,7 @@ impl SaltAPI {
         salt_token: &SaltToken,
         data: serde_json::Value,
     ) -> Result<Value, SaltError> {
-        let url = &SConfig::salt_api_url();
+        let url = &ResaltConfig::salt_api_url();
 
         // debug!("run_job data {:?}", data);
 
