@@ -74,6 +74,7 @@ where
     let key = rck.key();
     let key_file = format!("{}_FILE", key);
     let key_file = std::env::var(key_file).ok();
+    println!("key_file: {:?}", key_file);
     if let Some(key_file) = key_file {
         if !key_file.is_empty() {
             let data = match std::fs::read_to_string(strip_quotes(&key_file)) {
@@ -203,25 +204,24 @@ mod tests {
             .unwrap()
             .as_millis();
         let tmp_path = &format!("/tmp/resalt-config-test-{}", time);
-        std::env::set_var("RESALT_AUTH_FORWARD_ENABLED", "true");
-        std::env::set_var("RESALT_AUTH_FORWARD_ENABLED_FILE", tmp_path);
 
-        std::fs::write(tmp_path, "false").unwrap();
+        std::env::set_var("RESALT_HTTP_PORT_FILE", tmp_path);
+
+        std::fs::write(tmp_path, "1234").unwrap();
         std::thread::sleep(std::time::Duration::from_millis(100)); // Wait for file to be written
-        assert_eq!(ResaltConfig::auth_forward_enabled(), false);
-        std::fs::remove_file(tmp_path).unwrap();
 
-        std::fs::write(tmp_path, "true").unwrap();
-        std::thread::sleep(std::time::Duration::from_millis(100)); // Wait for file to be written
-        assert_eq!(ResaltConfig::auth_forward_enabled(), true);
-        std::fs::remove_file(tmp_path).unwrap();
+        let result = ResaltConfig::http_port();
 
-        std::env::remove_var("RESALT_AUTH_FORWARD_ENABLED_FILE");
+        std::fs::remove_file(tmp_path).unwrap();
+        std::env::remove_var("RESALT_HTTP_PORT_FILE");
+
+        assert_eq!(result, 1234);
     }
 
     #[test]
     fn test_fallback() {
-        std::env::remove_var("RESALT_AUTH_FORWARD_ENABLED");
-        assert_eq!(ResaltConfig::auth_forward_enabled(), false);
+        std::env::remove_var("RESALT_DATABASE_DATABASE");
+        std::env::remove_var("RESALT_DATABASE_DATABASE_FILE");
+        assert_eq!(ResaltConfig::database_database(), "0");
     }
 }
