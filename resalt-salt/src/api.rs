@@ -575,7 +575,7 @@ impl SaltAPI {
             for (host, finger) in minions_rejected.iter() {
                 keys.push(SaltMinionKey {
                     id: host.clone(),
-                    state: SaltKeyState::Rejected.to_string(),
+                    state: SaltKeyState::Rejected,
                     finger: finger.as_str().unwrap().to_owned(),
                 });
             }
@@ -584,7 +584,7 @@ impl SaltAPI {
             for (host, finger) in minions_denied.iter() {
                 keys.push(SaltMinionKey {
                     id: host.clone(),
-                    state: SaltKeyState::Denied.to_string(),
+                    state: SaltKeyState::Denied,
                     finger: finger.as_str().unwrap().to_owned(),
                 });
             }
@@ -593,7 +593,7 @@ impl SaltAPI {
             for (host, finger) in minions_pre.iter() {
                 keys.push(SaltMinionKey {
                     id: host.clone(),
-                    state: SaltKeyState::Pending.to_string(),
+                    state: SaltKeyState::Pending,
                     finger: finger.as_str().unwrap().to_owned(),
                 });
             }
@@ -602,7 +602,7 @@ impl SaltAPI {
             for (host, finger) in minions.iter() {
                 keys.push(SaltMinionKey {
                     id: host.clone(),
-                    state: SaltKeyState::Accepted.to_string(),
+                    state: SaltKeyState::Accepted,
                     finger: finger.as_str().unwrap().to_owned(),
                 });
             }

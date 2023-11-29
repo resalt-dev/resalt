@@ -6,7 +6,7 @@ use axum::{
 use log::*;
 use resalt_auth::renew_token_salt_token;
 use resalt_models::*;
-use resalt_salt::{SaltAPI, SaltError, SaltKeyState};
+use resalt_salt::{SaltAPI, SaltError};
 use resalt_security::*;
 use resalt_storage::StorageImpl;
 
@@ -72,8 +72,7 @@ pub async fn route_keys_get(
 }
 
 pub async fn route_key_accept_put(
-    Path(state): Path<SaltKeyState>,
-    Path(id): Path<String>,
+    Path((state, id)): Path<(SaltKeyState, String)>,
     State(data): State<Box<dyn StorageImpl>>,
     State(salt): State<SaltAPI>,
     Extension(auth): Extension<AuthStatus>,
@@ -107,21 +106,20 @@ pub async fn route_key_accept_put(
             {
                 Ok(()) => Ok(Json(())),
                 Err(e) => {
-                    error!("{:?}", e);
+                    error!("Accept error2: {:?}", e);
                     Err(ApiError::InternalError)
                 }
             }
         }
         Err(e) => {
-            error!("{:?}", e);
+            error!("Accept error1: {:?}", e);
             Err(ApiError::InternalError)
         }
     }
 }
 
 pub async fn route_key_reject_put(
-    Path(state): Path<SaltKeyState>,
-    Path(id): Path<String>,
+    Path((state, id)): Path<(SaltKeyState, String)>,
     State(data): State<Box<dyn StorageImpl>>,
     State(salt): State<SaltAPI>,
     Extension(auth): Extension<AuthStatus>,
@@ -155,21 +153,20 @@ pub async fn route_key_reject_put(
             {
                 Ok(()) => Ok(Json(())),
                 Err(e) => {
-                    error!("{:?}", e);
+                    error!("Reject error2: {:?}", e);
                     Err(ApiError::InternalError)
                 }
             }
         }
         Err(e) => {
-            error!("{:?}", e);
+            error!("Reject error1: {:?}", e);
             Err(ApiError::InternalError)
         }
     }
 }
 
 pub async fn route_key_delete_delete(
-    Path(state): Path<SaltKeyState>,
-    Path(id): Path<String>,
+    Path((state, id)): Path<(SaltKeyState, String)>,
     State(data): State<Box<dyn StorageImpl>>,
     State(salt): State<SaltAPI>,
     Extension(auth): Extension<AuthStatus>,
@@ -203,13 +200,13 @@ pub async fn route_key_delete_delete(
             {
                 Ok(()) => Ok(Json(())),
                 Err(e) => {
-                    error!("{:?}", e);
+                    error!("Delete error2: {:?}", e);
                     Err(ApiError::InternalError)
                 }
             }
         }
         Err(e) => {
-            error!("{:?}", e);
+            error!("Delete error1: {:?}", e);
             Err(ApiError::InternalError)
         }
     }
