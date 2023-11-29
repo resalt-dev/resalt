@@ -5,23 +5,23 @@ pub use util::strip_quotes;
 
 static SYSTEM_TOKEN_FALLBACK: Lazy<String> = Lazy::new(generate_random_token);
 
-enum ResaltConfigKey {
-    AuthForwardEnabled,
-    AuthSessionLifespan,
-    DatabaseType,
-    DatabaseUsername,
-    DatabasePassword,
-    DatabaseHost,
-    DatabasePort,
-    DatabaseDatabase,
-    MetricsEnabled,
-    SaltApiUrl,
-    SaltApiTlsSkipverify,
-    SaltApiSystemServiceToken,
-    HttpPort,
-    HttpFrontendThemeEnabled,
-    HttpFrontendThemeColor,
-}
+// enum ResaltConfigKey {
+//     AuthForwardEnabled,
+//     AuthSessionLifespan,
+//     DatabaseType,
+//     DatabaseUsername,
+//     DatabasePassword,
+//     DatabaseHost,
+//     DatabasePort,
+//     DatabaseDatabase,
+//     MetricsEnabled,
+//     SaltApiUrl,
+//     SaltApiTlsSkipverify,
+//     SaltApiSystemServiceToken,
+//     HttpPort,
+//     HttpFrontendThemeEnabled,
+//     HttpFrontendThemeColor,
+// }
 
 // impl ResaltConfigKey {
 //     fn key(&self) -> &'static str {
