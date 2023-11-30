@@ -20,8 +20,7 @@ use tokio::task;
 use tower::Layer;
 
 async fn init_db() -> Box<dyn StorageImpl> {
-    let db_type = ResaltConfig::DATABASE_TYPE;
-    let db_type = db_type.to_lowercase();
+    let db_type = &ResaltConfig::DATABASE_TYPE.clone();
     let db_type = db_type.as_str();
     info!("Database type: \"{}\"", db_type);
     match db_type {

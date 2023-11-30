@@ -102,8 +102,37 @@ where
         .unwrap_or(fallback.parse().unwrap())
 }
 
-pub struct ResaltConfig {}
-impl ResaltConfig {
+#[allow(non_snake_case)]
+pub mod ResaltConfig {
+    use crate::ResaltConfigInternal;
+    use once_cell::sync::Lazy;
+
+    pub static AUTH_FORWARD_ENABLED: Lazy<bool> =
+        Lazy::new(ResaltConfigInternal::auth_forward_enabled);
+    pub static AUTH_SESSION_LIFESPAN: Lazy<u64> =
+        Lazy::new(ResaltConfigInternal::auth_session_lifespan);
+    pub static DATABASE_TYPE: Lazy<String> =
+        Lazy::new(|| ResaltConfigInternal::database_type().to_lowercase());
+    pub static DATABASE_USERNAME: Lazy<String> = Lazy::new(ResaltConfigInternal::database_username);
+    pub static DATABASE_PASSWORD: Lazy<String> = Lazy::new(ResaltConfigInternal::database_password);
+    pub static DATABASE_HOST: Lazy<String> = Lazy::new(ResaltConfigInternal::database_host);
+    pub static DATABASE_PORT: Lazy<u16> = Lazy::new(ResaltConfigInternal::database_port);
+    pub static DATABASE_DATABASE: Lazy<String> = Lazy::new(ResaltConfigInternal::database_database);
+    pub static METRICS_ENABLED: Lazy<bool> = Lazy::new(ResaltConfigInternal::metrics_enabled);
+    pub static SALT_API_URL: Lazy<String> = Lazy::new(ResaltConfigInternal::salt_api_url);
+    pub static SALT_API_TLS_SKIPVERIFY: Lazy<bool> =
+        Lazy::new(ResaltConfigInternal::salt_api_tls_skipverify);
+    pub static SALT_API_SYSTEM_SERVICE_TOKEN: Lazy<String> =
+        Lazy::new(ResaltConfigInternal::salt_api_system_service_token);
+    pub static HTTP_PORT: Lazy<u16> = Lazy::new(ResaltConfigInternal::http_port);
+    pub static HTTP_FRONTEND_THEME_ENABLED: Lazy<bool> =
+        Lazy::new(ResaltConfigInternal::http_frontend_theme_enabled);
+    pub static HTTP_FRONTEND_THEME_COLOR: Lazy<String> =
+        Lazy::new(ResaltConfigInternal::http_frontend_theme_color);
+}
+
+pub struct ResaltConfigInternal {}
+impl ResaltConfigInternal {
     fn auth_forward_enabled() -> bool {
         conf::<bool>(ResaltConfigKey::AuthForwardEnabled)
     }
@@ -163,26 +192,6 @@ impl ResaltConfig {
     fn http_frontend_theme_color() -> String {
         conf::<String>(ResaltConfigKey::HttpFrontendThemeColor)
     }
-
-    pub const AUTH_FORWARD_ENABLED: Lazy<bool> = Lazy::new(ResaltConfig::auth_forward_enabled);
-    pub const AUTH_SESSION_LIFESPAN: Lazy<u64> = Lazy::new(ResaltConfig::auth_session_lifespan);
-    pub const DATABASE_TYPE: Lazy<String> = Lazy::new(ResaltConfig::database_type);
-    pub const DATABASE_USERNAME: Lazy<String> = Lazy::new(ResaltConfig::database_username);
-    pub const DATABASE_PASSWORD: Lazy<String> = Lazy::new(ResaltConfig::database_password);
-    pub const DATABASE_HOST: Lazy<String> = Lazy::new(ResaltConfig::database_host);
-    pub const DATABASE_PORT: Lazy<u16> = Lazy::new(ResaltConfig::database_port);
-    pub const DATABASE_DATABASE: Lazy<String> = Lazy::new(ResaltConfig::database_database);
-    pub const METRICS_ENABLED: Lazy<bool> = Lazy::new(ResaltConfig::metrics_enabled);
-    pub const SALT_API_URL: Lazy<String> = Lazy::new(ResaltConfig::salt_api_url);
-    pub const SALT_API_TLS_SKIPVERIFY: Lazy<bool> =
-        Lazy::new(ResaltConfig::salt_api_tls_skipverify);
-    pub const SALT_API_SYSTEM_SERVICE_TOKEN: Lazy<String> =
-        Lazy::new(ResaltConfig::salt_api_system_service_token);
-    pub const HTTP_PORT: Lazy<u16> = Lazy::new(ResaltConfig::http_port);
-    pub const HTTP_FRONTEND_THEME_ENABLED: Lazy<bool> =
-        Lazy::new(ResaltConfig::http_frontend_theme_enabled);
-    pub const HTTP_FRONTEND_THEME_COLOR: Lazy<String> =
-        Lazy::new(ResaltConfig::http_frontend_theme_color);
 }
 
 #[cfg(test)]
@@ -192,6 +201,7 @@ mod tests {
 
     #[test]
     fn test_basic() {
+        #![allow(clippy::bool_assert_comparison)]
         assert_eq!(*ResaltConfig::AUTH_FORWARD_ENABLED, false);
         assert_eq!(*ResaltConfig::AUTH_SESSION_LIFESPAN, 43200);
         assert_eq!(*ResaltConfig::DATABASE_TYPE, "files");
@@ -210,7 +220,7 @@ mod tests {
         std::fs::write(tmp_path, "1234").unwrap();
         std::thread::sleep(std::time::Duration::from_millis(100)); // Wait for file to be written
 
-        let result = ResaltConfig::http_port();
+        let result = ResaltConfigInternal::http_port();
 
         std::fs::remove_file(tmp_path).unwrap();
         std::env::remove_var("RESALT_HTTP_PORT_FILE");
@@ -222,6 +232,6 @@ mod tests {
     fn test_fallback() {
         std::env::remove_var("RESALT_DATABASE_DATABASE");
         std::env::remove_var("RESALT_DATABASE_DATABASE_FILE");
-        assert_eq!(ResaltConfig::database_database(), "0");
+        assert_eq!(ResaltConfigInternal::database_database(), "0");
     }
 }

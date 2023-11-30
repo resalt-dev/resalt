@@ -91,7 +91,7 @@ mod tests {
 
         // Check Body length > 0
         let body_bytes = body.data().await.unwrap().unwrap();
-        assert!(body_bytes.len() > 0);
+        assert!(!body_bytes.is_empty());
     }
 
     #[test]

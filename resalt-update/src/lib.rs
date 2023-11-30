@@ -149,13 +149,9 @@ mod tests {
     async fn test_fetch_update_info() {
         let client = Client::new();
         let update_info = fetch_update_info(&client).await.unwrap();
-        match update_info.version {
-            Some(version) => assert!(version.len() >= 5), // x.x.x
-            None => assert!(false),
-        }
-        match update_info.news {
-            Some(news) => assert!(news.len() > 0),
-            None => assert!(false),
-        }
+        assert!(update_info.version.is_some());
+        assert!(update_info.version.unwrap().len() >= 5); // x.x.x
+        assert!(update_info.news.is_some());
+        assert!(!update_info.news.unwrap().is_empty());
     }
 }

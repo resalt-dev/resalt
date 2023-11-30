@@ -41,7 +41,7 @@ pub async fn route_config_get() -> Result<impl IntoResponse, ApiError> {
             }
         },
         theme_default_color: ResaltConfig::HTTP_FRONTEND_THEME_COLOR.clone(),
-        theme_enable_switching: ResaltConfig::HTTP_FRONTEND_THEME_ENABLED.clone(),
+        theme_enable_switching: *ResaltConfig::HTTP_FRONTEND_THEME_ENABLED,
     };
     Ok(Json(config))
 }
