@@ -134,7 +134,7 @@ impl StorageImpl for StorageRedis {
         Ok(user)
     }
 
-    fn list_users(&self, limit: Option<i64>, offset: Option<i64>) -> Result<Vec<User>, String> {
+    fn list_users(&self, paginate: Paginate) -> Result<Vec<User>, String> {
         let mut connection = self.create_connection()?;
         let mut users: Vec<User> = Vec::new();
 
@@ -142,12 +142,14 @@ impl StorageImpl for StorageRedis {
         let mut keys: Vec<String> = connection.keys("user:*").map_err(|e| format!("{:?}", e))?;
         keys.sort();
 
-        // Skip offset & Limit
-        keys = keys
-            .into_iter()
-            .skip(offset.unwrap_or(0) as usize)
-            .take(limit.unwrap_or(100) as usize)
-            .collect();
+        // Pagination
+        if let Some((limit, offset)) = paginate {
+            keys = keys
+                .into_iter()
+                .skip(offset as usize)
+                .take(limit as usize)
+                .collect();
+        }
 
         for key in keys {
             let id: String = key.split(':').last().unwrap().to_string();
@@ -302,8 +304,7 @@ impl StorageImpl for StorageRedis {
         &self,
         filters: Vec<Filter>,
         sort: Option<String>,
-        limit: Option<i64>,
-        offset: Option<i64>,
+        paginate: Paginate,
     ) -> Result<Vec<Minion>, String> {
         let mut connection = self.create_connection()?;
         let mut minions: Vec<Minion> = Vec::new();
@@ -316,14 +317,17 @@ impl StorageImpl for StorageRedis {
 
         // QUICK PAGINATION (Skip offset & Limit)
         if filters.is_empty() {
-            keys = keys
-                .into_iter()
-                .skip(offset.unwrap_or(0) as usize)
-                .take(limit.unwrap_or(100) as usize)
-                .collect();
+            // Pagination
+            if let Some((limit, offset)) = paginate {
+                keys = keys
+                    .into_iter()
+                    .skip(offset as usize)
+                    .take(limit as usize)
+                    .collect();
+            }
         }
 
-        for key in keys {
+        for key in &keys {
             let id: String = key.split(':').last().unwrap().to_string();
             // Fields are stored as HashMap
             let values = connection
@@ -342,9 +346,14 @@ impl StorageImpl for StorageRedis {
 
         // SLOW PAGINATION (Skip offset & Limit)
         if !filters.is_empty() {
-            let offset = offset.unwrap_or(0) as usize;
-            let limit = limit.unwrap_or(100) as usize;
-            minions = minions.into_iter().skip(offset).take(limit).collect();
+            // Pagination
+            if let Some((limit, offset)) = paginate {
+                minions = minions
+                    .into_iter()
+                    .skip(offset as usize)
+                    .take(limit as usize)
+                    .collect();
+            }
         }
 
         Ok(minions)
@@ -468,7 +477,7 @@ impl StorageImpl for StorageRedis {
         Ok(id)
     }
 
-    fn list_events(&self, limit: Option<i64>, offset: Option<i64>) -> Result<Vec<Event>, String> {
+    fn list_events(&self, paginate: Paginate) -> Result<Vec<Event>, String> {
         let mut connection = self.create_connection()?;
         let mut events: Vec<Event> = Vec::new();
 
@@ -476,12 +485,14 @@ impl StorageImpl for StorageRedis {
         let mut keys: Vec<String> = connection.keys("event:*").map_err(|e| format!("{:?}", e))?;
         keys.sort();
 
-        // Skip offset & Limit
-        keys = keys
-            .into_iter()
-            .skip(offset.unwrap_or(0) as usize)
-            .take(limit.unwrap_or(100) as usize)
-            .collect();
+        // Pagination
+        if let Some((limit, offset)) = paginate {
+            keys = keys
+                .into_iter()
+                .skip(offset as usize)
+                .take(limit as usize)
+                .collect();
+        }
 
         for key in keys {
             let id: String = key.split(':').last().unwrap().to_string();
@@ -539,12 +550,7 @@ impl StorageImpl for StorageRedis {
         Ok(())
     }
 
-    fn list_jobs(
-        &self,
-        sort: Option<String>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-    ) -> Result<Vec<Job>, String> {
+    fn list_jobs(&self, sort: Option<String>, paginate: Paginate) -> Result<Vec<Job>, String> {
         let mut connection = self.create_connection()?;
         let mut jobs: Vec<Job> = Vec::new();
 
@@ -552,12 +558,14 @@ impl StorageImpl for StorageRedis {
         let mut keys: Vec<String> = connection.keys("job:*").map_err(|e| format!("{:?}", e))?;
         keys.sort();
 
-        // Skip offset & Limit
-        keys = keys
-            .into_iter()
-            .skip(offset.unwrap_or(0) as usize)
-            .take(limit.unwrap_or(100) as usize)
-            .collect();
+        // Pagination
+        if let Some((limit, offset)) = paginate {
+            keys = keys
+                .into_iter()
+                .skip(offset as usize)
+                .take(limit as usize)
+                .collect();
+        }
 
         for key in keys {
             let id: String = key.split(':').last().unwrap().to_string();
@@ -671,11 +679,7 @@ impl StorageImpl for StorageRedis {
         Ok(id)
     }
 
-    fn list_permission_groups(
-        &self,
-        limit: Option<i64>,
-        offset: Option<i64>,
-    ) -> Result<Vec<PermissionGroup>, String> {
+    fn list_permission_groups(&self, paginate: Paginate) -> Result<Vec<PermissionGroup>, String> {
         let mut connection = self.create_connection()?;
         let mut permission_groups: Vec<PermissionGroup> = Vec::new();
 
@@ -685,12 +689,14 @@ impl StorageImpl for StorageRedis {
             .map_err(|e| format!("{:?}", e))?;
         keys.sort();
 
-        // Skip offset & Limit
-        keys = keys
-            .into_iter()
-            .skip(offset.unwrap_or(0) as usize)
-            .take(limit.unwrap_or(100) as usize)
-            .collect();
+        // Pagination
+        if let Some((limit, offset)) = paginate {
+            keys = keys
+                .into_iter()
+                .skip(offset as usize)
+                .take(limit as usize)
+                .collect();
+        }
 
         for key in keys {
             let id: String = key.split(':').last().unwrap().to_string();

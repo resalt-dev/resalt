@@ -74,7 +74,6 @@ where
     let key = rck.key();
     let key_file = format!("{}_FILE", key);
     let key_file = std::env::var(key_file).ok();
-    println!("key_file: {:?}", key_file);
     if let Some(key_file) = key_file {
         if !key_file.is_empty() {
             let data = match std::fs::read_to_string(strip_quotes(&key_file)) {

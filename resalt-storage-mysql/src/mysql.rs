@@ -67,13 +67,16 @@ impl StorageImpl for StorageMySQL {
     fn get_status(&self) -> Result<resalt_storage::StorageStatus, String> {
         let mut connection = self.create_connection()?;
 
-        let lifespan = *ResaltConfig::AUTH_SESSION_LIFESPAN * 1000;
-        let auth_expiry: NaiveDateTime = match NaiveDateTime::from_timestamp_millis(
-            Utc::now().timestamp_millis() - (lifespan as i64),
-        ) {
-            Some(dt) => dt,
-            None => return Err("Failed to convert timestamp to NaiveDateTime: {:?}".to_string()),
-        };
+        let lifespan: i64 = (*ResaltConfig::AUTH_SESSION_LIFESPAN * 1000)
+            .try_into()
+            .unwrap();
+        let auth_expiry: NaiveDateTime =
+            match NaiveDateTime::from_timestamp_millis(Utc::now().timestamp_millis() - lifespan) {
+                Some(dt) => dt,
+                None => {
+                    return Err("Failed to convert timestamp to NaiveDateTime: {:?}".to_string())
+                }
+            };
 
         let auth_tokens_total = authtokens::table
             .count()
@@ -187,7 +190,7 @@ impl StorageImpl for StorageMySQL {
         Ok(user.into())
     }
 
-    fn list_users(&self, limit: Option<i64>, offset: Option<i64>) -> Result<Vec<User>, String> {
+    fn list_users(&self, paginate: Paginate) -> Result<Vec<User>, String> {
         let mut connection = self.create_connection()?;
         let mut query = users::table.into_boxed();
         query = query.order(users::id.asc());
@@ -195,8 +198,10 @@ impl StorageImpl for StorageMySQL {
         // Filtering
 
         // Pagination
-        query = query.limit(limit.unwrap_or(100));
-        query = query.offset(offset.unwrap_or(0));
+        if let Some((limit, offset)) = paginate {
+            query = query.limit(limit);
+            query = query.offset(offset);
+        }
 
         // Query
         query
@@ -311,14 +316,11 @@ impl StorageImpl for StorageMySQL {
         &self,
         filters: Vec<Filter>,
         sort: Option<String>,
-        limit: Option<i64>,
-        offset: Option<i64>,
+        paginate: Paginate,
     ) -> Result<Vec<Minion>, String> {
         let mut connection = self.create_connection()?;
         let mut query = minions::table.into_boxed();
         query = query.order(minions::id.asc());
-        let limit = limit.unwrap_or(100);
-        let offset = offset.unwrap_or(0);
 
         // Filtering
         let mut has_grain_filters = false;
@@ -545,10 +547,9 @@ impl StorageImpl for StorageMySQL {
 
         // Pagination
         if !has_grain_filters && !has_package_filters {
-            if limit > 0 {
+            // Pagination
+            if let Some((limit, offset)) = paginate {
                 query = query.limit(limit);
-            }
-            if offset > 0 {
                 query = query.offset(offset);
             }
         }
@@ -571,9 +572,11 @@ impl StorageImpl for StorageMySQL {
 
         // 2nd Limit if the first limit didn't kick in
         if has_grain_filters || has_package_filters {
-            let offset = offset as usize;
-            let limit = limit as usize;
-            minions = minions.into_iter().skip(offset).take(limit).collect();
+            if let Some((limit, offset)) = paginate {
+                let offset = offset as usize;
+                let limit = limit as usize;
+                minions = minions.into_iter().skip(offset).take(limit).collect();
+            }
         }
 
         Ok(minions)
@@ -717,7 +720,7 @@ impl StorageImpl for StorageMySQL {
         Ok(id)
     }
 
-    fn list_events(&self, limit: Option<i64>, offset: Option<i64>) -> Result<Vec<Event>, String> {
+    fn list_events(&self, paginate: Paginate) -> Result<Vec<Event>, String> {
         let mut connection = self.create_connection()?;
         let mut query = events::table.into_boxed();
         query = query.order(events::timestamp.desc());
@@ -725,8 +728,10 @@ impl StorageImpl for StorageMySQL {
         // Filtering
 
         // Pagination
-        query = query.limit(limit.unwrap_or(100));
-        query = query.offset(offset.unwrap_or(0));
+        if let Some((limit, offset)) = paginate {
+            query = query.limit(limit);
+            query = query.offset(offset);
+        }
 
         // Query
         query
@@ -778,12 +783,7 @@ impl StorageImpl for StorageMySQL {
         Ok(())
     }
 
-    fn list_jobs(
-        &self,
-        sort: Option<String>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-    ) -> Result<Vec<Job>, String> {
+    fn list_jobs(&self, sort: Option<String>, paginate: Paginate) -> Result<Vec<Job>, String> {
         let mut connection = self.create_connection()?;
         let mut query = jobs::table.into_boxed();
         query = query.order(jobs::timestamp.desc());
@@ -804,8 +804,10 @@ impl StorageImpl for StorageMySQL {
         }
 
         // Pagination
-        query = query.limit(limit.unwrap_or(100));
-        query = query.offset(offset.unwrap_or(0));
+        if let Some((limit, offset)) = paginate {
+            query = query.limit(limit);
+            query = query.offset(offset);
+        }
 
         // Query
         query
@@ -889,11 +891,7 @@ impl StorageImpl for StorageMySQL {
         Ok(id)
     }
 
-    fn list_permission_groups(
-        &self,
-        limit: Option<i64>,
-        offset: Option<i64>,
-    ) -> Result<Vec<PermissionGroup>, String> {
+    fn list_permission_groups(&self, paginate: Paginate) -> Result<Vec<PermissionGroup>, String> {
         let mut connection = self.create_connection()?;
         let mut query = permission_groups::table.into_boxed();
         query = query.order(permission_groups::name.asc());
@@ -901,8 +899,10 @@ impl StorageImpl for StorageMySQL {
         // Filtering
 
         // Pagination
-        query = query.limit(limit.unwrap_or(100));
-        query = query.offset(offset.unwrap_or(0));
+        if let Some((limit, offset)) = paginate {
+            query = query.limit(limit);
+            query = query.offset(offset);
+        }
 
         // Query
         query

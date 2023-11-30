@@ -16,7 +16,7 @@ pub async fn route_keys_get(
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if !has_resalt_permission(&auth.perms, P_SALTKEY_LIST)? {
+    if !has_resalt_permission(&auth, P_SALTKEY_LIST)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -78,7 +78,7 @@ pub async fn route_key_accept_put(
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if !has_resalt_permission(&auth.perms, P_SALTKEY_ACCEPT)? {
+    if !has_resalt_permission(&auth, P_SALTKEY_ACCEPT)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -125,7 +125,7 @@ pub async fn route_key_reject_put(
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if !has_resalt_permission(&auth.perms, P_SALTKEY_REJECT)? {
+    if !has_resalt_permission(&auth, P_SALTKEY_REJECT)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -172,7 +172,7 @@ pub async fn route_key_delete_delete(
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if !has_resalt_permission(&auth.perms, P_SALTKEY_DELETE)? {
+    if !has_resalt_permission(&auth, P_SALTKEY_DELETE)? {
         return Err(ApiError::Forbidden);
     }
 

@@ -36,3 +36,19 @@ pub use status::*;
 pub use token::*;
 pub use token::*;
 pub use users::*;
+
+#[derive(serde::Deserialize)]
+pub struct PaginateQuery {
+    pub limit: Option<i64>,
+    pub offset: Option<i64>,
+}
+
+impl PaginateQuery {
+    fn parse_query(&self) -> resalt_models::Paginate {
+        match (self.limit, self.offset) {
+            (Some(limit), Some(offset)) => Some((limit, offset)),
+            (Some(limit), None) => Some((limit, 0)),
+            _ => None,
+        }
+    }
+}

@@ -1,8 +1,8 @@
 use log::*;
 use rand::Rng;
 use resalt_models::{
-    AuthToken, Event, Filter, Job, JobReturn, Minion, MinionPreset, PermissionGroup, ResaltTime,
-    SaltToken, User,
+    AuthToken, Event, Filter, Job, JobReturn, Minion, MinionPreset, Paginate, PermissionGroup,
+    ResaltTime, SaltToken, User,
 };
 use serde_json::{json, Value};
 
@@ -53,7 +53,7 @@ pub trait StorageImpl: Send + Sync {
         // Create default permission admin group
         //
         // 1. Get all groups
-        let groups = self.list_permission_groups(None, None).unwrap();
+        let groups = self.list_permission_groups(None).unwrap();
         // 2. Check if $superadmins exists
         let mut superadmins_group_id = None;
         for group in groups {
@@ -131,7 +131,7 @@ pub trait StorageImpl: Send + Sync {
         email: Option<String>,
     ) -> Result<User, String>;
 
-    fn list_users(&self, limit: Option<i64>, offset: Option<i64>) -> Result<Vec<User>, String>;
+    fn list_users(&self, paginate: Paginate) -> Result<Vec<User>, String>;
 
     fn get_user_by_id(&self, id: &str) -> Result<Option<User>, String>;
 
@@ -195,8 +195,7 @@ pub trait StorageImpl: Send + Sync {
         &self,
         filters: Vec<Filter>,
         sort: Option<String>,
-        limit: Option<i64>,
-        offset: Option<i64>,
+        paginate: Paginate,
     ) -> Result<Vec<Minion>, String>;
 
     fn get_minion_by_id(&self, id: &str) -> Result<Option<Minion>, String>;
@@ -329,7 +328,7 @@ pub trait StorageImpl: Send + Sync {
         timestamp: ResaltTime,
     ) -> Result<String, String>;
 
-    fn list_events(&self, limit: Option<i64>, offset: Option<i64>) -> Result<Vec<Event>, String>;
+    fn list_events(&self, paginate: Paginate) -> Result<Vec<Event>, String>;
 
     fn get_event_by_id(&self, id: &str) -> Result<Option<Event>, String>;
 
@@ -341,12 +340,7 @@ pub trait StorageImpl: Send + Sync {
         timestamp: ResaltTime,
     ) -> Result<(), String>;
 
-    fn list_jobs(
-        &self,
-        sort: Option<String>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-    ) -> Result<Vec<Job>, String>;
+    fn list_jobs(&self, sort: Option<String>, paginate: Paginate) -> Result<Vec<Job>, String>;
 
     fn get_job_by_jid(&self, jid: &str) -> Result<Option<Job>, String>;
 
@@ -368,11 +362,7 @@ pub trait StorageImpl: Send + Sync {
         perms: Option<String>,
     ) -> Result<String, String>;
 
-    fn list_permission_groups(
-        &self,
-        limit: Option<i64>,
-        offset: Option<i64>,
-    ) -> Result<Vec<PermissionGroup>, String>;
+    fn list_permission_groups(&self, paginate: Paginate) -> Result<Vec<PermissionGroup>, String>;
 
     fn get_permission_group_by_id(&self, id: &str) -> Result<Option<PermissionGroup>, String>;
 

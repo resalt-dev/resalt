@@ -20,14 +20,3 @@ pub struct StorageStatus {
     pub permission_groups_total: i64,
     pub users_total: i64,
 }
-
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-
-//     #[test]
-//     fn it_works() {
-//         let result = add(2, 2);
-//         assert_eq!(result, 4);
-//     }
-// }

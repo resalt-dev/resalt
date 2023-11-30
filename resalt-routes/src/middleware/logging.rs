@@ -1,5 +1,3 @@
-use std::net::SocketAddr;
-
 use axum::{
     extract::ConnectInfo,
     http::{header, Request},
@@ -9,6 +7,7 @@ use axum::{
 };
 use log::*;
 use resalt_models::{AuthStatus, ResaltTime};
+use std::net::SocketAddr;
 
 pub async fn middleware_logging<B>(
     ConnectInfo(socket): ConnectInfo<SocketAddr>,

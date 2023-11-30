@@ -1,3 +1,4 @@
+use crate::PaginateQuery;
 use axum::{
     extract::{Path, Query, State},
     response::IntoResponse,
@@ -15,8 +16,9 @@ use serde::Deserialize;
 pub struct MinionsListGetQuery {
     filter: Option<String>, // URL-encoded JSON
     sort: Option<String>,
-    limit: Option<i64>,
-    offset: Option<i64>,
+    // Include fields from PaginateQuery
+    #[serde(flatten)]
+    paginate_query: PaginateQuery,
 }
 
 pub async fn route_minions_get(
@@ -25,7 +27,7 @@ pub async fn route_minions_get(
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if !has_resalt_permission(&auth.perms, P_MINION_LIST)? {
+    if !has_resalt_permission(&auth, P_MINION_LIST)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -42,8 +44,8 @@ pub async fn route_minions_get(
     };
 
     let sort = query.sort.clone();
-    let limit = query.limit;
-    let offset = query.offset;
+    // Pagination
+    let paginate: Paginate = query.paginate_query.parse_query();
 
     let filters: Vec<Filter> = match filter {
         Some(filter) => match serde_json::from_str(&filter) {
@@ -56,7 +58,7 @@ pub async fn route_minions_get(
         None => vec![],
     };
 
-    let mut minions = match data.list_minions(filters, sort, limit, offset) {
+    let mut minions = match data.list_minions(filters, sort, paginate) {
         Ok(minions) => minions,
         Err(e) => {
             error!("{:?}", e);
@@ -65,17 +67,17 @@ pub async fn route_minions_get(
     };
 
     // Validate extra permission
-    if !has_resalt_permission(&auth.perms, P_MINION_CONFORMITY)? {
+    if !has_resalt_permission(&auth, P_MINION_CONFORMITY)? {
         for minion in minions.iter_mut() {
             minion.conformity = None;
         }
     }
-    if !has_resalt_permission(&auth.perms, P_MINION_PILLARS)? {
+    if !has_resalt_permission(&auth, P_MINION_PILLARS)? {
         for minion in minions.iter_mut() {
             minion.pillars = None;
         }
     }
-    if !has_resalt_permission(&auth.perms, P_MINION_PACKAGES)? {
+    if !has_resalt_permission(&auth, P_MINION_PACKAGES)? {
         for minion in minions.iter_mut() {
             minion.pkgs = None;
         }
@@ -90,7 +92,7 @@ pub async fn route_minion_get(
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if !has_resalt_permission(&auth.perms, P_MINION_LIST)? {
+    if !has_resalt_permission(&auth, P_MINION_LIST)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -119,7 +121,7 @@ pub async fn route_minion_refresh_post(
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if !has_resalt_permission(&auth.perms, P_MINION_REFRESH)? {
+    if !has_resalt_permission(&auth, P_MINION_REFRESH)? {
         return Err(ApiError::Forbidden);
     }
 

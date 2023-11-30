@@ -22,7 +22,7 @@ pub async fn route_settings_import_post(
     Json(input): Json<DataDump>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if !has_resalt_permission(&auth.perms, P_ADMIN_SUPERADMIN)? {
+    if !has_resalt_permission(&auth, P_ADMIN_SUPERADMIN)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -162,17 +162,17 @@ pub async fn route_settings_export_get(
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if !has_resalt_permission(&auth.perms, P_ADMIN_SUPERADMIN)? {
+    if !has_resalt_permission(&auth, P_ADMIN_SUPERADMIN)? {
         return Err(ApiError::Forbidden);
     }
 
     // Get all users (Warning: This will include passwords!)
-    let users = match data.list_users(Some(i64::MAX), Some(0)) {
+    let users = match data.list_users(None) {
         Ok(users) => users,
         Err(_) => return Err(ApiError::DatabaseError),
     };
     // Get all permission groups
-    let groups = match data.list_permission_groups(Some(i64::MAX), Some(0)) {
+    let groups = match data.list_permission_groups(None) {
         Ok(groups) => groups,
         Err(_) => return Err(ApiError::DatabaseError),
     };
@@ -189,7 +189,7 @@ pub async fn route_settings_export_get(
     }
 
     // Get all minions
-    let minions = match data.list_minions(vec![], None, Some(i64::MAX), Some(0)) {
+    let minions = match data.list_minions(vec![], None, None) {
         Ok(minions) => minions,
         Err(_) => return Err(ApiError::DatabaseError),
     };

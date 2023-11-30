@@ -1,3 +1,4 @@
+use crate::PaginateQuery;
 use axum::{
     extract::{Path, Query, State},
     response::IntoResponse,
@@ -16,8 +17,9 @@ use std::collections::HashMap;
 #[derive(Deserialize)]
 pub struct JobsListGetQuery {
     sort: Option<String>,
-    limit: Option<i64>,
-    offset: Option<i64>,
+    // Include fields from PaginateQuery
+    #[serde(flatten)]
+    paginate_query: PaginateQuery,
 }
 
 pub async fn route_jobs_get(
@@ -26,15 +28,15 @@ pub async fn route_jobs_get(
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if !has_resalt_permission(&auth.perms, P_JOB_LIST)? {
+    if !has_resalt_permission(&auth, P_JOB_LIST)? {
         return Err(ApiError::Forbidden);
     }
 
     let sort = query.sort.clone();
-    let limit = query.limit;
-    let offset = query.offset;
+    // Pagination
+    let paginate: Paginate = query.paginate_query.parse_query();
 
-    let jobs = match data.list_jobs(sort, limit, offset) {
+    let jobs = match data.list_jobs(sort, paginate) {
         Ok(jobs) => jobs,
         Err(e) => {
             error!("{:?}", e);
@@ -65,7 +67,7 @@ pub async fn route_jobs_post(
     Json(input): Json<JobRunRequest>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if !has_resalt_permission(&auth.perms, P_RUN_LIVE)? {
+    if !has_resalt_permission(&auth, P_RUN_LIVE)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -193,7 +195,7 @@ pub async fn route_job_get(
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if !has_resalt_permission(&auth.perms, P_JOB_LIST)? {
+    if !has_resalt_permission(&auth, P_JOB_LIST)? {
         return Err(ApiError::Forbidden);
     }
 

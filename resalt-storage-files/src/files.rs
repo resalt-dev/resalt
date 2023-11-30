@@ -197,18 +197,20 @@ impl StorageImpl for StorageFiles {
         Ok(user)
     }
 
-    fn list_users(&self, limit: Option<i64>, offset: Option<i64>) -> Result<Vec<User>, String> {
+    fn list_users(&self, paginate: Paginate) -> Result<Vec<User>, String> {
         let mut users: Vec<User> = Vec::new();
 
         let mut keys: Vec<String> = self.list_file_names("users")?;
         keys.sort();
 
-        // Skip offset & Limit
-        keys = keys
-            .into_iter()
-            .skip(offset.unwrap_or(0) as usize)
-            .take(limit.unwrap_or(100) as usize)
-            .collect();
+        // Pagination
+        if let Some((limit, offset)) = paginate {
+            keys = keys
+                .into_iter()
+                .skip(offset as usize)
+                .take(limit as usize)
+                .collect();
+        }
 
         for key in keys {
             let user = self.get_user_by_id(&key)?;
@@ -326,8 +328,7 @@ impl StorageImpl for StorageFiles {
         &self,
         filters: Vec<Filter>,
         sort: Option<String>,
-        limit: Option<i64>,
-        offset: Option<i64>,
+        paginate: Paginate,
     ) -> Result<Vec<Minion>, String> {
         let mut minions: Vec<Minion> = Vec::new();
 
@@ -336,11 +337,14 @@ impl StorageImpl for StorageFiles {
 
         // QUICK PAGINATION (Skip offset & Limit)
         if filters.is_empty() {
-            keys = keys
-                .into_iter()
-                .skip(offset.unwrap_or(0) as usize)
-                .take(limit.unwrap_or(100) as usize)
-                .collect();
+            // Pagination
+            if let Some((limit, offset)) = paginate {
+                keys = keys
+                    .into_iter()
+                    .skip(offset as usize)
+                    .take(limit as usize)
+                    .collect();
+            }
         }
 
         for key in keys {
@@ -360,9 +364,14 @@ impl StorageImpl for StorageFiles {
 
         // SLOW PAGINATION (Skip offset & Limit)
         if !filters.is_empty() {
-            let offset = offset.unwrap_or(0) as usize;
-            let limit = limit.unwrap_or(100) as usize;
-            minions = minions.into_iter().skip(offset).take(limit).collect();
+            // Pagination
+            if let Some((limit, offset)) = paginate {
+                minions = minions
+                    .into_iter()
+                    .skip(offset as usize)
+                    .take(limit as usize)
+                    .collect();
+            }
         }
 
         Ok(minions)
@@ -473,19 +482,21 @@ impl StorageImpl for StorageFiles {
         Ok(id)
     }
 
-    fn list_events(&self, limit: Option<i64>, offset: Option<i64>) -> Result<Vec<Event>, String> {
+    fn list_events(&self, paginate: Paginate) -> Result<Vec<Event>, String> {
         let mut events: Vec<Event> = Vec::new();
 
         // Loop over event:*, which are HashMaps
         let mut keys = self.list_file_names("events")?;
         keys.sort();
 
-        // Skip offset & Limit
-        keys = keys
-            .into_iter()
-            .skip(offset.unwrap_or(0) as usize)
-            .take(limit.unwrap_or(100) as usize)
-            .collect();
+        // Pagination
+        if let Some((limit, offset)) = paginate {
+            keys = keys
+                .into_iter()
+                .skip(offset as usize)
+                .take(limit as usize)
+                .collect();
+        }
 
         for key in keys {
             let event = self.get_event_by_id(&key)?;
@@ -535,24 +546,21 @@ impl StorageImpl for StorageFiles {
         Ok(())
     }
 
-    fn list_jobs(
-        &self,
-        sort: Option<String>,
-        limit: Option<i64>,
-        offset: Option<i64>,
-    ) -> Result<Vec<Job>, String> {
+    fn list_jobs(&self, sort: Option<String>, paginate: Paginate) -> Result<Vec<Job>, String> {
         let mut jobs: Vec<Job> = Vec::new();
 
         // Loop over job:*, which are HashMaps
         let mut keys = self.list_file_names("jobs")?;
         keys.sort();
 
-        // Skip offset & Limit
-        keys = keys
-            .into_iter()
-            .skip(offset.unwrap_or(0) as usize)
-            .take(limit.unwrap_or(100) as usize)
-            .collect();
+        // Pagination
+        if let Some((limit, offset)) = paginate {
+            keys = keys
+                .into_iter()
+                .skip(offset as usize)
+                .take(limit as usize)
+                .collect();
+        }
 
         for key in keys {
             let job = self.get_job_by_jid(&key)?;
@@ -651,22 +659,20 @@ impl StorageImpl for StorageFiles {
         Ok(id)
     }
 
-    fn list_permission_groups(
-        &self,
-        limit: Option<i64>,
-        offset: Option<i64>,
-    ) -> Result<Vec<PermissionGroup>, String> {
+    fn list_permission_groups(&self, paginate: Paginate) -> Result<Vec<PermissionGroup>, String> {
         let mut permission_groups: Vec<PermissionGroup> = Vec::new();
 
         let mut keys: Vec<String> = self.list_file_names("permission_groups")?;
         keys.sort();
 
-        // Skip offset & Limit
-        keys = keys
-            .into_iter()
-            .skip(offset.unwrap_or(0) as usize)
-            .take(limit.unwrap_or(100) as usize)
-            .collect();
+        // Pagination
+        if let Some((limit, offset)) = paginate {
+            keys = keys
+                .into_iter()
+                .skip(offset as usize)
+                .take(limit as usize)
+                .collect();
+        }
 
         for key in keys {
             let permission_group = self.get_permission_group_by_id(&key)?;

@@ -1,5 +1,8 @@
 use serde::{Deserialize, Serialize};
 
+/// Pagination
+pub type Paginate = Option<(i64, i64)>;
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Filter {
     #[serde(rename = "fieldType")]

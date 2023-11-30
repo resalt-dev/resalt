@@ -10,6 +10,8 @@ use resalt_storage::StorageImpl;
 use serde::Deserialize;
 use serde_json::Value;
 
+use crate::PaginateQuery;
+
 #[allow(clippy::borrowed_box)]
 async fn get_group(
     data: &Box<dyn StorageImpl>,
@@ -38,27 +40,20 @@ async fn get_group(
     Ok(Json(permission_group.public(users)))
 }
 
-#[derive(Deserialize)]
-pub struct PermissionGroupsListGetQuery {
-    limit: Option<i64>,
-    offset: Option<i64>,
-}
-
 pub async fn route_permissions_get(
-    query: Query<PermissionGroupsListGetQuery>,
+    query: Query<PaginateQuery>,
     State(data): State<Box<dyn StorageImpl>>,
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if !has_resalt_permission(&auth.perms, P_ADMIN_GROUP)? {
+    if !has_resalt_permission(&auth, P_ADMIN_GROUP)? {
         return Err(ApiError::Forbidden);
     }
 
     // Pagination
-    let limit = query.limit;
-    let offset = query.offset;
+    let paginate: Paginate = query.parse_query();
 
-    let permission_groups = match data.list_permission_groups(limit, offset) {
+    let permission_groups = match data.list_permission_groups(paginate) {
         Ok(permission_groups) => permission_groups,
         Err(e) => {
             error!("{:?}", e);
@@ -91,7 +86,7 @@ pub async fn route_permissions_post(
     Json(input): Json<PermissionGroupCreateRequest>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if !has_resalt_permission(&auth.perms, P_ADMIN_GROUP)? {
+    if !has_resalt_permission(&auth, P_ADMIN_GROUP)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -129,7 +124,7 @@ pub async fn route_permission_get(
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if !has_resalt_permission(&auth.perms, P_ADMIN_GROUP)? {
+    if !has_resalt_permission(&auth, P_ADMIN_GROUP)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -149,7 +144,7 @@ pub async fn route_permission_put(
     Json(input): Json<PermissionGroupUpdateRequest>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if !has_resalt_permission(&auth.perms, P_ADMIN_GROUP)? {
+    if !has_resalt_permission(&auth, P_ADMIN_GROUP)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -203,7 +198,7 @@ pub async fn route_permission_delete(
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if !has_resalt_permission(&auth.perms, P_ADMIN_GROUP)? {
+    if !has_resalt_permission(&auth, P_ADMIN_GROUP)? {
         return Err(ApiError::Forbidden);
     }
 

@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use axum::{
     extract::{Query, State},
     http::Request,
@@ -11,6 +9,7 @@ use resalt_auth::{renew_token_salt_token, validate_auth_token};
 use resalt_models::{ApiError, AuthStatus};
 use resalt_salt::SaltAPI;
 use resalt_storage::StorageImpl;
+use std::collections::HashMap;
 
 #[allow(clippy::let_and_return)]
 pub async fn middleware_auth<B>(

@@ -14,7 +14,7 @@ pub async fn route_presets_get(
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if !has_resalt_permission(&auth.perms, P_MINION_PRESETS_LIST)? {
+    if !has_resalt_permission(&auth, P_MINION_PRESETS_LIST)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -41,7 +41,7 @@ pub async fn route_presets_post(
     Json(input): Json<PresetsCreateRequest>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if !has_resalt_permission(&auth.perms, P_MINION_PRESETS_MANAGE)? {
+    if !has_resalt_permission(&auth, P_MINION_PRESETS_MANAGE)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -75,7 +75,7 @@ pub async fn route_preset_get(
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if !has_resalt_permission(&auth.perms, P_MINION_PRESETS_LIST)? {
+    if !has_resalt_permission(&auth, P_MINION_PRESETS_LIST)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -106,7 +106,7 @@ pub async fn route_preset_put(
     Json(input): Json<PresetUpdateRequest>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if !has_resalt_permission(&auth.perms, P_MINION_PRESETS_MANAGE)? {
+    if !has_resalt_permission(&auth, P_MINION_PRESETS_MANAGE)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -151,7 +151,7 @@ pub async fn route_preset_delete(
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if !has_resalt_permission(&auth.perms, P_MINION_PRESETS_MANAGE)? {
+    if !has_resalt_permission(&auth, P_MINION_PRESETS_MANAGE)? {
         return Err(ApiError::Forbidden);
     }
 

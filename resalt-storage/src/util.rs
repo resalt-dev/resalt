@@ -60,6 +60,7 @@ pub fn sort_jobs(jobs: &mut [Job], sort: &str) {
         _ => std::cmp::Ordering::Equal,
     })
 }
+
 fn value_to_simple_str(value: &Value) -> String {
     match value {
         Value::String(s) => strip_quotes(&s.to_string()),

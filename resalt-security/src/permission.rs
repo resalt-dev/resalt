@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use log::*;
 use regex::Regex;
-use resalt_models::ApiError;
+use resalt_models::{ApiError, AuthStatus};
 use serde_json::Value;
 
 pub const P_ADMIN_SUPERADMIN: &str = "admin.superadmin";
@@ -57,8 +57,8 @@ pub const P_USER_EMAIL: &str = "user.email";
 pub const P_USER_PASSWORD: &str = "user.password";
 
 #[allow(clippy::borrowed_box)]
-pub fn has_resalt_permission(perms: &str, permission: &str) -> Result<bool, ApiError> {
-    let perms = match serde_json::from_str(perms) {
+pub fn has_resalt_permission(auth: &AuthStatus, permission: &str) -> Result<bool, ApiError> {
+    let perms = match serde_json::from_str(&auth.perms) {
         Ok(perms) => perms,
         Err(e) => {
             error!("{:?}", e);

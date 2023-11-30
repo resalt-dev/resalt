@@ -5,6 +5,7 @@ members = [
 ]
 default-members = [
     "resalt-server",
+    "resalt-cli"
 ]
 
 [workspace.package]

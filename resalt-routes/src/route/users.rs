@@ -1,36 +1,30 @@
+use crate::PaginateQuery;
 use axum::{
     extract::{Path, Query, State},
     response::IntoResponse,
     Extension, Json,
 };
 use log::*;
-use resalt_models::{ApiError, AuthStatus};
+use resalt_models::{ApiError, AuthStatus, Paginate};
 use resalt_security::*;
 use resalt_storage::StorageImpl;
 use serde::Deserialize;
 use serde_json::Value;
 
-#[derive(Deserialize)]
-pub struct UsersListGetQuery {
-    limit: Option<i64>,
-    offset: Option<i64>,
-}
-
 pub async fn route_users_get(
-    query: Query<UsersListGetQuery>,
+    query: Query<PaginateQuery>,
     State(data): State<Box<dyn StorageImpl>>,
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if !has_resalt_permission(&auth.perms, P_USER_LIST)? {
+    if !has_resalt_permission(&auth, P_USER_LIST)? {
         return Err(ApiError::Forbidden);
     }
 
     // Pagination
-    let limit = query.limit;
-    let offset = query.offset;
+    let paginate: Paginate = query.parse_query();
 
-    let users = match data.list_users(limit, offset) {
+    let users = match data.list_users(paginate) {
         Ok(users) => users,
         Err(e) => {
             error!("{:?}", e);
@@ -66,7 +60,7 @@ pub async fn route_users_post(
     Json(input): Json<UserCreateRequest>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if !has_resalt_permission(&auth.perms, P_USER_ADMIN)? {
+    if !has_resalt_permission(&auth, P_USER_ADMIN)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -115,7 +109,7 @@ pub async fn route_user_get(
         // Always allow fetching self
     } else {
         #[allow(clippy::collapsible_else_if)]
-        if !has_resalt_permission(&auth.perms, P_USER_LIST)? {
+        if !has_resalt_permission(&auth, P_USER_LIST)? {
             return Err(ApiError::Forbidden);
         }
     }
@@ -152,7 +146,7 @@ pub async fn route_user_delete(
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if !has_resalt_permission(&auth.perms, P_USER_ADMIN)? {
+    if !has_resalt_permission(&auth, P_USER_ADMIN)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -203,12 +197,12 @@ pub async fn route_user_password_post(
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
     if auth.user_id == user_id {
-        if !has_resalt_permission(&auth.perms, P_USER_PASSWORD)? {
+        if !has_resalt_permission(&auth, P_USER_PASSWORD)? {
             return Err(ApiError::Forbidden);
         }
     } else {
         #[allow(clippy::collapsible_else_if)]
-        if !has_resalt_permission(&auth.perms, P_USER_LIST)? {
+        if !has_resalt_permission(&auth, P_USER_LIST)? {
             return Err(ApiError::Forbidden);
         }
     }
@@ -254,7 +248,7 @@ pub async fn route_user_permissions_post(
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if !has_resalt_permission(&auth.perms, P_ADMIN_GROUP)? {
+    if !has_resalt_permission(&auth, P_ADMIN_GROUP)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -327,7 +321,7 @@ pub async fn route_user_permissions_delete(
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if !has_resalt_permission(&auth.perms, P_ADMIN_GROUP)? {
+    if !has_resalt_permission(&auth, P_ADMIN_GROUP)? {
         return Err(ApiError::Forbidden);
     }
 

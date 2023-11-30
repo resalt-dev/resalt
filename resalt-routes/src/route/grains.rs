@@ -22,7 +22,7 @@ pub async fn route_grains_get(
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
-    if !has_resalt_permission(&auth.perms, P_MINION_GRAINEXPLORER)? {
+    if !has_resalt_permission(&auth, P_MINION_GRAINEXPLORER)? {
         return Err(ApiError::Forbidden);
     }
 
@@ -61,7 +61,7 @@ pub async fn route_grains_get(
         None => vec![],
     };
 
-    let minions = match data.list_minions(filters, None, Some(0), None) {
+    let minions = match data.list_minions(filters, None, None) {
         Ok(minions) => minions,
         Err(e) => {
             error!("{:?}", e);
