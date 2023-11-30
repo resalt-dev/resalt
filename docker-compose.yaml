@@ -63,7 +63,7 @@ services:
       - ./resalt-storage-files:/usr/src/app/resalt-storage-files:ro
       - ./resalt-storage-mysql:/usr/src/app/resalt-storage-mysql:ro
       - ./resalt-storage-redis:/usr/src/app/resalt-storage-redis:ro
-      - ./resalt-updater:/usr/src/app/resalt-updater:ro
+      - ./resalt-update:/usr/src/app/resalt-update:ro
       # The following is because Bun does not support reading files which are mounted as read-only
       # Same as frontend, except /home/bun/app -> /usr/src/app/resalt-frontend
       - ./resalt-frontend/.svelte-kit/tsconfig.json:/usr/src/app/resalt-frontend/.svelte-kit/tsconfig.json

@@ -53,11 +53,6 @@ async fn fetch_update_info(client: &Client) -> Result<UpdateInfo, String> {
         Err(e) => return Err(format!("Error parsing TOML: {}", e)),
     };
 
-    let workspace = match cargo.get("workspace") {
-        Some(v) => v,
-        None => return Err("Error parsing TOML: no workspace".to_string()),
-    };
-
     let package = match cargo.get("package") {
         Some(v) => v,
         None => return Err("Error parsing TOML: no package".to_string()),
@@ -71,7 +66,7 @@ async fn fetch_update_info(client: &Client) -> Result<UpdateInfo, String> {
         None => return Err("Error parsing TOML: no version".to_string()),
     };
 
-    let metadata = match workspace.get("metadata") {
+    let metadata = match package.get("metadata") {
         Some(metadata) => metadata,
         None => return Err("Error parsing TOML: no metadata".to_string()),
     };
@@ -139,4 +134,28 @@ pub async fn update_loop() {
 pub fn get_update_cache() -> UpdateInfo {
     let update_info = CACHE.lock().unwrap();
     update_info.clone()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_current_version() {
+        assert!(CURRENT_VERSION.len() >= 5); // x.x.x
+    }
+
+    #[tokio::test]
+    async fn test_fetch_update_info() {
+        let client = Client::new();
+        let update_info = fetch_update_info(&client).await.unwrap();
+        match update_info.version {
+            Some(version) => assert!(version.len() >= 5), // x.x.x
+            None => assert!(false),
+        }
+        match update_info.news {
+            Some(news) => assert!(news.len() > 0),
+            None => assert!(false),
+        }
+    }
 }

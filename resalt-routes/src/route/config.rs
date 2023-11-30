@@ -2,7 +2,7 @@ use axum::response::{IntoResponse, Json};
 use log::error;
 use resalt_config::ResaltConfig;
 use resalt_models::ApiError;
-use resalt_updater::{get_update_cache, CURRENT_VERSION};
+use resalt_update::{get_update_cache, CURRENT_VERSION};
 use serde::Serialize;
 
 #[derive(Default, Serialize)]

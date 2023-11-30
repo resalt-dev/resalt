@@ -35,6 +35,6 @@ CMD cargo watch --poll --why \
       -w resalt-storage-files \
       -w resalt-storage-mysql \
       -w resalt-storage-redis \
-      -w resalt-updater \
+      -w resalt-update \
       -w Cargo.toml \
       -x run
