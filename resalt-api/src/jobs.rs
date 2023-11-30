@@ -1,6 +1,8 @@
 use log::*;
 use resalt_models::*;
+use resalt_salt::{SaltAPI, SaltError};
 use resalt_storage::StorageImpl;
+use serde_json::Value;
 
 pub fn get_jobs(
     data: Box<dyn StorageImpl>,
@@ -16,4 +18,12 @@ pub fn get_jobs(
     };
 
     Ok(jobs)
+}
+
+pub async fn create_job(
+    salt: &SaltAPI,
+    salt_token: &SaltToken,
+    run_job: &SaltRunJob,
+) -> Result<Value, SaltError> {
+    salt.run_job(salt_token, run_job).await
 }

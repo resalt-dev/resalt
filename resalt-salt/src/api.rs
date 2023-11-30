@@ -5,7 +5,7 @@ use futures_core::stream;
 use log::*;
 use reqwest::StatusCode;
 use resalt_config::ResaltConfig;
-use resalt_models::{SaltClientType, SaltKeyState, SaltMinionKey, SaltTgtType, SaltToken};
+use resalt_models::{SaltKeyState, SaltMinionKey, SaltRunJob, SaltToken};
 use serde_json::{json, Value};
 use std::{collections::HashMap, time::Duration};
 
@@ -255,12 +255,13 @@ impl SaltAPI {
         }
     }
 
-    async fn run_job(
+    pub async fn run_job(
         &self,
         salt_token: &SaltToken,
-        data: serde_json::Value,
+        run_job: &SaltRunJob,
     ) -> Result<Value, SaltError> {
         let url: &str = &ResaltConfig::SALT_API_URL;
+        let data = json!(run_job);
 
         // debug!("run_job data {:?}", data);
 
@@ -307,7 +308,7 @@ impl SaltAPI {
                 ));
             }
         };
-        let body = match body.get(0) {
+        let mut body = match body.get(0) {
             Some(body) => body,
             None => {
                 return Err(SaltError::MissingExpectedDataError(
@@ -316,200 +317,30 @@ impl SaltAPI {
             }
         };
 
+        // Check if run_job is of type SaltRunJob::Wheel
+        if let SaltRunJob::Wheel { .. } = run_job {
+            body = match body.get("data") {
+                Some(body) => body,
+                None => {
+                    return Err(SaltError::MissingExpectedDataError(
+                        "run_job(wheel): missing return[0]['data']".to_owned(),
+                    ));
+                }
+            };
+        }
+
         Ok(body.clone())
-    }
-
-    pub async fn run_job_local<S: AsRef<str>>(
-        &self,
-        salt_token: &SaltToken,
-        tgt: S,
-        fun: S,
-        arg: Option<Vec<SV>>,
-        tgt_type: Option<SaltTgtType>,
-        kwarg: Option<HashMap<String, String>>,
-    ) -> Result<Value, SaltError> {
-        let data = json!({
-            "client": SaltClientType::Local.to_string(),
-            "tgt": tgt.as_ref(),
-            "fun": fun.as_ref(),
-            // map arg to empty array if None
-            "arg": arg.map(|v| {
-                let mut args = Vec::new();
-                for s in v.iter() {
-                    args.push(s.as_value());
-                }
-                args
-            }).unwrap_or_default(),
-            "tgt_type": (tgt_type.unwrap_or_default()).to_string(),
-            "kwarg": kwarg.unwrap_or_default(),
-        });
-        self.run_job(salt_token, data).await
-    }
-
-    pub async fn run_job_local_async<S: AsRef<str>>(
-        &self,
-        salt_token: &SaltToken,
-        tgt: S,
-        fun: S,
-        arg: Option<Vec<SV>>,
-        tgt_type: Option<SaltTgtType>,
-        kwarg: Option<HashMap<String, String>>,
-    ) -> Result<Value, SaltError> {
-        let data = json!({
-            "client": SaltClientType::LocalAsync.to_string(),
-            "tgt": tgt.as_ref(),
-            "fun": fun.as_ref(),
-            "arg": arg.map(|v| {
-                let mut args = Vec::new();
-                for s in v.iter() {
-                    args.push(s.as_value());
-                }
-                args
-            }).unwrap_or_default(),
-            "tgt_type": (tgt_type.unwrap_or_default()).to_string(),
-            "kwarg": kwarg.unwrap_or_default(),
-        });
-        self.run_job(salt_token, data).await
-    }
-
-    #[allow(clippy::too_many_arguments)]
-    pub async fn run_job_local_batch<S: AsRef<str>>(
-        &self,
-        salt_token: &SaltToken,
-        tgt: S,
-        fun: S,
-        arg: Option<Vec<SV>>,
-        tgt_type: Option<SaltTgtType>,
-        kwarg: Option<HashMap<String, String>>,
-        batch: S,
-    ) -> Result<Value, SaltError> {
-        let data = json!({
-            "client": SaltClientType::LocalBatch.to_string(),
-            "tgt": tgt.as_ref(),
-            "fun": fun.as_ref(),
-            "arg": arg.map(|v| {
-                let mut args = Vec::new();
-                for s in v.iter() {
-                    args.push(s.as_value());
-                }
-                args
-            }).unwrap_or_default(),
-            "tgt_type": (tgt_type.unwrap_or_default()).to_string(),
-            "kwarg": kwarg.unwrap_or_default(),
-            "batch": batch.as_ref(),
-        });
-        self.run_job(salt_token, data).await
-    }
-
-    pub async fn run_job_runner<S: AsRef<str>>(
-        &self,
-        salt_token: &SaltToken,
-        fun: S,
-        arg: Option<Vec<SV>>,
-        kwarg: Option<HashMap<String, String>>,
-    ) -> Result<Value, SaltError> {
-        let data = json!({
-            "client": SaltClientType::Runner.to_string(),
-            "fun": fun.as_ref(),
-            "arg": arg.map(|v| {
-                let mut args = Vec::new();
-                for s in v.iter() {
-                    args.push(s.as_value());
-                }
-                args
-            }).unwrap_or_default(),
-            "kwarg": kwarg.unwrap_or_default(),
-        });
-        self.run_job(salt_token, data).await
-    }
-
-    pub async fn run_job_runner_async<S: AsRef<str>>(
-        &self,
-        salt_token: &SaltToken,
-        fun: S,
-        arg: Option<Vec<SV>>,
-        kwarg: Option<HashMap<String, String>>,
-    ) -> Result<Value, SaltError> {
-        let data = json!({
-            "client": SaltClientType::RunnerAsync.to_string(),
-            "fun": fun.as_ref(),
-            "arg": arg.map(|v| {
-                let mut args = Vec::new();
-                for s in v.iter() {
-                    args.push(s.as_value());
-                }
-                args
-            }).unwrap_or_default(),
-            "kwarg": kwarg.unwrap_or_default(),
-        });
-        self.run_job(salt_token, data).await
-    }
-
-    pub async fn run_job_wheel<S: AsRef<str>>(
-        &self,
-        salt_token: &SaltToken,
-        fun: S,
-        arg: Option<Vec<SV>>,
-        kwarg: Option<HashMap<String, String>>,
-    ) -> Result<Value, SaltError> {
-        let data = json!({
-            "client": SaltClientType::Wheel.to_string(),
-            "fun": fun.as_ref(),
-            "arg": arg.map(|v| {
-                let mut args = Vec::new();
-                for s in v.iter() {
-                    args.push(s.as_value());
-                }
-                args
-            }).unwrap_or_default(),
-            "kwarg": kwarg.unwrap_or_default(),
-        });
-        let data = match self.run_job(salt_token, data).await {
-            Ok(res) => res,
-            Err(e) => {
-                return Err(e);
-            }
-        };
-        let data = match data.get("data") {
-            Some(res) => res,
-            None => {
-                return Err(SaltError::MissingExpectedDataError(
-                    "run_job_wheel: missing ['data']".to_owned(),
-                ));
-            }
-        };
-        Ok(data.clone())
-    }
-
-    pub async fn run_job_wheel_async<S: AsRef<str>>(
-        &self,
-        salt_token: &SaltToken,
-        fun: S,
-        arg: Option<Vec<SV>>,
-        kwarg: Option<HashMap<String, String>>,
-    ) -> Result<Value, SaltError> {
-        let data = json!({
-            "client": SaltClientType::WheelAsync.to_string(),
-            "fun": fun.as_ref(),
-            "arg": arg.map(|v| {
-                let mut args = Vec::new();
-                for s in v.iter() {
-                    args.push(s.as_value());
-                }
-                args
-            }).unwrap_or_default(),
-            "kwarg": kwarg.unwrap_or_default(),
-        });
-        self.run_job(salt_token, data).await
     }
 
     pub async fn get_keys(&self, salt_token: &SaltToken) -> Result<Vec<SaltMinionKey>, SaltError> {
         let data = match self
-            .run_job_wheel(
+            .run_job(
                 salt_token,
-                "key.finger",
-                Some(vec![SV::S("*".to_owned())]),
-                None,
+                &SaltRunJob::Wheel {
+                    fun: "key.finger".to_owned(),
+                    arg: Some(vec![json!("*")]),
+                    kwarg: None,
+                },
             )
             .await
         {
@@ -620,13 +451,15 @@ impl SaltAPI {
         kwargs.insert("include_rejected".to_owned(), "True".to_owned());
         kwargs.insert("include_denied".to_owned(), "True".to_owned());
         let data = match self
-            .run_job_wheel(
+            .run_job(
                 salt_token,
-                "key.accept_dict",
-                Some(vec![SV::V(json!({
-                    state.to_string(): vec![id.to_owned()],
-                }))]),
-                Some(kwargs),
+                &SaltRunJob::Wheel {
+                    fun: "key.accept_dict".to_owned(),
+                    arg: Some(vec![json!({
+                        state.to_string(): vec![id.to_owned()],
+                    })]),
+                    kwarg: Some(kwargs),
+                },
             )
             .await
         {
@@ -674,13 +507,15 @@ impl SaltAPI {
         kwargs.insert("include_accepted".to_owned(), "True".to_owned());
         kwargs.insert("include_denied".to_owned(), "True".to_owned());
         let data = match self
-            .run_job_wheel(
+            .run_job(
                 salt_token,
-                "key.reject_dict",
-                Some(vec![SV::V(json!({
-                    state.to_string(): vec![id.to_owned()],
-                }))]),
-                Some(kwargs),
+                &SaltRunJob::Wheel {
+                    fun: "key.reject_dict".to_string(),
+                    arg: Some(vec![json!({
+                        state.to_string(): vec![id.to_owned()],
+                    })]),
+                    kwarg: Some(kwargs),
+                },
             )
             .await
         {
@@ -725,13 +560,15 @@ impl SaltAPI {
         id: &str,
     ) -> Result<(), SaltError> {
         let data = match self
-            .run_job_wheel(
+            .run_job(
                 salt_token,
-                "key.delete_dict",
-                Some(vec![SV::V(json!({
-                    state.to_string(): vec![id.to_owned()],
-                }))]),
-                None,
+                &SaltRunJob::Wheel {
+                    fun: "key.delete_dict".to_string(),
+                    arg: Some(vec![json!({
+                        state.to_string(): vec![id.to_owned()],
+                    })]),
+                    kwarg: None,
+                },
             )
             .await
         {
@@ -761,47 +598,53 @@ impl SaltAPI {
         Ok(())
     }
 
+    async fn run_local_async(
+        &self,
+        salt_token: &SaltToken,
+        id: &str,
+        cmd: &str,
+    ) -> Result<(), SaltError> {
+        match self
+            .run_job(
+                salt_token,
+                &SaltRunJob::LocalAsync {
+                    tgt: id.to_owned(),
+                    fun: cmd.to_owned(),
+                    arg: None,
+                    tgt_type: None,
+                    kwarg: None,
+                },
+            )
+            .await
+        {
+            Ok(_) => Ok(()),
+            Err(e) => return Err(e),
+        }
+    }
     pub async fn refresh_minion(&self, salt_token: &SaltToken, id: &str) -> Result<(), SaltError> {
-        match self
-            .run_job_local_async(salt_token, id, "grains.items", None, None, None)
-            .await
-        {
-            Ok(_) => (),
-            Err(e) => return Err(e),
-        };
-        match self
-            .run_job_local_async(salt_token, id, "pillar.items", None, None, None)
-            .await
-        {
-            Ok(_) => (),
-            Err(e) => return Err(e),
-        };
-        match self
-            .run_job_local_async(salt_token, id, "pkg.list_pkgs", None, None, None)
-            .await
-        {
-            Ok(_) => (),
-            Err(e) => return Err(e),
-        };
+        self.run_local_async(salt_token, id, "grains.items").await?;
+        self.run_local_async(salt_token, id, "pillar.items").await?;
+        self.run_local_async(salt_token, id, "pkg.list_pkgs")
+            .await?;
 
         // Expect compliance to take the longest, so sync on that and show the UI as done whenever it returns
         let mut map_test_true = HashMap::new();
         map_test_true.insert("test".to_owned(), "True".to_owned());
         match self
-            .run_job_local(
+            .run_job(
                 salt_token,
-                id,
-                "state.highstate",
-                None,
-                None,
-                Some(map_test_true),
+                &SaltRunJob::Local {
+                    tgt: id.to_owned(),
+                    fun: "state.highstate".to_owned(),
+                    arg: None,
+                    tgt_type: None,
+                    kwarg: Some(map_test_true),
+                },
             )
             .await
         {
-            Ok(_) => (),
-            Err(e) => return Err(e),
-        };
-
-        Ok(())
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
+        }
     }
 }

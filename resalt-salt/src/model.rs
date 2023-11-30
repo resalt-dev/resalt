@@ -1,5 +1,3 @@
-use serde_json::{json, Value};
-
 #[derive(Clone, Debug, Default)]
 pub struct SaltEvent {
     pub tag: String,
@@ -14,18 +12,4 @@ pub enum SaltError {
     RequestError(String),
     ResponseParseError(Option<String>),
     MissingExpectedDataError(String),
-}
-
-pub enum SV {
-    S(String),
-    V(Value),
-}
-
-impl SV {
-    pub fn as_value(&self) -> Value {
-        match self {
-            SV::S(s) => json!(s),
-            SV::V(v) => v.clone(),
-        }
-    }
 }

@@ -1,4 +1,7 @@
+use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
 use crate::{strip_quotes, ResaltTime};
 
@@ -117,5 +120,174 @@ pub enum SaltTgtType {
 impl ToString for SaltTgtType {
     fn to_string(&self) -> String {
         strip_quotes(serde_json::to_string(self).unwrap())
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub enum SaltRunJob {
+    Local {
+        tgt: String,
+        fun: String,
+        arg: Option<Vec<Value>>,
+        tgt_type: Option<SaltTgtType>,
+        kwarg: Option<HashMap<String, String>>,
+    },
+    LocalAsync {
+        tgt: String,
+        fun: String,
+        arg: Option<Vec<Value>>,
+        tgt_type: Option<SaltTgtType>,
+        kwarg: Option<HashMap<String, String>>,
+    },
+    LocalBatch {
+        tgt: String,
+        fun: String,
+        arg: Option<Vec<Value>>,
+        tgt_type: Option<SaltTgtType>,
+        kwarg: Option<HashMap<String, String>>,
+        batch_size: String,
+    },
+    Runner {
+        fun: String,
+        arg: Option<Vec<Value>>,
+        kwarg: Option<HashMap<String, String>>,
+    },
+    RunnerAsync {
+        fun: String,
+        arg: Option<Vec<Value>>,
+        kwarg: Option<HashMap<String, String>>,
+    },
+    Wheel {
+        fun: String,
+        arg: Option<Vec<Value>>,
+        kwarg: Option<HashMap<String, String>>,
+    },
+    WheelAsync {
+        fun: String,
+        arg: Option<Vec<Value>>,
+        kwarg: Option<HashMap<String, String>>,
+    },
+}
+
+#[cfg(test)]
+mod tests {
+    use std::collections::HashMap;
+
+    use crate::*;
+    use serde_json::json;
+
+    #[test]
+    fn test_saltrunjob() {
+        let salt_run_job = SaltRunJob::Local {
+            tgt: "test".to_string(),
+            fun: "test".to_string(),
+            arg: Some(vec![json!("test")]),
+            tgt_type: Some(SaltTgtType::Glob),
+            kwarg: Some(HashMap::new()),
+        };
+        assert_eq!(
+            json!(salt_run_job),
+            json!({
+                "tgt": "test",
+                "fun": "test",
+                "arg": ["test"],
+                "tgt_type": "glob",
+                "kwarg": {}
+            })
+        );
+
+        let salt_run_job = SaltRunJob::LocalAsync {
+            tgt: "test".to_string(),
+            fun: "test".to_string(),
+            arg: Some(vec![json!("test")]),
+            tgt_type: Some(SaltTgtType::Glob),
+            kwarg: Some(HashMap::new()),
+        };
+        assert_eq!(
+            json!(salt_run_job),
+            json!({
+                "tgt": "test",
+                "fun": "test",
+                "arg": ["test"],
+                "tgt_type": "glob",
+                "kwarg": {}
+            })
+        );
+
+        let salt_run_job = SaltRunJob::LocalBatch {
+            tgt: "test".to_string(),
+            fun: "test".to_string(),
+            arg: Some(vec![json!("test")]),
+            tgt_type: Some(SaltTgtType::Glob),
+            kwarg: Some(HashMap::new()),
+            batch_size: "test".to_string(),
+        };
+        assert_eq!(
+            json!(salt_run_job),
+            json!({
+                "tgt": "test",
+                "fun": "test",
+                "arg": ["test"],
+                "tgt_type": "glob",
+                "kwarg": {},
+                "batch_size": "test"
+            })
+        );
+
+        let salt_run_job = SaltRunJob::Runner {
+            fun: "test".to_string(),
+            arg: Some(vec![json!("test")]),
+            kwarg: Some(HashMap::new()),
+        };
+        assert_eq!(
+            json!(salt_run_job),
+            json!({
+                "fun": "test",
+                "arg": ["test"],
+                "kwarg": {}
+            })
+        );
+
+        let salt_run_job = SaltRunJob::RunnerAsync {
+            fun: "test".to_string(),
+            arg: Some(vec![json!("test")]),
+            kwarg: Some(HashMap::new()),
+        };
+        assert_eq!(
+            json!(salt_run_job),
+            json!({
+                "fun": "test",
+                "arg": ["test"],
+                "kwarg": {}
+            })
+        );
+
+        let salt_run_job = SaltRunJob::Wheel {
+            fun: "test".to_string(),
+            arg: Some(vec![json!("test")]),
+            kwarg: Some(HashMap::new()),
+        };
+        assert_eq!(
+            json!(salt_run_job),
+            json!({
+                "fun": "test",
+                "arg": ["test"],
+                "kwarg": {}
+            })
+        );
+
+        let salt_run_job = SaltRunJob::WheelAsync {
+            fun: "test".to_string(),
+            arg: Some(vec![json!("test")]),
+            kwarg: Some(HashMap::new()),
+        };
+        assert_eq!(
+            json!(salt_run_job),
+            json!({
+                "fun": "test",
+                "arg": ["test"],
+                "kwarg": {}
+            })
+        );
     }
 }

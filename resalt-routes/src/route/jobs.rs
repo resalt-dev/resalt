@@ -5,7 +5,7 @@ use axum::{
     Extension, Json,
 };
 use log::*;
-use resalt_api::jobs::get_jobs;
+use resalt_api::jobs::{create_job, get_jobs};
 use resalt_auth::renew_token_salt_token;
 use resalt_models::*;
 use resalt_salt::*;
@@ -40,7 +40,6 @@ pub async fn route_jobs_get(
     // API
     Ok(Json(get_jobs(data, paginate, sort)?))
 }
-
 #[derive(Deserialize)]
 pub struct JobRunRequest {
     client: SaltClientType,
@@ -48,10 +47,57 @@ pub struct JobRunRequest {
     tgt_type: SaltTgtType,
     tgt: String,
     fun: String,
-    arg: Vec<String>,
+    arg: Vec<Value>,
     kwarg: HashMap<String, String>,
     #[serde(rename = "batchSize")]
     batch_size: String,
+}
+
+pub fn map_client_to_runjob(request: JobRunRequest) -> SaltRunJob {
+    match request.client {
+        SaltClientType::Local => SaltRunJob::Local {
+            tgt: request.tgt,
+            fun: request.fun,
+            arg: Some(request.arg),
+            tgt_type: Some(request.tgt_type),
+            kwarg: Some(request.kwarg),
+        },
+        SaltClientType::LocalAsync => SaltRunJob::LocalAsync {
+            tgt: request.tgt,
+            fun: request.fun,
+            arg: Some(request.arg),
+            tgt_type: Some(request.tgt_type),
+            kwarg: Some(request.kwarg),
+        },
+        SaltClientType::LocalBatch => SaltRunJob::LocalBatch {
+            tgt: request.tgt,
+            fun: request.fun,
+            arg: Some(request.arg),
+            tgt_type: Some(request.tgt_type),
+            kwarg: Some(request.kwarg),
+            batch_size: request.batch_size,
+        },
+        SaltClientType::Runner => SaltRunJob::Runner {
+            fun: request.fun,
+            arg: Some(request.arg),
+            kwarg: Some(request.kwarg),
+        },
+        SaltClientType::RunnerAsync => SaltRunJob::RunnerAsync {
+            fun: request.fun,
+            arg: Some(request.arg),
+            kwarg: Some(request.kwarg),
+        },
+        SaltClientType::Wheel => SaltRunJob::Wheel {
+            fun: request.fun,
+            arg: Some(request.arg),
+            kwarg: Some(request.kwarg),
+        },
+        SaltClientType::WheelAsync => SaltRunJob::WheelAsync {
+            fun: request.fun,
+            arg: Some(request.arg),
+            kwarg: Some(request.kwarg),
+        },
+    }
 }
 
 pub async fn route_jobs_post(
@@ -73,96 +119,21 @@ pub async fn route_jobs_post(
         }
     };
 
-    async fn run(
-        salt: SaltAPI,
-        input: &JobRunRequest,
-        salt_token: &SaltToken,
-    ) -> Result<Value, SaltError> {
-        match input.client {
-            SaltClientType::Local => {
-                salt.run_job_local(
-                    salt_token,
-                    input.tgt.clone(),
-                    input.fun.clone(),
-                    Some(input.arg.clone().into_iter().map(SV::S).collect()),
-                    Some(input.tgt_type),
-                    Some(input.kwarg.clone()),
-                )
-                .await
-            }
-            SaltClientType::LocalAsync => {
-                salt.run_job_local_async(
-                    salt_token,
-                    input.tgt.clone(),
-                    input.fun.clone(),
-                    Some(input.arg.clone().into_iter().map(SV::S).collect()),
-                    Some(input.tgt_type),
-                    Some(input.kwarg.clone()),
-                )
-                .await
-            }
-            SaltClientType::LocalBatch => {
-                salt.run_job_local_batch(
-                    salt_token,
-                    input.tgt.clone(),
-                    input.fun.clone(),
-                    Some(input.arg.clone().into_iter().map(SV::S).collect()),
-                    Some(input.tgt_type),
-                    Some(input.kwarg.clone()),
-                    input.batch_size.clone(),
-                )
-                .await
-            }
-            SaltClientType::Runner => {
-                salt.run_job_runner(
-                    salt_token,
-                    input.fun.clone(),
-                    Some(input.arg.clone().into_iter().map(SV::S).collect()),
-                    Some(input.kwarg.clone()),
-                )
-                .await
-            }
-            SaltClientType::RunnerAsync => {
-                salt.run_job_runner_async(
-                    salt_token,
-                    input.fun.clone(),
-                    Some(input.arg.clone().into_iter().map(SV::S).collect()),
-                    Some(input.kwarg.clone()),
-                )
-                .await
-            }
-            SaltClientType::Wheel => {
-                salt.run_job_wheel(
-                    salt_token,
-                    input.fun.clone(),
-                    Some(input.arg.clone().into_iter().map(SV::S).collect()),
-                    Some(input.kwarg.clone()),
-                )
-                .await
-            }
-            SaltClientType::WheelAsync => {
-                salt.run_job_wheel_async(
-                    salt_token,
-                    input.fun.clone(),
-                    Some(input.arg.clone().into_iter().map(SV::S).collect()),
-                    Some(input.kwarg.clone()),
-                )
-                .await
-            }
-        }
-    }
+    let run_job = map_client_to_runjob(input);
 
-    match run(salt.clone(), &input, salt_token).await {
+    // API
+    match create_job(&salt, salt_token, &run_job).await {
         Ok(job) => Ok(Json(job)),
         Err(SaltError::Unauthorized) => {
             if !salt_token.matured() {
                 error!("Salt token unauthorized, but not matured");
                 return Err(ApiError::InternalError);
             }
+            // TODO: Remove this complex logic, this is more of a hack
             error!("Salt token expired, renewing and retrying");
             let auth =
                 renew_token_salt_token(&data, &salt, &auth.user_id, &auth.auth_token).await?;
-            match run(salt, &input, &auth.salt_token.unwrap()).await {
+            match create_job(&salt, &auth.salt_token.unwrap(), &run_job).await {
                 Ok(job) => Ok(Json(job)),
                 Err(e) => {
                     error!("{:?}", e);
