@@ -6,8 +6,8 @@ publish.workspace = true
 
 [dependencies]
 axum = { workspace = true }
-jsonpath_lib = { workspace = true }
 log = { workspace = true }
+resalt-api = { path = "../resalt-api" }
 resalt-auth = { path = "../resalt-auth" }
 resalt-config = { path = "../resalt-config" }
 resalt-frontend = { path = "../resalt-frontend" }
@@ -15,7 +15,6 @@ resalt-models = { path = "../resalt-models" }
 resalt-salt = { path = "../resalt-salt" }
 resalt-security = { path = "../resalt-security" }
 resalt-storage = { path = "../resalt-storage" }
-resalt-update = { path = "../resalt-update" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tower-http = { workspace = true }

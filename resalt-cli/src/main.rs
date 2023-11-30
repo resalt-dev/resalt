@@ -1,21 +1,16 @@
-use axum::{
-    extract::{Query, State},
-    Extension,
-};
 use clap::{command, Parser, Subcommand};
 use env_logger::{init_from_env, Env};
-use log::info;
+use log::*;
+use resalt_api::config::get_config;
 use resalt_config::ResaltConfig;
-use resalt_models::AuthStatus;
-use resalt_routes::*;
 use resalt_salt::SaltAPI;
 use resalt_storage::StorageImpl;
 use resalt_storage_mysql::StorageMySQL;
 use resalt_storage_redis::StorageRedis;
-use serde_json::json;
+use serde_json::to_string_pretty;
 use std::error::Error;
 
-pub const RESALT_CLI_SYSTEM_SERVICE_USERNAME: &str = "$superadmin/svc/resalt-cli$";
+// pub const RESALT_CLI_SYSTEM_SERVICE_USERNAME: &str = "$superadmin/svc/resalt-cli$";
 
 /// Command-line interface for Resalt
 #[derive(Parser, Debug)]
@@ -27,6 +22,7 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
+    Config,
     User {
         #[clap(subcommand)]
         subcmd: Option<UserCommands>,
@@ -45,7 +41,7 @@ enum UserCommands {
 async fn init_db() -> Box<dyn StorageImpl> {
     let db_type = &ResaltConfig::DATABASE_TYPE.clone();
     let db_type = db_type.as_str();
-    info!("Database type: \"{}\"", db_type);
+    debug!("Database type: \"{}\"", db_type);
     match db_type {
         "files" => {
             let path: String = ResaltConfig::DATABASE_HOST.clone();
@@ -97,28 +93,27 @@ async fn run() -> Result<(), Box<dyn Error>> {
     init_from_env(Env::new().default_filter_or("Debug"));
 
     // Database
-    let db: Box<dyn StorageImpl> = init_db().await;
+    let _db: Box<dyn StorageImpl> = init_db().await;
 
     // Salt
     let _salt_api = SaltAPI::new();
 
-    // Fake perms
-    let auth = AuthStatus {
-        user_id: RESALT_CLI_SYSTEM_SERVICE_USERNAME.to_string(),
-        perms: json!({"admin": true}).to_string(),
-        auth_token: "".to_string(),
-        salt_token: None,
-    };
-
     // Cli
     match cli.subcmd {
+        Some(Commands::Config) => {
+            let config = get_config(false).await;
+            match config {
+                Ok(config) => info!("Config: {}", to_string_pretty(&config).unwrap()),
+                Err(e) => error!("Error: {}", e),
+            }
+        }
         Some(Commands::User { subcmd }) => match subcmd {
             Some(UserCommands::List) => {
-                let query: Query<PaginateQuery> = Query(PaginateQuery {
-                    limit: Some(i64::MAX),
-                    offset: None,
-                });
-                let _users = route_users_get(query, State(db), Extension(auth)).await;
+                // let query: Query<PaginateQuery> = Query(Paginate {
+                //     limit: Some(i64::MAX),
+                //     offset: None,
+                // });
+                // let _users = route_users_get(query, State(db), Extension(auth)).await;
                 // println!("Users: {:?}", users);
             }
             None => {

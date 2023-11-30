@@ -6,9 +6,12 @@ publish.workspace = true
 
 [dependencies]
 log = { workspace = true }
+jsonpath_lib = { workspace = true }
 resalt-config = { path = "../resalt-config" }
 resalt-models = { path = "../resalt-models" }
 resalt-salt = { path = "../resalt-salt" }
 resalt-security = { path = "../resalt-security" }
 resalt-storage = { path = "../resalt-storage" }
+resalt-update = { path = "../resalt-update" }
+serde = { workspace = true }
 serde_json = { workspace = true }

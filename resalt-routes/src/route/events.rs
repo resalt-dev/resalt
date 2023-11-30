@@ -4,7 +4,7 @@ use axum::{
     response::IntoResponse,
     Extension, Json,
 };
-use log::*;
+use resalt_api::events::get_events;
 use resalt_models::{ApiError, AuthStatus};
 use resalt_security::*;
 use resalt_storage::StorageImpl;
@@ -22,13 +22,9 @@ pub async fn route_events_get(
     // Pagination
     let paginate = query.parse_query();
 
-    let events = match data.list_events(paginate) {
-        Ok(events) => events,
-        Err(e) => {
-            error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
-        }
-    };
-
-    Ok(Json(events))
+    // API
+    match get_events(paginate, data).await {
+        Ok(events) => Ok(Json(events)),
+        Err(e) => Err(e),
+    }
 }

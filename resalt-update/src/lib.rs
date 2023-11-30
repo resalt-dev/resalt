@@ -131,9 +131,17 @@ pub async fn update_loop() {
     }
 }
 
-pub fn get_update_cache() -> UpdateInfo {
-    let update_info = CACHE.lock().unwrap();
-    update_info.clone()
+pub async fn get_update_info(use_cache: bool) -> Result<UpdateInfo, String> {
+    if use_cache {
+        let update_info = CACHE.lock().unwrap();
+        Ok(update_info.clone())
+    } else {
+        let client = Client::new();
+        match fetch_update_info(&client).await {
+            Ok(update_info) => Ok(update_info),
+            Err(e) => Err(e),
+        }
+    }
 }
 
 #[cfg(test)]

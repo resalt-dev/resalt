@@ -5,14 +5,12 @@ use serde_json::json;
 
 #[derive(Clone, Debug)]
 pub enum ApiError {
-    Unauthorized,                 // Missing credentials
-    Forbidden,                    // Lackign permissions
-    NotFound,                     // Resource not found
-    NotFoundMessage(String),      // Resource not found with custom message
-    InvalidRequest,               // Invalid request
-    InternalError,                // Internal error
-    InternalErrorMessage(String), // Internal error with custom message
-    DatabaseError,                // Database error
+    Unauthorized,   // Missing credentials
+    Forbidden,      // Lackign permissions
+    NotFound,       // Resource not found
+    InvalidRequest, // Invalid request
+    InternalError,  // Internal error
+    DatabaseError,  // Database error
 }
 
 impl ApiError {
@@ -23,11 +21,9 @@ impl ApiError {
             ApiError::Forbidden => StatusCode::FORBIDDEN,
             // Request-related
             ApiError::NotFound => StatusCode::NOT_FOUND,
-            ApiError::NotFoundMessage(_) => StatusCode::NOT_FOUND,
             ApiError::InvalidRequest => StatusCode::BAD_REQUEST,
             // Internal server errors
             ApiError::InternalError => StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::InternalErrorMessage(_) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::DatabaseError => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
@@ -36,13 +32,11 @@ impl ApiError {
         match self {
             ApiError::Unauthorized => String::from("Unauthorized - Invalid credentials"),
             ApiError::Forbidden => String::from("Forbidden - Insufficient permissions"),
-            ApiError::NotFound => String::from("Resource not found"),
-            ApiError::NotFoundMessage(str) => str.clone(),
+            ApiError::NotFound => String::from("Not found"),
             ApiError::InvalidRequest => String::from("Invalid request"),
             ApiError::InternalError => {
                 String::from("Internal error, please contact the system administrator")
             }
-            ApiError::InternalErrorMessage(str) => str.clone(),
             ApiError::DatabaseError => {
                 String::from("Database error, please contact the system administrator")
             }

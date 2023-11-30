@@ -4,7 +4,7 @@ use axum::{
     Router, Server, ServiceExt,
 };
 use env_logger::{init_from_env, Env};
-use log::info;
+use log::*;
 use resalt_config::ResaltConfig;
 use resalt_routes::*;
 use resalt_salt::{SaltAPI, SaltEventListener, SaltEventListenerStatus};
@@ -22,7 +22,7 @@ use tower::Layer;
 async fn init_db() -> Box<dyn StorageImpl> {
     let db_type = &ResaltConfig::DATABASE_TYPE.clone();
     let db_type = db_type.as_str();
-    info!("Database type: \"{}\"", db_type);
+    debug!("Database type: \"{}\"", db_type);
     match db_type {
         "files" => {
             let path: String = ResaltConfig::DATABASE_HOST.clone();

@@ -5,6 +5,7 @@ use axum::{
     Extension, Json,
 };
 use log::*;
+use resalt_api::jobs::get_jobs;
 use resalt_auth::renew_token_salt_token;
 use resalt_models::*;
 use resalt_salt::*;
@@ -36,15 +37,8 @@ pub async fn route_jobs_get(
     // Pagination
     let paginate: Paginate = query.paginate_query.parse_query();
 
-    let jobs = match data.list_jobs(sort, paginate) {
-        Ok(jobs) => jobs,
-        Err(e) => {
-            error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
-        }
-    };
-
-    Ok(Json(jobs))
+    // API
+    Ok(Json(get_jobs(data, paginate, sort)?))
 }
 
 #[derive(Deserialize)]
