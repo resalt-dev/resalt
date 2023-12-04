@@ -13,7 +13,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@eonasdan/tempus-dominus": "6.7.16",
+		"@eonasdan/tempus-dominus": "6.7.19",
 		"@eslint/js": "8.53.0",
 		"@lezer/highlight": "1.2.0",
 		"@sveltejs/adapter-static": "2.0.3",
