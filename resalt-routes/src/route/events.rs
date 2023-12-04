@@ -1,11 +1,10 @@
-use crate::PaginateQuery;
 use axum::{
     extract::{Query, State},
     response::IntoResponse,
     Extension, Json,
 };
 use resalt_api::events::get_events;
-use resalt_models::{ApiError, AuthStatus};
+use resalt_models::{ApiError, AuthStatus, PaginateQuery};
 use resalt_security::*;
 use resalt_storage::StorageImpl;
 

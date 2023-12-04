@@ -3,6 +3,22 @@ use serde::{Deserialize, Serialize};
 /// Pagination
 pub type Paginate = Option<(i64, i64)>;
 
+#[derive(serde::Deserialize)]
+pub struct PaginateQuery {
+    pub limit: Option<i64>,
+    pub offset: Option<i64>,
+}
+
+impl PaginateQuery {
+    pub fn parse_query(&self) -> Paginate {
+        match (self.limit, self.offset) {
+            (Some(limit), Some(offset)) => Some((limit, offset)),
+            (Some(limit), None) => Some((limit, 0)),
+            _ => None,
+        }
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Filter {
     #[serde(rename = "fieldType")]

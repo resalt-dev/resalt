@@ -6,7 +6,9 @@ use axum::{
 use env_logger::{init_from_env, Env};
 use log::*;
 use resalt_config::ResaltConfig;
-use resalt_routes::*;
+use resalt_routes::middleware::*;
+use resalt_routes::route::*;
+use resalt_routes::state::*;
 use resalt_salt::{SaltAPI, SaltEventListener, SaltEventListenerStatus};
 use resalt_storage::StorageImpl;
 use resalt_storage_mysql::StorageMySQL;
@@ -145,8 +147,8 @@ async fn start_server(
     let router_noauth = Router::new()
         .route("/", get(route_index_get))
         .route("/config", get(route_config_get))
-        .route("/metrics", get(route_metrics_get))
         .route("/login", post(route_login_post))
+        .route("/metrics", get(route_metrics_get))
         .route("/token", post(route_token_post))
         .fallback(route_fallback_404);
 

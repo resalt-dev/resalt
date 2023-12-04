@@ -1,11 +1,10 @@
-use crate::PaginateQuery;
 use axum::{
     extract::{Path, Query, State},
     response::IntoResponse,
     Extension, Json,
 };
 use log::*;
-use resalt_models::{ApiError, AuthStatus, Paginate};
+use resalt_models::{ApiError, AuthStatus, Paginate, PaginateQuery};
 use resalt_security::*;
 use resalt_storage::StorageImpl;
 use serde::Deserialize;

@@ -10,8 +10,6 @@ use resalt_storage::StorageImpl;
 use serde::Deserialize;
 use serde_json::Value;
 
-use crate::PaginateQuery;
-
 #[allow(clippy::borrowed_box)]
 async fn get_group(
     data: &Box<dyn StorageImpl>,
