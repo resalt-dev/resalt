@@ -363,10 +363,6 @@
 			groupNameFieldError = true;
 			return;
 		}
-		if (groupNameFieldValue === '$superadmins') {
-			groupNameFieldError = true;
-			return;
-		}
 	}
 
 	function validateAddUserField(): void {
@@ -551,16 +547,6 @@
 				{:else}
 					<div class="row">
 						<div class="col-12 ps-3 mb-0">
-							{#if $selectedGroup.name === '$superadmins'}
-								<div class="alert alert-warning" role="alert">
-									<strong>Warning!</strong> You have selected the "<strong
-										>$superadmins</strong
-									>" group. This is a special system-protected group that cannot
-									be edited or deleted.
-								</div>
-							{/if}
-						</div>
-						<div class="col-12 ps-3 mb-0">
 							<div class="form-floating mb-3">
 								<input
 									id="selectedGroupId"
@@ -578,7 +564,6 @@
 									id="selectedGroupName"
 									type="text"
 									class="form-control {groupNameFieldError ? 'is-invalid' : ''}"
-									disabled={$selectedGroup.name === '$superadmins'}
 									bind:value={groupNameFieldValue}
 									on:blur={validateGroupNameField}
 									required
@@ -590,7 +575,6 @@
 							<button
 								type="button"
 								class="btn btn-primary float-end"
-								disabled={$selectedGroup.name === '$superadmins'}
 								on:click={updateSelectedGroup}
 							>
 								Save
@@ -619,8 +603,6 @@
 												<button
 													type="button"
 													class="btn btn-sm btn-danger float-end"
-													disabled={$selectedGroup.name ===
-														'$superadmins'}
 													on:click={() => {
 														removeUserFromSelectedGroup(user.id);
 													}}
@@ -641,7 +623,6 @@
 										type="text"
 										class="form-control {addUserFieldError ? 'is-invalid' : ''}"
 										style="height: 2.5rem;"
-										disabled={$selectedGroup.name === '$superadmins'}
 										bind:value={addUserFieldValue}
 										on:blur={validateAddUserField}
 									/>
@@ -656,7 +637,6 @@
 								<button
 									type="button"
 									class="btn btn-primary float-end text-nowrap px-4"
-									disabled={$selectedGroup.name === '$superadmins'}
 									on:click={addUserToSelectedGroup}
 								>
 									Add user
@@ -690,8 +670,6 @@
 												<input
 													type="checkbox"
 													class="form-check-input form-check-input-primary fs-3 ms-0 mt-0"
-													disabled={$selectedGroup.name ===
-														'$superadmins'}
 													bind:checked={permissionWebFields[
 														resaltPermission.permission
 													]}
@@ -737,7 +715,6 @@
 												type="button"
 												class="btn btn-sm btn-success float-end"
 												style="margin-top: -4px;margin-bottom: -4px;"
-												disabled={$selectedGroup.name === '$superadmins'}
 												on:click={localAddMinionTarget}
 											>
 												<Icon
@@ -762,8 +739,6 @@
 																? 'is-invalid'
 																: ''}"
 															style="height: 2.5rem;"
-															disabled={$selectedGroup.name ===
-																'$superadmins'}
 															bind:value={minionTarget.target}
 															on:blur={validatePermissionMinionTargetsFields}
 														/>
@@ -778,8 +753,6 @@
 													<button
 														type="button"
 														class="btn btn-sm btn-success float-end"
-														disabled={$selectedGroup.name ===
-															'$superadmins'}
 														on:click={() => {
 															localAddMinionTargetModule(
 																minionTarget.targetId,
@@ -810,8 +783,6 @@
 																	? 'is-invalid'
 																	: ''}"
 																style="height: 2.5rem;"
-																disabled={$selectedGroup.name ===
-																	'$superadmins'}
 																bind:value={minionModule.name}
 																on:blur={validatePermissionMinionTargetsFields}
 															/>
@@ -826,8 +797,6 @@
 														<button
 															type="button"
 															class="btn btn-sm btn-danger float-end"
-															disabled={$selectedGroup.name ===
-																'$superadmins'}
 															on:click={() => {
 																localRemoveMinionTargetModule(
 																	minionTarget.targetId,
@@ -859,8 +828,6 @@
 																	type="text"
 																	class="form-control"
 																	style="height: 2.5rem; max-width: 7rem;"
-																	disabled={$selectedGroup.name ===
-																		'$superadmins'}
 																	bind:value={arg}
 																	on:blur={validatePermissionMinionTargetsFields}
 																/>
@@ -875,16 +842,8 @@
 															<Icon
 																name="x"
 																size="1.5"
-																class="mouse-pointer my-2 ms-1 me-3 {$selectedGroup.name ===
-																'$superadmins'
-																	? 'text-muted'
-																	: 'text-danger'}"
+																class="mouse-pointer my-2 ms-1 me-3 text-danger"
 																on:click={() => {
-																	if (
-																		$selectedGroup?.name ===
-																		'$superadmins'
-																	)
-																		return;
 																	localRemoveMinionTargetModuleArg(
 																		minionTarget.targetId,
 																		minionModule.moduleId,
@@ -896,16 +855,8 @@
 														<Icon
 															name="plus"
 															size="1.5"
-															class="mouse-pointer my-2 ms-3 {$selectedGroup.name ===
-															'$superadmins'
-																? 'text-muted'
-																: 'text-success'}"
+															class="mouse-pointer my-2 ms-3 text-success"
 															on:click={() => {
-																if (
-																	$selectedGroup?.name ===
-																	'$superadmins'
-																)
-																	return;
 																localAddMinionTargetModuleArg(
 																	minionTarget.targetId,
 																	minionModule.moduleId,
@@ -920,8 +871,6 @@
 													type="button"
 													class="btn btn-sm btn-danger float-end mt-1"
 													style="height: 2rem;"
-													disabled={$selectedGroup.name ===
-														'$superadmins'}
 													on:click={() => {
 														localRemoveMinionTarget(
 															minionTarget.targetId,
@@ -976,7 +925,6 @@
 							<button
 								type="button"
 								class="btn btn-primary"
-								disabled={$selectedGroup.name === '$superadmins'}
 								on:click={updateSelectedGroup}
 							>
 								Save
@@ -984,7 +932,6 @@
 							<button
 								type="button"
 								class="btn btn-danger float-end"
-								disabled={$selectedGroup.name === '$superadmins'}
 								on:click={deleteSelectedGroup}
 							>
 								Delete Group
