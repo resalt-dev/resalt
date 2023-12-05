@@ -4,9 +4,10 @@ use axum::{
     Extension, Json,
 };
 use log::*;
+use resalt_api::key::{accept_key, delete_key, get_keys, reject_key};
 use resalt_auth::renew_token_salt_token;
 use resalt_models::*;
-use resalt_salt::{SaltAPI, SaltError};
+use resalt_salt::SaltAPI;
 use resalt_security::*;
 use resalt_storage::StorageImpl;
 
@@ -28,27 +29,22 @@ pub async fn route_keys_get(
         }
     };
 
-    let keys = match salt.get_keys(salt_token).await {
+    // API
+    let keys = match get_keys(&salt, &salt_token).await {
         Ok(keys) => keys,
-        Err(SaltError::Unauthorized) => {
-            if !salt_token.matured() {
-                error!("Salt token unauthorized, but not matured");
-                return Err(ApiError::InternalError);
-            }
-            error!("Salt token expired, renewing and retrying");
-            let auth =
-                renew_token_salt_token(&data, &salt, &auth.user_id, &auth.auth_token).await?;
-            match salt.get_keys(&auth.salt_token.unwrap()).await {
+        Err(e) => {
+            error!("get_keys {:?}", e);
+            // Try refresh salt token, and try again
+            let salt_token = renew_token_salt_token(&data, &salt, &auth.user_id, &auth.auth_token)
+                .await?
+                .salt_token;
+            match get_keys(&salt, &salt_token.unwrap()).await {
                 Ok(keys) => keys,
                 Err(e) => {
-                    error!("salt.get_keys {:?}", e);
-                    return Err(ApiError::InternalError);
+                    error!("get_keys {:?}", e);
+                    return Err(ApiError::Unauthorized);
                 }
             }
-        }
-        Err(e) => {
-            error!("salt.get_keys {:?}", e);
-            return Err(ApiError::InternalError);
         }
     };
 
@@ -90,30 +86,22 @@ pub async fn route_key_accept_put(
         }
     };
 
-    match salt.accept_key(salt_token, &state, &id).await {
-        Ok(()) => Ok(Json(())),
-        Err(SaltError::Unauthorized) => {
-            if !salt_token.matured() {
-                error!("Salt token unauthorized, but not matured");
-                return Err(ApiError::InternalError);
-            }
-            error!("Salt token expired, renewing and retrying");
-            let auth =
-                renew_token_salt_token(&data, &salt, &auth.user_id, &auth.auth_token).await?;
-            match salt
-                .accept_key(&auth.salt_token.unwrap(), &state, &id)
-                .await
-            {
-                Ok(()) => Ok(Json(())),
+    // API
+    match accept_key(&salt, &salt_token, &state, &id).await {
+        Ok(()) => Ok(()),
+        Err(e) => {
+            error!("accept_key {:?}", e);
+            // Try refresh salt token, and try again
+            let salt_token = renew_token_salt_token(&data, &salt, &auth.user_id, &auth.auth_token)
+                .await?
+                .salt_token;
+            match accept_key(&salt, &salt_token.unwrap(), &state, &id).await {
+                Ok(()) => Ok(()),
                 Err(e) => {
-                    error!("Accept error2: {:?}", e);
-                    Err(ApiError::InternalError)
+                    error!("accept_key {:?}", e);
+                    return Err(ApiError::Unauthorized);
                 }
             }
-        }
-        Err(e) => {
-            error!("Accept error1: {:?}", e);
-            Err(ApiError::InternalError)
         }
     }
 }
@@ -137,30 +125,22 @@ pub async fn route_key_reject_put(
         }
     };
 
-    match salt.reject_key(salt_token, &state, &id).await {
-        Ok(()) => Ok(Json(())),
-        Err(SaltError::Unauthorized) => {
-            if !salt_token.matured() {
-                error!("Salt token unauthorized, but not matured");
-                return Err(ApiError::InternalError);
-            }
-            error!("Salt token expired, renewing and retrying");
-            let auth =
-                renew_token_salt_token(&data, &salt, &auth.user_id, &auth.auth_token).await?;
-            match salt
-                .reject_key(&auth.salt_token.unwrap(), &state, &id)
-                .await
-            {
-                Ok(()) => Ok(Json(())),
+    // API
+    match reject_key(&salt, &salt_token, &state, &id).await {
+        Ok(()) => Ok(()),
+        Err(e) => {
+            error!("reject_key {:?}", e);
+            // Try refresh salt token, and try again
+            let salt_token = renew_token_salt_token(&data, &salt, &auth.user_id, &auth.auth_token)
+                .await?
+                .salt_token;
+            match reject_key(&salt, &salt_token.unwrap(), &state, &id).await {
+                Ok(()) => Ok(()),
                 Err(e) => {
-                    error!("Reject error2: {:?}", e);
-                    Err(ApiError::InternalError)
+                    error!("reject_key {:?}", e);
+                    return Err(ApiError::Unauthorized);
                 }
             }
-        }
-        Err(e) => {
-            error!("Reject error1: {:?}", e);
-            Err(ApiError::InternalError)
         }
     }
 }
@@ -184,30 +164,22 @@ pub async fn route_key_delete_delete(
         }
     };
 
-    match salt.delete_key(salt_token, &state, &id).await {
-        Ok(()) => Ok(Json(())),
-        Err(SaltError::Unauthorized) => {
-            if !salt_token.matured() {
-                error!("Salt token unauthorized, but not matured");
-                return Err(ApiError::InternalError);
-            }
-            error!("Salt token expired, renewing and retrying");
-            let auth =
-                renew_token_salt_token(&data, &salt, &auth.user_id, &auth.auth_token).await?;
-            match salt
-                .delete_key(&auth.salt_token.unwrap(), &state, &id)
-                .await
-            {
-                Ok(()) => Ok(Json(())),
+    // API
+    match delete_key(&salt, &salt_token, &state, &id).await {
+        Ok(()) => Ok(()),
+        Err(e) => {
+            error!("delete_key {:?}", e);
+            // Try refresh salt token, and try again
+            let salt_token = renew_token_salt_token(&data, &salt, &auth.user_id, &auth.auth_token)
+                .await?
+                .salt_token;
+            match delete_key(&salt, &salt_token.unwrap(), &state, &id).await {
+                Ok(()) => Ok(()),
                 Err(e) => {
-                    error!("Delete error2: {:?}", e);
-                    Err(ApiError::InternalError)
+                    error!("delete_key {:?}", e);
+                    return Err(ApiError::Unauthorized);
                 }
             }
-        }
-        Err(e) => {
-            error!("Delete error1: {:?}", e);
-            Err(ApiError::InternalError)
         }
     }
 }

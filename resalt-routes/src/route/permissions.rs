@@ -4,6 +4,10 @@ use axum::{
     Extension, Json,
 };
 use log::*;
+use resalt_api::permission::{
+    create_permission_group, get_permission_group_by_id, get_permission_group_users,
+    get_permission_groups, update_permission_group,
+};
 use resalt_models::*;
 use resalt_security::*;
 use resalt_storage::StorageImpl;
@@ -15,23 +19,19 @@ async fn get_group(
     data: &Box<dyn StorageImpl>,
     group_id: &str,
 ) -> Result<impl IntoResponse, ApiError> {
-    let permission_group = match data.get_permission_group_by_id(group_id) {
-        Ok(permission_group) => permission_group,
+    let permission_group = match get_permission_group_by_id(&data, group_id) {
+        Ok(Some(permission_group)) => permission_group,
+        Ok(None) => return Err(ApiError::NotFound),
         Err(e) => {
-            error!("{:?}", e);
+            error!("get_group.group {:?}", e);
             return Err(ApiError::DatabaseError);
         }
     };
 
-    let permission_group = match permission_group {
-        Some(permission_group) => permission_group,
-        None => return Err(ApiError::NotFound),
-    };
-
-    let users = match data.list_users_by_permission_group_id(group_id) {
+    let users = match get_permission_group_users(&data, group_id) {
         Ok(users) => users,
         Err(e) => {
-            error!("{:?}", e);
+            error!("get_group.users {:?}", e);
             return Err(ApiError::DatabaseError);
         }
     };
@@ -51,20 +51,21 @@ pub async fn route_permissions_get(
     // Pagination
     let paginate: Paginate = query.parse_query();
 
-    let permission_groups = match data.list_permission_groups(paginate) {
+    // API
+    let permission_groups = match get_permission_groups(&data, paginate) {
         Ok(permission_groups) => permission_groups,
         Err(e) => {
-            error!("{:?}", e);
+            error!("route_permissions_get.groups {:?}", e);
             return Err(ApiError::DatabaseError);
         }
     };
 
     let mut results: Vec<Value> = Vec::new();
     for group in permission_groups {
-        let users = match data.list_users_by_permission_group_id(&group.id) {
+        let users = match get_permission_group_users(&data, &group.id) {
             Ok(users) => users,
             Err(e) => {
-                error!("{:?}", e);
+                error!("route_permissions_get.users {:?}", e);
                 return Err(ApiError::DatabaseError);
             }
         };
@@ -88,28 +89,26 @@ pub async fn route_permissions_post(
         return Err(ApiError::Forbidden);
     }
 
-    let permission_group_id = match data.create_permission_group(None, &input.name, None) {
+    // API
+    let permission_group_id = match create_permission_group(&data, None, &input.name, None) {
         Ok(id) => id,
         Err(e) => {
-            error!("{:?}", e);
+            error!("route_permissions_post.create {:?}", e);
             return Err(ApiError::DatabaseError);
         }
     };
-    let permission_group = match data.get_permission_group_by_id(&permission_group_id) {
-        Ok(permission_group) => match permission_group {
-            Some(permission_group) => permission_group,
-            None => return Err(ApiError::DatabaseError),
-        },
+    let permission_group = match get_permission_group_by_id(&data, &permission_group_id) {
+        Ok(Some(permission_group)) => permission_group,
+        Ok(None) => return Err(ApiError::DatabaseError),
         Err(e) => {
-            error!("{:?}", e);
+            error!("route_permissions_post.group {:?}", e);
             return Err(ApiError::DatabaseError);
         }
     };
-    let permission_group_users = match data.list_users_by_permission_group_id(&permission_group_id)
-    {
+    let permission_group_users = match get_permission_group_users(&data, &permission_group_id) {
         Ok(permission_group_users) => permission_group_users,
         Err(e) => {
-            error!("{:?}", e);
+            error!("route_permissions_post.users {:?}", e);
             return Err(ApiError::DatabaseError);
         }
     };
@@ -147,7 +146,7 @@ pub async fn route_permission_put(
     }
 
     // Get permission group
-    let mut permission_group = match data.get_permission_group_by_id(&id) {
+    let mut permission_group = match get_permission_group_by_id(&data, &id) {
         Ok(Some(permission_group)) => permission_group,
         Ok(None) => return Err(ApiError::NotFound),
         Err(e) => {
@@ -160,16 +159,13 @@ pub async fn route_permission_put(
     permission_group.name = input.name.clone();
     permission_group.perms = input.perms.clone(); // TODO: Validate JSON
 
-    match data.update_permission_group(&permission_group) {
-        Ok(()) => (),
-        Err(e) => {
-            error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
-        }
+    if let Err(e) = update_permission_group(&data, &permission_group) {
+        error!("{:?}", e);
+        return Err(ApiError::DatabaseError);
     };
 
     // Update members
-    match data.list_users_by_permission_group_id(&id) {
+    match get_permission_group_users(&data, &id) {
         Ok(users) => {
             for user in users {
                 match data.refresh_user_permissions(&user) {

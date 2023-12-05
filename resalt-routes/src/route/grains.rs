@@ -4,7 +4,7 @@ use axum::{
     Extension, Json,
 };
 use log::*;
-use resalt_api::grains::search_grains;
+use resalt_api::grain::search_grains;
 use resalt_models::*;
 use resalt_security::*;
 use resalt_storage::StorageImpl;
@@ -45,6 +45,7 @@ pub async fn route_grains_get(
         None => None,
     };
 
+    // API
     let results = search_grains(&data, path, filter)?;
 
     Ok(Json(results))

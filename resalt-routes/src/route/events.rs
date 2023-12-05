@@ -3,7 +3,7 @@ use axum::{
     response::IntoResponse,
     Extension, Json,
 };
-use resalt_api::events::get_events;
+use resalt_api::event::get_events;
 use resalt_models::{ApiError, AuthStatus, PaginateQuery};
 use resalt_security::*;
 use resalt_storage::StorageImpl;

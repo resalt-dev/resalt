@@ -4,7 +4,7 @@ use axum::{
     Extension, Json,
 };
 use log::*;
-use resalt_api::jobs::{create_job, get_jobs};
+use resalt_api::job::{create_job, get_job, get_job_returns_by_job, get_jobs};
 use resalt_auth::renew_token_salt_token;
 use resalt_models::*;
 use resalt_salt::*;
@@ -39,6 +39,7 @@ pub async fn route_jobs_get(
     // API
     Ok(Json(get_jobs(data, paginate, sort)?))
 }
+
 #[derive(Deserialize)]
 pub struct JobRunRequest {
     client: SaltClientType,
@@ -135,13 +136,13 @@ pub async fn route_jobs_post(
             match create_job(&salt, &auth.salt_token.unwrap(), &run_job).await {
                 Ok(job) => Ok(Json(job)),
                 Err(e) => {
-                    error!("{:?}", e);
+                    error!("route_jobs_post {:?}", e);
                     Err(ApiError::InternalError)
                 }
             }
         }
         Err(e) => {
-            error!("{:?}", e);
+            error!("route_jobs_post {:?}", e);
             Err(ApiError::InternalError)
         }
     }
@@ -163,7 +164,8 @@ pub async fn route_job_get(
         return Err(ApiError::Forbidden);
     }
 
-    let job = match data.get_job_by_jid(&jid) {
+    // API
+    let job = match get_job(data.clone(), &jid) {
         Ok(job) => job,
         Err(e) => {
             error!("{:?}", e);
@@ -171,14 +173,14 @@ pub async fn route_job_get(
         }
     };
 
-    let job = match job {
+    let job: Job = match job {
         Some(job) => job,
         None => {
             return Err(ApiError::NotFound);
         }
     };
 
-    let returns = match data.get_job_returns_by_job(&job) {
+    let returns = match get_job_returns_by_job(data, &job) {
         Ok(returns) => returns,
         Err(e) => {
             error!("{:?}", e);

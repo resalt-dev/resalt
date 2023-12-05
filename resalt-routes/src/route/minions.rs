@@ -4,6 +4,7 @@ use axum::{
     Extension, Json,
 };
 use log::*;
+use resalt_api::minion::{get_minion, get_minions, refresh_minion};
 use resalt_auth::renew_token_salt_token;
 use resalt_models::*;
 use resalt_salt::{SaltAPI, SaltError};
@@ -30,8 +31,7 @@ pub async fn route_minions_get(
         return Err(ApiError::Forbidden);
     }
 
-    let filter = query.filter.clone();
-    let filter = match filter {
+    let filter = match &query.filter {
         Some(filter) => Some(match urlencoding::decode(filter.as_str()) {
             Ok(filter) => filter.to_string(),
             Err(e) => {
@@ -57,7 +57,7 @@ pub async fn route_minions_get(
         None => vec![],
     };
 
-    let mut minions = match data.list_minions(filters, sort, paginate) {
+    let mut minions = match get_minions(&data, filters, sort, paginate) {
         Ok(minions) => minions,
         Err(e) => {
             error!("{:?}", e);
@@ -95,18 +95,14 @@ pub async fn route_minion_get(
         return Err(ApiError::Forbidden);
     }
 
-    let minion = match data.get_minion_by_id(&minion_id) {
-        Ok(minion) => minion,
+    let minion = match get_minion(&data, &minion_id) {
+        Ok(Some(minion)) => minion,
+        Ok(None) => {
+            return Err(ApiError::NotFound);
+        }
         Err(e) => {
             error!("{:?}", e);
             return Err(ApiError::DatabaseError);
-        }
-    };
-
-    let minion = match minion {
-        Some(minion) => minion,
-        None => {
-            return Err(ApiError::NotFound);
         }
     };
 
@@ -131,8 +127,10 @@ pub async fn route_minion_refresh_post(
             return Err(ApiError::Unauthorized);
         }
     };
-    match salt.refresh_minion(salt_token, &minion_id).await {
-        Ok(_) => (),
+
+    // API
+    match refresh_minion(&salt, salt_token, &minion_id).await {
+        Ok(()) => Ok(Json(())),
         Err(SaltError::Unauthorized) => {
             if !salt_token.matured() {
                 error!("Salt token unauthorized, but not matured");
@@ -141,22 +139,17 @@ pub async fn route_minion_refresh_post(
             error!("Salt token expired, renewing and retrying");
             let auth =
                 renew_token_salt_token(&data, &salt, &auth.user_id, &auth.auth_token).await?;
-            match salt
-                .refresh_minion(&auth.salt_token.unwrap(), &minion_id)
-                .await
-            {
-                Ok(_) => (),
+            match refresh_minion(&salt, &auth.salt_token.unwrap(), &minion_id).await {
+                Ok(()) => Ok(Json(())),
                 Err(e) => {
-                    error!("refresh_minion {:?}", e);
+                    error!("route_minion_refresh_post {:?}", e);
                     return Err(ApiError::InternalError);
                 }
             }
         }
         Err(e) => {
-            error!("refresh_minion {:?}", e);
+            error!("route_minion_refresh_post {:?}", e);
             return Err(ApiError::InternalError);
         }
-    };
-
-    Ok(Json(()))
+    }
 }
