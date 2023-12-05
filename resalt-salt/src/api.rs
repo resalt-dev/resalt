@@ -618,7 +618,7 @@ impl SaltAPI {
             .await
         {
             Ok(_) => Ok(()),
-            Err(e) => return Err(e),
+            Err(e) => Err(e),
         }
     }
     pub async fn refresh_minion(&self, salt_token: &SaltToken, id: &str) -> Result<(), SaltError> {

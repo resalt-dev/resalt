@@ -12,6 +12,17 @@ pub fn get_permission_groups(
     })
 }
 
+pub fn get_permission_groups_by_user_id(
+    data: &Box<dyn StorageImpl>,
+    user_id: &str,
+) -> Result<Vec<PermissionGroup>, ApiError> {
+    data.list_permission_groups_by_user_id(user_id)
+        .map_err(|e| {
+            error!("api.get_permission_groups_by_user_id {:?}", e);
+            ApiError::DatabaseError
+        })
+}
+
 pub fn get_permission_group_by_id(
     data: &Box<dyn StorageImpl>,
     group_id: &str,
@@ -52,5 +63,23 @@ pub fn update_permission_group(
     data.update_permission_group(group).map_err(|e| {
         error!("api.update_group {:?}", e);
         ApiError::DatabaseError
-    })
+    })?;
+
+    // Update members
+    match get_permission_group_users(data, &group.id) {
+        Ok(users) => {
+            for user in users {
+                if let Err(e) = data.refresh_user_permissions(&user) {
+                    error!("{:?}", e);
+                    return Err(ApiError::DatabaseError);
+                }
+            }
+        }
+        Err(e) => {
+            error!("{:?}", e);
+            return Err(ApiError::DatabaseError);
+        }
+    };
+
+    Ok(())
 }

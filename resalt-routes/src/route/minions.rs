@@ -143,13 +143,13 @@ pub async fn route_minion_refresh_post(
                 Ok(()) => Ok(Json(())),
                 Err(e) => {
                     error!("route_minion_refresh_post {:?}", e);
-                    return Err(ApiError::InternalError);
+                    Err(ApiError::InternalError)
                 }
             }
         }
         Err(e) => {
             error!("route_minion_refresh_post {:?}", e);
-            return Err(ApiError::InternalError);
+            Err(ApiError::InternalError)
         }
     }
 }

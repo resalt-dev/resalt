@@ -1,6 +1,6 @@
 use axum::{extract::State, response::IntoResponse, Extension, Json};
 use log::*;
-use resalt_api::user::get_user_by_id;
+use resalt_api::{permission::get_permission_groups_by_user_id, user::get_user_by_id};
 use resalt_models::{ApiError, AuthStatus};
 use resalt_storage::StorageImpl;
 
@@ -18,7 +18,7 @@ pub async fn route_myself_get(
         }
     };
 
-    let permission_groups = match data.list_permission_groups_by_user_id(&user.id) {
+    let permission_groups = match get_permission_groups_by_user_id(&data, &user.id) {
         Ok(permission_groups) => permission_groups,
         Err(e) => {
             error!("route_myself_get.groups {:?}", e);

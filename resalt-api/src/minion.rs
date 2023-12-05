@@ -30,7 +30,7 @@ pub async fn refresh_minion(
     salt_token: &SaltToken,
     minion_id: &str,
 ) -> Result<(), SaltError> {
-    salt.refresh_minion(&salt_token, minion_id)
+    salt.refresh_minion(salt_token, minion_id)
         .await
         .map_err(|e| {
             error!("api.refresh_minion {:?}", e);

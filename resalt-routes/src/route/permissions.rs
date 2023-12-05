@@ -19,7 +19,7 @@ async fn get_group(
     data: &Box<dyn StorageImpl>,
     group_id: &str,
 ) -> Result<impl IntoResponse, ApiError> {
-    let permission_group = match get_permission_group_by_id(&data, group_id) {
+    let permission_group = match get_permission_group_by_id(data, group_id) {
         Ok(Some(permission_group)) => permission_group,
         Ok(None) => return Err(ApiError::NotFound),
         Err(e) => {
@@ -28,7 +28,7 @@ async fn get_group(
         }
     };
 
-    let users = match get_permission_group_users(&data, group_id) {
+    let users = match get_permission_group_users(data, group_id) {
         Ok(users) => users,
         Err(e) => {
             error!("get_group.users {:?}", e);
@@ -159,28 +159,10 @@ pub async fn route_permission_put(
     permission_group.name = input.name.clone();
     permission_group.perms = input.perms.clone(); // TODO: Validate JSON
 
+    // API
     if let Err(e) = update_permission_group(&data, &permission_group) {
         error!("{:?}", e);
         return Err(ApiError::DatabaseError);
-    };
-
-    // Update members
-    match get_permission_group_users(&data, &id) {
-        Ok(users) => {
-            for user in users {
-                match data.refresh_user_permissions(&user) {
-                    Ok(_) => (),
-                    Err(e) => {
-                        error!("{:?}", e);
-                        return Err(ApiError::DatabaseError);
-                    }
-                }
-            }
-        }
-        Err(e) => {
-            error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
-        }
     };
 
     get_group(&data, &id).await
@@ -200,7 +182,7 @@ pub async fn route_permission_delete(
     let group = get_group(&data, &id).await?;
 
     // Get list of all users, so we can update them after deleting the group
-    let users = match data.list_users_by_permission_group_id(&id) {
+    let users = match get_permission_group_users(&data, &id) {
         Ok(users) => users,
         Err(e) => {
             error!("{:?}", e);

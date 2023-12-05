@@ -37,11 +37,11 @@ pub async fn accept_key(
                 return Err(ApiError::InternalError);
             }
             error!("Salt token expired");
-            return Err(ApiError::Unauthorized);
+            Err(ApiError::Unauthorized)
         }
         Err(e) => {
             error!("salt.accept_key {:?}", e);
-            return Err(ApiError::InternalError);
+            Err(ApiError::InternalError)
         }
     }
 }
@@ -60,11 +60,11 @@ pub async fn reject_key(
                 return Err(ApiError::InternalError);
             }
             error!("Salt token expired");
-            return Err(ApiError::Unauthorized);
+            Err(ApiError::Unauthorized)
         }
         Err(e) => {
             error!("salt.reject_key {:?}", e);
-            return Err(ApiError::InternalError);
+            Err(ApiError::InternalError)
         }
     }
 }
@@ -83,11 +83,11 @@ pub async fn delete_key(
                 return Err(ApiError::InternalError);
             }
             error!("Salt token expired");
-            return Err(ApiError::Unauthorized);
+            Err(ApiError::Unauthorized)
         }
         Err(e) => {
             error!("salt.delete_key {:?}", e);
-            return Err(ApiError::InternalError);
+            Err(ApiError::InternalError)
         }
     }
 }

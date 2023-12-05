@@ -30,7 +30,7 @@ pub async fn route_keys_get(
     };
 
     // API
-    let keys = match get_keys(&salt, &salt_token).await {
+    let keys = match get_keys(&salt, salt_token).await {
         Ok(keys) => keys,
         Err(e) => {
             error!("get_keys {:?}", e);
@@ -87,7 +87,7 @@ pub async fn route_key_accept_put(
     };
 
     // API
-    match accept_key(&salt, &salt_token, &state, &id).await {
+    match accept_key(&salt, salt_token, &state, &id).await {
         Ok(()) => Ok(()),
         Err(e) => {
             error!("accept_key {:?}", e);
@@ -99,7 +99,7 @@ pub async fn route_key_accept_put(
                 Ok(()) => Ok(()),
                 Err(e) => {
                     error!("accept_key {:?}", e);
-                    return Err(ApiError::Unauthorized);
+                    Err(ApiError::Unauthorized)
                 }
             }
         }
@@ -126,7 +126,7 @@ pub async fn route_key_reject_put(
     };
 
     // API
-    match reject_key(&salt, &salt_token, &state, &id).await {
+    match reject_key(&salt, salt_token, &state, &id).await {
         Ok(()) => Ok(()),
         Err(e) => {
             error!("reject_key {:?}", e);
@@ -138,7 +138,7 @@ pub async fn route_key_reject_put(
                 Ok(()) => Ok(()),
                 Err(e) => {
                     error!("reject_key {:?}", e);
-                    return Err(ApiError::Unauthorized);
+                    Err(ApiError::Unauthorized)
                 }
             }
         }
@@ -165,7 +165,7 @@ pub async fn route_key_delete_delete(
     };
 
     // API
-    match delete_key(&salt, &salt_token, &state, &id).await {
+    match delete_key(&salt, salt_token, &state, &id).await {
         Ok(()) => Ok(()),
         Err(e) => {
             error!("delete_key {:?}", e);
@@ -177,7 +177,7 @@ pub async fn route_key_delete_delete(
                 Ok(()) => Ok(()),
                 Err(e) => {
                     error!("delete_key {:?}", e);
-                    return Err(ApiError::Unauthorized);
+                    Err(ApiError::Unauthorized)
                 }
             }
         }
