@@ -78,7 +78,7 @@ pub fn update_permission_group(
         }
         Err(e) => {
             error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
+            Err(ApiError::DatabaseError)
         }
     }
 }
@@ -133,7 +133,7 @@ pub fn add_user_to_group(
         Ok(_) => Ok(()),
         Err(e) => {
             error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
+            Err(ApiError::DatabaseError)
         }
     }
 }
@@ -154,7 +154,7 @@ pub fn remove_user_from_group(
         Ok(_) => Ok(()),
         Err(e) => {
             error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
+            Err(ApiError::DatabaseError)
         }
     }
 }

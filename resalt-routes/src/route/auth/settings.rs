@@ -28,5 +28,5 @@ pub async fn route_settings_export_get(
     }
 
     // API
-    export_backup(&data).map(|backup| Json(backup))
+    export_backup(&data).map(Json)
 }

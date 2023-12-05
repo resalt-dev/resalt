@@ -23,7 +23,7 @@ pub async fn route_presets_get(
     }
 
     // API
-    get_minion_presets(&data).map(|presets| Json(presets))
+    get_minion_presets(&data).map(Json)
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -58,7 +58,7 @@ pub async fn route_presets_post(
         })),
         Err(e) => {
             error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
+            Err(ApiError::DatabaseError)
         }
     }
 }
@@ -79,7 +79,7 @@ pub async fn route_preset_get(
         Ok(None) => Err(ApiError::NotFound),
         Err(e) => {
             error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
+            Err(ApiError::DatabaseError)
         }
     }
 }

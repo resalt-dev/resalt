@@ -61,7 +61,7 @@ pub async fn route_users_post(
     }
 
     // Check if username is taken
-    if let None = get_user_by_username(&data, &input.username)? {
+    if (get_user_by_username(&data, &input.username)?).is_none() {
         return Err(ApiError::InvalidRequest);
     };
 
