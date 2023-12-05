@@ -1,5 +1,5 @@
 [package]
-name = "resalt-storage_files"
+name = "resalt-storage-files"
 version.workspace = true
 edition.workspace = true
 publish.workspace = true
