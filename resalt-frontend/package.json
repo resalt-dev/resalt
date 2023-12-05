@@ -35,7 +35,7 @@
 		"highlight.js": "11.9.0",
 		"prettier": "3.0.3",
 		"prettier-plugin-svelte": "3.1.2",
-		"svelte": "4.2.3",
+		"svelte": "4.2.8",
 		"svelte-check": "3.6.2",
 		"svelte-local-storage-store": "0.6.4",
 		"svelte-preprocess": "5.1.0",
