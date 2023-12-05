@@ -86,7 +86,7 @@ pub async fn route_login_post(
     debug!("User {} found, generating token", &user.username);
 
     // Refresh their user-cached permissions before doing anything else
-    match data.refresh_user_permissions(&user) {
+    match data.refresh_user_permissions(&user.id) {
         Ok(_) => {}
         Err(e) => {
             error!("{:?}", e);

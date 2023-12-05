@@ -4,6 +4,10 @@ use axum::{
     Extension, Json,
 };
 use log::*;
+use resalt_api::preset::{
+    create_minion_preset, delete_minion_preset, get_minion_preset, get_minion_presets,
+    update_minion_preset,
+};
 use resalt_models::{ApiError, AuthStatus, MinionPreset};
 use resalt_security::*;
 use resalt_storage::StorageImpl;
@@ -18,15 +22,8 @@ pub async fn route_presets_get(
         return Err(ApiError::Forbidden);
     }
 
-    let presets = match data.list_minion_presets() {
-        Ok(presets) => presets,
-        Err(e) => {
-            error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
-        }
-    };
-
-    Ok(Json(presets))
+    // API
+    get_minion_presets(&data).map(|presets| Json(presets))
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -46,27 +43,24 @@ pub async fn route_presets_post(
     }
 
     let name = input.name.clone();
-    let filter = input.filter.clone();
+    let filter = input.filter.clone(); // TODO: validate filter
 
     if name.is_empty() || filter.is_empty() || name.len() > 100 || filter.len() > 65535 {
         return Err(ApiError::InvalidRequest);
     }
 
-    let preset_id = match data.insert_minion_preset(None, &name, &filter) {
-        Ok(preset) => preset,
+    // API
+    match create_minion_preset(&data, None, &name, &filter) {
+        Ok(preset_id) => Ok(Json(MinionPreset {
+            id: preset_id,
+            name,
+            filter,
+        })),
         Err(e) => {
             error!("{:?}", e);
             return Err(ApiError::DatabaseError);
         }
-    };
-
-    let preset = MinionPreset {
-        id: preset_id,
-        name,
-        filter,
-    };
-
-    Ok(Json(preset))
+    }
 }
 
 pub async fn route_preset_get(
@@ -79,17 +73,14 @@ pub async fn route_preset_get(
         return Err(ApiError::Forbidden);
     }
 
-    let preset = match data.get_minion_preset_by_id(&preset_id) {
-        Ok(preset) => preset,
+    // API
+    match get_minion_preset(&data, &preset_id) {
+        Ok(Some(preset)) => Ok(Json(preset)),
+        Ok(None) => Err(ApiError::NotFound),
         Err(e) => {
             error!("{:?}", e);
             return Err(ApiError::DatabaseError);
         }
-    };
-
-    match preset {
-        Some(preset) => Ok(Json(preset)),
-        None => Err(ApiError::NotFound),
     }
 }
 
@@ -112,37 +103,26 @@ pub async fn route_preset_put(
 
     let id = preset_id.clone();
     let name = input.name.clone();
-    let filter = input.filter.clone();
+    let filter = input.filter.clone(); // TODO: validate filter
 
     if name.is_empty() || filter.is_empty() || name.len() > 100 || filter.len() > 65535 {
         return Err(ApiError::InvalidRequest);
     }
 
     // Check if it exists
-    let preset = match data.get_minion_preset_by_id(&id) {
-        Ok(preset) => preset,
+    match get_minion_preset(&data, &id) {
+        Ok(Some(_)) => (),
+        Ok(None) => return Err(ApiError::NotFound),
         Err(e) => {
             error!("{:?}", e);
             return Err(ApiError::DatabaseError);
         }
     };
-
-    match preset {
-        Some(_) => {}
-        None => return Err(ApiError::NotFound),
-    }
 
     let preset = MinionPreset { id, name, filter };
 
-    match data.update_minion_preset(&preset) {
-        Ok(_) => {}
-        Err(e) => {
-            error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
-        }
-    };
-
-    Ok(Json(preset))
+    // API
+    update_minion_preset(&data, &preset).map(|_| Json(preset))
 }
 
 pub async fn route_preset_delete(
@@ -156,26 +136,15 @@ pub async fn route_preset_delete(
     }
 
     // Check if it exists
-    let preset = match data.get_minion_preset_by_id(&preset_id) {
-        Ok(preset) => preset,
+    let preset = match get_minion_preset(&data, &preset_id) {
+        Ok(Some(preset)) => Some(preset),
+        Ok(None) => None,
         Err(e) => {
             error!("{:?}", e);
             return Err(ApiError::DatabaseError);
         }
     };
 
-    match preset {
-        Some(_) => {}
-        None => return Err(ApiError::NotFound),
-    }
-
-    match data.delete_minion_preset(&preset_id) {
-        Ok(_) => {}
-        Err(e) => {
-            error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
-        }
-    };
-
-    Ok(Json(()))
+    // API
+    delete_minion_preset(&data, &preset_id).map(|_| Json(preset))
 }

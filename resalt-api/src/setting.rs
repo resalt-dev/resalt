@@ -1,8 +1,5 @@
-use axum::{extract::State, response::IntoResponse, Extension, Json};
 use log::error;
-use resalt_models::{ApiError, AuthStatus, Minion, MinionPreset, PermissionGroup, User};
-use resalt_security::{has_resalt_permission, P_ADMIN_SUPERADMIN};
-use resalt_storage::StorageImpl;
+use resalt_models::{ApiError, Minion, MinionPreset, Paginate, PermissionGroup, User};
 use serde::{Deserialize, Serialize};
 
 #[allow(non_snake_case)]
@@ -16,18 +13,12 @@ pub struct DataDump {
     pub minion_presets: Vec<MinionPreset>,
 }
 
-pub async fn route_settings_import_post(
-    State(data): State<Box<dyn StorageImpl>>,
-    Extension(auth): Extension<AuthStatus>,
-    Json(input): Json<DataDump>,
-) -> Result<impl IntoResponse, ApiError> {
-    // Validate permission
-    if !has_resalt_permission(&auth, P_ADMIN_SUPERADMIN)? {
-        return Err(ApiError::Forbidden);
-    }
-
+pub fn import_backup(
+    data: &Box<dyn resalt_storage::StorageImpl>,
+    config: &DataDump,
+) -> Result<(), resalt_models::ApiError> {
     // Import users
-    for user in &input.users {
+    for user in &config.users {
         // Check if user exists
         let user_exists = match data.get_user_by_username(&user.username) {
             Ok(Some(_)) => true,
@@ -65,7 +56,7 @@ pub async fn route_settings_import_post(
     }
 
     // Import groups
-    for group in &input.groups {
+    for group in &config.groups {
         // Check if group exists
         let group_exists = match data.get_permission_group_by_id(&group.id) {
             Ok(Some(_)) => true,
@@ -103,7 +94,7 @@ pub async fn route_settings_import_post(
     }
 
     // Import memberships
-    for (group_id, user_ids) in &input.memberships {
+    for (group_id, user_ids) in &config.memberships {
         for user_id in user_ids {
             match data.insert_permission_group_user(user_id, group_id) {
                 Ok(_) => {}
@@ -119,7 +110,7 @@ pub async fn route_settings_import_post(
     }
 
     // Import minions
-    for minion in &input.minions {
+    for minion in &config.minions {
         match data.update_minion(
             minion.id.clone(),
             minion.last_seen,
@@ -144,7 +135,7 @@ pub async fn route_settings_import_post(
     }
 
     // Import minion presets
-    for preset in &input.minion_presets {
+    for preset in &config.minion_presets {
         match data.insert_minion_preset(Some(preset.id.clone()), &preset.name, &preset.filter) {
             Ok(_) => {}
             Err(e) => {
@@ -154,58 +145,56 @@ pub async fn route_settings_import_post(
         };
     }
 
-    Ok(Json(()))
+    Ok(())
 }
 
-pub async fn route_settings_export_get(
-    State(data): State<Box<dyn StorageImpl>>,
-    Extension(auth): Extension<AuthStatus>,
-) -> Result<impl IntoResponse, ApiError> {
-    // Validate permission
-    if !has_resalt_permission(&auth, P_ADMIN_SUPERADMIN)? {
-        return Err(ApiError::Forbidden);
-    }
-
+pub fn export_backup(
+    data: &Box<dyn resalt_storage::StorageImpl>,
+) -> Result<DataDump, resalt_models::ApiError> {
     // Get all users (Warning: This will include passwords!)
-    let users = match data.list_users(None) {
-        Ok(users) => users,
-        Err(_) => return Err(ApiError::DatabaseError),
-    };
+    let users = data.list_users(None).map_err(|e| {
+        error!("route_settings_export_get list_users {:?}", e);
+        ApiError::DatabaseError
+    })?;
     // Get all permission groups
-    let groups = match data.list_permission_groups(None) {
-        Ok(groups) => groups,
-        Err(_) => return Err(ApiError::DatabaseError),
-    };
+    let groups = data.list_permission_groups(None).map_err(|e| {
+        error!("route_settings_export_get list_permission_groups {:?}", e);
+        ApiError::DatabaseError
+    })?;
     // Get all permission group memberships
-    let mut users_by_group_id: std::collections::HashMap<String, Vec<String>> =
+    let mut memberships: std::collections::HashMap<String, Vec<String>> =
         std::collections::HashMap::new();
     for group in &groups {
-        let users = match data.list_users_by_permission_group_id(&group.id) {
-            Ok(users) => users,
-            Err(_) => return Err(ApiError::DatabaseError),
-        };
+        let users = data
+            .list_users_by_permission_group_id(&group.id)
+            .map_err(|e| {
+                error!(
+                    "route_settings_export_get list_users_by_permission_group_id {:?}",
+                    e
+                );
+                ApiError::DatabaseError
+            })?;
         let users: Vec<String> = users.iter().map(|u| u.id.clone()).collect();
-        users_by_group_id.insert(group.id.clone(), users);
+        memberships.insert(group.id.clone(), users);
     }
-
     // Get all minions
-    let minions = match data.list_minions(vec![], None, None) {
-        Ok(minions) => minions,
-        Err(_) => return Err(ApiError::DatabaseError),
-    };
-
+    let minions = data
+        .list_minions(Vec::new(), None, Paginate::None)
+        .map_err(|e| {
+            error!("route_settings_export_get list_minions {:?}", e);
+            ApiError::DatabaseError
+        })?;
     // Get all minion presets
-    let minion_presets = match data.list_minion_presets() {
-        Ok(minion_presets) => minion_presets,
-        Err(_) => return Err(ApiError::DatabaseError),
-    };
+    let minion_presets = data.list_minion_presets().map_err(|e| {
+        error!("route_settings_export_get list_minion_presets {:?}", e);
+        ApiError::DatabaseError
+    })?;
 
-    let config = DataDump {
+    Ok(DataDump {
         users,
         groups,
-        memberships: users_by_group_id,
+        memberships,
         minions,
         minion_presets,
-    };
-    Ok(Json(config))
+    })
 }

@@ -5,8 +5,8 @@ use axum::{
 };
 use log::*;
 use resalt_api::permission::{
-    create_permission_group, get_permission_group_by_id, get_permission_group_users,
-    get_permission_groups, update_permission_group,
+    create_permission_group, delete_permission_group, get_permission_group_by_id,
+    get_permission_group_users, get_permission_groups, update_permission_group,
 };
 use resalt_models::*;
 use resalt_security::*;
@@ -181,34 +181,11 @@ pub async fn route_permission_delete(
     // Get the group so we can return it as result
     let group = get_group(&data, &id).await?;
 
-    // Get list of all users, so we can update them after deleting the group
-    let users = match get_permission_group_users(&data, &id) {
-        Ok(users) => users,
-        Err(e) => {
-            error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
-        }
+    // API
+    if let Err(e) = delete_permission_group(&data, &id) {
+        error!("{:?}", e);
+        return Err(ApiError::DatabaseError);
     };
-
-    // Delete group
-    match &data.delete_permission_group(&id) {
-        Ok(()) => (),
-        Err(e) => {
-            error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
-        }
-    };
-
-    // Update ex-members
-    for user in users {
-        match data.refresh_user_permissions(&user) {
-            Ok(_) => (),
-            Err(e) => {
-                error!("{:?}", e);
-                return Err(ApiError::DatabaseError);
-            }
-        }
-    }
 
     Ok(group)
 }

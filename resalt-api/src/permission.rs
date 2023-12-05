@@ -69,17 +69,92 @@ pub fn update_permission_group(
     match get_permission_group_users(data, &group.id) {
         Ok(users) => {
             for user in users {
-                if let Err(e) = data.refresh_user_permissions(&user) {
+                if let Err(e) = data.refresh_user_permissions(&user.id) {
                     error!("{:?}", e);
                     return Err(ApiError::DatabaseError);
                 }
             }
+            Ok(())
         }
         Err(e) => {
             error!("{:?}", e);
             return Err(ApiError::DatabaseError);
         }
-    };
+    }
+}
+
+pub fn delete_permission_group(
+    data: &Box<dyn StorageImpl>,
+    group_id: &str,
+) -> Result<(), ApiError> {
+    let users = get_permission_group_users(data, group_id)?;
+
+    data.delete_permission_group(group_id).map_err(|e| {
+        error!("api.delete_group {:?}", e);
+        ApiError::DatabaseError
+    })?;
+
+    // Update ex-members
+    for user in users {
+        if let Err(e) = data.refresh_user_permissions(&user.id) {
+            error!("{:?}", e);
+            return Err(ApiError::DatabaseError);
+        }
+    }
 
     Ok(())
+}
+
+pub fn is_user_member_of_group(
+    data: &Box<dyn StorageImpl>,
+    user_id: &str,
+    group_id: &str,
+) -> Result<bool, ApiError> {
+    data.is_user_member_of_group(user_id, group_id)
+        .map_err(|e| {
+            error!("api.is_user_member_of_group {:?}", e);
+            ApiError::DatabaseError
+        })
+}
+
+pub fn add_user_to_group(
+    data: &Box<dyn StorageImpl>,
+    user_id: &str,
+    group_id: &str,
+) -> Result<(), ApiError> {
+    data.insert_permission_group_user(user_id, group_id)
+        .map_err(|e| {
+            error!("api.add_user_to_group {:?}", e);
+            ApiError::DatabaseError
+        })?;
+
+    // Update user-cached permissions
+    match data.refresh_user_permissions(user_id) {
+        Ok(_) => Ok(()),
+        Err(e) => {
+            error!("{:?}", e);
+            return Err(ApiError::DatabaseError);
+        }
+    }
+}
+
+pub fn remove_user_from_group(
+    data: &Box<dyn StorageImpl>,
+    user_id: &str,
+    group_id: &str,
+) -> Result<(), ApiError> {
+    data.delete_permission_group_user(user_id, group_id)
+        .map_err(|e| {
+            error!("api.remove_user_from_group {:?}", e);
+            ApiError::DatabaseError
+        })?;
+
+    // Update user-cached permissions
+    match data.refresh_user_permissions(user_id) {
+        Ok(_) => Ok(()),
+        Err(e) => {
+            error!("{:?}", e);
+            return Err(ApiError::DatabaseError);
+        }
+    }
 }

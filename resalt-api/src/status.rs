@@ -1,12 +1,11 @@
-use axum::{extract::State, response::IntoResponse, Json};
-use resalt_models::*;
+use resalt_models::SystemStatus;
 use resalt_salt::SaltEventListenerStatus;
 use resalt_storage::{StorageImpl, StorageStatus};
 
-pub async fn route_status_get(
-    State(listener_status): State<SaltEventListenerStatus>,
-    State(data): State<Box<dyn StorageImpl>>,
-) -> Result<impl IntoResponse, ApiError> {
+pub fn get_status(
+    data: &Box<dyn StorageImpl>,
+    listener_status: &SaltEventListenerStatus,
+) -> SystemStatus {
     let db_status: Option<StorageStatus> = match data.get_status() {
         Ok(s) => Some(s),
         Err(e) => {
@@ -21,7 +20,7 @@ pub async fn route_status_get(
     }
 
     #[allow(clippy::redundant_clone)]
-    let status = SystemStatus {
+    SystemStatus {
         // Salt
         salt,
         // DB
@@ -35,7 +34,5 @@ pub async fn route_status_get(
         db_permission_group_users_total: db_status.clone().map(|s| s.permission_group_users_total),
         db_permission_groups_total: db_status.clone().map(|s| s.permission_groups_total),
         db_users_total: db_status.clone().map(|s| s.users_total),
-    };
-
-    Ok(Json(status))
+    }
 }

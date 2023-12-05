@@ -142,8 +142,8 @@ pub trait StorageImpl: Send + Sync {
     fn delete_user(&self, id: &str) -> Result<(), String>;
 
     #[allow(clippy::borrowed_box)]
-    fn refresh_user_permissions(&self, user: &User) -> Result<(), String> {
-        let groups = match self.list_permission_groups_by_user_id(&user.id) {
+    fn refresh_user_permissions(&self, user_id: &str) -> Result<(), String> {
+        let groups = match self.list_permission_groups_by_user_id(user_id) {
             Ok(groups) => groups,
             Err(e) => {
                 error!("{:?}", e);
@@ -170,7 +170,17 @@ pub trait StorageImpl: Send + Sync {
         }
         let perms = Value::Array(perms);
         let perms = serde_json::to_string(&perms).unwrap();
-        let mut user: User = user.clone();
+        let mut user: User = match self.get_user_by_id(user_id) {
+            Ok(Some(user)) => user,
+            Ok(None) => {
+                error!("User not found");
+                return Err("User not found".to_string());
+            }
+            Err(e) => {
+                error!("{:?}", e);
+                return Err(e);
+            }
+        };
         user.perms = perms;
         match self.update_user(&user) {
             Ok(_) => Ok(()),
