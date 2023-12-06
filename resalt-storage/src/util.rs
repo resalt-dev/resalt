@@ -76,19 +76,6 @@ fn value_to_simple_str(value: &Value) -> String {
     }
 }
 
-fn filter_str_logic(minion_value: &str, filter_value: &str, operand: &FilterOperand) -> bool {
-    match operand {
-        FilterOperand::Contains => minion_value.contains(filter_value),
-        FilterOperand::NotContains => !minion_value.contains(filter_value),
-        FilterOperand::Equals => minion_value == filter_value,
-        FilterOperand::NotEquals => minion_value != filter_value,
-        FilterOperand::StartsWith => minion_value.starts_with(filter_value),
-        FilterOperand::EndsWith => minion_value.ends_with(filter_value),
-        FilterOperand::GreaterThanOrEqual => minion_value >= filter_value,
-        FilterOperand::LessThanOrEqual => minion_value <= filter_value,
-    }
-}
-
 fn filter_i32_logic(minion_value: i32, filter_value: &str, operand: &FilterOperand) -> bool {
     match filter_value.parse::<i32>() {
         Ok(filter_value) => match operand {
@@ -126,20 +113,18 @@ fn filter_timestamp_logic(
 
 fn filter_minion(minion: &Minion, filters: &[Filter]) -> bool {
     for filter in filters {
+        let operand = filter.operand.clone();
         match filter.field_type {
             FilterFieldType::None => {}
             FilterFieldType::Object => match filter.field.as_str() {
                 "id" => {
-                    if !filter_str_logic(&minion.id, &filter.value, &filter.operand) {
+                    if !operand.filter_str_logic(&minion.id, &filter.value) {
                         return false;
                     }
                 }
                 "os_type" => {
-                    let value: &str = match &minion.os_type {
-                        Some(value) => value,
-                        None => "",
-                    };
-                    if !filter_str_logic(value, &filter.value, &filter.operand) {
+                    let value = minion.os_type.as_deref().unwrap_or("");
+                    if !operand.filter_str_logic(value, &filter.value) {
                         return false;
                     }
                 }

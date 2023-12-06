@@ -59,3 +59,18 @@ pub enum FilterOperand {
     #[serde(rename = "lte")]
     LessThanOrEqual,
 }
+
+impl FilterOperand {
+    pub fn filter_str_logic(self, a: &str, b: &str) -> bool {
+        match self {
+            FilterOperand::Contains => a.contains(b),
+            FilterOperand::NotContains => !a.contains(b),
+            FilterOperand::Equals => a == b,
+            FilterOperand::NotEquals => a != b,
+            FilterOperand::StartsWith => a.starts_with(b),
+            FilterOperand::EndsWith => a.ends_with(b),
+            FilterOperand::GreaterThanOrEqual => a >= b,
+            FilterOperand::LessThanOrEqual => a <= b,
+        }
+    }
+}

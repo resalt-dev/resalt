@@ -69,7 +69,7 @@ pub async fn cli_user(
         }
         UserCommands::InitAdmin => {
             // Check if "admin" user exists
-            if let Some(_) = get_user_by_username(&data, "admin")? {
+            if (get_user_by_username(&data, "admin")?).is_some() {
                 error!("User \"admin\" already exists");
                 std::process::exit(1);
             }
