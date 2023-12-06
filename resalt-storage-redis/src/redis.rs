@@ -299,7 +299,7 @@ impl StorageImpl for StorageRedis {
     fn list_minions(
         &self,
         filters: Vec<Filter>,
-        sort: Option<String>,
+        sort: Option<MinionSort>,
         paginate: Paginate,
     ) -> Result<Vec<Minion>, String> {
         let mut connection = self.create_connection()?;
@@ -337,8 +337,9 @@ impl StorageImpl for StorageRedis {
         resalt_storage::filter_minions(&mut minions, &filters);
 
         // Sorting
-        let sort = sort.unwrap_or("id.asc".to_string());
-        resalt_storage::sort_minions(&mut minions, &sort);
+        if let Some(sort) = sort {
+            sort_minions(&mut minions, &sort);
+        }
 
         // SLOW PAGINATION (Skip offset & Limit)
         if !filters.is_empty() {

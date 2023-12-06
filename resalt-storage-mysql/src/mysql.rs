@@ -313,7 +313,7 @@ impl StorageImpl for StorageMySQL {
     fn list_minions(
         &self,
         filters: Vec<Filter>,
-        sort: Option<String>,
+        sort: Option<MinionSort>,
         paginate: Paginate,
     ) -> Result<Vec<Minion>, String> {
         let mut connection = self.create_connection()?;
@@ -527,20 +527,33 @@ impl StorageImpl for StorageMySQL {
         }
 
         // Sorting
-        match sort.unwrap_or_else(|| "id.asc".to_string()).as_str() {
-            "id.asc" => query = query.order(minions::id.asc()),
-            "id.desc" => query = query.order(minions::id.desc()),
-            "lastSeen.asc" => query = query.order(minions::last_seen.asc()),
-            "lastSeen.desc" => query = query.order(minions::last_seen.desc()),
-            "conformitySuccess.asc" => query = query.order(minions::conformity_success.asc()),
-            "conformitySuccess.desc" => query = query.order(minions::conformity_success.desc()),
-            "conformityIncorrect.asc" => query = query.order(minions::conformity_incorrect.asc()),
-            "conformityIncorrect.desc" => query = query.order(minions::conformity_incorrect.desc()),
-            "conformityError.asc" => query = query.order(minions::conformity_error.asc()),
-            "conformityError.desc" => query = query.order(minions::conformity_error.desc()),
-            "osType.asc" => query = query.order(minions::os_type.asc()),
-            "osType.desc" => query = query.order(minions::os_type.desc()),
-            _ => return Err(String::from("Invalid sort parameter")),
+        if let Some(sort) = sort {
+            match sort {
+                MinionSort::IdAsc => query = query.order(minions::id.asc()),
+                MinionSort::IdDesc => query = query.order(minions::id.desc()),
+                MinionSort::LastSeenAsc => query = query.order(minions::last_seen.asc()),
+                MinionSort::LastSeenDesc => query = query.order(minions::last_seen.desc()),
+                MinionSort::ConformitySuccessAsc => {
+                    query = query.order(minions::conformity_success.asc())
+                }
+                MinionSort::ConformitySuccessDesc => {
+                    query = query.order(minions::conformity_success.desc())
+                }
+                MinionSort::ConformityIncorrectAsc => {
+                    query = query.order(minions::conformity_incorrect.asc())
+                }
+                MinionSort::ConformityIncorrectDesc => {
+                    query = query.order(minions::conformity_incorrect.desc())
+                }
+                MinionSort::ConformityErrorAsc => {
+                    query = query.order(minions::conformity_error.asc())
+                }
+                MinionSort::ConformityErrorDesc => {
+                    query = query.order(minions::conformity_error.desc())
+                }
+                MinionSort::OsTypeAsc => query = query.order(minions::os_type.asc()),
+                MinionSort::OsTypeDesc => query = query.order(minions::os_type.desc()),
+            }
         }
 
         // Pagination

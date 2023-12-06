@@ -1,7 +1,7 @@
 use log::*;
 use resalt_models::{
-    AuthToken, Event, Filter, Job, JobReturn, Minion, MinionPreset, Paginate, PermissionGroup,
-    ResaltTime, SaltToken, StorageStatus, User,
+    AuthToken, Event, Filter, Job, JobReturn, Minion, MinionPreset, MinionSort, Paginate,
+    PermissionGroup, ResaltTime, SaltToken, StorageStatus, User,
 };
 use serde_json::Value;
 
@@ -113,7 +113,7 @@ pub trait StorageImpl: Send + Sync {
     fn list_minions(
         &self,
         filters: Vec<Filter>,
-        sort: Option<String>,
+        sort: Option<MinionSort>,
         paginate: Paginate,
     ) -> Result<Vec<Minion>, String>;
 

@@ -15,7 +15,7 @@ use serde::Deserialize;
 #[derive(Deserialize)]
 pub struct MinionsListGetQuery {
     filter: Option<String>, // URL-encoded JSON
-    sort: Option<String>,
+    sort: Option<MinionSort>,
     // Include fields from PaginateQuery
     #[serde(flatten)]
     paginate_query: PaginateQuery,

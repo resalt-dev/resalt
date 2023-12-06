@@ -6,13 +6,14 @@ use resalt_storage::StorageImpl;
 pub fn get_minions(
     data: &Box<dyn StorageImpl>,
     filters: Vec<Filter>,
-    sort: Option<String>,
+    sort: Option<MinionSort>,
     paginate: Paginate,
 ) -> Result<Vec<Minion>, ApiError> {
-    data.list_minions(filters, sort, paginate).map_err(|e| {
-        error!("api.get_minions {:?}", e);
-        ApiError::DatabaseError
-    })
+    data.list_minions(filters, Some(sort.unwrap_or_default()), paginate)
+        .map_err(|e| {
+            error!("api.get_minions {:?}", e);
+            ApiError::DatabaseError
+        })
 }
 
 pub fn get_minion(
