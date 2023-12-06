@@ -7,7 +7,6 @@ publish.workspace = true
 [dependencies]
 jsonpath_lib = { workspace = true }
 log = { workspace = true }
-rand = { workspace = true }
 resalt-config = { path = "../resalt-config" }
 resalt-models = { path = "../resalt-models" }
 resalt-security = { path = "../resalt-security" }

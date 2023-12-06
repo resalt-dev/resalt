@@ -1,3 +1,4 @@
+use log::debug;
 use serde::{Deserialize, Serialize};
 use std::io::{Read, Write};
 
@@ -23,35 +24,35 @@ pub struct StorageFiles {
 
 impl StorageFiles {
     pub fn connect(path: &str) -> Result<StorageFiles, String> {
-        log::info!("Connecting to files storage at {}", path);
         let path = path.trim_end_matches('/');
         let storage = StorageFiles {
             path: path.to_string(),
         };
-
-        // Create directories if they don't exist
-        let dirs = vec![
-            "users",
-            "authtokens",
-            "minions",
-            "events",
-            "jobs",
-            "job_returns",
-            "permission_groups",
-            "minion_presets",
-        ];
-        for dir in dirs {
-            let path = format!("{}/{}", storage.path, dir);
-            std::fs::create_dir_all(path).map_err(|e| format!("{:?}", e))?;
-        }
 
         Ok(storage)
     }
 
     fn save_file(&self, path: &str, data: &impl Serialize) -> Result<(), String> {
         let path = format!("{}/{}.json", self.path, path);
-        let serialized_data = serde_json::to_string(data).map_err(|e| format!("{:?}", e))?;
-        let mut file = std::fs::File::create(path).map_err(|e| format!("{:?}", e))?;
+
+        // Create parent folders if does not exist
+        let parts = path.split('/').collect::<Vec<&str>>();
+        let mut w = String::new();
+        for part in parts.iter().take(parts.len() - 1) {
+            w.push_str(part);
+            w.push('/');
+            // Create folder if it doesn't exist
+            let exists = std::path::Path::new(&w).exists();
+            debug!("Creating folder: {} ({})", w, exists);
+            if !exists {
+                std::fs::create_dir(&w).map_err(|e| format!("{:?}", e))?;
+            }
+        }
+
+        // Write file
+        debug!("Writing file: {}", path);
+        let serialized_data = serde_json::to_string_pretty(data).map_err(|e| format!("{:?}", e))?;
+        let mut file = std::fs::File::create(path.clone()).map_err(|e| format!("{:?}", e))?;
         file.write_all(serialized_data.as_bytes())
             .map_err(|e| format!("{:?}", e))?;
         Ok(())
@@ -72,6 +73,7 @@ impl StorageFiles {
 
     fn check_file_exists(&self, path: &str) -> Result<bool, String> {
         let path = format!("{}/{}.json", self.path, path);
+        debug!("Checking if file exists: {}", path);
         let exists = std::path::Path::new(&path).exists();
         Ok(exists)
     }
@@ -79,7 +81,13 @@ impl StorageFiles {
     fn list_file_names(&self, path: &str) -> Result<Vec<String>, String> {
         let path = format!("{}/{}", self.path, path);
         let mut file_names: Vec<String> = Vec::new();
-        for entry in std::fs::read_dir(path).map_err(|e| format!("{:?}", e))? {
+        let entries = match std::fs::read_dir(path).map_err(|e| format!("{:?}", e)) {
+            Ok(entries) => entries,
+            Err(_) => {
+                return Ok(Vec::new());
+            }
+        };
+        for entry in entries {
             let entry = entry.map_err(|e| format!("{:?}", e))?;
             let file_name = entry
                 .file_name()
@@ -191,7 +199,7 @@ impl StorageImpl for StorageFiles {
             email: email.clone(),
         };
 
-        let path = format!("users/{}.json", id);
+        let path = format!("users/{}", id);
         self.save_file(&path, &user)?;
 
         Ok(user)

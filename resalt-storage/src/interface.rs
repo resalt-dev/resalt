@@ -1,101 +1,13 @@
 use log::*;
-use rand::Rng;
 use resalt_models::{
     AuthToken, Event, Filter, Job, JobReturn, Minion, MinionPreset, Paginate, PermissionGroup,
     ResaltTime, SaltToken, User,
 };
-use serde_json::{json, Value};
+use serde_json::Value;
 
 use crate::StorageStatus;
 
 pub trait StorageImpl: Send + Sync {
-    fn init(&self) {
-        //
-        // Create default admin user
-        //
-        if self.get_user_by_username("admin").unwrap().is_none() {
-            // Generate random password instead of using default
-            let random_password = rand::thread_rng()
-                .sample_iter(&rand::distributions::Alphanumeric)
-                .take(15)
-                .map(|c| c.to_string())
-                .collect::<String>();
-
-            // Create initial admin user
-            let mut user = self
-                .create_user("admin".to_string(), Some(random_password.to_string()), None)
-                .unwrap();
-
-            // Give permissions to admin
-            let perms: Value = json!([
-                ".*".to_string(),
-                "@runner".to_string(),
-                "@wheel".to_string(),
-                {
-                    "@resalt": [
-                        "admin.superadmin".to_string(),
-                    ],
-                },
-            ]);
-            user.perms = serde_json::to_string(&perms).unwrap();
-            self.update_user(&user).unwrap();
-
-            // Announce randomly generated password
-            warn!("============================================================");
-            warn!(
-                "==  CREATED DEFAULT USER: admin WITH PASSWORD: {}  ==",
-                random_password
-            );
-            warn!("============================================================");
-        }
-
-        //
-        // Create default permission admin group
-        //
-        // 1. Get all groups
-        let groups = self.list_permission_groups(None).unwrap();
-        // 2. Check if $superadmins exists
-        let mut superadmins_group_id = None;
-        for group in groups {
-            if group.name == "$superadmins" {
-                superadmins_group_id = Some(group.id);
-                break;
-            }
-        }
-        // 3. Create $superadmins if not exists
-        if superadmins_group_id.is_none() {
-            superadmins_group_id = Some(
-                self.create_permission_group(
-                    None,
-                    "$superadmins",
-                    Some(
-                        json!([
-                            ".*".to_string(),
-                            "@runner".to_string(),
-                            "@wheel".to_string(),
-                            {
-                                "@resalt": [
-                                    "admin.superadmin".to_string(),
-                                ]
-                            }
-                        ])
-                        .to_string(),
-                    ),
-                )
-                .unwrap(),
-            );
-        }
-        // Add admin to $superadmins if not member
-        let admin_user_id = self.get_user_by_username("admin").unwrap().unwrap().id;
-        if !self
-            .is_user_member_of_group(&admin_user_id, &superadmins_group_id.clone().unwrap())
-            .unwrap()
-        {
-            self.insert_permission_group_user(&admin_user_id, &superadmins_group_id.unwrap())
-                .unwrap();
-        }
-    }
-
     fn clone(&self) -> Box<dyn StorageImpl>;
 
     fn clone_self(&self) -> Box<dyn StorageImpl> {
@@ -141,7 +53,6 @@ pub trait StorageImpl: Send + Sync {
 
     fn delete_user(&self, id: &str) -> Result<(), String>;
 
-    #[allow(clippy::borrowed_box)]
     fn refresh_user_permissions(&self, user_id: &str) -> Result<(), String> {
         let groups = match self.list_permission_groups_by_user_id(user_id) {
             Ok(groups) => groups,

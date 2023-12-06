@@ -14,11 +14,7 @@ impl StorageRedis {
         let pool = Pool::builder().build(client);
 
         match pool {
-            Ok(pool) => {
-                let own = Self { pool };
-                own.init();
-                Ok(own)
-            }
+            Ok(pool) => Ok(Self { pool }),
             Err(e) => Err(format!("{:?}", e)),
         }
     }

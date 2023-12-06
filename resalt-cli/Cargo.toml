@@ -8,6 +8,7 @@ publish.workspace = true
 clap = { version = "4.4.10", features = ["derive"] }
 env_logger = { version = "0.10.1", features = ["auto-color"], default-features = false }
 log = { workspace = true }
+rand = { workspace = true }
 resalt-api = { path = "../resalt-api" }
 resalt-config = { path = "../resalt-config" }
 resalt-models = { path = "../resalt-models" }

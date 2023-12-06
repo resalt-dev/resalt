@@ -29,6 +29,7 @@ async fn init_db() -> Box<dyn StorageImpl> {
     match db_type {
         "files" => {
             let path: String = ResaltConfig::DATABASE_HOST.clone();
+            debug!("Database path: \"{}\"", path);
             Box::new(
                 resalt_storage_files::StorageFiles::connect(&path)
                     .unwrap_or_else(|_| panic!("Error connecting to {}", &path)),
@@ -43,6 +44,7 @@ async fn init_db() -> Box<dyn StorageImpl> {
                 *ResaltConfig::DATABASE_PORT,
                 *ResaltConfig::DATABASE_DATABASE
             );
+            debug!("Database URL: \"{}\"", database_url);
             Box::new(
                 StorageMySQL::connect(&database_url)
                     .await
@@ -58,8 +60,7 @@ async fn init_db() -> Box<dyn StorageImpl> {
                 *ResaltConfig::DATABASE_PORT,
                 *ResaltConfig::DATABASE_DATABASE
             );
-
-            println!("Connecting to {}", &database_url);
+            debug!("Database URL: \"{}\"", database_url);
             Box::new(
                 StorageRedis::connect(&database_url)
                     .await

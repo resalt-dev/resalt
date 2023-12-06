@@ -43,8 +43,6 @@ impl StorageMySQL {
                     }
                 };
 
-                own.init();
-
                 Ok(own)
             }
             Err(e) => Err(format!("{:?}", e)),
