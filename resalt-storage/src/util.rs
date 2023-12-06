@@ -3,6 +3,7 @@ use resalt_models::*;
 use serde_json::Value;
 use version_compare::Cmp;
 
+// TODO: convert to enum
 pub fn sort_jobs(jobs: &mut [Job], sort: &str) {
     jobs.sort_by(|a, b| match sort {
         "id.asc" => a.id.cmp(&b.id),
