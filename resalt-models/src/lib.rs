@@ -3,6 +3,7 @@ mod db;
 mod filter;
 mod salt;
 mod status;
+mod storage;
 mod time;
 
 pub use api::*;
@@ -10,6 +11,7 @@ pub use db::*;
 pub use filter::*;
 pub use salt::*;
 pub use status::*;
+pub use storage::*;
 pub use time::*;
 
 pub fn strip_quotes<S: AsRef<str>>(s: S) -> String {

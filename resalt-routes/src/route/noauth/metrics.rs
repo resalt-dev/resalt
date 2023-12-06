@@ -1,9 +1,9 @@
 use axum::{extract::State, response::IntoResponse};
 use log::*;
 use resalt_config::ResaltConfig;
-use resalt_models::ApiError;
+use resalt_models::{ApiError, StorageStatus};
 use resalt_salt::SaltEventListenerStatus;
-use resalt_storage::{StorageImpl, StorageStatus};
+use resalt_storage::StorageImpl;
 
 pub async fn route_metrics_get(
     State(listener_status): State<SaltEventListenerStatus>,

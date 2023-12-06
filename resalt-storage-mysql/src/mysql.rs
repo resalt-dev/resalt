@@ -9,7 +9,7 @@ use diesel_migrations::EmbeddedMigrations;
 use log::*;
 use resalt_config::ResaltConfig;
 use resalt_models::*;
-use resalt_storage::{StorageImpl, StorageStatus};
+use resalt_storage::StorageImpl;
 
 type DbPooledConnection = PooledConnection<ConnectionManager<MysqlConnection>>;
 
@@ -62,7 +62,7 @@ impl StorageImpl for StorageMySQL {
         Box::new(Clone::clone(self))
     }
 
-    fn get_status(&self) -> Result<resalt_storage::StorageStatus, String> {
+    fn get_status(&self) -> Result<StorageStatus, String> {
         let mut connection = self.create_connection()?;
 
         let lifespan: i64 = (*ResaltConfig::AUTH_SESSION_LIFESPAN * 1000)

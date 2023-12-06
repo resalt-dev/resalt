@@ -1,6 +1,6 @@
-use resalt_models::SystemStatus;
+use resalt_models::{StorageStatus, SystemStatus};
 use resalt_salt::SaltEventListenerStatus;
-use resalt_storage::{StorageImpl, StorageStatus};
+use resalt_storage::StorageImpl;
 
 pub fn get_status(
     data: &Box<dyn StorageImpl>,

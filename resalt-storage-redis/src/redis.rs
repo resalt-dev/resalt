@@ -1,7 +1,7 @@
 use r2d2::{Pool, PooledConnection};
 use redis::{Client, Commands, Iter};
 use resalt_models::*;
-use resalt_storage::{StorageImpl, StorageStatus};
+use resalt_storage::StorageImpl;
 
 #[derive(Clone)]
 pub struct StorageRedis {
@@ -32,7 +32,7 @@ impl StorageImpl for StorageRedis {
         Box::new(Clone::clone(self))
     }
 
-    fn get_status(&self) -> Result<resalt_storage::StorageStatus, String> {
+    fn get_status(&self) -> Result<StorageStatus, String> {
         //        let mut connection = self.create_connection()?;
 
         //let lifespan = SConfig::auth_session_lifespan() * 1000;

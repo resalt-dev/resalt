@@ -27,11 +27,14 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
+    #[clap(about = "Print the current config")]
     Config,
+    #[clap(about = "Manage users")]
     User {
         #[clap(subcommand)]
         subcmd: UserCommands,
     },
+    #[clap(about = "Print the current version")]
     Version,
 }
 
@@ -156,12 +159,10 @@ async fn run() -> Result<(), ApiError> {
                 add_user_to_group(&data, &user.id, &group_id)?;
 
                 // Announce randomly generated password
-                warn!("============================================================");
                 warn!(
-                    "==  CREATED DEFAULT USER: admin WITH PASSWORD: {}  ==",
+                    "CREATED DEFAULT USER: admin WITH PASSWORD: {}",
                     random_password
                 );
-                warn!("============================================================");
             }
         },
         Commands::Version => {

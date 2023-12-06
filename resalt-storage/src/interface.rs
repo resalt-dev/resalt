@@ -1,11 +1,9 @@
 use log::*;
 use resalt_models::{
     AuthToken, Event, Filter, Job, JobReturn, Minion, MinionPreset, Paginate, PermissionGroup,
-    ResaltTime, SaltToken, User,
+    ResaltTime, SaltToken, StorageStatus, User,
 };
 use serde_json::Value;
-
-use crate::StorageStatus;
 
 pub trait StorageImpl: Send + Sync {
     fn clone(&self) -> Box<dyn StorageImpl>;

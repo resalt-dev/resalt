@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::io::{Read, Write};
 
 use resalt_models::*;
-use resalt_storage::{StorageImpl, StorageStatus};
+use resalt_storage::StorageImpl;
 
 /// Dev storage which saves everything to filesystem instead of using a database
 /// NOTE! NOT MEANT FOR PRODUCTION!!!
@@ -111,7 +111,7 @@ impl StorageImpl for StorageFiles {
         Box::new(Clone::clone(self))
     }
 
-    fn get_status(&self) -> Result<resalt_storage::StorageStatus, String> {
+    fn get_status(&self) -> Result<StorageStatus, String> {
         //
 
         //let lifespan = SConfig::auth_session_lifespan() * 1000;
