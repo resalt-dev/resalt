@@ -1,12 +1,11 @@
 // Wrapper around chrono::NaiveDateTime, but make it serializable/deserializable
 
-use std::ops::Sub;
-
 use chrono::{
     format::{DelayedFormat, StrftimeItems},
     Duration, NaiveDateTime, ParseError,
 };
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use std::{fmt::Display, fmt::Formatter, ops::Sub};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Default)]
 pub struct ResaltTime {
@@ -49,6 +48,13 @@ impl Sub for ResaltTime {
     #[inline]
     fn sub(self, rhs: ResaltTime) -> Duration {
         self.time - rhs.time
+    }
+}
+
+impl Display for ResaltTime {
+    #[inline]
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.time.format("%Y-%m-%d %H:%M:%S"))
     }
 }
 

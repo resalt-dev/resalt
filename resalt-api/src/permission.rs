@@ -89,6 +89,14 @@ pub fn delete_permission_group(
 ) -> Result<(), ApiError> {
     let users = get_permission_group_users(data, group_id)?;
 
+    for user in &users {
+        data.delete_permission_group_user(&user.id, group_id)
+            .map_err(|e| {
+                error!("api.delete_group_user {:?}", e);
+                ApiError::DatabaseError
+            })?;
+    }
+
     data.delete_permission_group(group_id).map_err(|e| {
         error!("api.delete_group {:?}", e);
         ApiError::DatabaseError
