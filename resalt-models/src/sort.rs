@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::Minion;
+use crate::{Job, Minion};
 
 /*
 minions.sort_by(|a, b| match sort {
@@ -113,5 +113,49 @@ pub fn sort_minions(minions: &mut [Minion], sort: &MinionSort) {
             .as_ref()
             .unwrap_or(&String::from(""))
             .cmp(a.os_type.as_ref().unwrap_or(&String::from(""))),
+    })
+}
+
+/*
+"id.asc" => a.id.cmp(&b.id),
+"id.desc" => b.id.cmp(&a.id),
+"timestamp.asc" => a.timestamp.cmp(&b.timestamp),
+"timestamp.desc" => b.timestamp.cmp(&a.timestamp),
+"jid.asc" => a.jid.cmp(&b.jid),
+"jid.desc" => b.jid.cmp(&a.jid),
+"user.asc" => a.user.cmp(&b.user),
+"user.desc" => b.user.cmp(&a.user),
+_ => std::cmp::Ordering::Equal, */
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, Default)]
+pub enum JobSort {
+    #[default]
+    #[serde(rename = "id.asc")]
+    IdAsc,
+    #[serde(rename = "id.desc")]
+    IdDesc,
+    #[serde(rename = "timestamp.asc")]
+    TimestampAsc,
+    #[serde(rename = "timestamp.desc")]
+    TimestampDesc,
+    #[serde(rename = "jid.asc")]
+    JidAsc,
+    #[serde(rename = "jid.desc")]
+    JidDesc,
+    #[serde(rename = "user.asc")]
+    UserAsc,
+    #[serde(rename = "user.desc")]
+    UserDesc,
+}
+
+pub fn sort_jobs(jobs: &mut [Job], sort: &JobSort) {
+    jobs.sort_by(|a, b| match sort {
+        JobSort::IdAsc => a.id.cmp(&b.id),
+        JobSort::IdDesc => b.id.cmp(&a.id),
+        JobSort::TimestampAsc => a.timestamp.cmp(&b.timestamp),
+        JobSort::TimestampDesc => b.timestamp.cmp(&a.timestamp),
+        JobSort::JidAsc => a.jid.cmp(&b.jid),
+        JobSort::JidDesc => b.jid.cmp(&a.jid),
+        JobSort::UserAsc => a.user.cmp(&b.user),
+        JobSort::UserDesc => b.user.cmp(&a.user),
     })
 }

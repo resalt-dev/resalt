@@ -7,7 +7,7 @@ use serde_json::Value;
 pub fn get_jobs(
     data: Box<dyn StorageImpl>,
     paginate: Paginate,
-    sort: Option<String>,
+    sort: Option<JobSort>,
 ) -> Result<Vec<Job>, ApiError> {
     data.list_jobs(sort, paginate).map_err(|e| {
         error!("api.get_jobs {:?}", e);

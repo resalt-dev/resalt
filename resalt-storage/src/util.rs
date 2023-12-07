@@ -3,21 +3,6 @@ use resalt_models::*;
 use serde_json::Value;
 use version_compare::Cmp;
 
-// TODO: convert to enum
-pub fn sort_jobs(jobs: &mut [Job], sort: &str) {
-    jobs.sort_by(|a, b| match sort {
-        "id.asc" => a.id.cmp(&b.id),
-        "id.desc" => b.id.cmp(&a.id),
-        "timestamp.asc" => a.timestamp.cmp(&b.timestamp),
-        "timestamp.desc" => b.timestamp.cmp(&a.timestamp),
-        "jid.asc" => a.jid.cmp(&b.jid),
-        "jid.desc" => b.jid.cmp(&a.jid),
-        "user.asc" => a.user.cmp(&b.user),
-        "user.desc" => b.user.cmp(&a.user),
-        _ => std::cmp::Ordering::Equal,
-    })
-}
-
 fn value_to_simple_str(value: &Value) -> String {
     match value {
         Value::String(s) => strip_quotes(&s.to_string()),

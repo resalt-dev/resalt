@@ -547,7 +547,7 @@ impl StorageImpl for StorageRedis {
         Ok(())
     }
 
-    fn list_jobs(&self, sort: Option<String>, paginate: Paginate) -> Result<Vec<Job>, String> {
+    fn list_jobs(&self, sort: Option<JobSort>, paginate: Paginate) -> Result<Vec<Job>, String> {
         let mut connection = self.create_connection()?;
         let mut jobs: Vec<Job> = Vec::new();
 
@@ -575,8 +575,9 @@ impl StorageImpl for StorageRedis {
         }
 
         // Sorting
-        let sort = sort.unwrap_or("id.asc".to_string());
-        resalt_storage::sort_jobs(&mut jobs, &sort);
+        if let Some(sort) = sort {
+            sort_jobs(&mut jobs, &sort);
+        }
 
         Ok(jobs)
     }

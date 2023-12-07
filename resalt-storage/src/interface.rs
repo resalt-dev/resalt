@@ -1,6 +1,6 @@
 use log::*;
 use resalt_models::{
-    AuthToken, Event, Filter, Job, JobReturn, Minion, MinionPreset, MinionSort, Paginate,
+    AuthToken, Event, Filter, Job, JobReturn, JobSort, Minion, MinionPreset, MinionSort, Paginate,
     PermissionGroup, ResaltTime, SaltToken, StorageStatus, User,
 };
 use serde_json::Value;
@@ -259,7 +259,7 @@ pub trait StorageImpl: Send + Sync {
         timestamp: ResaltTime,
     ) -> Result<(), String>;
 
-    fn list_jobs(&self, sort: Option<String>, paginate: Paginate) -> Result<Vec<Job>, String>;
+    fn list_jobs(&self, sort: Option<JobSort>, paginate: Paginate) -> Result<Vec<Job>, String>;
 
     fn get_job_by_jid(&self, jid: &str) -> Result<Option<Job>, String>;
 

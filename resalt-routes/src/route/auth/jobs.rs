@@ -16,7 +16,7 @@ use std::collections::HashMap;
 
 #[derive(Deserialize)]
 pub struct JobsListGetQuery {
-    sort: Option<String>,
+    sort: Option<JobSort>,
     // Include fields from PaginateQuery
     #[serde(flatten)]
     paginate_query: PaginateQuery,

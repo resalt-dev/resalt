@@ -794,7 +794,7 @@ impl StorageImpl for StorageMySQL {
         Ok(())
     }
 
-    fn list_jobs(&self, sort: Option<String>, paginate: Paginate) -> Result<Vec<Job>, String> {
+    fn list_jobs(&self, sort: Option<JobSort>, paginate: Paginate) -> Result<Vec<Job>, String> {
         let mut connection = self.create_connection()?;
         let mut query = jobs::table.into_boxed();
         query = query.order(jobs::timestamp.desc());
@@ -802,16 +802,17 @@ impl StorageImpl for StorageMySQL {
         // Filtering
 
         // Sorting
-        match sort.unwrap_or_else(|| "id.asc".to_string()).as_str() {
-            "id.asc" => query = query.order(jobs::id.asc()),
-            "id.desc" => query = query.order(jobs::id.desc()),
-            "timestamp.asc" => query = query.order(jobs::timestamp.asc()),
-            "timestamp.desc" => query = query.order(jobs::timestamp.desc()),
-            "jid.asc" => query = query.order(jobs::jid.asc()),
-            "jid.desc" => query = query.order(jobs::jid.desc()),
-            "user.asc" => query = query.order(jobs::user.asc()),
-            "user.desc" => query = query.order(jobs::user.desc()),
-            _ => return Err(String::from("Invalid sort parameter")),
+        if let Some(sort) = sort {
+            match sort {
+                JobSort::IdAsc => query = query.order(jobs::id.asc()),
+                JobSort::IdDesc => query = query.order(jobs::id.desc()),
+                JobSort::TimestampAsc => query = query.order(jobs::timestamp.asc()),
+                JobSort::TimestampDesc => query = query.order(jobs::timestamp.desc()),
+                JobSort::JidAsc => query = query.order(jobs::jid.asc()),
+                JobSort::JidDesc => query = query.order(jobs::jid.desc()),
+                JobSort::UserAsc => query = query.order(jobs::user.asc()),
+                JobSort::UserDesc => query = query.order(jobs::user.desc()),
+            }
         }
 
         // Pagination
