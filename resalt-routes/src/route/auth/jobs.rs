@@ -9,7 +9,7 @@ use resalt_auth::renew_token_salt_token;
 use resalt_models::*;
 use resalt_salt::*;
 use resalt_security::*;
-use resalt_storage::StorageImpl;
+use resalt_storage::Storage;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
@@ -24,7 +24,7 @@ pub struct JobsListGetQuery {
 
 pub async fn route_jobs_get(
     query: Query<JobsListGetQuery>,
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
@@ -102,7 +102,7 @@ pub fn map_client_to_runjob(request: JobRunRequest) -> SaltRunJob {
 
 pub async fn route_jobs_post(
     State(salt): State<SaltAPI>,
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
     Json(input): Json<JobRunRequest>,
 ) -> Result<impl IntoResponse, ApiError> {
@@ -156,7 +156,7 @@ pub struct JobGetResponse {
 
 pub async fn route_job_get(
     Path(jid): Path<String>,
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
@@ -165,7 +165,7 @@ pub async fn route_job_get(
     }
 
     // API
-    let job = match get_job(data.clone(), &jid) {
+    let job = match get_job(Clone::clone(&data), &jid) {
         Ok(job) => job,
         Err(e) => {
             error!("{:?}", e);

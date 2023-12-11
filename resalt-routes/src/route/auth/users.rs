@@ -15,13 +15,13 @@ use resalt_api::{
 };
 use resalt_models::{ApiError, AuthStatus, Paginate, PaginateQuery};
 use resalt_security::*;
-use resalt_storage::StorageImpl;
+use resalt_storage::Storage;
 use serde::Deserialize;
 use serde_json::Value;
 
 pub async fn route_users_get(
     query: Query<PaginateQuery>,
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
@@ -51,7 +51,7 @@ pub struct UserCreateRequest {
 }
 
 pub async fn route_users_post(
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
     Json(input): Json<UserCreateRequest>,
 ) -> Result<impl IntoResponse, ApiError> {
@@ -76,7 +76,7 @@ pub async fn route_users_post(
 
 pub async fn route_user_get(
     Path(user_id): Path<String>,
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission (always allow fetching self)
@@ -98,7 +98,7 @@ pub async fn route_user_get(
 
 pub async fn route_user_delete(
     Path(user_id): Path<String>,
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
@@ -125,7 +125,7 @@ pub struct UserPostPasswordData {
 
 pub async fn route_user_password_post(
     Path(user_id): Path<String>,
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
     Json(input): Json<UserPostPasswordData>,
 ) -> Result<impl IntoResponse, ApiError> {
@@ -163,7 +163,7 @@ pub async fn route_user_password_post(
 
 pub async fn route_user_permissions_post(
     Path((user_id, group_id)): Path<(String, String)>,
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
@@ -197,7 +197,7 @@ pub async fn route_user_permissions_post(
 
 pub async fn route_user_permissions_delete(
     Path((user_id, group_id)): Path<(String, String)>,
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission

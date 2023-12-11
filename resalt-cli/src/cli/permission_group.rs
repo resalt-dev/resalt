@@ -5,7 +5,7 @@ use resalt_api::permission::{
 };
 use resalt_models::{ApiError, Paginate};
 use resalt_salt::SaltAPI;
-use resalt_storage::StorageImpl;
+use resalt_storage::Storage;
 use serde_json::to_string_pretty;
 
 #[derive(Subcommand, Debug)]
@@ -43,7 +43,7 @@ pub enum PermissionGroupCommands {
 }
 
 pub async fn cli_permission_group(
-    data: Box<dyn StorageImpl>,
+    data: Storage,
     _salt_api: SaltAPI,
     cmd: PermissionGroupCommands,
 ) -> Result<(), ApiError> {

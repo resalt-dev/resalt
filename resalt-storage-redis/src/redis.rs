@@ -1,7 +1,6 @@
 use r2d2::{Pool, PooledConnection};
 use redis::{Client, Commands, Iter};
 use resalt_models::*;
-use resalt_storage::StorageImpl;
 
 #[derive(Clone)]
 pub struct StorageRedis {

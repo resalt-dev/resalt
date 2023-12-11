@@ -1,9 +1,9 @@
 use log::error;
-use resalt_models::{ApiError, Paginate, PermissionGroup, User};
-use resalt_storage::StorageImpl;
+use resalt_models::{ApiError, Paginate, PermissionGroup, StorageImpl, User};
+use resalt_storage::Storage;
 
 pub fn get_permission_groups(
-    data: &Box<dyn StorageImpl>,
+    data: &Storage,
     paginate: Paginate,
 ) -> Result<Vec<PermissionGroup>, ApiError> {
     data.list_permission_groups(paginate).map_err(|e| {
@@ -13,7 +13,7 @@ pub fn get_permission_groups(
 }
 
 pub fn get_permission_groups_by_user_id(
-    data: &Box<dyn StorageImpl>,
+    data: &Storage,
     user_id: &str,
 ) -> Result<Vec<PermissionGroup>, ApiError> {
     data.list_permission_groups_by_user_id(user_id)
@@ -24,7 +24,7 @@ pub fn get_permission_groups_by_user_id(
 }
 
 pub fn get_permission_group_by_id(
-    data: &Box<dyn StorageImpl>,
+    data: &Storage,
     group_id: &str,
 ) -> Result<Option<PermissionGroup>, ApiError> {
     data.get_permission_group_by_id(group_id).map_err(|e| {
@@ -33,10 +33,7 @@ pub fn get_permission_group_by_id(
     })
 }
 
-pub fn get_permission_group_users(
-    data: &Box<dyn StorageImpl>,
-    group_id: &str,
-) -> Result<Vec<User>, ApiError> {
+pub fn get_permission_group_users(data: &Storage, group_id: &str) -> Result<Vec<User>, ApiError> {
     data.list_users_by_permission_group_id(group_id)
         .map_err(|e| {
             error!("api.get_permission_group_users {:?}", e);
@@ -45,7 +42,7 @@ pub fn get_permission_group_users(
 }
 
 pub fn create_permission_group(
-    data: &Box<dyn StorageImpl>,
+    data: &Storage,
     id: Option<String>,
     name: &str,
     perms: Option<String>,
@@ -56,10 +53,7 @@ pub fn create_permission_group(
     })
 }
 
-pub fn update_permission_group(
-    data: &Box<dyn StorageImpl>,
-    group: &PermissionGroup,
-) -> Result<(), ApiError> {
+pub fn update_permission_group(data: &Storage, group: &PermissionGroup) -> Result<(), ApiError> {
     data.update_permission_group(group).map_err(|e| {
         error!("api.update_group {:?}", e);
         ApiError::DatabaseError
@@ -83,10 +77,7 @@ pub fn update_permission_group(
     }
 }
 
-pub fn delete_permission_group(
-    data: &Box<dyn StorageImpl>,
-    group_id: &str,
-) -> Result<(), ApiError> {
+pub fn delete_permission_group(data: &Storage, group_id: &str) -> Result<(), ApiError> {
     let users = get_permission_group_users(data, group_id)?;
 
     for user in &users {
@@ -114,7 +105,7 @@ pub fn delete_permission_group(
 }
 
 pub fn is_user_member_of_group(
-    data: &Box<dyn StorageImpl>,
+    data: &Storage,
     user_id: &str,
     group_id: &str,
 ) -> Result<bool, ApiError> {
@@ -125,11 +116,7 @@ pub fn is_user_member_of_group(
         })
 }
 
-pub fn add_user_to_group(
-    data: &Box<dyn StorageImpl>,
-    user_id: &str,
-    group_id: &str,
-) -> Result<(), ApiError> {
+pub fn add_user_to_group(data: &Storage, user_id: &str, group_id: &str) -> Result<(), ApiError> {
     data.insert_permission_group_user(user_id, group_id)
         .map_err(|e| {
             error!("api.add_user_to_group {:?}", e);
@@ -147,7 +134,7 @@ pub fn add_user_to_group(
 }
 
 pub fn remove_user_from_group(
-    data: &Box<dyn StorageImpl>,
+    data: &Storage,
     user_id: &str,
     group_id: &str,
 ) -> Result<(), ApiError> {

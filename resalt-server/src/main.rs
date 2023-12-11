@@ -4,16 +4,13 @@ use axum::{
     Router, Server, ServiceExt,
 };
 use env_logger::{init_from_env, Env};
-use log::*;
 use resalt_config::ResaltConfig;
 use resalt_routes::middleware::*;
 use resalt_routes::route::auth::*;
 use resalt_routes::route::noauth::*;
 use resalt_routes::state::*;
 use resalt_salt::{SaltAPI, SaltEventListener, SaltEventListenerStatus};
-use resalt_storage::StorageImpl;
-use resalt_storage_mysql::StorageMySQL;
-use resalt_storage_redis::StorageRedis;
+use resalt_storage::Storage;
 use std::{
     error::Error,
     net::SocketAddr,
@@ -22,56 +19,7 @@ use std::{
 use tokio::task;
 use tower::Layer;
 
-async fn init_db() -> Box<dyn StorageImpl> {
-    let db_type = &ResaltConfig::DATABASE_TYPE.clone();
-    let db_type = db_type.as_str();
-    debug!("Database type: \"{}\"", db_type);
-    match db_type {
-        "files" => {
-            let path: String = ResaltConfig::DATABASE_HOST.clone();
-            debug!("Database path: \"{}\"", path);
-            Box::new(
-                resalt_storage_files::StorageFiles::connect(&path)
-                    .unwrap_or_else(|_| panic!("Error connecting to {}", &path)),
-            )
-        }
-        "mysql" => {
-            let database_url = format!(
-                "mysql://{}:{}@{}:{}/{}",
-                *ResaltConfig::DATABASE_USERNAME,
-                *ResaltConfig::DATABASE_PASSWORD,
-                *ResaltConfig::DATABASE_HOST,
-                *ResaltConfig::DATABASE_PORT,
-                *ResaltConfig::DATABASE_DATABASE
-            );
-            debug!("Database URL: \"{}\"", database_url);
-            Box::new(
-                StorageMySQL::connect(&database_url)
-                    .await
-                    .unwrap_or_else(|_| panic!("Error connecting to {}", &database_url)),
-            )
-        }
-        "redis" => {
-            let database_url = format!(
-                "redis://{}:{}@{}:{}/{}",
-                *ResaltConfig::DATABASE_USERNAME,
-                *ResaltConfig::DATABASE_PASSWORD,
-                *ResaltConfig::DATABASE_HOST,
-                *ResaltConfig::DATABASE_PORT,
-                *ResaltConfig::DATABASE_DATABASE
-            );
-            debug!("Database URL: \"{}\"", database_url);
-            Box::new(
-                StorageRedis::connect(&database_url)
-                    .await
-                    .unwrap_or_else(|_| panic!("Error connecting to {}", &database_url)),
-            )
-        }
-        _ => panic!(),
-    }
-}
-
-fn start_salt_websocket_thread(db: Box<dyn StorageImpl>) -> SaltEventListenerStatus {
+fn start_salt_websocket_thread(db: Storage) -> SaltEventListenerStatus {
     let listener_status: SaltEventListenerStatus = SaltEventListenerStatus {
         connected: Arc::new(Mutex::new(false)),
     };
@@ -90,7 +38,7 @@ fn start_salt_websocket_thread(db: Box<dyn StorageImpl>) -> SaltEventListenerSta
 }
 
 async fn start_server(
-    db: Box<dyn StorageImpl>,
+    db: Storage,
     listener_status: SaltEventListenerStatus,
 ) -> Result<(), Box<dyn Error>> {
     let salt_api = SaltAPI::new();
@@ -184,7 +132,7 @@ async fn run() -> Result<(), Box<dyn Error>> {
     init_from_env(Env::new().default_filter_or("Debug"));
 
     // Database
-    let db: Box<dyn StorageImpl> = init_db().await;
+    let db: Storage = Storage::init_db().await;
 
     // Salt WebSocket Thread
     let listener_status = start_salt_websocket_thread(db.clone());

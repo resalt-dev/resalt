@@ -1,11 +1,8 @@
-use resalt_models::{StorageStatus, SystemStatus};
+use resalt_models::{StorageImpl, StorageStatus, SystemStatus};
 use resalt_salt::SaltEventListenerStatus;
-use resalt_storage::StorageImpl;
+use resalt_storage::Storage;
 
-pub fn get_status(
-    data: &Box<dyn StorageImpl>,
-    listener_status: &SaltEventListenerStatus,
-) -> SystemStatus {
+pub fn get_status(data: &Storage, listener_status: &SaltEventListenerStatus) -> SystemStatus {
     let db_status: Option<StorageStatus> = match data.get_status() {
         Ok(s) => Some(s),
         Err(e) => {

@@ -9,10 +9,10 @@ use resalt_auth::renew_token_salt_token;
 use resalt_models::*;
 use resalt_salt::SaltAPI;
 use resalt_security::*;
-use resalt_storage::StorageImpl;
+use resalt_storage::Storage;
 
 pub async fn route_keys_get(
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     State(salt): State<SaltAPI>,
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
@@ -69,7 +69,7 @@ pub async fn route_keys_get(
 
 pub async fn route_key_accept_put(
     Path((state, id)): Path<(SaltKeyState, String)>,
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     State(salt): State<SaltAPI>,
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
@@ -108,7 +108,7 @@ pub async fn route_key_accept_put(
 
 pub async fn route_key_reject_put(
     Path((state, id)): Path<(SaltKeyState, String)>,
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     State(salt): State<SaltAPI>,
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
@@ -147,7 +147,7 @@ pub async fn route_key_reject_put(
 
 pub async fn route_key_delete_delete(
     Path((state, id)): Path<(SaltKeyState, String)>,
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     State(salt): State<SaltAPI>,
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {

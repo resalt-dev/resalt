@@ -11,6 +11,5 @@ diesel_migrations = { version = "2.1.0", features = ["mysql"], default-features 
 log = { workspace = true }
 resalt-config = { path = "../resalt-config" }
 resalt-models = { path = "../resalt-models" }
-resalt-storage = { path = "../resalt-storage" }
 serde_json = { workspace = true }
 uuid = { workspace = true }

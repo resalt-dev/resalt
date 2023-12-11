@@ -3,12 +3,11 @@ use resalt_config::ResaltConfig;
 use resalt_models::*;
 use resalt_salt::SaltAPI;
 use resalt_security::verify_password;
-use resalt_storage::StorageImpl;
+use resalt_storage::Storage;
 use serde_json::from_str;
 
-#[allow(clippy::borrowed_box)]
 pub async fn renew_token_salt_token(
-    data: &Box<dyn StorageImpl>,
+    data: &Storage,
     salt: &SaltAPI,
     user_id: &str,
     auth_token: &str,
@@ -51,11 +50,7 @@ pub async fn renew_token_salt_token(
     })
 }
 
-#[allow(clippy::borrowed_box)]
-pub fn validate_auth_token(
-    data: &Box<dyn StorageImpl>,
-    token: &str,
-) -> Result<Option<AuthStatus>, ApiError> {
+pub fn validate_auth_token(data: &Storage, token: &str) -> Result<Option<AuthStatus>, ApiError> {
     if token.len() < 20 {
         return Ok(None);
     }
@@ -107,9 +102,8 @@ pub fn validate_auth_token(
     }))
 }
 
-#[allow(clippy::borrowed_box)]
 pub fn auth_login_classic(
-    data: &Box<dyn StorageImpl>,
+    data: &Storage,
     username: &str,
     password: &str,
 ) -> Result<Option<User>, ApiError> {

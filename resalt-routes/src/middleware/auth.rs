@@ -8,12 +8,12 @@ use log::*;
 use resalt_auth::{renew_token_salt_token, validate_auth_token};
 use resalt_models::{ApiError, AuthStatus};
 use resalt_salt::SaltAPI;
-use resalt_storage::StorageImpl;
+use resalt_storage::Storage;
 use std::collections::HashMap;
 
 #[allow(clippy::let_and_return)]
 pub async fn middleware_auth<B>(
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     State(salt): State<SaltAPI>,
     Query(params): Query<HashMap<String, String>>,
     // you can add more extractors here but the last
@@ -69,7 +69,7 @@ pub async fn middleware_auth<B>(
 }
 
 async fn resolve_auth_status(
-    db: Box<dyn StorageImpl>,
+    db: Storage,
     salt: SaltAPI,
     token: String,
 ) -> Result<Option<AuthStatus>, ApiError> {

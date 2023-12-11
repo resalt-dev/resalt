@@ -7,7 +7,7 @@ use log::*;
 use resalt_api::grain::search_grains;
 use resalt_models::*;
 use resalt_security::*;
-use resalt_storage::StorageImpl;
+use resalt_storage::Storage;
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -18,7 +18,7 @@ pub struct GrainsGetQuery {
 
 pub async fn route_grains_get(
     query: Query<GrainsGetQuery>,
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission

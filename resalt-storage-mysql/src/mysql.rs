@@ -9,7 +9,6 @@ use diesel_migrations::EmbeddedMigrations;
 use log::*;
 use resalt_config::ResaltConfig;
 use resalt_models::*;
-use resalt_storage::StorageImpl;
 
 type DbPooledConnection = PooledConnection<ConnectionManager<MysqlConnection>>;
 

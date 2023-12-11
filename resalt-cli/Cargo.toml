@@ -14,8 +14,5 @@ resalt-config = { path = "../resalt-config" }
 resalt-models = { path = "../resalt-models" }
 resalt-salt = { path = "../resalt-salt" }
 resalt-storage = { path = "../resalt-storage" }
-resalt-storage-files = { path = "../resalt-storage-files" }
-resalt-storage-mysql = { path = "../resalt-storage-mysql" }
-resalt-storage-redis = { path = "../resalt-storage-redis" }
 serde_json = { workspace = true }
 tokio = { workspace = true }

@@ -2,8 +2,8 @@ use super::SaltAPI;
 use futures::{pin_mut, StreamExt};
 use log::*;
 use resalt_config::ResaltConfig;
-use resalt_models::{ResaltTime, SaltToken};
-use resalt_storage::StorageImpl;
+use resalt_models::{ResaltTime, SaltToken, StorageImpl};
+use resalt_storage::Storage;
 use serde_json::Value;
 use std::sync::{Arc, Mutex};
 
@@ -18,12 +18,12 @@ pub struct SaltEventListenerStatus {
 
 pub struct SaltEventListener {
     api: SaltAPI,
-    storage: Box<dyn StorageImpl>,
+    storage: Storage,
     status: SaltEventListenerStatus,
 }
 
 impl SaltEventListener {
-    pub fn new(storage: Box<dyn StorageImpl>, status: SaltEventListenerStatus) -> Self {
+    pub fn new(storage: Storage, status: SaltEventListenerStatus) -> Self {
         Self {
             api: SaltAPI::new(),
             storage,

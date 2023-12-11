@@ -9,7 +9,7 @@ use resalt_auth::renew_token_salt_token;
 use resalt_models::*;
 use resalt_salt::{SaltAPI, SaltError};
 use resalt_security::*;
-use resalt_storage::StorageImpl;
+use resalt_storage::Storage;
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -23,7 +23,7 @@ pub struct MinionsListGetQuery {
 
 pub async fn route_minions_get(
     query: Query<MinionsListGetQuery>,
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
@@ -87,7 +87,7 @@ pub async fn route_minions_get(
 
 pub async fn route_minion_get(
     Path(minion_id): Path<String>,
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
@@ -112,7 +112,7 @@ pub async fn route_minion_get(
 pub async fn route_minion_refresh_post(
     Path(minion_id): Path<String>,
     State(salt): State<SaltAPI>,
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission

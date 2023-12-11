@@ -10,15 +10,11 @@ use resalt_api::permission::{
 };
 use resalt_models::*;
 use resalt_security::*;
-use resalt_storage::StorageImpl;
+use resalt_storage::Storage;
 use serde::Deserialize;
 use serde_json::Value;
 
-#[allow(clippy::borrowed_box)]
-async fn get_group(
-    data: &Box<dyn StorageImpl>,
-    group_id: &str,
-) -> Result<impl IntoResponse, ApiError> {
+async fn get_group(data: &Storage, group_id: &str) -> Result<impl IntoResponse, ApiError> {
     let permission_group = match get_permission_group_by_id(data, group_id) {
         Ok(Some(permission_group)) => permission_group,
         Ok(None) => return Err(ApiError::NotFound),
@@ -40,7 +36,7 @@ async fn get_group(
 
 pub async fn route_permissions_get(
     query: Query<PaginateQuery>,
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
@@ -80,7 +76,7 @@ pub struct PermissionGroupCreateRequest {
 }
 
 pub async fn route_permissions_post(
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
     Json(input): Json<PermissionGroupCreateRequest>,
 ) -> Result<impl IntoResponse, ApiError> {
@@ -117,7 +113,7 @@ pub async fn route_permissions_post(
 
 pub async fn route_permission_get(
     Path(id): Path<String>,
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
@@ -136,7 +132,7 @@ pub struct PermissionGroupUpdateRequest {
 
 pub async fn route_permission_put(
     Path(id): Path<String>,
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
     Json(input): Json<PermissionGroupUpdateRequest>,
 ) -> Result<impl IntoResponse, ApiError> {
@@ -170,7 +166,7 @@ pub async fn route_permission_put(
 
 pub async fn route_permission_delete(
     Path(id): Path<String>,
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission

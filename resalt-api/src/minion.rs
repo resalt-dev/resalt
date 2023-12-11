@@ -1,10 +1,10 @@
 use log::error;
 use resalt_models::*;
 use resalt_salt::{SaltAPI, SaltError};
-use resalt_storage::StorageImpl;
+use resalt_storage::Storage;
 
 pub fn get_minions(
-    data: &Box<dyn StorageImpl>,
+    data: &Storage,
     filters: Vec<Filter>,
     sort: Option<MinionSort>,
     paginate: Paginate,
@@ -16,10 +16,7 @@ pub fn get_minions(
         })
 }
 
-pub fn get_minion(
-    data: &Box<dyn StorageImpl>,
-    minion_id: &str,
-) -> Result<Option<Minion>, ApiError> {
+pub fn get_minion(data: &Storage, minion_id: &str) -> Result<Option<Minion>, ApiError> {
     data.get_minion_by_id(minion_id).map_err(|e| {
         error!("api.get_minion {:?}", e);
         ApiError::DatabaseError

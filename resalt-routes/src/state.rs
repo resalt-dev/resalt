@@ -1,17 +1,17 @@
 use axum::extract::FromRef;
 use resalt_salt::{SaltAPI, SaltEventListenerStatus};
-use resalt_storage::StorageImpl;
+use resalt_storage::Storage;
 
 #[derive(Clone)]
 pub struct AppState {
-    pub data: Box<dyn StorageImpl>,
+    pub data: Storage,
     pub salt_api: SaltAPI,
     pub listener_status: SaltEventListenerStatus,
 }
 
-impl FromRef<AppState> for Box<dyn StorageImpl> {
-    fn from_ref(app_state: &AppState) -> Box<dyn StorageImpl> {
-        app_state.data.clone()
+impl FromRef<AppState> for Storage {
+    fn from_ref(app_state: &AppState) -> Storage {
+        Clone::clone(&app_state.data)
     }
 }
 

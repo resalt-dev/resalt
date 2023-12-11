@@ -1,12 +1,11 @@
+use log::*;
+use resalt_models::*;
+use resalt_storage::Storage;
+use serde_json::Value;
 use std::collections::HashMap;
 
-use log::*;
-use resalt_models::{ApiError, Filter};
-use resalt_storage::StorageImpl;
-use serde_json::Value;
-
 pub fn search_grains(
-    data: &Box<dyn StorageImpl>,
+    data: &Storage,
     path: String,
     filter: Option<String>,
 ) -> Result<HashMap<String, Value>, ApiError> {

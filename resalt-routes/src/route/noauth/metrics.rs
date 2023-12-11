@@ -1,13 +1,13 @@
 use axum::{extract::State, response::IntoResponse};
 use log::*;
 use resalt_config::ResaltConfig;
-use resalt_models::{ApiError, StorageStatus};
+use resalt_models::{ApiError, StorageImpl, StorageStatus};
 use resalt_salt::SaltEventListenerStatus;
-use resalt_storage::StorageImpl;
+use resalt_storage::Storage;
 
 pub async fn route_metrics_get(
     State(listener_status): State<SaltEventListenerStatus>,
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
 ) -> Result<impl IntoResponse, ApiError> {
     if !*ResaltConfig::METRICS_ENABLED {
         return Err(ApiError::NotFound);

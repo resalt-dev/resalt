@@ -1,11 +1,11 @@
 use log::*;
 use resalt_models::*;
 use resalt_salt::{SaltAPI, SaltError};
-use resalt_storage::StorageImpl;
+use resalt_storage::Storage;
 use serde_json::Value;
 
 pub fn get_jobs(
-    data: Box<dyn StorageImpl>,
+    data: Storage,
     paginate: Paginate,
     sort: Option<JobSort>,
 ) -> Result<Vec<Job>, ApiError> {
@@ -23,17 +23,14 @@ pub async fn create_job(
     salt.run_job(salt_token, run_job).await
 }
 
-pub fn get_job(data: Box<dyn StorageImpl>, jid: &str) -> Result<Option<Job>, ApiError> {
+pub fn get_job(data: Storage, jid: &str) -> Result<Option<Job>, ApiError> {
     data.get_job_by_jid(jid).map_err(|e| {
         error!("api.get_job {:?}", e);
         ApiError::DatabaseError
     })
 }
 
-pub fn get_job_returns_by_job(
-    data: Box<dyn StorageImpl>,
-    job: &Job,
-) -> Result<Vec<JobReturn>, ApiError> {
+pub fn get_job_returns_by_job(data: Storage, job: &Job) -> Result<Vec<JobReturn>, ApiError> {
     data.get_job_returns_by_job(job).map_err(|e| {
         error!("api.get_job_returns_by_job {:?}", e);
         ApiError::DatabaseError

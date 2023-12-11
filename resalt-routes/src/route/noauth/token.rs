@@ -2,9 +2,9 @@ use axum::{extract::State, response::IntoResponse, Form, Json};
 use log::*;
 use resalt_auth::validate_auth_token;
 use resalt_config::ResaltConfig;
-use resalt_models::ApiError;
+use resalt_models::{ApiError, StorageImpl};
 use resalt_salt::RESALT_SALT_SYSTEM_SERVICE_USERNAME;
-use resalt_storage::StorageImpl;
+use resalt_storage::Storage;
 use serde::Deserialize;
 use serde_json::{json, Value};
 
@@ -15,7 +15,7 @@ pub struct TokenValidateRequest {
 }
 
 pub async fn route_token_post(
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     Form(input): Form<TokenValidateRequest>,
 ) -> Result<impl IntoResponse, ApiError> {
     let db = data;

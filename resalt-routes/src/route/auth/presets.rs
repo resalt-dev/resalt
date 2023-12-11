@@ -10,11 +10,11 @@ use resalt_api::preset::{
 };
 use resalt_models::{ApiError, AuthStatus, MinionPreset};
 use resalt_security::*;
-use resalt_storage::StorageImpl;
+use resalt_storage::Storage;
 use serde::{Deserialize, Serialize};
 
 pub async fn route_presets_get(
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
@@ -33,7 +33,7 @@ pub struct PresetsCreateRequest {
 }
 
 pub async fn route_presets_post(
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
     Json(input): Json<PresetsCreateRequest>,
 ) -> Result<impl IntoResponse, ApiError> {
@@ -65,7 +65,7 @@ pub async fn route_presets_post(
 
 pub async fn route_preset_get(
     Path(preset_id): Path<String>,
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission
@@ -92,7 +92,7 @@ pub struct PresetUpdateRequest {
 
 pub async fn route_preset_put(
     Path(preset_id): Path<String>,
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
     Json(input): Json<PresetUpdateRequest>,
 ) -> Result<impl IntoResponse, ApiError> {
@@ -127,7 +127,7 @@ pub async fn route_preset_put(
 
 pub async fn route_preset_delete(
     Path(preset_id): Path<String>,
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission

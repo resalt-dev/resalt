@@ -6,9 +6,10 @@ use log::*;
 use resalt_auth::auth_login_classic;
 use resalt_auth::renew_token_salt_token;
 use resalt_config::ResaltConfig;
+use resalt_models::StorageImpl;
 use resalt_models::{ApiError, User};
 use resalt_salt::SaltAPI;
-use resalt_storage::StorageImpl;
+use resalt_storage::Storage;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Debug)]
@@ -27,7 +28,7 @@ struct LoginResponse {
 
 pub async fn route_login_post(
     headers: HeaderMap,
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     State(salt): State<SaltAPI>,
     Json(input): Json<LoginRequest>,
 ) -> Result<impl IntoResponse, ApiError> {

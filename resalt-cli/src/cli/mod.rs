@@ -10,7 +10,7 @@ use clap::{command, Parser, Subcommand};
 use resalt_api::config::get_config;
 use resalt_models::ApiError;
 use resalt_salt::SaltAPI;
-use resalt_storage::StorageImpl;
+use resalt_storage::Storage;
 use serde_json::to_string_pretty;
 
 /// Command-line interface for Resalt
@@ -39,11 +39,7 @@ pub enum Commands {
     Version,
 }
 
-pub async fn run_cli(
-    data: Box<dyn StorageImpl>,
-    salt_api: SaltAPI,
-    cmd: Commands,
-) -> Result<(), ApiError> {
+pub async fn run_cli(data: Storage, salt_api: SaltAPI, cmd: Commands) -> Result<(), ApiError> {
     match cmd {
         Commands::Config => {
             let config = get_config(false).await?;

@@ -3,7 +3,6 @@ use serde::{Deserialize, Serialize};
 use std::io::{Read, Write};
 
 use resalt_models::*;
-use resalt_storage::StorageImpl;
 
 /// Dev storage which saves everything to filesystem instead of using a database
 /// NOTE! NOT MEANT FOR PRODUCTION!!!

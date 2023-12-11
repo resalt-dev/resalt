@@ -3,11 +3,11 @@ use resalt_api::status::get_status;
 use resalt_models::*;
 use resalt_salt::SaltEventListenerStatus;
 use resalt_security::{has_resalt_permission, P_MINION_LIST};
-use resalt_storage::StorageImpl;
+use resalt_storage::Storage;
 
 pub async fn route_status_get(
     State(listener_status): State<SaltEventListenerStatus>,
-    State(data): State<Box<dyn StorageImpl>>,
+    State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, ApiError> {
     // Validate permission

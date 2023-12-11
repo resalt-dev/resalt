@@ -1,5 +1,6 @@
 use log::error;
-use resalt_models::{ApiError, Minion, MinionPreset, Paginate, PermissionGroup, User};
+use resalt_models::*;
+use resalt_storage::Storage;
 use serde::{Deserialize, Serialize};
 
 #[allow(non_snake_case)]
@@ -13,10 +14,7 @@ pub struct DataDump {
     pub minion_presets: Vec<MinionPreset>,
 }
 
-pub fn import_backup(
-    data: &Box<dyn resalt_storage::StorageImpl>,
-    config: &DataDump,
-) -> Result<(), resalt_models::ApiError> {
+pub fn import_backup(data: &Storage, config: &DataDump) -> Result<(), resalt_models::ApiError> {
     // Import users
     for user in &config.users {
         // Check if user exists
@@ -148,9 +146,7 @@ pub fn import_backup(
     Ok(())
 }
 
-pub fn export_backup(
-    data: &Box<dyn resalt_storage::StorageImpl>,
-) -> Result<DataDump, resalt_models::ApiError> {
+pub fn export_backup(data: &Storage) -> Result<DataDump, resalt_models::ApiError> {
     // Get all users (Warning: This will include passwords!)
     let users = data.list_users(None).map_err(|e| {
         error!("route_settings_export_get list_users {:?}", e);

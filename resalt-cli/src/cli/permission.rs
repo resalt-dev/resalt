@@ -1,7 +1,7 @@
 use clap::Subcommand;
 use resalt_models::ApiError;
 use resalt_salt::SaltAPI;
-use resalt_storage::StorageImpl;
+use resalt_storage::Storage;
 
 use super::permission_group::{cli_permission_group, PermissionGroupCommands};
 
@@ -16,7 +16,7 @@ pub enum PermissionCommands {
 }
 
 pub async fn run_cli_permission(
-    data: Box<dyn StorageImpl>,
+    data: Storage,
     _salt_api: SaltAPI,
     cmd: PermissionCommands,
 ) -> Result<(), ApiError> {
