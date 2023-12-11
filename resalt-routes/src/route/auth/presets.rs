@@ -1,3 +1,4 @@
+use crate::permission::*;
 use axum::{
     extract::{Path, State},
     response::IntoResponse,
@@ -9,7 +10,6 @@ use resalt_api::preset::{
     update_minion_preset,
 };
 use resalt_models::{ApiError, AuthStatus, MinionPreset};
-use resalt_security::*;
 use resalt_storage::Storage;
 use serde::{Deserialize, Serialize};
 

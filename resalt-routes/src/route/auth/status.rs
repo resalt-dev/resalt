@@ -1,8 +1,8 @@
+use crate::permission::*;
 use axum::{extract::State, response::IntoResponse, Extension, Json};
 use resalt_api::status::get_status;
 use resalt_models::*;
 use resalt_salt::SaltEventListenerStatus;
-use resalt_security::{has_resalt_permission, P_MINION_LIST};
 use resalt_storage::Storage;
 
 pub async fn route_status_get(

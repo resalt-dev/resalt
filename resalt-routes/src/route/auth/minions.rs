@@ -1,3 +1,4 @@
+use crate::permission::*;
 use axum::{
     extract::{Path, Query, State},
     response::IntoResponse,
@@ -8,7 +9,6 @@ use resalt_api::minion::{get_minion, get_minions, refresh_minion};
 use resalt_auth::renew_token_salt_token;
 use resalt_models::*;
 use resalt_salt::{SaltAPI, SaltError};
-use resalt_security::*;
 use resalt_storage::Storage;
 use serde::Deserialize;
 

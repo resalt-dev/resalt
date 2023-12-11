@@ -1,3 +1,4 @@
+use crate::permission::*;
 use axum::{
     extract::{Path, State},
     response::IntoResponse,
@@ -8,7 +9,6 @@ use resalt_api::key::{accept_key, delete_key, get_keys, reject_key};
 use resalt_auth::renew_token_salt_token;
 use resalt_models::*;
 use resalt_salt::SaltAPI;
-use resalt_security::*;
 use resalt_storage::Storage;
 
 pub async fn route_keys_get(

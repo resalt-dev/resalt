@@ -1,3 +1,4 @@
+use crate::permission::*;
 use axum::{
     extract::{Query, State},
     response::IntoResponse,
@@ -5,7 +6,6 @@ use axum::{
 };
 use resalt_api::event::get_events;
 use resalt_models::{ApiError, AuthStatus, PaginateQuery};
-use resalt_security::*;
 use resalt_storage::Storage;
 
 pub async fn route_events_get(

@@ -1,9 +1,8 @@
-use std::collections::HashMap;
-
 use log::*;
 use regex::Regex;
 use resalt_models::{ApiError, AuthStatus};
 use serde_json::Value;
+use std::collections::HashMap;
 
 pub const P_ADMIN_SUPERADMIN: &str = "admin.superadmin";
 pub const P_ADMIN_GROUP: &str = "admin.group";
@@ -56,7 +55,6 @@ pub const P_USER_LIST: &str = "user.list";
 pub const P_USER_EMAIL: &str = "user.email";
 pub const P_USER_PASSWORD: &str = "user.password";
 
-#[allow(clippy::borrowed_box)]
 pub fn has_resalt_permission(auth: &AuthStatus, permission: &str) -> Result<bool, ApiError> {
     let perms = match serde_json::from_str(&auth.perms) {
         Ok(perms) => perms,
@@ -68,7 +66,7 @@ pub fn has_resalt_permission(auth: &AuthStatus, permission: &str) -> Result<bool
     Ok(evaluate_resalt_permission(&perms, permission))
 }
 
-pub fn evaluate_resalt_permission(permissions: &Value, permission: &str) -> bool {
+pub(crate) fn evaluate_resalt_permission(permissions: &Value, permission: &str) -> bool {
     let args = Vec::new();
     let kwargs = HashMap::new();
     let normal = evaluate_permission(permissions, "@resalt", permission, &args, &kwargs);
@@ -228,7 +226,7 @@ mod tests {
 
     use serde_json::from_str;
 
-    use crate::{evaluate_permission, evaluate_resalt_permission};
+    use crate::permission::{evaluate_permission, evaluate_resalt_permission};
 
     #[test]
     fn test_evalute_resalt_permission() {

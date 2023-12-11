@@ -1,3 +1,4 @@
+use crate::permission::*;
 use axum::{
     extract::{Path, Query, State},
     response::IntoResponse,
@@ -9,7 +10,6 @@ use resalt_api::permission::{
     get_permission_group_users, get_permission_groups, update_permission_group,
 };
 use resalt_models::*;
-use resalt_security::*;
 use resalt_storage::Storage;
 use serde::Deserialize;
 use serde_json::Value;
