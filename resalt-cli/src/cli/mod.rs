@@ -8,7 +8,6 @@ use self::{
 };
 use clap::{command, Parser, Subcommand};
 use resalt_api::config::get_config;
-use resalt_models::ApiError;
 use resalt_salt::SaltAPI;
 use resalt_storage::Storage;
 use serde_json::to_string_pretty;
@@ -39,10 +38,12 @@ pub enum Commands {
     Version,
 }
 
-pub async fn run_cli(data: Storage, salt_api: SaltAPI, cmd: Commands) -> Result<(), ApiError> {
+pub async fn run_cli(data: Storage, salt_api: SaltAPI, cmd: Commands) -> Result<(), String> {
     match cmd {
         Commands::Config => {
-            let config = get_config(false).await?;
+            let config = get_config(false)
+                .await
+                .map_err(|e| format!("Failed to get config: {}", e))?;
             println!("Config: {}", to_string_pretty(&config).unwrap());
         }
         Commands::Permission { subcmd } => run_cli_permission(data, salt_api, subcmd).await?,

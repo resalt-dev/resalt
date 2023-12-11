@@ -1,3 +1,4 @@
+use http::StatusCode;
 use log::*;
 use resalt_models::*;
 use resalt_storage::Storage;
@@ -8,7 +9,7 @@ pub fn search_grains(
     data: &Storage,
     path: String,
     filter: Option<String>,
-) -> Result<HashMap<String, Value>, ApiError> {
+) -> Result<HashMap<String, Value>, StatusCode> {
     let path = path
         .starts_with('$')
         .then(|| path.clone())
@@ -19,7 +20,7 @@ pub fn search_grains(
             Ok(filters) => filters,
             Err(e) => {
                 error!("Failed to parse filter: {}", e);
-                return Err(ApiError::InvalidRequest);
+                return Err(StatusCode::BAD_REQUEST);
             }
         },
         None => vec![],
@@ -29,7 +30,7 @@ pub fn search_grains(
         Ok(minions) => minions,
         Err(e) => {
             error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
         }
     };
 
@@ -65,7 +66,7 @@ pub fn search_grains(
     // Check if results is empty object && error
     if results.is_empty() && error {
         error!("Failed to extract grains");
-        return Err(ApiError::InvalidRequest);
+        return Err(StatusCode::BAD_REQUEST);
     }
 
     Ok(results)

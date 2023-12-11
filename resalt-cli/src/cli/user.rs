@@ -5,7 +5,7 @@ use resalt_api::{
     permission::{add_user_to_group, create_permission_group},
     user::{create_user, delete_user, get_user_by_id, get_user_by_username, get_users},
 };
-use resalt_models::{ApiError, Paginate};
+use resalt_models::Paginate;
 use resalt_salt::SaltAPI;
 use resalt_storage::Storage;
 use serde_json::{json, to_string_pretty};
@@ -27,17 +27,15 @@ pub enum UserCommands {
     InitAdmin,
 }
 
-pub async fn cli_user(
-    data: Storage,
-    _salt_api: SaltAPI,
-    cmd: UserCommands,
-) -> Result<(), ApiError> {
+pub async fn cli_user(data: Storage, _salt_api: SaltAPI, cmd: UserCommands) -> Result<(), String> {
     match cmd {
         UserCommands::Delete { id } => {
-            let user = get_user_by_id(&data, &id)?;
+            let user =
+                get_user_by_id(&data, &id).map_err(|e| format!("Failed to get user: {}", e))?;
             if let Some(user) = user {
                 debug!("Deleting user: {}", user.id);
-                delete_user(&data, &user.id)?;
+                delete_user(&data, &user.id)
+                    .map_err(|e| format!("Failed to delete user: {}", e))?;
                 println!("Deleted user: {}", user.username);
             } else {
                 error!("User not found");
@@ -45,7 +43,8 @@ pub async fn cli_user(
             }
         }
         UserCommands::List { raw } => {
-            let users = get_users(&data, Paginate::None)?;
+            let users = get_users(&data, Paginate::None)
+                .map_err(|e| format!("Failed to get users: {}", e))?;
             if raw {
                 println!("{}", to_string_pretty(&users).unwrap());
             } else {
@@ -69,9 +68,14 @@ pub async fn cli_user(
         }
         UserCommands::InitAdmin => {
             // Check if "admin" user exists
-            if (get_user_by_username(&data, "admin")?).is_some() {
-                error!("User \"admin\" already exists");
-                std::process::exit(1);
+            match get_user_by_username(&data, "admin") {
+                Ok(Some(_)) => {
+                    return Err("Admin user already exists".to_string());
+                }
+                Ok(None) => {}
+                Err(e) => {
+                    return Err(format!("Failed to get user: {}", e));
+                }
             }
 
             // Create Admin group
@@ -86,7 +90,8 @@ pub async fn cli_user(
                 }
             ])
             .to_string();
-            let group_id = create_permission_group(&data, None, "$superadmins", Some(perms))?;
+            let group_id = create_permission_group(&data, None, "$superadmins", Some(perms))
+                .map_err(|e| format!("Failed to create group: {}", e))?;
             // Create Admin user
             let random_password = rand::thread_rng()
                 .sample_iter(&rand::distributions::Alphanumeric)
@@ -98,9 +103,11 @@ pub async fn cli_user(
                 ("admin").to_string(),
                 Some(random_password.clone()),
                 None,
-            )?;
+            )
+            .map_err(|e| format!("Failed to create user: {}", e))?;
             // Add Admin user to Admin group
-            add_user_to_group(&data, &user.id, &group_id)?;
+            add_user_to_group(&data, &user.id, &group_id)
+                .map_err(|e| format!("Failed to add user to group: {}", e))?;
 
             // Announce randomly generated password
             println!("Created ADMIN user (!)");

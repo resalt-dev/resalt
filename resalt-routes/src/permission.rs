@@ -1,6 +1,7 @@
 use log::*;
 use regex::Regex;
-use resalt_models::{ApiError, AuthStatus};
+use resalt_api::StatusCode;
+use resalt_models::AuthStatus;
 use serde_json::Value;
 use std::collections::HashMap;
 
@@ -55,12 +56,12 @@ pub const P_USER_LIST: &str = "user.list";
 pub const P_USER_EMAIL: &str = "user.email";
 pub const P_USER_PASSWORD: &str = "user.password";
 
-pub fn has_resalt_permission(auth: &AuthStatus, permission: &str) -> Result<bool, ApiError> {
+pub fn has_resalt_permission(auth: &AuthStatus, permission: &str) -> Result<bool, StatusCode> {
     let perms = match serde_json::from_str(&auth.perms) {
         Ok(perms) => perms,
         Err(e) => {
             error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
         }
     };
     Ok(evaluate_resalt_permission(&perms, permission))

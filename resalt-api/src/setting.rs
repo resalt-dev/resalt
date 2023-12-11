@@ -1,3 +1,4 @@
+use http::StatusCode;
 use log::error;
 use resalt_models::*;
 use resalt_storage::Storage;
@@ -14,7 +15,7 @@ pub struct DataDump {
     pub minion_presets: Vec<MinionPreset>,
 }
 
-pub fn import_backup(data: &Storage, config: &DataDump) -> Result<(), resalt_models::ApiError> {
+pub fn import_backup(data: &Storage, config: &DataDump) -> Result<(), StatusCode> {
     // Import users
     for user in &config.users {
         // Check if user exists
@@ -23,7 +24,7 @@ pub fn import_backup(data: &Storage, config: &DataDump) -> Result<(), resalt_mod
             Ok(None) => false,
             Err(e) => {
                 error!("route_settings_import_post get_user_by_username {:?}", e);
-                return Err(ApiError::DatabaseError);
+                return Err(StatusCode::INTERNAL_SERVER_ERROR);
             }
         };
         if user_exists {
@@ -31,7 +32,7 @@ pub fn import_backup(data: &Storage, config: &DataDump) -> Result<(), resalt_mod
                 Ok(_) => {}
                 Err(e) => {
                     error!("route_settings_import_post update_user {:?}", e);
-                    return Err(ApiError::DatabaseError);
+                    return Err(StatusCode::INTERNAL_SERVER_ERROR);
                 }
             };
         } else {
@@ -47,7 +48,7 @@ pub fn import_backup(data: &Storage, config: &DataDump) -> Result<(), resalt_mod
                 Ok(_) => {}
                 Err(e) => {
                     error!("route_settings_import_post create_user_hashed {:?}", e);
-                    return Err(ApiError::DatabaseError);
+                    return Err(StatusCode::INTERNAL_SERVER_ERROR);
                 }
             };
         }
@@ -64,7 +65,7 @@ pub fn import_backup(data: &Storage, config: &DataDump) -> Result<(), resalt_mod
                     "route_settings_import_post get_permission_group_by_id {:?}",
                     e
                 );
-                return Err(ApiError::DatabaseError);
+                return Err(StatusCode::INTERNAL_SERVER_ERROR);
             }
         };
         if group_exists {
@@ -72,7 +73,7 @@ pub fn import_backup(data: &Storage, config: &DataDump) -> Result<(), resalt_mod
                 Ok(_) => {}
                 Err(e) => {
                     error!("route_settings_import_post update_permission_group {:?}", e);
-                    return Err(ApiError::DatabaseError);
+                    return Err(StatusCode::INTERNAL_SERVER_ERROR);
                 }
             };
         } else {
@@ -85,7 +86,7 @@ pub fn import_backup(data: &Storage, config: &DataDump) -> Result<(), resalt_mod
                 Ok(_) => {}
                 Err(e) => {
                     error!("route_settings_import_post create_permission_group {:?}", e);
-                    return Err(ApiError::DatabaseError);
+                    return Err(StatusCode::INTERNAL_SERVER_ERROR);
                 }
             };
         }
@@ -101,7 +102,7 @@ pub fn import_backup(data: &Storage, config: &DataDump) -> Result<(), resalt_mod
                         "route_settings_import_post update_permission_group_memberships {:?}",
                         e
                     );
-                    return Err(ApiError::DatabaseError);
+                    return Err(StatusCode::INTERNAL_SERVER_ERROR);
                 }
             };
         }
@@ -127,7 +128,7 @@ pub fn import_backup(data: &Storage, config: &DataDump) -> Result<(), resalt_mod
             Ok(_) => {}
             Err(e) => {
                 error!("route_settings_import_post update_minion {:?}", e);
-                return Err(ApiError::DatabaseError);
+                return Err(StatusCode::INTERNAL_SERVER_ERROR);
             }
         };
     }
@@ -138,7 +139,7 @@ pub fn import_backup(data: &Storage, config: &DataDump) -> Result<(), resalt_mod
             Ok(_) => {}
             Err(e) => {
                 error!("route_settings_import_post update_minion_preset {:?}", e);
-                return Err(ApiError::DatabaseError);
+                return Err(StatusCode::INTERNAL_SERVER_ERROR);
             }
         };
     }
@@ -146,16 +147,16 @@ pub fn import_backup(data: &Storage, config: &DataDump) -> Result<(), resalt_mod
     Ok(())
 }
 
-pub fn export_backup(data: &Storage) -> Result<DataDump, resalt_models::ApiError> {
+pub fn export_backup(data: &Storage) -> Result<DataDump, StatusCode> {
     // Get all users (Warning: This will include passwords!)
     let users = data.list_users(None).map_err(|e| {
         error!("route_settings_export_get list_users {:?}", e);
-        ApiError::DatabaseError
+        StatusCode::INTERNAL_SERVER_ERROR
     })?;
     // Get all permission groups
     let groups = data.list_permission_groups(None).map_err(|e| {
         error!("route_settings_export_get list_permission_groups {:?}", e);
-        ApiError::DatabaseError
+        StatusCode::INTERNAL_SERVER_ERROR
     })?;
     // Get all permission group memberships
     let mut memberships: std::collections::HashMap<String, Vec<String>> =
@@ -168,7 +169,7 @@ pub fn export_backup(data: &Storage) -> Result<DataDump, resalt_models::ApiError
                     "route_settings_export_get list_users_by_permission_group_id {:?}",
                     e
                 );
-                ApiError::DatabaseError
+                StatusCode::INTERNAL_SERVER_ERROR
             })?;
         let users: Vec<String> = users.iter().map(|u| u.id.clone()).collect();
         memberships.insert(group.id.clone(), users);
@@ -178,12 +179,12 @@ pub fn export_backup(data: &Storage) -> Result<DataDump, resalt_models::ApiError
         .list_minions(Vec::new(), None, Paginate::None)
         .map_err(|e| {
             error!("route_settings_export_get list_minions {:?}", e);
-            ApiError::DatabaseError
+            StatusCode::INTERNAL_SERVER_ERROR
         })?;
     // Get all minion presets
     let minion_presets = data.list_minion_presets().map_err(|e| {
         error!("route_settings_export_get list_minion_presets {:?}", e);
-        ApiError::DatabaseError
+        StatusCode::INTERNAL_SERVER_ERROR
     })?;
 
     Ok(DataDump {

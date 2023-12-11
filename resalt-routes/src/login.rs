@@ -1,4 +1,5 @@
 use log::*;
+use resalt_api::StatusCode;
 use resalt_config::ResaltConfig;
 use resalt_models::*;
 use resalt_salt::SaltAPI;
@@ -11,16 +12,16 @@ pub async fn renew_token_salt_token(
     salt: &SaltAPI,
     user_id: &str,
     auth_token: &str,
-) -> Result<AuthStatus, ApiError> {
+) -> Result<AuthStatus, StatusCode> {
     // Fetch username of user
     let user = match data.get_user_by_id(user_id) {
         Ok(user) => match user {
             Some(user) => user,
-            None => return Err(ApiError::InternalError),
+            None => return Err(StatusCode::INTERNAL_SERVER_ERROR),
         },
         Err(e) => {
             error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
         }
     };
 
@@ -29,7 +30,7 @@ pub async fn renew_token_salt_token(
         Ok(salt_token) => salt_token,
         Err(e) => {
             error!("update_token_salt_token salt login {:?}", e);
-            return Err(ApiError::InternalError);
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
         }
     };
 
@@ -38,7 +39,7 @@ pub async fn renew_token_salt_token(
         Ok(_) => {}
         Err(e) => {
             error!("update_token_salt_token update_salttoken {:?}", e);
-            return Err(ApiError::DatabaseError);
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
         }
     };
 
@@ -50,7 +51,7 @@ pub async fn renew_token_salt_token(
     })
 }
 
-pub fn validate_auth_token(data: &Storage, token: &str) -> Result<Option<AuthStatus>, ApiError> {
+pub fn validate_auth_token(data: &Storage, token: &str) -> Result<Option<AuthStatus>, StatusCode> {
     if token.len() < 20 {
         return Ok(None);
     }
@@ -62,7 +63,7 @@ pub fn validate_auth_token(data: &Storage, token: &str) -> Result<Option<AuthSta
         },
         Err(e) => {
             error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
         }
     };
 
@@ -77,11 +78,11 @@ pub fn validate_auth_token(data: &Storage, token: &str) -> Result<Option<AuthSta
     let user = match data.get_user_by_id(&authtoken.user_id) {
         Ok(user) => match user {
             Some(user) => user,
-            None => return Err(ApiError::DatabaseError),
+            None => return Err(StatusCode::INTERNAL_SERVER_ERROR),
         },
         Err(e) => {
             error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
         }
     };
 
@@ -94,7 +95,7 @@ pub fn validate_auth_token(data: &Storage, token: &str) -> Result<Option<AuthSta
                 Ok(v) => Some(v),
                 Err(e) => {
                     error!("Failed parsing authtoken.salt_token {:?}", e);
-                    return Err(ApiError::InternalError);
+                    return Err(StatusCode::INTERNAL_SERVER_ERROR);
                 }
             },
             None => None,
@@ -106,7 +107,7 @@ pub fn auth_login_classic(
     data: &Storage,
     username: &str,
     password: &str,
-) -> Result<Option<User>, ApiError> {
+) -> Result<Option<User>, StatusCode> {
     // Fetch user
     let user = match data.get_user_by_username(username) {
         Ok(user) => match user {
@@ -115,7 +116,7 @@ pub fn auth_login_classic(
         },
         Err(e) => {
             error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
         }
     };
 

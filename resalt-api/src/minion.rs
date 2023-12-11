@@ -1,3 +1,4 @@
+use http::StatusCode;
 use log::error;
 use resalt_models::*;
 use resalt_salt::{SaltAPI, SaltError};
@@ -8,18 +9,18 @@ pub fn get_minions(
     filters: Vec<Filter>,
     sort: Option<MinionSort>,
     paginate: Paginate,
-) -> Result<Vec<Minion>, ApiError> {
+) -> Result<Vec<Minion>, StatusCode> {
     data.list_minions(filters, Some(sort.unwrap_or_default()), paginate)
         .map_err(|e| {
             error!("api.get_minions {:?}", e);
-            ApiError::DatabaseError
+            StatusCode::INTERNAL_SERVER_ERROR
         })
 }
 
-pub fn get_minion(data: &Storage, minion_id: &str) -> Result<Option<Minion>, ApiError> {
+pub fn get_minion(data: &Storage, minion_id: &str) -> Result<Option<Minion>, StatusCode> {
     data.get_minion_by_id(minion_id).map_err(|e| {
         error!("api.get_minion {:?}", e);
-        ApiError::DatabaseError
+        StatusCode::INTERNAL_SERVER_ERROR
     })
 }
 

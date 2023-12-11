@@ -9,7 +9,6 @@ axum = { workspace = true }
 log = { workspace = true }
 regex = { version = "1.10.2", features = [], default-features = false }
 resalt-api = { path = "../resalt-api" }
-resalt-auth = { path = "../resalt-auth" }
 resalt-config = { path = "../resalt-config" }
 resalt-frontend = { path = "../resalt-frontend" }
 resalt-models = { path = "../resalt-models" }

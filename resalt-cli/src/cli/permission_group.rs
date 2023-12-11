@@ -3,7 +3,7 @@ use log::*;
 use resalt_api::permission::{
     delete_permission_group, get_permission_group_by_id, get_permission_groups,
 };
-use resalt_models::{ApiError, Paginate};
+use resalt_models::Paginate;
 use resalt_salt::SaltAPI;
 use resalt_storage::Storage;
 use serde_json::to_string_pretty;
@@ -46,21 +46,23 @@ pub async fn cli_permission_group(
     data: Storage,
     _salt_api: SaltAPI,
     cmd: PermissionGroupCommands,
-) -> Result<(), ApiError> {
+) -> Result<(), String> {
     match cmd {
         PermissionGroupCommands::Delete { id } => {
-            let group = get_permission_group_by_id(&data, &id)?;
+            let group = get_permission_group_by_id(&data, &id)
+                .map_err(|e| format!("Failed to get group: {}", e))?;
             if let Some(group) = group {
                 debug!("Deleting group: {}", group.id);
-                delete_permission_group(&data, &group.id)?;
+                delete_permission_group(&data, &group.id)
+                    .map_err(|e| format!("Failed to delete group: {}", e))?;
                 println!("Deleted group: {}", group.name);
             } else {
-                error!("Group not found");
-                std::process::exit(1);
+                return Err(format!("Group not found: {}", id));
             }
         }
         PermissionGroupCommands::List { raw } => {
-            let groups = get_permission_groups(&data, Paginate::None)?;
+            let groups = get_permission_groups(&data, Paginate::None)
+                .map_err(|e| format!("Failed to get groups: {}", e))?;
             if raw {
                 println!("{}", to_string_pretty(&groups).unwrap());
             } else {

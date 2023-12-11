@@ -9,3 +9,4 @@ pub mod preset;
 pub mod setting;
 pub mod status;
 pub mod user;
+pub use http::StatusCode;

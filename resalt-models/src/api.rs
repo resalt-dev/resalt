@@ -4,6 +4,7 @@ use axum::http::StatusCode;
 use serde_json::json;
 
 #[derive(Clone, Debug)]
+#[deprecated]
 pub enum ApiError {
     Unauthorized,   // Missing credentials
     Forbidden,      // Lackign permissions

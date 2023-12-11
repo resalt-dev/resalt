@@ -3,14 +3,14 @@ use axum::http::HeaderMap;
 use axum::response::IntoResponse;
 use axum::Json;
 use log::*;
-use resalt_auth::auth_login_classic;
-use resalt_auth::renew_token_salt_token;
 use resalt_config::ResaltConfig;
 use resalt_models::StorageImpl;
 use resalt_models::{ApiError, User};
 use resalt_salt::SaltAPI;
 use resalt_storage::Storage;
 use serde::{Deserialize, Serialize};
+
+use crate::login::{auth_login_classic, renew_token_salt_token};
 
 #[derive(Deserialize, Debug)]
 pub struct LoginRequest {

@@ -5,7 +5,7 @@ use axum::{
     Extension, Json,
 };
 use log::*;
-use resalt_api::grain::search_grains;
+use resalt_api::{grain::search_grains, StatusCode};
 use resalt_models::*;
 use resalt_storage::Storage;
 use serde::Deserialize;
@@ -20,10 +20,10 @@ pub async fn route_grains_get(
     query: Query<GrainsGetQuery>,
     State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<impl IntoResponse, StatusCode> {
     // Validate permission
     if !has_resalt_permission(&auth, P_MINION_GRAINEXPLORER)? {
-        return Err(ApiError::Forbidden);
+        return Err(StatusCode::FORBIDDEN);
     }
 
     // Args
@@ -31,7 +31,7 @@ pub async fn route_grains_get(
         Ok(q) => q.to_string(),
         Err(e) => {
             error!("Failed to decode q: {}", e);
-            return Err(ApiError::InvalidRequest);
+            return Err(StatusCode::BAD_REQUEST);
         }
     };
     let filter = match &query.filter {
@@ -39,7 +39,7 @@ pub async fn route_grains_get(
             Ok(filter) => filter.to_string(),
             Err(e) => {
                 error!("Failed to decode filter: {}", e);
-                return Err(ApiError::InvalidRequest);
+                return Err(StatusCode::BAD_REQUEST);
             }
         }),
         None => None,

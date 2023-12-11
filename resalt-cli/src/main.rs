@@ -1,7 +1,6 @@
 use crate::cli::*;
 use clap::Parser;
 use env_logger::{init_from_env, Env};
-use resalt_models::ApiError;
 use resalt_salt::SaltAPI;
 use resalt_storage::Storage;
 
@@ -9,7 +8,7 @@ mod cli;
 
 // pub const RESALT_CLI_SYSTEM_SERVICE_USERNAME: &str = "$superadmin/svc/resalt-cli$";
 
-async fn run() -> Result<(), ApiError> {
+async fn run() -> Result<(), String> {
     let cli = Cli::parse();
 
     // Logging
@@ -32,7 +31,7 @@ pub async fn main() {
     match run().await {
         Ok(_) => {}
         Err(e) => {
-            panic!("Error: {}", e.message());
+            panic!("Error: {}", e);
         }
     }
 }

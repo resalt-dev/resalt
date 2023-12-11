@@ -1,12 +1,14 @@
-use crate::permission::*;
+use crate::{login::renew_token_salt_token, permission::*};
 use axum::{
     extract::{Path, Query, State},
     response::IntoResponse,
     Extension, Json,
 };
 use log::*;
-use resalt_api::job::{create_job, get_job, get_job_returns_by_job, get_jobs};
-use resalt_auth::renew_token_salt_token;
+use resalt_api::{
+    job::{create_job, get_job, get_job_returns_by_job, get_jobs},
+    StatusCode,
+};
 use resalt_models::*;
 use resalt_salt::*;
 use resalt_storage::Storage;
@@ -26,10 +28,10 @@ pub async fn route_jobs_get(
     query: Query<JobsListGetQuery>,
     State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<impl IntoResponse, StatusCode> {
     // Validate permission
     if !has_resalt_permission(&auth, P_JOB_LIST)? {
-        return Err(ApiError::Forbidden);
+        return Err(StatusCode::FORBIDDEN);
     }
 
     let sort = query.sort.clone();
@@ -105,17 +107,17 @@ pub async fn route_jobs_post(
     State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
     Json(input): Json<JobRunRequest>,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<impl IntoResponse, StatusCode> {
     // Validate permission
     if !has_resalt_permission(&auth, P_RUN_LIVE)? {
-        return Err(ApiError::Forbidden);
+        return Err(StatusCode::FORBIDDEN);
     }
 
     let salt_token = match &auth.salt_token {
         Some(salt_token) => salt_token,
         None => {
             error!("No salt token found");
-            return Err(ApiError::Unauthorized);
+            return Err(StatusCode::UNAUTHORIZED);
         }
     };
 
@@ -127,7 +129,7 @@ pub async fn route_jobs_post(
         Err(SaltError::Unauthorized) => {
             if !salt_token.matured() {
                 error!("Salt token unauthorized, but not matured");
-                return Err(ApiError::InternalError);
+                return Err(StatusCode::INTERNAL_SERVER_ERROR);
             }
             // TODO: Remove this complex logic, this is more of a hack
             error!("Salt token expired, renewing and retrying");
@@ -137,13 +139,13 @@ pub async fn route_jobs_post(
                 Ok(job) => Ok(Json(job)),
                 Err(e) => {
                     error!("route_jobs_post {:?}", e);
-                    Err(ApiError::InternalError)
+                    Err(StatusCode::INTERNAL_SERVER_ERROR)
                 }
             }
         }
         Err(e) => {
             error!("route_jobs_post {:?}", e);
-            Err(ApiError::InternalError)
+            Err(StatusCode::INTERNAL_SERVER_ERROR)
         }
     }
 }
@@ -158,10 +160,10 @@ pub async fn route_job_get(
     Path(jid): Path<String>,
     State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<impl IntoResponse, StatusCode> {
     // Validate permission
     if !has_resalt_permission(&auth, P_JOB_LIST)? {
-        return Err(ApiError::Forbidden);
+        return Err(StatusCode::FORBIDDEN);
     }
 
     // API
@@ -169,14 +171,14 @@ pub async fn route_job_get(
         Ok(job) => job,
         Err(e) => {
             error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
         }
     };
 
     let job: Job = match job {
         Some(job) => job,
         None => {
-            return Err(ApiError::NotFound);
+            return Err(StatusCode::NOT_FOUND);
         }
     };
 
@@ -184,7 +186,7 @@ pub async fn route_job_get(
         Ok(returns) => returns,
         Err(e) => {
             error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
         }
     };
 

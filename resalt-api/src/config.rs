@@ -1,6 +1,6 @@
+use http::StatusCode;
 use log::error;
 use resalt_config::ResaltConfig;
-use resalt_models::ApiError;
 use resalt_update::{get_update_info, CURRENT_VERSION};
 use serde::Serialize;
 
@@ -20,12 +20,12 @@ pub struct ApiConfig {
     theme_enable_switching: bool,
 }
 
-pub async fn get_config(use_cache: bool) -> Result<ApiConfig, ApiError> {
+pub async fn get_config(use_cache: bool) -> Result<ApiConfig, StatusCode> {
     let update_info = match get_update_info(use_cache).await {
         Ok(update_info) => update_info,
         Err(e) => {
             error!("Error getting update info: {}", e);
-            return Err(ApiError::InternalError);
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
         }
     };
     let config = ApiConfig {
