@@ -8,7 +8,6 @@ publish.workspace = true
 log = { workspace = true }
 resalt-config = { path = "../resalt-config" }
 resalt-models = { path = "../resalt-models" }
-resalt-security = { path = "../resalt-security" }
 resalt-storage-files = { path = "../resalt-storage-files" }
 resalt-storage-mysql = { path = "../resalt-storage-mysql" }
 resalt-storage-redis = { path = "../resalt-storage-redis" }

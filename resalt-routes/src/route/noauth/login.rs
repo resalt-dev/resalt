@@ -3,6 +3,7 @@ use axum::response::IntoResponse;
 use axum::Json;
 use axum::{extract::State, http::StatusCode};
 use log::*;
+use resalt_api::user::create_user;
 use resalt_config::ResaltConfig;
 use resalt_models::{StorageImpl, User};
 use resalt_salt::SaltAPI;
@@ -47,7 +48,7 @@ pub async fn route_login_post(
                 let email: Option<String> = None;
 
                 // Create user
-                let user = match data.create_user(username, None, email) {
+                let user = match create_user(&data, username, None, email) {
                     Ok(user) => user,
                     Err(e) => {
                         error!("Failed creating user {:?}", e);

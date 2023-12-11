@@ -62,22 +62,6 @@ impl Storage {
         Storage { storage }
     }
 
-    pub fn create_user(
-        &self,
-        username: String,
-        password: Option<String>,
-        email: Option<String>,
-    ) -> Result<User, String> {
-        self.create_user_hashed(
-            None,
-            username,
-            password.map(|v| resalt_security::hash_password(&v)),
-            "[]".to_string(),
-            None,
-            email,
-        )
-    }
-
     pub fn refresh_user_permissions(&self, user_id: &str) -> Result<(), String> {
         let groups = match self.list_permission_groups_by_user_id(user_id) {
             Ok(groups) => groups,

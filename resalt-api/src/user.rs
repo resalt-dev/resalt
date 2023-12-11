@@ -1,6 +1,7 @@
 use axum::http::StatusCode;
 use log::error;
 use resalt_models::{Paginate, StorageImpl, User};
+use resalt_security::hash_password;
 use resalt_storage::Storage;
 
 pub fn create_user(
@@ -9,7 +10,15 @@ pub fn create_user(
     password: Option<String>,
     email: Option<String>,
 ) -> Result<User, StatusCode> {
-    data.create_user(username, password, email).map_err(|e| {
+    data.create_user_hashed(
+        None,
+        username,
+        password.map(|v| hash_password(&v)),
+        "[]".to_string(),
+        None,
+        email,
+    )
+    .map_err(|e| {
         error!("api.create_user {:?}", e);
         StatusCode::INTERNAL_SERVER_ERROR
     })
