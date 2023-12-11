@@ -1,4 +1,4 @@
-use http::StatusCode;
+use axum::http::StatusCode;
 use log::error;
 use resalt_config::ResaltConfig;
 use resalt_update::{get_update_info, CURRENT_VERSION};

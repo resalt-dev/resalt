@@ -1,15 +1,16 @@
 use axum::{
     extract::{Query, State},
-    http::Request,
+    http::{Request, StatusCode},
     middleware::Next,
     response::{IntoResponse, Response},
 };
 use log::*;
-use resalt_auth::{renew_token_salt_token, validate_auth_token};
-use resalt_models::{ApiError, AuthStatus};
+use resalt_models::AuthStatus;
 use resalt_salt::SaltAPI;
 use resalt_storage::Storage;
 use std::collections::HashMap;
+
+use crate::login::{renew_token_salt_token, validate_auth_token};
 
 #[allow(clippy::let_and_return)]
 pub async fn middleware_auth<B>(
@@ -44,7 +45,7 @@ pub async fn middleware_auth<B>(
         Ok(auth_status) => match auth_status {
             Some(auth_status) => auth_status,
             None => {
-                return ApiError::Unauthorized.into_response();
+                return StatusCode::UNAUTHORIZED.into_response();
             }
         },
         Err(e) => {
@@ -72,7 +73,7 @@ async fn resolve_auth_status(
     db: Storage,
     salt: SaltAPI,
     token: String,
-) -> Result<Option<AuthStatus>, ApiError> {
+) -> Result<Option<AuthStatus>, StatusCode> {
     let data = db.clone();
 
     let auth_status = match validate_auth_token(&data, &token) {

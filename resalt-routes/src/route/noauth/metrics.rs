@@ -1,16 +1,16 @@
-use axum::{extract::State, response::IntoResponse};
+use axum::{extract::State, http::StatusCode, response::IntoResponse};
 use log::*;
 use resalt_config::ResaltConfig;
-use resalt_models::{ApiError, StorageImpl, StorageStatus};
+use resalt_models::{StorageImpl, StorageStatus};
 use resalt_salt::SaltEventListenerStatus;
 use resalt_storage::Storage;
 
 pub async fn route_metrics_get(
     State(listener_status): State<SaltEventListenerStatus>,
     State(data): State<Storage>,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<impl IntoResponse, StatusCode> {
     if !*ResaltConfig::METRICS_ENABLED {
-        return Err(ApiError::NotFound);
+        return Err(StatusCode::NOT_FOUND);
     }
 
     let db_status: Option<StorageStatus> = match data.get_status() {

@@ -1,6 +1,6 @@
+use axum::http::StatusCode;
 use log::*;
 use regex::Regex;
-use resalt_api::StatusCode;
 use resalt_models::AuthStatus;
 use serde_json::Value;
 use std::collections::HashMap;

@@ -1,6 +1,7 @@
 use crate::permission::*;
 use axum::{
     extract::{Path, Query, State},
+    http::StatusCode,
     response::IntoResponse,
     Extension, Json,
 };
@@ -14,7 +15,7 @@ use resalt_api::{
         create_user, delete_user, get_user_by_id, get_user_by_username, get_users, update_user,
     },
 };
-use resalt_models::{ApiError, AuthStatus, Paginate, PaginateQuery};
+use resalt_models::{AuthStatus, Paginate, PaginateQuery};
 use resalt_security::hash_password;
 use resalt_storage::Storage;
 use serde::Deserialize;
@@ -24,10 +25,10 @@ pub async fn route_users_get(
     query: Query<PaginateQuery>,
     State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<impl IntoResponse, StatusCode> {
     // Validate permission
     if !has_resalt_permission(&auth, P_USER_LIST)? {
-        return Err(ApiError::Forbidden);
+        return Err(StatusCode::FORBIDDEN);
     }
 
     // Pagination
@@ -55,15 +56,15 @@ pub async fn route_users_post(
     State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
     Json(input): Json<UserCreateRequest>,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<impl IntoResponse, StatusCode> {
     // Validate permission
     if !has_resalt_permission(&auth, P_USER_ADMIN)? {
-        return Err(ApiError::Forbidden);
+        return Err(StatusCode::FORBIDDEN);
     }
 
     // Check if username is taken
     if (get_user_by_username(&data, &input.username)?).is_none() {
-        return Err(ApiError::InvalidRequest);
+        return Err(StatusCode::BAD_REQUEST);
     };
 
     // Create user
@@ -79,16 +80,16 @@ pub async fn route_user_get(
     Path(user_id): Path<String>,
     State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<impl IntoResponse, StatusCode> {
     // Validate permission (always allow fetching self)
     if auth.user_id != user_id && !has_resalt_permission(&auth, P_USER_LIST)? {
-        return Err(ApiError::Forbidden);
+        return Err(StatusCode::FORBIDDEN);
     }
 
     // API
     let user = match get_user_by_id(&data, &user_id)? {
         Some(user) => user,
-        None => return Err(ApiError::NotFound),
+        None => return Err(StatusCode::NOT_FOUND),
     };
 
     // Map to "public" - for among other things - remove password
@@ -101,16 +102,16 @@ pub async fn route_user_delete(
     Path(user_id): Path<String>,
     State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<impl IntoResponse, StatusCode> {
     // Validate permission
     if !has_resalt_permission(&auth, P_USER_ADMIN)? {
-        return Err(ApiError::Forbidden);
+        return Err(StatusCode::FORBIDDEN);
     }
 
     // Don't allow deleting self
     if auth.user_id == user_id {
         warn!("Tried to delete self: {}", user_id);
-        return Err(ApiError::InvalidRequest);
+        return Err(StatusCode::BAD_REQUEST);
     }
 
     // Delete user
@@ -129,29 +130,29 @@ pub async fn route_user_password_post(
     State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
     Json(input): Json<UserPostPasswordData>,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<impl IntoResponse, StatusCode> {
     // Validate permission
     if auth.user_id == user_id {
         if !has_resalt_permission(&auth, P_USER_PASSWORD)? {
-            return Err(ApiError::Forbidden);
+            return Err(StatusCode::FORBIDDEN);
         }
     } else {
         #[allow(clippy::collapsible_else_if)]
         if !has_resalt_permission(&auth, P_USER_ADMIN)? {
-            return Err(ApiError::Forbidden);
+            return Err(StatusCode::FORBIDDEN);
         }
     }
 
     // Minimum password check
     if input.password.len() < 8 {
-        return Err(ApiError::InvalidRequest);
+        return Err(StatusCode::BAD_REQUEST);
     }
 
     // Check if user exists
     let mut user = match get_user_by_id(&data, &user_id)? {
         Some(user) => user,
         None => {
-            return Err(ApiError::NotFound);
+            return Err(StatusCode::NOT_FOUND);
         }
     };
 
@@ -166,17 +167,17 @@ pub async fn route_user_permissions_post(
     Path((user_id, group_id)): Path<(String, String)>,
     State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<impl IntoResponse, StatusCode> {
     // Validate permission
     if !has_resalt_permission(&auth, P_ADMIN_GROUP)? {
-        return Err(ApiError::Forbidden);
+        return Err(StatusCode::FORBIDDEN);
     }
 
     // Check if user exists
     let user = match get_user_by_id(&data, &user_id)? {
         Some(user) => user,
         None => {
-            return Err(ApiError::NotFound);
+            return Err(StatusCode::NOT_FOUND);
         }
     };
 
@@ -184,7 +185,7 @@ pub async fn route_user_permissions_post(
     let permission_group = match get_permission_group_by_id(&data, &group_id)? {
         Some(permission_group) => permission_group,
         None => {
-            return Err(ApiError::NotFound);
+            return Err(StatusCode::NOT_FOUND);
         }
     };
 
@@ -200,17 +201,17 @@ pub async fn route_user_permissions_delete(
     Path((user_id, group_id)): Path<(String, String)>,
     State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<impl IntoResponse, StatusCode> {
     // Validate permission
     if !has_resalt_permission(&auth, P_ADMIN_GROUP)? {
-        return Err(ApiError::Forbidden);
+        return Err(StatusCode::FORBIDDEN);
     }
 
     // Check if user exists
     let user = match get_user_by_id(&data, &user_id)? {
         Some(user) => user,
         None => {
-            return Err(ApiError::NotFound);
+            return Err(StatusCode::NOT_FOUND);
         }
     };
 
@@ -218,7 +219,7 @@ pub async fn route_user_permissions_delete(
     let permission_group = match get_permission_group_by_id(&data, &group_id)? {
         Some(permission_group) => permission_group,
         None => {
-            return Err(ApiError::NotFound);
+            return Err(StatusCode::NOT_FOUND);
         }
     };
 

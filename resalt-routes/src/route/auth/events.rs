@@ -1,10 +1,11 @@
 use crate::permission::*;
 use axum::{
     extract::{Query, State},
+    http::StatusCode,
     response::IntoResponse,
     Extension, Json,
 };
-use resalt_api::{event::get_events, StatusCode};
+use resalt_api::event::get_events;
 use resalt_models::{AuthStatus, PaginateQuery};
 use resalt_storage::Storage;
 

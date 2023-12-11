@@ -1,10 +1,13 @@
-use axum::{extract::OriginalUri, http::header, response::IntoResponse};
+use axum::{
+    extract::OriginalUri,
+    http::{header, StatusCode},
+    response::IntoResponse,
+};
 use resalt_frontend::frontend_get;
-use resalt_models::ApiError;
 
 pub async fn route_frontend_get(
     OriginalUri(uri): OriginalUri,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<impl IntoResponse, StatusCode> {
     let path = uri.path().to_owned();
 
     let (file_path, body) = frontend_get(path);

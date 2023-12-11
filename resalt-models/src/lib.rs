@@ -1,4 +1,3 @@
-mod api;
 mod db;
 mod filter;
 mod salt;
@@ -7,7 +6,6 @@ mod status;
 mod storage;
 mod time;
 
-pub use api::*;
 pub use db::*;
 pub use filter::*;
 pub use salt::*;

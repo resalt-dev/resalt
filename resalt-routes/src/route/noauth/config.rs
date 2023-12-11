@@ -1,5 +1,7 @@
-use axum::response::{IntoResponse, Json};
-use resalt_api::StatusCode;
+use axum::{
+    http::StatusCode,
+    response::{IntoResponse, Json},
+};
 
 pub async fn route_config_get() -> Result<impl IntoResponse, StatusCode> {
     // API

@@ -1,11 +1,10 @@
-use axum::extract::State;
 use axum::http::HeaderMap;
 use axum::response::IntoResponse;
 use axum::Json;
+use axum::{extract::State, http::StatusCode};
 use log::*;
 use resalt_config::ResaltConfig;
-use resalt_models::StorageImpl;
-use resalt_models::{ApiError, User};
+use resalt_models::{StorageImpl, User};
 use resalt_salt::SaltAPI;
 use resalt_storage::Storage;
 use serde::{Deserialize, Serialize};
@@ -31,12 +30,12 @@ pub async fn route_login_post(
     State(data): State<Storage>,
     State(salt): State<SaltAPI>,
     Json(input): Json<LoginRequest>,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<impl IntoResponse, StatusCode> {
     let user: User = if *ResaltConfig::AUTH_FORWARD_ENABLED {
         // Use X-Forwarded-User header as username
         let username = match headers.get("X-Forwarded-User") {
             Some(forwarded_user) => forwarded_user.to_str().unwrap().to_string(),
-            None => return Err(ApiError::Unauthorized),
+            None => return Err(StatusCode::UNAUTHORIZED),
         };
 
         // Fetch user to see if they exist
@@ -52,7 +51,7 @@ pub async fn route_login_post(
                     Ok(user) => user,
                     Err(e) => {
                         error!("Failed creating user {:?}", e);
-                        return Err(ApiError::DatabaseError);
+                        return Err(StatusCode::INTERNAL_SERVER_ERROR);
                     }
                 };
 
@@ -63,7 +62,7 @@ pub async fn route_login_post(
             // Error from Database, which is critical, so return error
             Err(e) => {
                 error!("{:?}", e);
-                return Err(ApiError::DatabaseError);
+                return Err(StatusCode::INTERNAL_SERVER_ERROR);
             }
         }
     } else {
@@ -79,7 +78,7 @@ pub async fn route_login_post(
             Some(user) => user,
             None => {
                 info!("User login failed for: {}", &username);
-                return Err(ApiError::Unauthorized);
+                return Err(StatusCode::UNAUTHORIZED);
             }
         }
     };
@@ -91,7 +90,7 @@ pub async fn route_login_post(
         Ok(_) => {}
         Err(e) => {
             error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -100,7 +99,7 @@ pub async fn route_login_post(
         Ok(authtoken) => authtoken,
         Err(e) => {
             error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
         }
     };
 
@@ -109,7 +108,7 @@ pub async fn route_login_post(
         Ok(_) => {}
         Err(e) => {
             error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
         }
     };
 

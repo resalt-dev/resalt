@@ -1,4 +1,4 @@
-use http::StatusCode;
+use axum::http::StatusCode;
 use log::*;
 use resalt_models::*;
 use resalt_salt::{SaltAPI, SaltError};

@@ -1,12 +1,13 @@
-use axum::{extract::State, response::IntoResponse, Form, Json};
+use axum::{extract::State, http::StatusCode, response::IntoResponse, Form, Json};
 use log::*;
-use resalt_auth::validate_auth_token;
 use resalt_config::ResaltConfig;
-use resalt_models::{ApiError, StorageImpl};
+use resalt_models::StorageImpl;
 use resalt_salt::RESALT_SALT_SYSTEM_SERVICE_USERNAME;
 use resalt_storage::Storage;
 use serde::Deserialize;
 use serde_json::{json, Value};
+
+use crate::login::validate_auth_token;
 
 #[derive(Deserialize, Debug)]
 pub struct TokenValidateRequest {
@@ -17,7 +18,7 @@ pub struct TokenValidateRequest {
 pub async fn route_token_post(
     State(data): State<Storage>,
     Form(input): Form<TokenValidateRequest>,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<impl IntoResponse, StatusCode> {
     let db = data;
     let username = input.username.to_lowercase();
     let token = input.password.clone();
@@ -33,7 +34,7 @@ pub async fn route_token_post(
                 "@wheel".to_string(),
             ])));
         } else {
-            return Err(ApiError::Unauthorized);
+            return Err(StatusCode::UNAUTHORIZED);
         }
     }
 
@@ -45,12 +46,12 @@ pub async fn route_token_post(
                 Ok(user) => match user {
                     Some(user) => user,
                     None => {
-                        return Err(ApiError::Unauthorized);
+                        return Err(StatusCode::UNAUTHORIZED);
                     }
                 },
                 Err(err) => {
                     error!("Error getting user: {:?}", err);
-                    return Err(ApiError::InternalError);
+                    return Err(StatusCode::INTERNAL_SERVER_ERROR);
                 }
             };
 
@@ -60,17 +61,17 @@ pub async fn route_token_post(
                 Ok(perms) => Ok(Json(perms)),
                 Err(e) => {
                     error!("Error parsing permissions: {:?}", e);
-                    Err(ApiError::InternalError)
+                    Err(StatusCode::INTERNAL_SERVER_ERROR)
                 }
             }
         }
         Ok(None) => {
             info!("Invalid token from Salt validation");
-            Err(ApiError::Unauthorized)
+            Err(StatusCode::UNAUTHORIZED)
         }
         Err(e) => {
             error!("{:?}", e);
-            Err(ApiError::DatabaseError)
+            Err(StatusCode::INTERNAL_SERVER_ERROR)
         }
     }
 }

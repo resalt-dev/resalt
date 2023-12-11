@@ -1,6 +1,7 @@
 use crate::permission::*;
 use axum::{
     extract::{Path, State},
+    http::StatusCode,
     response::IntoResponse,
     Extension, Json,
 };
@@ -9,17 +10,17 @@ use resalt_api::preset::{
     create_minion_preset, delete_minion_preset, get_minion_preset, get_minion_presets,
     update_minion_preset,
 };
-use resalt_models::{ApiError, AuthStatus, MinionPreset};
+use resalt_models::{AuthStatus, MinionPreset};
 use resalt_storage::Storage;
 use serde::{Deserialize, Serialize};
 
 pub async fn route_presets_get(
     State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<impl IntoResponse, StatusCode> {
     // Validate permission
     if !has_resalt_permission(&auth, P_MINION_PRESETS_LIST)? {
-        return Err(ApiError::Forbidden);
+        return Err(StatusCode::FORBIDDEN);
     }
 
     // API
@@ -36,17 +37,17 @@ pub async fn route_presets_post(
     State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
     Json(input): Json<PresetsCreateRequest>,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<impl IntoResponse, StatusCode> {
     // Validate permission
     if !has_resalt_permission(&auth, P_MINION_PRESETS_MANAGE)? {
-        return Err(ApiError::Forbidden);
+        return Err(StatusCode::FORBIDDEN);
     }
 
     let name = input.name.clone();
     let filter = input.filter.clone(); // TODO: validate filter
 
     if name.is_empty() || filter.is_empty() || name.len() > 100 || filter.len() > 65535 {
-        return Err(ApiError::InvalidRequest);
+        return Err(StatusCode::BAD_REQUEST);
     }
 
     // API
@@ -58,7 +59,7 @@ pub async fn route_presets_post(
         })),
         Err(e) => {
             error!("{:?}", e);
-            Err(ApiError::DatabaseError)
+            Err(StatusCode::INTERNAL_SERVER_ERROR)
         }
     }
 }
@@ -67,19 +68,19 @@ pub async fn route_preset_get(
     Path(preset_id): Path<String>,
     State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<impl IntoResponse, StatusCode> {
     // Validate permission
     if !has_resalt_permission(&auth, P_MINION_PRESETS_LIST)? {
-        return Err(ApiError::Forbidden);
+        return Err(StatusCode::FORBIDDEN);
     }
 
     // API
     match get_minion_preset(&data, &preset_id) {
         Ok(Some(preset)) => Ok(Json(preset)),
-        Ok(None) => Err(ApiError::NotFound),
+        Ok(None) => Err(StatusCode::NOT_FOUND),
         Err(e) => {
             error!("{:?}", e);
-            Err(ApiError::DatabaseError)
+            Err(StatusCode::INTERNAL_SERVER_ERROR)
         }
     }
 }
@@ -95,10 +96,10 @@ pub async fn route_preset_put(
     State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
     Json(input): Json<PresetUpdateRequest>,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<impl IntoResponse, StatusCode> {
     // Validate permission
     if !has_resalt_permission(&auth, P_MINION_PRESETS_MANAGE)? {
-        return Err(ApiError::Forbidden);
+        return Err(StatusCode::FORBIDDEN);
     }
 
     let id = preset_id.clone();
@@ -106,16 +107,16 @@ pub async fn route_preset_put(
     let filter = input.filter.clone(); // TODO: validate filter
 
     if name.is_empty() || filter.is_empty() || name.len() > 100 || filter.len() > 65535 {
-        return Err(ApiError::InvalidRequest);
+        return Err(StatusCode::BAD_REQUEST);
     }
 
     // Check if it exists
     match get_minion_preset(&data, &id) {
         Ok(Some(_)) => (),
-        Ok(None) => return Err(ApiError::NotFound),
+        Ok(None) => return Err(StatusCode::NOT_FOUND),
         Err(e) => {
             error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
         }
     };
 
@@ -129,10 +130,10 @@ pub async fn route_preset_delete(
     Path(preset_id): Path<String>,
     State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<impl IntoResponse, StatusCode> {
     // Validate permission
     if !has_resalt_permission(&auth, P_MINION_PRESETS_MANAGE)? {
-        return Err(ApiError::Forbidden);
+        return Err(StatusCode::FORBIDDEN);
     }
 
     // Check if it exists
@@ -141,7 +142,7 @@ pub async fn route_preset_delete(
         Ok(None) => None,
         Err(e) => {
             error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
         }
     };
 

@@ -1,6 +1,7 @@
 use crate::permission::*;
 use axum::{
     extract::{Path, Query, State},
+    http::StatusCode,
     response::IntoResponse,
     Extension, Json,
 };
@@ -14,13 +15,13 @@ use resalt_storage::Storage;
 use serde::Deserialize;
 use serde_json::Value;
 
-async fn get_group(data: &Storage, group_id: &str) -> Result<impl IntoResponse, ApiError> {
+async fn get_group(data: &Storage, group_id: &str) -> Result<impl IntoResponse, StatusCode> {
     let permission_group = match get_permission_group_by_id(data, group_id) {
         Ok(Some(permission_group)) => permission_group,
-        Ok(None) => return Err(ApiError::NotFound),
+        Ok(None) => return Err(StatusCode::NOT_FOUND),
         Err(e) => {
             error!("get_group.group {:?}", e);
-            return Err(ApiError::DatabaseError);
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
         }
     };
 
@@ -28,7 +29,7 @@ async fn get_group(data: &Storage, group_id: &str) -> Result<impl IntoResponse, 
         Ok(users) => users,
         Err(e) => {
             error!("get_group.users {:?}", e);
-            return Err(ApiError::DatabaseError);
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
         }
     };
     Ok(Json(permission_group.public(users)))
@@ -38,10 +39,10 @@ pub async fn route_permissions_get(
     query: Query<PaginateQuery>,
     State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<impl IntoResponse, StatusCode> {
     // Validate permission
     if !has_resalt_permission(&auth, P_ADMIN_GROUP)? {
-        return Err(ApiError::Forbidden);
+        return Err(StatusCode::FORBIDDEN);
     }
 
     // Pagination
@@ -52,7 +53,7 @@ pub async fn route_permissions_get(
         Ok(permission_groups) => permission_groups,
         Err(e) => {
             error!("route_permissions_get.groups {:?}", e);
-            return Err(ApiError::DatabaseError);
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
         }
     };
 
@@ -62,7 +63,7 @@ pub async fn route_permissions_get(
             Ok(users) => users,
             Err(e) => {
                 error!("route_permissions_get.users {:?}", e);
-                return Err(ApiError::DatabaseError);
+                return Err(StatusCode::INTERNAL_SERVER_ERROR);
             }
         };
         results.push(group.public(users));
@@ -79,10 +80,10 @@ pub async fn route_permissions_post(
     State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
     Json(input): Json<PermissionGroupCreateRequest>,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<impl IntoResponse, StatusCode> {
     // Validate permission
     if !has_resalt_permission(&auth, P_ADMIN_GROUP)? {
-        return Err(ApiError::Forbidden);
+        return Err(StatusCode::FORBIDDEN);
     }
 
     // API
@@ -90,22 +91,22 @@ pub async fn route_permissions_post(
         Ok(id) => id,
         Err(e) => {
             error!("route_permissions_post.create {:?}", e);
-            return Err(ApiError::DatabaseError);
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
         }
     };
     let permission_group = match get_permission_group_by_id(&data, &permission_group_id) {
         Ok(Some(permission_group)) => permission_group,
-        Ok(None) => return Err(ApiError::DatabaseError),
+        Ok(None) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
         Err(e) => {
             error!("route_permissions_post.group {:?}", e);
-            return Err(ApiError::DatabaseError);
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
         }
     };
     let permission_group_users = match get_permission_group_users(&data, &permission_group_id) {
         Ok(permission_group_users) => permission_group_users,
         Err(e) => {
             error!("route_permissions_post.users {:?}", e);
-            return Err(ApiError::DatabaseError);
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
         }
     };
     Ok(Json(permission_group.public(permission_group_users)))
@@ -115,10 +116,10 @@ pub async fn route_permission_get(
     Path(id): Path<String>,
     State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<impl IntoResponse, StatusCode> {
     // Validate permission
     if !has_resalt_permission(&auth, P_ADMIN_GROUP)? {
-        return Err(ApiError::Forbidden);
+        return Err(StatusCode::FORBIDDEN);
     }
 
     get_group(&data, &id).await
@@ -135,19 +136,19 @@ pub async fn route_permission_put(
     State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
     Json(input): Json<PermissionGroupUpdateRequest>,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<impl IntoResponse, StatusCode> {
     // Validate permission
     if !has_resalt_permission(&auth, P_ADMIN_GROUP)? {
-        return Err(ApiError::Forbidden);
+        return Err(StatusCode::FORBIDDEN);
     }
 
     // Get permission group
     let mut permission_group = match get_permission_group_by_id(&data, &id) {
         Ok(Some(permission_group)) => permission_group,
-        Ok(None) => return Err(ApiError::NotFound),
+        Ok(None) => return Err(StatusCode::NOT_FOUND),
         Err(e) => {
             error!("{:?}", e);
-            return Err(ApiError::DatabaseError);
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
         }
     };
 
@@ -158,7 +159,7 @@ pub async fn route_permission_put(
     // API
     if let Err(e) = update_permission_group(&data, &permission_group) {
         error!("{:?}", e);
-        return Err(ApiError::DatabaseError);
+        return Err(StatusCode::INTERNAL_SERVER_ERROR);
     };
 
     get_group(&data, &id).await
@@ -168,10 +169,10 @@ pub async fn route_permission_delete(
     Path(id): Path<String>,
     State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<impl IntoResponse, StatusCode> {
     // Validate permission
     if !has_resalt_permission(&auth, P_ADMIN_GROUP)? {
-        return Err(ApiError::Forbidden);
+        return Err(StatusCode::FORBIDDEN);
     }
 
     // Get the group so we can return it as result
@@ -180,7 +181,7 @@ pub async fn route_permission_delete(
     // API
     if let Err(e) = delete_permission_group(&data, &id) {
         error!("{:?}", e);
-        return Err(ApiError::DatabaseError);
+        return Err(StatusCode::INTERNAL_SERVER_ERROR);
     };
 
     Ok(group)

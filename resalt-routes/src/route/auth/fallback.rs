@@ -1,6 +1,5 @@
-use axum::response::IntoResponse;
-use resalt_models::ApiError;
+use axum::http::StatusCode;
 
-pub async fn route_fallback_404() -> impl IntoResponse {
-    ApiError::NotFound
+pub async fn route_fallback_404() -> StatusCode {
+    StatusCode::NOT_FOUND
 }

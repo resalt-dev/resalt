@@ -1,4 +1,4 @@
-use http::StatusCode;
+use axum::http::StatusCode;
 use log::error;
 use resalt_models::{SaltKeyState, SaltMinionKey, SaltToken};
 use resalt_salt::{SaltAPI, SaltError};

@@ -1,14 +1,12 @@
 use crate::{login::renew_token_salt_token, permission::*};
 use axum::{
     extract::{Path, Query, State},
+    http::StatusCode,
     response::IntoResponse,
     Extension, Json,
 };
 use log::*;
-use resalt_api::{
-    job::{create_job, get_job, get_job_returns_by_job, get_jobs},
-    StatusCode,
-};
+use resalt_api::job::{create_job, get_job, get_job_returns_by_job, get_jobs};
 use resalt_models::*;
 use resalt_salt::*;
 use resalt_storage::Storage;

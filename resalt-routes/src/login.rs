@@ -1,5 +1,5 @@
+use axum::http::StatusCode;
 use log::*;
-use resalt_api::StatusCode;
 use resalt_config::ResaltConfig;
 use resalt_models::*;
 use resalt_salt::SaltAPI;

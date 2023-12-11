@@ -1,11 +1,12 @@
 use crate::permission::*;
 use axum::{
     extract::{Query, State},
+    http::StatusCode,
     response::IntoResponse,
     Extension, Json,
 };
 use log::*;
-use resalt_api::{grain::search_grains, StatusCode};
+use resalt_api::grain::search_grains;
 use resalt_models::*;
 use resalt_storage::Storage;
 use serde::Deserialize;

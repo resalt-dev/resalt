@@ -1,6 +1,8 @@
-use axum::response::{IntoResponse, Json};
-use resalt_models::ApiError;
+use axum::{
+    http::StatusCode,
+    response::{IntoResponse, Json},
+};
 
-pub async fn route_index_get() -> Result<impl IntoResponse, ApiError> {
+pub async fn route_index_get() -> Result<impl IntoResponse, StatusCode> {
     Ok(Json("Hello API".to_owned()))
 }

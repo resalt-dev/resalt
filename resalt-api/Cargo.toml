@@ -7,7 +7,7 @@ publish.workspace = true
 [dependencies]
 log = { workspace = true }
 jsonpath_lib = { workspace = true }
-http = { version = "1.0.0" }
+axum = { workspace = true }
 resalt-config = { path = "../resalt-config" }
 resalt-models = { path = "../resalt-models" }
 resalt-salt = { path = "../resalt-salt" }
