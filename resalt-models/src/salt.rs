@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use serde::{Deserialize, Serialize};
+use serde::{ser::SerializeMap, Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::{strip_quotes, ResaltTime};
@@ -123,7 +123,7 @@ impl ToString for SaltTgtType {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum SaltRunJob {
     Local {
         tgt: String,
@@ -169,12 +169,130 @@ pub enum SaltRunJob {
     },
 }
 
+impl Serialize for SaltRunJob {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        match self {
+            SaltRunJob::Local {
+                tgt,
+                fun,
+                arg,
+                tgt_type,
+                kwarg,
+            } => {
+                let mut map = serializer.serialize_map(Some(5))?;
+                map.serialize_entry("tgt", tgt)?;
+                map.serialize_entry("fun", fun)?;
+                if let Some(arg) = arg {
+                    map.serialize_entry("arg", arg)?;
+                }
+                if let Some(tgt_type) = tgt_type {
+                    map.serialize_entry("tgt_type", tgt_type)?;
+                }
+                if let Some(kwarg) = kwarg {
+                    map.serialize_entry("kwarg", kwarg)?;
+                }
+                map.end()
+            }
+            SaltRunJob::LocalAsync {
+                tgt,
+                fun,
+                arg,
+                tgt_type,
+                kwarg,
+            } => {
+                let mut map = serializer.serialize_map(Some(5))?;
+                map.serialize_entry("tgt", tgt)?;
+                map.serialize_entry("fun", fun)?;
+                if let Some(arg) = arg {
+                    map.serialize_entry("arg", arg)?;
+                }
+                if let Some(tgt_type) = tgt_type {
+                    map.serialize_entry("tgt_type", tgt_type)?;
+                }
+                if let Some(kwarg) = kwarg {
+                    map.serialize_entry("kwarg", kwarg)?;
+                }
+                map.end()
+            }
+            SaltRunJob::LocalBatch {
+                tgt,
+                fun,
+                arg,
+                tgt_type,
+                kwarg,
+                batch_size,
+            } => {
+                let mut map = serializer.serialize_map(Some(6))?;
+                map.serialize_entry("tgt", tgt)?;
+                map.serialize_entry("fun", fun)?;
+                if let Some(arg) = arg {
+                    map.serialize_entry("arg", arg)?;
+                }
+                if let Some(tgt_type) = tgt_type {
+                    map.serialize_entry("tgt_type", tgt_type)?;
+                }
+                if let Some(kwarg) = kwarg {
+                    map.serialize_entry("kwarg", kwarg)?;
+                }
+                map.serialize_entry("batch_size", batch_size)?;
+                map.end()
+            }
+            SaltRunJob::Runner { fun, arg, kwarg } => {
+                let mut map = serializer.serialize_map(Some(3))?;
+                map.serialize_entry("fun", fun)?;
+                if let Some(arg) = arg {
+                    map.serialize_entry("arg", arg)?;
+                }
+                if let Some(kwarg) = kwarg {
+                    map.serialize_entry("kwarg", kwarg)?;
+                }
+                map.end()
+            }
+            SaltRunJob::RunnerAsync { fun, arg, kwarg } => {
+                let mut map = serializer.serialize_map(Some(3))?;
+                map.serialize_entry("fun", fun)?;
+                if let Some(arg) = arg {
+                    map.serialize_entry("arg", arg)?;
+                }
+                if let Some(kwarg) = kwarg {
+                    map.serialize_entry("kwarg", kwarg)?;
+                }
+                map.end()
+            }
+            SaltRunJob::Wheel { fun, arg, kwarg } => {
+                let mut map = serializer.serialize_map(Some(3))?;
+                map.serialize_entry("fun", fun)?;
+                if let Some(arg) = arg {
+                    map.serialize_entry("arg", arg)?;
+                }
+                if let Some(kwarg) = kwarg {
+                    map.serialize_entry("kwarg", kwarg)?;
+                }
+                map.end()
+            }
+            SaltRunJob::WheelAsync { fun, arg, kwarg } => {
+                let mut map = serializer.serialize_map(Some(3))?;
+                map.serialize_entry("fun", fun)?;
+                if let Some(arg) = arg {
+                    map.serialize_entry("arg", arg)?;
+                }
+                if let Some(kwarg) = kwarg {
+                    map.serialize_entry("kwarg", kwarg)?;
+                }
+                map.end()
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
-
-    use crate::*;
+    use crate::{SaltRunJob, SaltTgtType};
     use serde_json::json;
+    use std::collections::HashMap;
 
     #[test]
     fn test_saltrunjob() {
