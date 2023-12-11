@@ -334,7 +334,7 @@ impl StorageImpl for StorageRedis {
         }
 
         // Filtering
-        resalt_storage::filter_minions(&mut minions, &filters);
+        filter_minions(&mut minions, &filters);
 
         // Sorting
         if let Some(sort) = sort {

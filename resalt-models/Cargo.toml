@@ -7,5 +7,7 @@ publish.workspace = true
 [dependencies]
 axum = { workspace = true }
 chrono = { workspace = true }
+jsonpath_lib = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+version-compare = "0.1.1"

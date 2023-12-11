@@ -578,7 +578,7 @@ impl StorageImpl for StorageMySQL {
         // 2nd stage JSON Filtering
         // Filter on grains and/or packages
         if has_grain_filters || has_package_filters {
-            resalt_storage::filter_minions(&mut minions, &filters);
+            filter_minions(&mut minions, &filters);
         }
 
         // 2nd Limit if the first limit didn't kick in
