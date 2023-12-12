@@ -6,18 +6,24 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use log::*;
-use resalt_models::AuthStatus;
+use resalt_models::{empty_string_as_none, AuthStatus};
 use resalt_salt::SaltAPI;
 use resalt_storage::Storage;
-use std::collections::HashMap;
+use serde::Deserialize;
 
 use crate::login::{renew_token_salt_token, validate_auth_token};
+
+#[derive(Debug, Deserialize)]
+pub struct Params {
+    #[serde(default, deserialize_with = "empty_string_as_none")]
+    token: Option<String>,
+}
 
 #[allow(clippy::let_and_return)]
 pub async fn middleware_auth(
     State(data): State<Storage>,
     State(salt): State<SaltAPI>,
-    Query(params): Query<HashMap<String, String>>,
+    Query(params): Query<Params>,
     // you can add more extractors here but the last
     // extractor must implement `FromRequest` which
     // `Request` does
@@ -33,7 +39,7 @@ pub async fn middleware_auth(
         Some(header) => header.to_str().unwrap().replace("Bearer ", ""),
         None => {
             // Try fetch value "token" from query params
-            let token = match params.get("token") {
+            let token = match params.token {
                 Some(token) => token.to_string(),
                 None => "".to_string(),
             };

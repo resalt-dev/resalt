@@ -2,14 +2,16 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use version_compare::Cmp;
 
-use crate::{strip_quotes, Minion, ResaltTime};
+use crate::{empty_i64_as_none, strip_quotes, Minion, ResaltTime};
 
 /// Pagination
 pub type Paginate = Option<(i64, i64)>;
 
 #[derive(serde::Deserialize)]
 pub struct PaginateQuery {
+    #[serde(default, deserialize_with = "empty_i64_as_none")]
     pub limit: Option<i64>,
+    #[serde(default, deserialize_with = "empty_i64_as_none")]
     pub offset: Option<i64>,
 }
 
