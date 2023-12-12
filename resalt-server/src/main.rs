@@ -1,7 +1,7 @@
 use axum::{
     middleware::{from_fn, from_fn_with_state},
     routing::{delete, get, post, put},
-    Router, Server, ServiceExt,
+    Router, ServiceExt,
 };
 use env_logger::{init_from_env, Env};
 use resalt_config::ResaltConfig;
@@ -16,7 +16,7 @@ use std::{
     net::SocketAddr,
     sync::{Arc, Mutex},
 };
-use tokio::task;
+use tokio::{net::TcpListener, task};
 use tower::Layer;
 
 fn start_salt_websocket_thread(db: Storage) -> SaltEventListenerStatus {
@@ -120,9 +120,12 @@ async fn start_server(
     let app = logging.layer(app);
 
     let socket = SocketAddr::from(([0, 0, 0, 0], *ResaltConfig::HTTP_PORT));
-    Server::bind(&socket)
-        .serve(app.into_make_service_with_connect_info::<SocketAddr>())
-        .await?;
+    let listener = TcpListener::bind(socket).await?;
+    axum::serve(
+        listener,
+        app.into_make_service_with_connect_info::<SocketAddr>(),
+    )
+    .await?;
 
     Ok(())
 }

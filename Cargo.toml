@@ -19,7 +19,7 @@ description = "Resalt is a free, open-source, self-hosted, web-based administrat
 repository = "https://github.com/resalt-dev/resalt"
 
 [workspace.dependencies]
-axum = { version = "0.6.20" , features = ["json", "form", "original-uri", "query", "tokio"], default-features = false }
+axum = { version = "0.7.2" , features = ["json", "form", "original-uri", "query", "tokio", "http1"], default-features = false }
 chrono = { version = "0.4.31", features = ["std", "clock"], default-features = false }
 env_logger = { version = "0.10.1", features = ["auto-color"], default-features = false }
 jsonpath_lib = "0.3.0"

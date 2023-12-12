@@ -1,4 +1,5 @@
 use axum::{
+    body::Body,
     extract::{Query, State},
     http::{Request, StatusCode},
     middleware::Next,
@@ -13,15 +14,15 @@ use std::collections::HashMap;
 use crate::login::{renew_token_salt_token, validate_auth_token};
 
 #[allow(clippy::let_and_return)]
-pub async fn middleware_auth<B>(
+pub async fn middleware_auth(
     State(data): State<Storage>,
     State(salt): State<SaltAPI>,
     Query(params): Query<HashMap<String, String>>,
     // you can add more extractors here but the last
     // extractor must implement `FromRequest` which
     // `Request` does
-    mut req: Request<B>,
-    next: Next<B>,
+    mut req: Request<Body>,
+    next: Next,
 ) -> Response {
     //
     // PRE-REQUEST PROCESSING
