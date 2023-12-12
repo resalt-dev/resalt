@@ -19,7 +19,7 @@
 					'data-bs-toggle': 'tooltip',
 					'data-bs-placement': 'top',
 					'data-bs-title': tooltip,
-			  }
+				}
 			: {};
 
 	onMount(() => {

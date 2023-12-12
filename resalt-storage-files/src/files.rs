@@ -42,8 +42,8 @@ impl StorageFiles {
             w.push('/');
             // Create folder if it doesn't exist
             let exists = std::path::Path::new(&w).exists();
-            debug!("Creating folder: {} ({})", w, exists);
             if !exists {
+                debug!("Creating folder: {}", w);
                 std::fs::create_dir(&w).map_err(|e| format!("{:?}", e))?;
             }
         }

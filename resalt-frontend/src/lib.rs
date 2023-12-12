@@ -67,19 +67,19 @@ mod tests {
     fn test_frontend_get() {
         let (mime_type, body) = frontend_get("index.html".to_owned());
         assert_eq!(mime_type, "text/html; charset=utf-8");
-        assert_eq!(body, include_bytes!("../build/index.html"));
+        assert_eq!(body, include_bytes!("../output/index.html"));
 
         let (mime_type, body) = frontend_get("/".to_owned());
         assert_eq!(mime_type, "text/html; charset=utf-8");
-        assert_eq!(body, include_bytes!("../build/index.html"));
+        assert_eq!(body, include_bytes!("../output/index.html"));
 
         let (mime_type, body) = frontend_get("".to_owned());
         assert_eq!(mime_type, "text/html; charset=utf-8");
-        assert_eq!(body, include_bytes!("../build/index.html"));
+        assert_eq!(body, include_bytes!("../output/index.html"));
 
         let (mime_type, body) = frontend_get("favicon.png".to_owned());
         assert_eq!(mime_type, "image/png");
-        assert_eq!(body, include_bytes!("../build/favicon.png"));
+        assert_eq!(body, include_bytes!("../output/favicon.png"));
     }
 
     #[test]

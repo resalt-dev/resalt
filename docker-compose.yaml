@@ -30,7 +30,7 @@ services:
       replicas: 3
 
   frontend:
-    image: oven/bun:1.0.11
+    image: oven/bun:1.0.17
     volumes:
       - ./resalt-frontend/.svelte-kit/tsconfig.json:/home/bun/app/.svelte-kit/tsconfig.json
       - ./resalt-frontend/src:/home/bun/app/src
