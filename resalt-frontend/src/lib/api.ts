@@ -46,23 +46,8 @@ async function sendRequest(url: string, options: RequestInit): Promise<unknown> 
 		const text = await res.text();
 		return JSON.parse(text);
 	} else {
-		const body = await res.text();
-		// Try parse JSON
-		let parsed = null;
-		try {
-			parsed = JSON.parse(body);
-		} catch (e) {
-			// If it fails, just return the text
-			throw new Error(body);
-		}
-
-		// Check if body has value "error"
-		if (Object.prototype.hasOwnProperty.call(parsed, 'error')) {
-			throw new ApiError(parsed.error);
-		} else {
-			console.error('FAILED PARSING ERROR', body);
-			throw new Error('Failed parsing error');
-		}
+		console.log('API ERROR', res.status);
+		throw new Error(res.statusText);
 	}
 }
 
