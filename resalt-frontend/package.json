@@ -20,7 +20,7 @@
 		"@sveltejs/kit": "1.27.6",
 		"@sveltejs/vite-plugin-svelte": "2.5.3",
 		"@tsconfig/svelte": "5.0.2",
-		"@types/bootstrap": "5.2.8",
+		"@types/bootstrap": "5.2.10",
 		"@types/uuid": "9.0.6",
 		"@typescript-eslint/eslint-plugin": "6.8.0",
 		"@typescript-eslint/parser": "6.13.1",
