@@ -12,5 +12,6 @@ resalt-config = { path = "../resalt-config" }
 resalt-routes = { path = "../resalt-routes" }
 resalt-salt = { path = "../resalt-salt" }
 resalt-storage = { path = "../resalt-storage" }
+resalt-update = { path = "../resalt-update" }
 tokio = { workspace = true }
 tower = { workspace = true }

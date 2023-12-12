@@ -11,6 +11,7 @@ use resalt_routes::route::noauth::*;
 use resalt_routes::state::*;
 use resalt_salt::{SaltAPI, SaltEventListener, SaltEventListenerStatus};
 use resalt_storage::Storage;
+use resalt_update::update_loop;
 use std::{
     error::Error,
     net::SocketAddr,
@@ -136,6 +137,9 @@ async fn run() -> Result<(), Box<dyn Error>> {
 
     // Database
     let db: Storage = Storage::init_db().await;
+
+    // Update Loop
+    let _update_loop = task::spawn(update_loop());
 
     // Salt WebSocket Thread
     let listener_status = start_salt_websocket_thread(db.clone());

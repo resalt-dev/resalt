@@ -113,7 +113,9 @@ async fn fetch_update_info(client: &Client) -> Result<UpdateInfo, String> {
 
 pub async fn update_loop() {
     let client = Client::new();
+    log::debug!("Starting update loop");
     loop {
+        log::debug!("Checking for updates");
         let update_info = match fetch_update_info(&client).await {
             Ok(update_info) => update_info,
             Err(e) => {
@@ -121,10 +123,13 @@ pub async fn update_loop() {
                 UpdateInfo::default()
             }
         };
+        log::debug!("Latest version: {:?}", update_info.version);
 
         // Update the cache
-        let mut cache = CACHE.lock().unwrap();
-        *cache = update_info;
+        {
+            let mut cache = CACHE.lock().unwrap();
+            *cache = update_info;
+        }
 
         // Sleep for some time before checking for updates again
         thread::sleep(Duration::from_secs(60 * 60));
