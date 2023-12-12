@@ -252,11 +252,11 @@
 								<th
 									class={$selectedPreset.id === preset.id
 										? 'bg-' +
-										  $theme.color +
-										  ' border-' +
-										  $theme.color +
-										  ' text-' +
-										  ($theme.color === 'yellow' ? 'black' : 'white')
+											$theme.color +
+											' border-' +
+											$theme.color +
+											' text-' +
+											($theme.color === 'yellow' ? 'black' : 'white')
 										: ''}
 								>
 									{preset.name}

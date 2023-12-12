@@ -491,11 +491,11 @@
 								<th
 									class={$selectedGroup?.id === group.id
 										? 'bg-' +
-										  $theme.color +
-										  ' border-' +
-										  $theme.color +
-										  ' text-' +
-										  ($theme.color === 'yellow' ? 'black' : 'white')
+											$theme.color +
+											' border-' +
+											$theme.color +
+											' text-' +
+											($theme.color === 'yellow' ? 'black' : 'white')
 										: ''}
 								>
 									{group.name}
@@ -503,11 +503,11 @@
 								<td
 									class={$selectedGroup?.id === group.id
 										? 'bg-' +
-										  $theme.color +
-										  ' border-' +
-										  $theme.color +
-										  ' text-' +
-										  ($theme.color === 'yellow' ? 'black' : 'white')
+											$theme.color +
+											' border-' +
+											$theme.color +
+											' text-' +
+											($theme.color === 'yellow' ? 'black' : 'white')
 										: ''}
 								>
 									{group.users.length}
