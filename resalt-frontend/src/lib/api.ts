@@ -33,7 +33,7 @@ async function sendRequest(url: string, options: RequestInit): Promise<unknown> 
 		return JSON.parse(text);
 	} else {
 		console.log('API ERROR', res.status);
-		throw new Error(res.statusText);
+		throw new Error(res.statusText + ' (' + res.status + ')');
 	}
 }
 
