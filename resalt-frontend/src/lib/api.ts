@@ -14,20 +14,6 @@ import { get } from 'svelte/store';
 import constants from './constants';
 import { auth as authStore, currentUser as currentUserStore } from './stores';
 
-export class ApiError extends Error {
-	code: number;
-	// "error" is the `"error": {}` object inside the response
-	constructor(error: { message: string; code: number }) {
-		super(error.message);
-		this.name = 'ApiError';
-		this.code = error.code;
-	}
-
-	toString(): string {
-		return `${this.name}: ${this.message} (${this.code})`;
-	}
-}
-
 function getToken(): string {
 	const auth = get(authStore);
 	if (!auth) {
