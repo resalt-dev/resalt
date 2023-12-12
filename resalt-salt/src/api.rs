@@ -263,7 +263,7 @@ impl SaltAPI {
         let url: &str = &ResaltConfig::SALT_API_URL;
         let data = json!(run_job);
 
-        // debug!("run_job data {:?}", data);
+        debug!("run_job data {:?}", data.to_string());
 
         let res = match self
             .client
@@ -338,7 +338,7 @@ impl SaltAPI {
                 salt_token,
                 &SaltRunJob::Wheel {
                     fun: "key.finger".to_owned(),
-                    arg: Some(vec![json!("*")]),
+                    arg: Some(vec![serde_json::Value::String("*".to_string())]),
                     kwarg: None,
                 },
             )

@@ -174,6 +174,7 @@ impl Serialize for SaltRunJob {
     where
         S: serde::Serializer,
     {
+        let mut map = serializer.serialize_map(Some(7))?;
         match self {
             SaltRunJob::Local {
                 tgt,
@@ -182,19 +183,12 @@ impl Serialize for SaltRunJob {
                 tgt_type,
                 kwarg,
             } => {
-                let mut map = serializer.serialize_map(Some(5))?;
+                map.serialize_entry("client", "local")?;
                 map.serialize_entry("tgt", tgt)?;
                 map.serialize_entry("fun", fun)?;
-                if let Some(arg) = arg {
-                    map.serialize_entry("arg", arg)?;
-                }
-                if let Some(tgt_type) = tgt_type {
-                    map.serialize_entry("tgt_type", tgt_type)?;
-                }
-                if let Some(kwarg) = kwarg {
-                    map.serialize_entry("kwarg", kwarg)?;
-                }
-                map.end()
+                map.serialize_entry("arg", &arg.clone().unwrap_or_default())?;
+                map.serialize_entry("tgt_type", &tgt_type.clone().unwrap_or_default())?;
+                map.serialize_entry("kwarg", &kwarg.clone().unwrap_or_default())?;
             }
             SaltRunJob::LocalAsync {
                 tgt,
@@ -203,19 +197,12 @@ impl Serialize for SaltRunJob {
                 tgt_type,
                 kwarg,
             } => {
-                let mut map = serializer.serialize_map(Some(5))?;
+                map.serialize_entry("client", "local_async")?;
                 map.serialize_entry("tgt", tgt)?;
                 map.serialize_entry("fun", fun)?;
-                if let Some(arg) = arg {
-                    map.serialize_entry("arg", arg)?;
-                }
-                if let Some(tgt_type) = tgt_type {
-                    map.serialize_entry("tgt_type", tgt_type)?;
-                }
-                if let Some(kwarg) = kwarg {
-                    map.serialize_entry("kwarg", kwarg)?;
-                }
-                map.end()
+                map.serialize_entry("arg", &arg.clone().unwrap_or_default())?;
+                map.serialize_entry("tgt_type", &tgt_type.clone().unwrap_or_default())?;
+                map.serialize_entry("kwarg", &kwarg.clone().unwrap_or_default())?;
             }
             SaltRunJob::LocalBatch {
                 tgt,
@@ -225,66 +212,40 @@ impl Serialize for SaltRunJob {
                 kwarg,
                 batch_size,
             } => {
-                let mut map = serializer.serialize_map(Some(6))?;
+                map.serialize_entry("client", "local_batch")?;
                 map.serialize_entry("tgt", tgt)?;
                 map.serialize_entry("fun", fun)?;
-                if let Some(arg) = arg {
-                    map.serialize_entry("arg", arg)?;
-                }
-                if let Some(tgt_type) = tgt_type {
-                    map.serialize_entry("tgt_type", tgt_type)?;
-                }
-                if let Some(kwarg) = kwarg {
-                    map.serialize_entry("kwarg", kwarg)?;
-                }
+                map.serialize_entry("arg", &arg.clone().unwrap_or_default())?;
+                map.serialize_entry("tgt_type", &tgt_type.clone().unwrap_or_default())?;
+                map.serialize_entry("kwarg", &kwarg.clone().unwrap_or_default())?;
                 map.serialize_entry("batch_size", batch_size)?;
-                map.end()
             }
             SaltRunJob::Runner { fun, arg, kwarg } => {
-                let mut map = serializer.serialize_map(Some(3))?;
+                map.serialize_entry("client", "runner")?;
                 map.serialize_entry("fun", fun)?;
-                if let Some(arg) = arg {
-                    map.serialize_entry("arg", arg)?;
-                }
-                if let Some(kwarg) = kwarg {
-                    map.serialize_entry("kwarg", kwarg)?;
-                }
-                map.end()
+                map.serialize_entry("arg", &arg.clone().unwrap_or_default())?;
+                map.serialize_entry("kwarg", &kwarg.clone().unwrap_or_default())?;
             }
             SaltRunJob::RunnerAsync { fun, arg, kwarg } => {
-                let mut map = serializer.serialize_map(Some(3))?;
+                map.serialize_entry("client", "runner_async")?;
                 map.serialize_entry("fun", fun)?;
-                if let Some(arg) = arg {
-                    map.serialize_entry("arg", arg)?;
-                }
-                if let Some(kwarg) = kwarg {
-                    map.serialize_entry("kwarg", kwarg)?;
-                }
-                map.end()
+                map.serialize_entry("arg", &arg.clone().unwrap_or_default())?;
+                map.serialize_entry("kwarg", &kwarg.clone().unwrap_or_default())?;
             }
             SaltRunJob::Wheel { fun, arg, kwarg } => {
-                let mut map = serializer.serialize_map(Some(3))?;
+                map.serialize_entry("client", "wheel")?;
                 map.serialize_entry("fun", fun)?;
-                if let Some(arg) = arg {
-                    map.serialize_entry("arg", arg)?;
-                }
-                if let Some(kwarg) = kwarg {
-                    map.serialize_entry("kwarg", kwarg)?;
-                }
-                map.end()
+                map.serialize_entry("arg", &arg.clone().unwrap_or_default())?;
+                map.serialize_entry("kwarg", &kwarg.clone().unwrap_or_default())?;
             }
             SaltRunJob::WheelAsync { fun, arg, kwarg } => {
-                let mut map = serializer.serialize_map(Some(3))?;
+                map.serialize_entry("client", "wheel_async")?;
                 map.serialize_entry("fun", fun)?;
-                if let Some(arg) = arg {
-                    map.serialize_entry("arg", arg)?;
-                }
-                if let Some(kwarg) = kwarg {
-                    map.serialize_entry("kwarg", kwarg)?;
-                }
-                map.end()
+                map.serialize_entry("arg", &arg.clone().unwrap_or_default())?;
+                map.serialize_entry("kwarg", &kwarg.clone().unwrap_or_default())?;
             }
         }
+        map.end()
     }
 }
 
@@ -306,6 +267,7 @@ mod tests {
         assert_eq!(
             json!(salt_run_job),
             json!({
+                "client": "local",
                 "tgt": "test",
                 "fun": "test",
                 "arg": ["test"],
@@ -324,6 +286,7 @@ mod tests {
         assert_eq!(
             json!(salt_run_job),
             json!({
+                "client": "local_async",
                 "tgt": "test",
                 "fun": "test",
                 "arg": ["test"],
@@ -343,6 +306,7 @@ mod tests {
         assert_eq!(
             json!(salt_run_job),
             json!({
+                "client": "local_batch",
                 "tgt": "test",
                 "fun": "test",
                 "arg": ["test"],
@@ -360,6 +324,7 @@ mod tests {
         assert_eq!(
             json!(salt_run_job),
             json!({
+                "client": "runner",
                 "fun": "test",
                 "arg": ["test"],
                 "kwarg": {}
@@ -374,6 +339,7 @@ mod tests {
         assert_eq!(
             json!(salt_run_job),
             json!({
+                "client": "runner_async",
                 "fun": "test",
                 "arg": ["test"],
                 "kwarg": {}
@@ -388,6 +354,7 @@ mod tests {
         assert_eq!(
             json!(salt_run_job),
             json!({
+                "client": "wheel",
                 "fun": "test",
                 "arg": ["test"],
                 "kwarg": {}
@@ -402,6 +369,7 @@ mod tests {
         assert_eq!(
             json!(salt_run_job),
             json!({
+                "client": "wheel_async",
                 "fun": "test",
                 "arg": ["test"],
                 "kwarg": {}

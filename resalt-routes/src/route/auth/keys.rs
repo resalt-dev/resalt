@@ -49,20 +49,10 @@ pub async fn route_keys_get(
     };
 
     // Clean out non-existing minions
-    let ids = keys
-        .clone()
-        .into_iter()
-        .map(|key| key.id)
-        .collect::<Vec<String>>();
-    for id in ids {
-        match data.delete_minion(id) {
-            Ok(_) => (),
-            Err(e) => {
-                error!("{:?}", e);
-                return Err(StatusCode::INTERNAL_SERVER_ERROR);
-            }
-        };
-    }
+    data.prune_minions_without_key(&keys).map_err(|e| {
+        error!("prune_minions_without_key {:?}", e);
+        StatusCode::INTERNAL_SERVER_ERROR
+    })?;
 
     Ok(Json(keys))
 }
@@ -88,7 +78,7 @@ pub async fn route_key_accept_put(
 
     // API
     match accept_key(&salt, salt_token, &state, &id).await {
-        Ok(()) => Ok(()),
+        Ok(()) => Ok(Json(())),
         Err(e) => {
             error!("accept_key {:?}", e);
             // Try refresh salt token, and try again
@@ -96,7 +86,7 @@ pub async fn route_key_accept_put(
                 .await?
                 .salt_token;
             match accept_key(&salt, &salt_token.unwrap(), &state, &id).await {
-                Ok(()) => Ok(()),
+                Ok(()) => Ok(Json(())),
                 Err(e) => {
                     error!("accept_key {:?}", e);
                     Err(StatusCode::UNAUTHORIZED)
@@ -127,7 +117,7 @@ pub async fn route_key_reject_put(
 
     // API
     match reject_key(&salt, salt_token, &state, &id).await {
-        Ok(()) => Ok(()),
+        Ok(()) => Ok(Json(())),
         Err(e) => {
             error!("reject_key {:?}", e);
             // Try refresh salt token, and try again
@@ -135,7 +125,7 @@ pub async fn route_key_reject_put(
                 .await?
                 .salt_token;
             match reject_key(&salt, &salt_token.unwrap(), &state, &id).await {
-                Ok(()) => Ok(()),
+                Ok(()) => Ok(Json(())),
                 Err(e) => {
                     error!("reject_key {:?}", e);
                     Err(StatusCode::UNAUTHORIZED)
@@ -166,7 +156,7 @@ pub async fn route_key_delete_delete(
 
     // API
     match delete_key(&salt, salt_token, &state, &id).await {
-        Ok(()) => Ok(()),
+        Ok(()) => Ok(Json(())),
         Err(e) => {
             error!("delete_key {:?}", e);
             // Try refresh salt token, and try again
@@ -174,7 +164,7 @@ pub async fn route_key_delete_delete(
                 .await?
                 .salt_token;
             match delete_key(&salt, &salt_token.unwrap(), &state, &id).await {
-                Ok(()) => Ok(()),
+                Ok(()) => Ok(Json(())),
                 Err(e) => {
                     error!("delete_key {:?}", e);
                     Err(StatusCode::UNAUTHORIZED)

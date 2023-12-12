@@ -38,7 +38,7 @@
 		collapsed={$collapsed.includes(ret.num)}
 	>
 		<div slot="header">
-			<code class="fw-bold">
+			<code class="fw-bold text-dark">
 				{ret.command.toCommandLine({ forceWheel: true })}
 			</code>
 			<small class="float-end text-muted pt-1">

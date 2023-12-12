@@ -62,6 +62,39 @@ impl Storage {
         Storage { storage }
     }
 
+    pub fn prune_minions_without_key(&self, keys: &Vec<SaltMinionKey>) -> Result<(), String> {
+        let mut minions: Vec<Minion> = match self.list_minions(Vec::new(), None, Paginate::None) {
+            Ok(minions) => minions,
+            Err(e) => {
+                error!("{:?}", e);
+                return Err(e);
+            }
+        };
+        let mut minions_to_delete: Vec<Minion> = Vec::new();
+        for minion in minions.iter_mut() {
+            let mut found = false;
+            for key in keys {
+                if minion.id == key.id {
+                    found = true;
+                    break;
+                }
+            }
+            if !found {
+                minions_to_delete.push(minion.clone());
+            }
+        }
+        for minion in minions_to_delete {
+            match self.delete_minion(minion.id) {
+                Ok(_) => (),
+                Err(e) => {
+                    error!("{:?}", e);
+                    return Err(e);
+                }
+            }
+        }
+        Ok(())
+    }
+
     pub fn refresh_user_permissions(&self, user_id: &str) -> Result<(), String> {
         let groups = match self.list_permission_groups_by_user_id(user_id) {
             Ok(groups) => groups,
