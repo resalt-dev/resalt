@@ -1,6 +1,6 @@
 use include_dir::{include_dir, Dir};
 
-static FRONTEND_PUBLIC_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/build");
+static FRONTEND_PUBLIC_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/output");
 
 pub fn frontend_get(path: String) -> (String, Vec<u8>) {
     // Fetch file from FRONTEND_PUBLIC_DIR based on request URL

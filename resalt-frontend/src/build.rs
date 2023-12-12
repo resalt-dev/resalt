@@ -54,10 +54,10 @@ fn main() {
     run_command("bun install");
 
     // Run "bun run build"
-    run_command("bun run build");
+    run_command("bun run --bun build");
 
-    // Check if "build" directory exists
-    if !std::path::Path::new("build").exists() {
+    // Check if "output" directory exists
+    if !std::path::Path::new("output").exists() {
         panic!(
             r#"
             ----------------------------------------

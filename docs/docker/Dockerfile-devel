@@ -36,4 +36,4 @@ CMD cargo watch --poll --why \
       -w resalt-storage-redis \
       -w resalt-update \
       -w Cargo.toml \
-      -x run
+      -x "run --bin resalt-server"
