@@ -51,7 +51,7 @@ services:
       - ./.cargo:/usr/src/app/.cargo:ro
       - ./Cargo.toml:/usr/src/app/Cargo.toml:ro
       - ./docs:/usr/src/app/docs
-      - ./gitignore:/usr/src/app/gitignore:ro
+      - ./.gitignore:/usr/src/app/.gitignore:ro
       - ./resalt-api:/usr/src/app/resalt-api:ro
       - ./resalt-cli:/usr/src/app/resalt-cli:ro
       - ./resalt-config:/usr/src/app/resalt-config:ro
