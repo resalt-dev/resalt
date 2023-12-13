@@ -250,7 +250,7 @@ impl SaltEventListener {
                                 continue;
                             }
                         };
-                        match self.storage.update_minion_grains(
+                        match self.storage.upsert_minion_grains(
                             minion_id.clone(),
                             time,
                             grains,
@@ -295,7 +295,7 @@ impl SaltEventListener {
                         };
                         match self
                             .storage
-                            .update_minion_pillars(minion_id.clone(), time, pillar)
+                            .upsert_minion_pillars(minion_id.clone(), time, pillar)
                         {
                             Ok(_) => {}
                             Err(e) => error!("Failed updating minion pillar {:?}", e),
@@ -336,7 +336,7 @@ impl SaltEventListener {
                         };
                         match self
                             .storage
-                            .update_minion_pkgs(minion_id.clone(), time, pkgs)
+                            .upsert_minion_pkgs(minion_id.clone(), time, pkgs)
                         {
                             Ok(_) => {}
                             Err(e) => error!("Failed updating minion pkgs {:?}", e),
@@ -452,7 +452,7 @@ impl SaltEventListener {
                                 continue;
                             }
                         };
-                        match self.storage.update_minion_conformity(
+                        match self.storage.upsert_minion_conformity(
                             minion_id.clone(),
                             time,
                             conformity,
@@ -497,7 +497,7 @@ impl SaltEventListener {
                         continue;
                     }
                 };
-                match self.storage.update_minion_last_seen(minion_id, time) {
+                match self.storage.upsert_minion_last_seen(minion_id, time) {
                     Ok(_) => {}
                     Err(e) => error!("Failed updating minion last seen {:?}", e),
                 }

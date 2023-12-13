@@ -286,11 +286,17 @@ impl StorageImpl for StorageFiles {
             salt_token: None,
         };
 
+        // Check user
+        let mut user = match self.get_user_by_id(&user_id)? {
+            Some(user) => user,
+            None => return Err("User does not exist".to_string()),
+        };
+
+        // Save authtoken
         let path = format!("authtokens/{}", id);
         self.save_file(&path, &authtoken)?;
 
         // Update user's last_login
-        let mut user = self.get_user_by_id(&user_id)?.unwrap();
         user.last_login = Some(authtoken.timestamp);
         self.update_user(&user)?;
 
@@ -314,12 +320,15 @@ impl StorageImpl for StorageFiles {
         auth_token: &str,
         salt_token: Option<&SaltToken>,
     ) -> Result<(), String> {
-        let salt_token_str = salt_token
-            .as_ref()
-            .map(|st| serde_json::to_string(st).unwrap());
+        let salt_token_str = salt_token.map(|st| serde_json::to_string(st).unwrap());
+
+        // Check authntoken
+        let mut authtoken = match self.get_authtoken_by_id(auth_token)? {
+            Some(authtoken) => authtoken,
+            None => return Err("Auth token does not exist".to_string()),
+        };
 
         // Update authtoken with salt_token
-        let mut authtoken = self.get_authtoken_by_id(auth_token)?.unwrap();
         authtoken.salt_token = salt_token_str;
         let path = format!("authtokens/{}", auth_token);
         self.save_file(&path, &authtoken)?;
@@ -397,7 +406,7 @@ impl StorageImpl for StorageFiles {
         Ok(Some(minion))
     }
 
-    fn update_minion(&self, minion: Minion) -> Result<(), String> {
+    fn upsert_minion(&self, minion: Minion) -> Result<(), String> {
         // Update if it exists, insert if it doesn't
         let path = format!("minions/{}", minion.id);
         self.save_file(&path, &minion)?;
@@ -405,22 +414,28 @@ impl StorageImpl for StorageFiles {
         Ok(())
     }
 
-    fn update_minion_last_seen(&self, minion_id: String, time: ResaltTime) -> Result<(), String> {
-        let mut minion = self.get_minion_by_id(&minion_id)?.unwrap();
+    fn upsert_minion_last_seen(&self, minion_id: String, time: ResaltTime) -> Result<(), String> {
+        let mut minion = match self.get_minion_by_id(&minion_id)? {
+            Some(minion) => minion,
+            None => Minion::default_with_id(minion_id.clone()),
+        };
         minion.last_seen = time;
         let path = format!("minions/{}", minion_id);
         self.save_file(&path, &minion)?;
         Ok(())
     }
 
-    fn update_minion_grains(
+    fn upsert_minion_grains(
         &self,
         minion_id: String,
         time: ResaltTime,
         grains: String,
         os_type: String,
     ) -> Result<(), String> {
-        let mut minion = self.get_minion_by_id(&minion_id)?.unwrap();
+        let mut minion = match self.get_minion_by_id(&minion_id)? {
+            Some(minion) => minion,
+            None => Minion::default_with_id(minion_id.clone()),
+        };
         minion.last_updated_grains = Some(time);
         minion.grains = Some(grains);
         minion.os_type = Some(os_type);
@@ -429,13 +444,16 @@ impl StorageImpl for StorageFiles {
         Ok(())
     }
 
-    fn update_minion_pillars(
+    fn upsert_minion_pillars(
         &self,
         minion_id: String,
         time: ResaltTime,
         pillars: String,
     ) -> Result<(), String> {
-        let mut minion = self.get_minion_by_id(&minion_id)?.unwrap();
+        let mut minion = match self.get_minion_by_id(&minion_id)? {
+            Some(minion) => minion,
+            None => Minion::default_with_id(minion_id.clone()),
+        };
         minion.last_updated_pillars = Some(time);
         minion.pillars = Some(pillars);
         let path = format!("minions/{}", minion_id);
@@ -443,13 +461,16 @@ impl StorageImpl for StorageFiles {
         Ok(())
     }
 
-    fn update_minion_pkgs(
+    fn upsert_minion_pkgs(
         &self,
         minion_id: String,
         time: ResaltTime,
         pkgs: String,
     ) -> Result<(), String> {
-        let mut minion = self.get_minion_by_id(&minion_id)?.unwrap();
+        let mut minion = match self.get_minion_by_id(&minion_id)? {
+            Some(minion) => minion,
+            None => Minion::default_with_id(minion_id.clone()),
+        };
         minion.last_updated_pkgs = Some(time);
         minion.pkgs = Some(pkgs);
         let path = format!("minions/{}", minion_id);
@@ -457,7 +478,7 @@ impl StorageImpl for StorageFiles {
         Ok(())
     }
 
-    fn update_minion_conformity(
+    fn upsert_minion_conformity(
         &self,
         minion_id: String,
         time: ResaltTime,
@@ -466,7 +487,10 @@ impl StorageImpl for StorageFiles {
         incorrect: i32,
         error: i32,
     ) -> Result<(), String> {
-        let mut minion = self.get_minion_by_id(&minion_id)?.unwrap();
+        let mut minion = match self.get_minion_by_id(&minion_id)? {
+            Some(minion) => minion,
+            None => Minion::default_with_id(minion_id.clone()),
+        };
         minion.last_updated_conformity = Some(time);
         minion.conformity = Some(conformity);
         minion.conformity_success = Some(success);

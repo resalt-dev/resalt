@@ -602,7 +602,7 @@ impl StorageImpl for StorageMySQL {
             .map(|sql_minion| sql_minion.map(|sql_minion| sql_minion.into()))
     }
 
-    fn update_minion(&self, minion: Minion) -> Result<(), String> {
+    fn upsert_minion(&self, minion: Minion) -> Result<(), String> {
         let mut connection = self.create_connection()?;
 
         let changeset: SQLMinion = minion.into();
@@ -643,7 +643,7 @@ impl StorageImpl for StorageMySQL {
         Ok(())
     }
 
-    fn update_minion_last_seen(&self, minion_id: String, time: ResaltTime) -> Result<(), String> {
+    fn upsert_minion_last_seen(&self, minion_id: String, time: ResaltTime) -> Result<(), String> {
         let mut connection = self.create_connection()?;
         let time: NaiveDateTime = time.into();
         diesel::update(minions::table)
@@ -654,7 +654,7 @@ impl StorageImpl for StorageMySQL {
             .map(|_| ())
     }
 
-    fn update_minion_grains(
+    fn upsert_minion_grains(
         &self,
         minion_id: String,
         time: ResaltTime,
@@ -675,7 +675,7 @@ impl StorageImpl for StorageMySQL {
             .map(|_| ())
     }
 
-    fn update_minion_pillars(
+    fn upsert_minion_pillars(
         &self,
         minion_id: String,
         time: ResaltTime,
@@ -694,7 +694,7 @@ impl StorageImpl for StorageMySQL {
             .map(|_| ())
     }
 
-    fn update_minion_pkgs(
+    fn upsert_minion_pkgs(
         &self,
         minion_id: String,
         time: ResaltTime,
@@ -710,7 +710,7 @@ impl StorageImpl for StorageMySQL {
             .map(|_| ())
     }
 
-    fn update_minion_conformity(
+    fn upsert_minion_conformity(
         &self,
         minion_id: String,
         time: ResaltTime,

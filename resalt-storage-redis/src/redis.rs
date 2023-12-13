@@ -370,7 +370,7 @@ impl StorageImpl for StorageRedis {
         Ok(Some(minion))
     }
 
-    fn update_minion(&self, minion: Minion) -> Result<(), String> {
+    fn upsert_minion(&self, minion: Minion) -> Result<(), String> {
         let mut connection = self.create_connection()?;
 
         let values = minion.hash();
@@ -383,51 +383,63 @@ impl StorageImpl for StorageRedis {
         Ok(())
     }
 
-    fn update_minion_last_seen(&self, minion_id: String, time: ResaltTime) -> Result<(), String> {
-        let mut minion = self.get_minion_by_id(&minion_id)?.unwrap();
+    fn upsert_minion_last_seen(&self, minion_id: String, time: ResaltTime) -> Result<(), String> {
+        let mut minion = match self.get_minion_by_id(&minion_id)? {
+            Some(minion) => minion,
+            None => Minion::default_with_id(minion_id.clone()),
+        };
         minion.last_seen = time;
-        self.update_minion(minion)
+        self.upsert_minion(minion)
     }
 
-    fn update_minion_grains(
+    fn upsert_minion_grains(
         &self,
         minion_id: String,
         time: ResaltTime,
         grains: String,
         os_type: String,
     ) -> Result<(), String> {
-        let mut minion = self.get_minion_by_id(&minion_id)?.unwrap();
+        let mut minion = match self.get_minion_by_id(&minion_id)? {
+            Some(minion) => minion,
+            None => Minion::default_with_id(minion_id.clone()),
+        };
         minion.last_updated_grains = Some(time);
         minion.grains = Some(grains);
         minion.os_type = Some(os_type);
-        self.update_minion(minion)
+        self.upsert_minion(minion)
     }
 
-    fn update_minion_pillars(
+    fn upsert_minion_pillars(
         &self,
         minion_id: String,
         time: ResaltTime,
         pillars: String,
     ) -> Result<(), String> {
-        let mut minion = self.get_minion_by_id(&minion_id)?.unwrap();
+        let mut minion = match self.get_minion_by_id(&minion_id)? {
+            Some(minion) => minion,
+            None => Minion::default_with_id(minion_id.clone()),
+        };
         minion.last_updated_pillars = Some(time);
         minion.pillars = Some(pillars);
-        self.update_minion(minion)
+        self.upsert_minion(minion)
     }
 
-    fn update_minion_pkgs(
+    fn upsert_minion_pkgs(
         &self,
         minion_id: String,
         time: ResaltTime,
         pkgs: String,
     ) -> Result<(), String> {
-        let mut minion = self.get_minion_by_id(&minion_id)?.unwrap();
+        let mut minion = match self.get_minion_by_id(&minion_id)? {
+            Some(minion) => minion,
+            None => Minion::default_with_id(minion_id.clone()),
+        };
         minion.last_updated_pkgs = Some(time);
         minion.pkgs = Some(pkgs);
-        self.update_minion(minion)
+        self.upsert_minion(minion)
     }
 
-    fn update_minion_conformity(
+    fn upsert_minion_conformity(
         &self,
         minion_id: String,
         time: ResaltTime,
@@ -436,13 +448,16 @@ impl StorageImpl for StorageRedis {
         incorrect: i32,
         error: i32,
     ) -> Result<(), String> {
-        let mut minion = self.get_minion_by_id(&minion_id)?.unwrap();
+        let mut minion = match self.get_minion_by_id(&minion_id)? {
+            Some(minion) => minion,
+            None => Minion::default_with_id(minion_id.clone()),
+        };
         minion.last_updated_conformity = Some(time);
         minion.conformity = Some(conformity);
         minion.conformity_success = Some(success);
         minion.conformity_incorrect = Some(incorrect);
         minion.conformity_error = Some(error);
-        self.update_minion(minion)
+        self.upsert_minion(minion)
     }
 
     // Delete minion

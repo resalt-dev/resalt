@@ -52,11 +52,11 @@ pub trait StorageImpl: Send + Sync {
 
     fn get_minion_by_id(&self, id: &str) -> Result<Option<Minion>, String>;
 
-    fn update_minion(&self, minion: Minion) -> Result<(), String>;
+    fn upsert_minion(&self, minion: Minion) -> Result<(), String>;
 
-    fn update_minion_last_seen(&self, minion_id: String, time: ResaltTime) -> Result<(), String>;
+    fn upsert_minion_last_seen(&self, minion_id: String, time: ResaltTime) -> Result<(), String>;
 
-    fn update_minion_grains(
+    fn upsert_minion_grains(
         &self,
         minion_id: String,
         time: ResaltTime,
@@ -64,21 +64,21 @@ pub trait StorageImpl: Send + Sync {
         os_type: String,
     ) -> Result<(), String>;
 
-    fn update_minion_pillars(
+    fn upsert_minion_pillars(
         &self,
         minion_id: String,
         time: ResaltTime,
         pillars: String,
     ) -> Result<(), String>;
 
-    fn update_minion_pkgs(
+    fn upsert_minion_pkgs(
         &self,
         minion_id: String,
         time: ResaltTime,
         pkgs: String,
     ) -> Result<(), String>;
 
-    fn update_minion_conformity(
+    fn upsert_minion_conformity(
         &self,
         minion_id: String,
         time: ResaltTime,

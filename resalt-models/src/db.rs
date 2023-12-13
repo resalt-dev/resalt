@@ -339,6 +339,13 @@ impl Minion {
         }
         minion
     }
+
+    pub fn default_with_id(id: String) -> Self {
+        Self {
+            id,
+            ..Default::default()
+        }
+    }
 }
 
 impl Default for Minion {

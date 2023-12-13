@@ -217,15 +217,15 @@ impl StorageImpl for Storage {
         self.storage.get_minion_by_id(id)
     }
 
-    fn update_minion(&self, minion: Minion) -> Result<(), String> {
-        self.storage.update_minion(minion)
+    fn upsert_minion(&self, minion: Minion) -> Result<(), String> {
+        self.storage.upsert_minion(minion)
     }
 
-    fn update_minion_last_seen(&self, minion_id: String, time: ResaltTime) -> Result<(), String> {
-        self.storage.update_minion_last_seen(minion_id, time)
+    fn upsert_minion_last_seen(&self, minion_id: String, time: ResaltTime) -> Result<(), String> {
+        self.storage.upsert_minion_last_seen(minion_id, time)
     }
 
-    fn update_minion_grains(
+    fn upsert_minion_grains(
         &self,
         minion_id: String,
         time: ResaltTime,
@@ -233,28 +233,28 @@ impl StorageImpl for Storage {
         os_type: String,
     ) -> Result<(), String> {
         self.storage
-            .update_minion_grains(minion_id, time, grains, os_type)
+            .upsert_minion_grains(minion_id, time, grains, os_type)
     }
 
-    fn update_minion_pillars(
+    fn upsert_minion_pillars(
         &self,
         minion_id: String,
         time: ResaltTime,
         pillars: String,
     ) -> Result<(), String> {
-        self.storage.update_minion_pillars(minion_id, time, pillars)
+        self.storage.upsert_minion_pillars(minion_id, time, pillars)
     }
 
-    fn update_minion_pkgs(
+    fn upsert_minion_pkgs(
         &self,
         minion_id: String,
         time: ResaltTime,
         pkgs: String,
     ) -> Result<(), String> {
-        self.storage.update_minion_pkgs(minion_id, time, pkgs)
+        self.storage.upsert_minion_pkgs(minion_id, time, pkgs)
     }
 
-    fn update_minion_conformity(
+    fn upsert_minion_conformity(
         &self,
         minion_id: String,
         time: ResaltTime,
@@ -264,7 +264,7 @@ impl StorageImpl for Storage {
         error: i32,
     ) -> Result<(), String> {
         self.storage
-            .update_minion_conformity(minion_id, time, conformity, success, incorrect, error)
+            .upsert_minion_conformity(minion_id, time, conformity, success, incorrect, error)
     }
 
     fn delete_minion(&self, id: String) -> Result<(), String> {
