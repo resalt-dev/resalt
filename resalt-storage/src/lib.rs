@@ -84,7 +84,7 @@ impl Storage {
             }
         }
         for minion in minions_to_delete {
-            match self.delete_minion(minion.id) {
+            match self.delete_minion(&minion.id) {
                 Ok(_) => (),
                 Err(e) => {
                     error!("{:?}", e);
@@ -221,13 +221,13 @@ impl StorageImpl for Storage {
         self.storage.upsert_minion(minion)
     }
 
-    fn upsert_minion_last_seen(&self, minion_id: String, time: ResaltTime) -> Result<(), String> {
+    fn upsert_minion_last_seen(&self, minion_id: &str, time: ResaltTime) -> Result<(), String> {
         self.storage.upsert_minion_last_seen(minion_id, time)
     }
 
     fn upsert_minion_grains(
         &self,
-        minion_id: String,
+        minion_id: &str,
         time: ResaltTime,
         grains: String,
         os_type: String,
@@ -238,7 +238,7 @@ impl StorageImpl for Storage {
 
     fn upsert_minion_pillars(
         &self,
-        minion_id: String,
+        minion_id: &str,
         time: ResaltTime,
         pillars: String,
     ) -> Result<(), String> {
@@ -247,7 +247,7 @@ impl StorageImpl for Storage {
 
     fn upsert_minion_pkgs(
         &self,
-        minion_id: String,
+        minion_id: &str,
         time: ResaltTime,
         pkgs: String,
     ) -> Result<(), String> {
@@ -256,7 +256,7 @@ impl StorageImpl for Storage {
 
     fn upsert_minion_conformity(
         &self,
-        minion_id: String,
+        minion_id: &str,
         time: ResaltTime,
         conformity: String,
         success: i32,
@@ -267,7 +267,7 @@ impl StorageImpl for Storage {
             .upsert_minion_conformity(minion_id, time, conformity, success, incorrect, error)
     }
 
-    fn delete_minion(&self, id: String) -> Result<(), String> {
+    fn delete_minion(&self, id: &str) -> Result<(), String> {
         self.storage.delete_minion(id)
     }
 

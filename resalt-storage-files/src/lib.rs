@@ -410,10 +410,10 @@ impl StorageImpl for StorageFiles {
         Ok(())
     }
 
-    fn upsert_minion_last_seen(&self, minion_id: String, time: ResaltTime) -> Result<(), String> {
+    fn upsert_minion_last_seen(&self, minion_id: &str, time: ResaltTime) -> Result<(), String> {
         let mut minion = match self.get_minion_by_id(&minion_id)? {
             Some(minion) => minion,
-            None => Minion::default_with_id(minion_id.clone()),
+            None => Minion::default_with_id(minion_id),
         };
         minion.last_seen = time;
         let path = format!("minions/{}", minion_id);
@@ -423,14 +423,14 @@ impl StorageImpl for StorageFiles {
 
     fn upsert_minion_grains(
         &self,
-        minion_id: String,
+        minion_id: &str,
         time: ResaltTime,
         grains: String,
         os_type: String,
     ) -> Result<(), String> {
         let mut minion = match self.get_minion_by_id(&minion_id)? {
             Some(minion) => minion,
-            None => Minion::default_with_id(minion_id.clone()),
+            None => Minion::default_with_id(minion_id),
         };
         minion.last_updated_grains = Some(time);
         minion.grains = Some(grains);
@@ -442,13 +442,13 @@ impl StorageImpl for StorageFiles {
 
     fn upsert_minion_pillars(
         &self,
-        minion_id: String,
+        minion_id: &str,
         time: ResaltTime,
         pillars: String,
     ) -> Result<(), String> {
         let mut minion = match self.get_minion_by_id(&minion_id)? {
             Some(minion) => minion,
-            None => Minion::default_with_id(minion_id.clone()),
+            None => Minion::default_with_id(minion_id),
         };
         minion.last_updated_pillars = Some(time);
         minion.pillars = Some(pillars);
@@ -459,13 +459,13 @@ impl StorageImpl for StorageFiles {
 
     fn upsert_minion_pkgs(
         &self,
-        minion_id: String,
+        minion_id: &str,
         time: ResaltTime,
         pkgs: String,
     ) -> Result<(), String> {
         let mut minion = match self.get_minion_by_id(&minion_id)? {
             Some(minion) => minion,
-            None => Minion::default_with_id(minion_id.clone()),
+            None => Minion::default_with_id(minion_id),
         };
         minion.last_updated_pkgs = Some(time);
         minion.pkgs = Some(pkgs);
@@ -476,7 +476,7 @@ impl StorageImpl for StorageFiles {
 
     fn upsert_minion_conformity(
         &self,
-        minion_id: String,
+        minion_id: &str,
         time: ResaltTime,
         conformity: String,
         success: i32,
@@ -485,7 +485,7 @@ impl StorageImpl for StorageFiles {
     ) -> Result<(), String> {
         let mut minion = match self.get_minion_by_id(&minion_id)? {
             Some(minion) => minion,
-            None => Minion::default_with_id(minion_id.clone()),
+            None => Minion::default_with_id(minion_id),
         };
         minion.last_updated_conformity = Some(time);
         minion.conformity = Some(conformity);
@@ -498,7 +498,7 @@ impl StorageImpl for StorageFiles {
     }
 
     // Delete minion
-    fn delete_minion(&self, id: String) -> Result<(), String> {
+    fn delete_minion(&self, id: &str) -> Result<(), String> {
         let path = format!("minions/{}", id);
         self.delete_file(&path)?;
         Ok(())
@@ -886,7 +886,9 @@ impl StorageImpl for StorageFiles {
 
 #[cfg(test)]
 mod tests {
-    use resalt_models::storage::{test_storage_impl_authtoken, test_storage_impl_users};
+    use resalt_models::storage::{
+        test_storage_impl_authtoken, test_storage_impl_minions, test_storage_impl_users,
+    };
 
     use crate::StorageFiles;
 
@@ -921,6 +923,13 @@ mod tests {
     fn test_authtokens() {
         let data = get_temp_storage();
         test_storage_impl_authtoken(&data.0);
+        cleanup_temp_storage(&data.1);
+    }
+
+    #[test]
+    fn test_minions() {
+        let data = get_temp_storage();
+        test_storage_impl_minions(&data.0);
         cleanup_temp_storage(&data.1);
     }
 }

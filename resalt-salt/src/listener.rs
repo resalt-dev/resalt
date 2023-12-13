@@ -250,12 +250,10 @@ impl SaltEventListener {
                                 continue;
                             }
                         };
-                        match self.storage.upsert_minion_grains(
-                            minion_id.clone(),
-                            time,
-                            grains,
-                            os_type,
-                        ) {
+                        match self
+                            .storage
+                            .upsert_minion_grains(&minion_id, time, grains, os_type)
+                        {
                             Ok(_) => {}
                             Err(e) => error!("Failed updating minion grains {:?}", e),
                         }
@@ -293,10 +291,7 @@ impl SaltEventListener {
                                 continue;
                             }
                         };
-                        match self
-                            .storage
-                            .upsert_minion_pillars(minion_id.clone(), time, pillar)
-                        {
+                        match self.storage.upsert_minion_pillars(&minion_id, time, pillar) {
                             Ok(_) => {}
                             Err(e) => error!("Failed updating minion pillar {:?}", e),
                         }
@@ -334,10 +329,7 @@ impl SaltEventListener {
                                 continue;
                             }
                         };
-                        match self
-                            .storage
-                            .upsert_minion_pkgs(minion_id.clone(), time, pkgs)
-                        {
+                        match self.storage.upsert_minion_pkgs(&minion_id, time, pkgs) {
                             Ok(_) => {}
                             Err(e) => error!("Failed updating minion pkgs {:?}", e),
                         }
@@ -453,12 +445,7 @@ impl SaltEventListener {
                             }
                         };
                         match self.storage.upsert_minion_conformity(
-                            minion_id.clone(),
-                            time,
-                            conformity,
-                            success,
-                            incorrect,
-                            error,
+                            &minion_id, time, conformity, success, incorrect, error,
                         ) {
                             Ok(_) => {}
                             Err(e) => error!("Failed updating minion conformity {:?}", e),
@@ -497,7 +484,7 @@ impl SaltEventListener {
                         continue;
                     }
                 };
-                match self.storage.upsert_minion_last_seen(minion_id, time) {
+                match self.storage.upsert_minion_last_seen(&minion_id, time) {
                     Ok(_) => {}
                     Err(e) => error!("Failed updating minion last seen {:?}", e),
                 }

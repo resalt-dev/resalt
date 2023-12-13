@@ -66,11 +66,11 @@ pub trait StorageImpl: Send + Sync {
 
     fn upsert_minion(&self, minion: Minion) -> Result<(), String>;
 
-    fn upsert_minion_last_seen(&self, minion_id: String, time: ResaltTime) -> Result<(), String>;
+    fn upsert_minion_last_seen(&self, minion_id: &str, time: ResaltTime) -> Result<(), String>;
 
     fn upsert_minion_grains(
         &self,
-        minion_id: String,
+        minion_id: &str,
         time: ResaltTime,
         grains: String,
         os_type: String,
@@ -78,21 +78,21 @@ pub trait StorageImpl: Send + Sync {
 
     fn upsert_minion_pillars(
         &self,
-        minion_id: String,
+        minion_id: &str,
         time: ResaltTime,
         pillars: String,
     ) -> Result<(), String>;
 
     fn upsert_minion_pkgs(
         &self,
-        minion_id: String,
+        minion_id: &str,
         time: ResaltTime,
         pkgs: String,
     ) -> Result<(), String>;
 
     fn upsert_minion_conformity(
         &self,
-        minion_id: String,
+        minion_id: &str,
         time: ResaltTime,
         conformity: String,
         success: i32,
@@ -100,7 +100,7 @@ pub trait StorageImpl: Send + Sync {
         error: i32,
     ) -> Result<(), String>;
 
-    fn delete_minion(&self, id: String) -> Result<(), String>;
+    fn delete_minion(&self, id: &str) -> Result<(), String>;
 
     fn insert_event(
         &self,
@@ -315,4 +315,108 @@ pub fn test_storage_impl_authtoken(data: &dyn StorageImpl) {
     assert_eq!(authtoken.id.len(), 41);
     assert_eq!(authtoken.user_id, user.id);
     assert_eq!(authtoken.salt_token.unwrap(), salttoken);
+}
+
+pub fn test_storage_impl_minions(data: &dyn StorageImpl) {
+    // Check DB is empty
+    let total = data.list_minions(vec![], None, Paginate::None).unwrap();
+    assert_eq!(total.len(), 0);
+
+    // Create minion
+    let time1 = ResaltTime::now();
+    let minion = Minion {
+        id: "testminion".to_string(),
+        last_seen: time1,
+        grains: None,
+        pillars: None,
+        pkgs: None,
+        last_updated_grains: None,
+        last_updated_pillars: None,
+        last_updated_pkgs: None,
+        conformity: None,
+        conformity_success: None,
+        conformity_incorrect: None,
+        conformity_error: None,
+        last_updated_conformity: None,
+        os_type: None,
+    };
+    data.upsert_minion(minion.clone()).unwrap();
+
+    // Check DB has one minion
+    let total = data.list_minions(vec![], None, Paginate::None).unwrap();
+    assert_eq!(total.len(), 1);
+    assert_eq!(total[0], minion);
+
+    // Get minion by id
+    let minion = data.get_minion_by_id(&minion.id).unwrap().unwrap();
+    assert_eq!(minion.id, "testminion");
+    assert_eq!(minion.last_seen, time1);
+
+    // Update minion last seen
+    let time2 = time1 + chrono::Duration::seconds(1);
+    assert!(time2.timestamp() > time1.timestamp());
+    data.upsert_minion_last_seen("testminion", time2).unwrap();
+
+    let minion = data.get_minion_by_id(&minion.id).unwrap().unwrap();
+    assert_eq!(minion.id, "testminion");
+    assert_eq!(minion.last_seen, time2);
+
+    // Update minion grains
+    data.upsert_minion_grains(
+        "testminion",
+        time2,
+        "testgrains".to_string(),
+        "testos".to_string(),
+    )
+    .unwrap();
+
+    let minion = data.get_minion_by_id(&minion.id).unwrap().unwrap();
+    assert_eq!(minion.id, "testminion");
+    assert_eq!(minion.last_updated_grains.unwrap(), time2);
+    assert_eq!(minion.grains.unwrap(), "testgrains");
+
+    // Update minion pillars
+    data.upsert_minion_pillars("testminion", time2, "testpillars".to_string())
+        .unwrap();
+
+    let minion = data.get_minion_by_id(&minion.id).unwrap().unwrap();
+    assert_eq!(minion.id, "testminion");
+    assert_eq!(minion.last_updated_pillars.unwrap(), time2);
+    assert_eq!(minion.pillars.unwrap(), "testpillars");
+
+    // Update minion pkgs
+    data.upsert_minion_pkgs("testminion", time2, "testpkgs".to_string())
+        .unwrap();
+
+    let minion = data.get_minion_by_id(&minion.id).unwrap().unwrap();
+    assert_eq!(minion.id, "testminion");
+    assert_eq!(minion.last_updated_pkgs.unwrap(), time2);
+    assert_eq!(minion.pkgs.unwrap(), "testpkgs");
+
+    // Update minion conformity
+    data.upsert_minion_conformity("testminion", time2, "testconformity".to_string(), 1, 2, 3)
+        .unwrap();
+
+    let minion = data.get_minion_by_id(&minion.id).unwrap().unwrap();
+    assert_eq!(minion.id, "testminion");
+    assert_eq!(minion.last_updated_conformity.unwrap(), time2);
+    assert_eq!(minion.conformity.unwrap(), "testconformity");
+    assert_eq!(minion.conformity_success.unwrap(), 1);
+    assert_eq!(minion.conformity_incorrect.unwrap(), 2);
+    assert_eq!(minion.conformity_error.unwrap(), 3);
+
+    // Check grains, pillars and pkgs are still there
+    assert_eq!(minion.last_updated_grains.unwrap(), time2);
+    assert_eq!(minion.grains.unwrap(), "testgrains");
+    assert_eq!(minion.last_updated_pillars.unwrap(), time2);
+    assert_eq!(minion.pillars.unwrap(), "testpillars");
+    assert_eq!(minion.last_updated_pkgs.unwrap(), time2);
+    assert_eq!(minion.pkgs.unwrap(), "testpkgs");
+
+    // Delete minion
+    data.delete_minion(&minion.id).unwrap();
+
+    // Check DB is empty
+    let total = data.list_minions(vec![], None, Paginate::None).unwrap();
+    assert_eq!(total.len(), 0);
 }

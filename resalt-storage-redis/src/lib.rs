@@ -383,10 +383,10 @@ impl StorageImpl for StorageRedis {
         Ok(())
     }
 
-    fn upsert_minion_last_seen(&self, minion_id: String, time: ResaltTime) -> Result<(), String> {
+    fn upsert_minion_last_seen(&self, minion_id: &str, time: ResaltTime) -> Result<(), String> {
         let mut minion = match self.get_minion_by_id(&minion_id)? {
             Some(minion) => minion,
-            None => Minion::default_with_id(minion_id.clone()),
+            None => Minion::default_with_id(minion_id),
         };
         minion.last_seen = time;
         self.upsert_minion(minion)
@@ -394,14 +394,14 @@ impl StorageImpl for StorageRedis {
 
     fn upsert_minion_grains(
         &self,
-        minion_id: String,
+        minion_id: &str,
         time: ResaltTime,
         grains: String,
         os_type: String,
     ) -> Result<(), String> {
         let mut minion = match self.get_minion_by_id(&minion_id)? {
             Some(minion) => minion,
-            None => Minion::default_with_id(minion_id.clone()),
+            None => Minion::default_with_id(minion_id),
         };
         minion.last_updated_grains = Some(time);
         minion.grains = Some(grains);
@@ -411,13 +411,13 @@ impl StorageImpl for StorageRedis {
 
     fn upsert_minion_pillars(
         &self,
-        minion_id: String,
+        minion_id: &str,
         time: ResaltTime,
         pillars: String,
     ) -> Result<(), String> {
         let mut minion = match self.get_minion_by_id(&minion_id)? {
             Some(minion) => minion,
-            None => Minion::default_with_id(minion_id.clone()),
+            None => Minion::default_with_id(minion_id),
         };
         minion.last_updated_pillars = Some(time);
         minion.pillars = Some(pillars);
@@ -426,13 +426,13 @@ impl StorageImpl for StorageRedis {
 
     fn upsert_minion_pkgs(
         &self,
-        minion_id: String,
+        minion_id: &str,
         time: ResaltTime,
         pkgs: String,
     ) -> Result<(), String> {
         let mut minion = match self.get_minion_by_id(&minion_id)? {
             Some(minion) => minion,
-            None => Minion::default_with_id(minion_id.clone()),
+            None => Minion::default_with_id(minion_id),
         };
         minion.last_updated_pkgs = Some(time);
         minion.pkgs = Some(pkgs);
@@ -441,7 +441,7 @@ impl StorageImpl for StorageRedis {
 
     fn upsert_minion_conformity(
         &self,
-        minion_id: String,
+        minion_id: &str,
         time: ResaltTime,
         conformity: String,
         success: i32,
@@ -450,7 +450,7 @@ impl StorageImpl for StorageRedis {
     ) -> Result<(), String> {
         let mut minion = match self.get_minion_by_id(&minion_id)? {
             Some(minion) => minion,
-            None => Minion::default_with_id(minion_id.clone()),
+            None => Minion::default_with_id(minion_id),
         };
         minion.last_updated_conformity = Some(time);
         minion.conformity = Some(conformity);
@@ -461,7 +461,7 @@ impl StorageImpl for StorageRedis {
     }
 
     // Delete minion
-    fn delete_minion(&self, id: String) -> Result<(), String> {
+    fn delete_minion(&self, id: &str) -> Result<(), String> {
         let mut connection = self.create_connection()?;
         connection
             .del(format!("minion:{}", id))

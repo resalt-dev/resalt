@@ -5,7 +5,11 @@ use chrono::{
     Duration, NaiveDateTime, ParseError,
 };
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use std::{fmt::Display, fmt::Formatter, ops::Sub};
+use std::{
+    fmt::Display,
+    fmt::Formatter,
+    ops::{Add, Sub},
+};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Default)]
 pub struct ResaltTime {
@@ -42,6 +46,17 @@ impl ResaltTime {
     }
 }
 
+impl Add<Duration> for ResaltTime {
+    type Output = ResaltTime;
+
+    #[inline]
+    fn add(self, rhs: Duration) -> ResaltTime {
+        ResaltTime {
+            time: self.time + rhs,
+        }
+    }
+}
+
 impl Sub for ResaltTime {
     type Output = Duration;
 
@@ -54,20 +69,20 @@ impl Sub for ResaltTime {
 impl Display for ResaltTime {
     #[inline]
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.time.format("%Y-%m-%d %H:%M:%S"))
+        write!(f, "{}", self.time.format("%Y-%m-%dT%H:%M:%S.%fZ"))
     }
 }
 
 impl Serialize for ResaltTime {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-        serializer.serialize_str(&self.time.format("%Y-%m-%d %H:%M:%S").to_string())
+        serializer.serialize_str(&self.time.format("%Y-%m-%dT%H:%M:%S.%fZ").to_string())
     }
 }
 
 impl<'de> Deserialize<'de> for ResaltTime {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         let time = String::deserialize(deserializer)?;
-        let time = NaiveDateTime::parse_from_str(&time, "%Y-%m-%d %H:%M:%S").unwrap();
+        let time = NaiveDateTime::parse_from_str(&time, "%Y-%m-%dT%H:%M:%S.%fZ").unwrap();
         Ok(ResaltTime { time })
     }
 }

@@ -643,7 +643,7 @@ impl StorageImpl for StorageMySQL {
         Ok(())
     }
 
-    fn upsert_minion_last_seen(&self, minion_id: String, time: ResaltTime) -> Result<(), String> {
+    fn upsert_minion_last_seen(&self, minion_id: &str, time: ResaltTime) -> Result<(), String> {
         let mut connection = self.create_connection()?;
         let time: NaiveDateTime = time.into();
         diesel::update(minions::table)
@@ -656,7 +656,7 @@ impl StorageImpl for StorageMySQL {
 
     fn upsert_minion_grains(
         &self,
-        minion_id: String,
+        minion_id: &str,
         time: ResaltTime,
         grains: String,
         os_type: String,
@@ -677,7 +677,7 @@ impl StorageImpl for StorageMySQL {
 
     fn upsert_minion_pillars(
         &self,
-        minion_id: String,
+        minion_id: &str,
         time: ResaltTime,
         pillars: String,
     ) -> Result<(), String> {
@@ -696,7 +696,7 @@ impl StorageImpl for StorageMySQL {
 
     fn upsert_minion_pkgs(
         &self,
-        minion_id: String,
+        minion_id: &str,
         time: ResaltTime,
         pkgs: String,
     ) -> Result<(), String> {
@@ -712,7 +712,7 @@ impl StorageImpl for StorageMySQL {
 
     fn upsert_minion_conformity(
         &self,
-        minion_id: String,
+        minion_id: &str,
         time: ResaltTime,
         conformity: String,
         success: i32,
@@ -735,7 +735,7 @@ impl StorageImpl for StorageMySQL {
             .map(|_| ())
     }
 
-    fn delete_minion(&self, id: String) -> Result<(), String> {
+    fn delete_minion(&self, id: &str) -> Result<(), String> {
         let mut connection = self.create_connection()?;
         diesel::delete(minions::table.find(id))
             .execute(&mut connection)

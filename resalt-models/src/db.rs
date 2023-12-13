@@ -340,9 +340,9 @@ impl Minion {
         minion
     }
 
-    pub fn default_with_id(id: String) -> Self {
+    pub fn default_with_id(id: &str) -> Self {
         Self {
-            id,
+            id: id.to_owned(),
             ..Default::default()
         }
     }
