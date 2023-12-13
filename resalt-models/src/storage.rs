@@ -12,7 +12,16 @@ pub trait StorageImpl: Send + Sync {
 
     fn get_status(&self) -> Result<StorageStatus, String>;
 
-    #[allow(clippy::too_many_arguments)]
+    /// Create a new user.
+    ///
+    /// If `id` is `None`, a new UUID will be generated according to the format `usr_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`.
+    /// If `password` is `None`, the account will be created without a password. THE PASSWORD MUST BE HASHED BEFORE CALLING THIS FUNCTION.
+    /// If `last_login` is `None`, the account will be created without a last login time.
+    /// If `email` is `None`, the account will be created without an email address.
+    ///
+    /// Username MUST be unique.
+    /// Perms SHOULD be a valid JSON string, however this is not enforced by the database layer.
+    /// Email SHOULD be a valid email address, however this is not enforced by the database layer.
     fn create_user_hashed(
         &self,
         id: Option<String>,
@@ -189,4 +198,71 @@ pub struct StorageStatus {
     pub permission_group_users_total: i64,
     pub permission_groups_total: i64,
     pub users_total: i64,
+}
+
+//
+// Test cases
+//
+
+pub fn test_storage_impl_users(data: &dyn StorageImpl) {
+    // Check DB is empty
+    let total = data.list_users(Paginate::None).unwrap();
+    assert_eq!(total.len(), 0);
+
+    // Create user
+    let user = data
+        .create_user_hashed(
+            None,
+            "testuser".to_string(),
+            Some("testpass".to_string()),
+            "testperms".to_string(),
+            None,
+            None,
+        )
+        .unwrap();
+    assert_eq!(user.id.len(), 40);
+    assert_eq!(user.username, "testuser");
+    assert_eq!(user.password, Some("testpass".to_string()));
+    assert_eq!(user.perms, "testperms");
+    assert_eq!(user.last_login, None);
+    assert_eq!(user.email, None);
+
+    // Check DB has one user
+    let total = data.list_users(Paginate::None).unwrap();
+    assert_eq!(total.len(), 1);
+
+    // Get user by id
+    let user = data.get_user_by_id(&user.id).unwrap().unwrap();
+    assert_eq!(user.id.len(), 40);
+    assert_eq!(user.username, "testuser");
+    assert_eq!(user.password, Some("testpass".to_string()));
+    assert_eq!(user.perms, "testperms");
+    assert_eq!(user.last_login, None);
+    assert_eq!(user.email, None);
+
+    // Get user by username
+    let user = data.get_user_by_username(&user.username).unwrap().unwrap();
+    assert_eq!(user.id.len(), 40);
+    assert_eq!(user.username, "testuser");
+    assert_eq!(user.password, Some("testpass".to_string()));
+    assert_eq!(user.perms, "testperms");
+
+    // Update user
+    let mut user = data.get_user_by_id(&user.id).unwrap().unwrap();
+    user.username = "testuser2".to_string();
+
+    data.update_user(&user).unwrap();
+
+    let user = data.get_user_by_id(&user.id).unwrap().unwrap();
+    assert_eq!(user.id.len(), 40);
+    assert_eq!(user.username, "testuser2");
+    assert_eq!(user.password, Some("testpass".to_string()));
+    assert_eq!(user.perms, "testperms");
+
+    // Delete user
+    data.delete_user(&user.id).unwrap();
+
+    // Check DB is empty
+    let total = data.list_users(Paginate::None).unwrap();
+    assert_eq!(total.len(), 0);
 }

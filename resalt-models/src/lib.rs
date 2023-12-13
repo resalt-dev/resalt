@@ -1,10 +1,10 @@
-mod db;
-mod filter;
-mod salt;
-mod sort;
-mod status;
-mod storage;
-mod time;
+pub mod db;
+pub mod filter;
+pub mod salt;
+pub mod sort;
+pub mod status;
+pub mod storage;
+pub mod time;
 
 use std::{fmt, str::FromStr};
 
@@ -13,11 +13,35 @@ pub use filter::*;
 pub use salt::*;
 pub use sort::*;
 pub use status::*;
-pub use storage::*;
+pub use storage::{StorageImpl, StorageStatus};
 pub use time::*;
 
 use serde::{Deserialize, Deserializer};
 
+/// Strip quotes from a string if it starts and ends with the same type of quote.
+///
+/// ```rust
+/// use resalt_models::strip_quotes;
+///
+/// strip_quotes("test"); // => test
+/// strip_quotes("\"test\""); // => test
+/// strip_quotes("'test'"); // => test
+/// strip_quotes("te\"st"); // => te"st
+/// ```
+///
+/// This is useful for parsing command-line strings and Environment variables which may or may not be quoted.
+///
+/// ```rust
+/// use resalt_models::strip_quotes;
+///
+/// // TEST="test"
+///
+/// let s = std::env::var("TEST").unwrap_or("\"test\"".to_string());
+/// assert_eq!(s, "\"test\"");
+///
+/// let s = strip_quotes(s);
+/// assert_eq!(s, "test");
+/// ```
 pub fn strip_quotes<S: AsRef<str>>(s: S) -> String {
     let s = s.as_ref();
     #[allow(clippy::if_same_then_else)]
@@ -46,7 +70,6 @@ where
     }
 }
 
-/// empty_i64_as_none
 /// Serde deserialization decorator to map empty Strings to None, otherwise parse as i64.
 pub fn empty_i64_as_none<'de, D>(de: D) -> Result<Option<i64>, D::Error>
 where
