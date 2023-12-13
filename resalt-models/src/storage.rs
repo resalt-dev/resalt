@@ -314,8 +314,5 @@ pub fn test_storage_impl_authtoken(data: &dyn StorageImpl) {
     let authtoken = data.get_authtoken_by_id(&authtoken.id).unwrap().unwrap();
     assert_eq!(authtoken.id.len(), 41);
     assert_eq!(authtoken.user_id, user.id);
-    assert_eq!(
-        authtoken.salt_token,
-        Some(serde_json::to_string(&salttoken).unwrap())
-    );
+    assert_eq!(authtoken.salt_token.unwrap(), salttoken);
 }

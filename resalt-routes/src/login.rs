@@ -5,7 +5,6 @@ use resalt_models::*;
 use resalt_salt::SaltAPI;
 use resalt_security::verify_password;
 use resalt_storage::Storage;
-use serde_json::from_str;
 
 pub async fn renew_token_salt_token(
     data: &Storage,
@@ -90,16 +89,7 @@ pub fn validate_auth_token(data: &Storage, token: &str) -> Result<Option<AuthSta
         user_id: authtoken.user_id,
         perms: user.perms,
         auth_token: authtoken.id,
-        salt_token: match authtoken.salt_token {
-            Some(v) => match from_str::<SaltToken>(&v) {
-                Ok(v) => Some(v),
-                Err(e) => {
-                    error!("Failed parsing authtoken.salt_token {:?}", e);
-                    return Err(StatusCode::INTERNAL_SERVER_ERROR);
-                }
-            },
-            None => None,
-        },
+        salt_token: authtoken.salt_token,
     }))
 }
 

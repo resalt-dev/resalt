@@ -25,7 +25,9 @@ impl From<AuthToken> for SQLAuthToken {
             id: auth_token.id,
             user_id: auth_token.user_id,
             timestamp: auth_token.timestamp.into(),
-            salt_token: auth_token.salt_token,
+            salt_token: auth_token
+                .salt_token
+                .map(|st| serde_json::to_string(&st).unwrap()),
         }
     }
 }
@@ -36,7 +38,9 @@ impl From<SQLAuthToken> for AuthToken {
             id: sql_auth_token.id,
             user_id: sql_auth_token.user_id,
             timestamp: sql_auth_token.timestamp.into(),
-            salt_token: sql_auth_token.salt_token,
+            salt_token: sql_auth_token
+                .salt_token
+                .map(|st| serde_json::from_str(&st).unwrap()),
         }
     }
 }

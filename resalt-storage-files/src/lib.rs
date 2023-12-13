@@ -318,8 +318,6 @@ impl StorageImpl for StorageFiles {
         auth_token: &str,
         salt_token: Option<&SaltToken>,
     ) -> Result<(), String> {
-        let salt_token_str = salt_token.map(|st| serde_json::to_string(st).unwrap());
-
         // Check authntoken
         let mut authtoken = match self.get_authtoken_by_id(auth_token)? {
             Some(authtoken) => authtoken,
@@ -327,7 +325,7 @@ impl StorageImpl for StorageFiles {
         };
 
         // Update authtoken with salt_token
-        authtoken.salt_token = salt_token_str;
+        authtoken.salt_token = salt_token.cloned();
         let path = format!("authtokens/{}", auth_token);
         self.save_file(&path, &authtoken)?;
 

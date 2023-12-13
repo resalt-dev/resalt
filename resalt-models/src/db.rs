@@ -1,4 +1,4 @@
-use crate::ResaltTime;
+use crate::{ResaltTime, SaltToken};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
@@ -8,13 +8,12 @@ use serde_json::{json, Value};
 =========================
 */
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct AuthToken {
     pub id: String,
     pub user_id: String,
     pub timestamp: ResaltTime,
-    /// JSON-encoded string of the salt token
-    pub salt_token: Option<String>, // TODO: Convert to Option<SaltToken>
+    pub salt_token: Option<SaltToken>,
 }
 
 impl AuthToken {
@@ -27,7 +26,7 @@ impl AuthToken {
             ),
         ]);
         if let Some(salt_token) = &self.salt_token {
-            values.push(("salt_token", salt_token.clone()));
+            values.push(("salt_token", serde_json::to_string(salt_token).unwrap()));
         }
         values
     }
@@ -46,7 +45,7 @@ impl AuthToken {
                     auth_token.timestamp =
                         ResaltTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap()
                 }
-                "salt_token" => auth_token.salt_token = Some(value),
+                "salt_token" => auth_token.salt_token = Some(serde_json::from_str(&value).unwrap()),
                 _ => (),
             }
         }
