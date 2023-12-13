@@ -305,14 +305,12 @@ impl StorageImpl for StorageFiles {
 
     fn get_authtoken_by_id(&self, id: &str) -> Result<Option<AuthToken>, String> {
         // If authtoken doesn't exist, return None
-        let exists = self.check_file_exists(&format!("authtokens/{}", id))?;
-        if !exists {
-            return Ok(None);
-        }
-
-        let authtoken: AuthToken = self.load_file(&format!("authtokens/{}", id))?;
-
-        Ok(Some(authtoken))
+        Ok(
+            match self.check_file_exists(&format!("authtokens/{}", id))? {
+                true => Some(self.load_file::<AuthToken>(&format!("authtokens/{}", id))?),
+                false => None,
+            },
+        )
     }
 
     fn update_authtoken_salttoken(
@@ -890,17 +888,19 @@ impl StorageImpl for StorageFiles {
 
 #[cfg(test)]
 mod tests {
-    use resalt_models::storage::test_storage_impl_users;
+    use resalt_models::storage::{test_storage_impl_authtoken, test_storage_impl_users};
 
     use crate::StorageFiles;
 
     fn get_temp_storage() -> (StorageFiles, String) {
         let random_path_under_tmp = std::env::temp_dir()
-            .join(uuid::Uuid::new_v4().to_string())
+            .join(format!(
+                "resalt-files-test-{}",
+                uuid::Uuid::new_v4().to_string()
+            ))
             .to_str()
             .unwrap()
             .to_string();
-        println!("random_path_under_tmp: {:?}", random_path_under_tmp);
 
         (
             StorageFiles::connect(&random_path_under_tmp).unwrap(),
@@ -916,6 +916,13 @@ mod tests {
     fn test_users() {
         let data = get_temp_storage();
         test_storage_impl_users(&data.0);
+        cleanup_temp_storage(&data.1);
+    }
+
+    #[test]
+    fn test_authtokens() {
+        let data = get_temp_storage();
+        test_storage_impl_authtoken(&data.0);
         cleanup_temp_storage(&data.1);
     }
 }

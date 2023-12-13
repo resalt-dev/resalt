@@ -42,6 +42,9 @@ pub trait StorageImpl: Send + Sync {
 
     fn delete_user(&self, id: &str) -> Result<(), String>;
 
+    /// Create a new auth token.
+    ///
+    /// If user does not exist, this function will return an error.
     fn create_authtoken(&self, user_id: String) -> Result<AuthToken, String>;
 
     fn get_authtoken_by_id(&self, id: &str) -> Result<Option<AuthToken>, String>;
@@ -220,6 +223,7 @@ pub fn test_storage_impl_users(data: &dyn StorageImpl) {
             None,
         )
         .unwrap();
+    assert!(user.id.starts_with("usr_"));
     assert_eq!(user.id.len(), 40);
     assert_eq!(user.username, "testuser");
     assert_eq!(user.password, Some("testpass".to_string()));
@@ -265,4 +269,53 @@ pub fn test_storage_impl_users(data: &dyn StorageImpl) {
     // Check DB is empty
     let total = data.list_users(Paginate::None).unwrap();
     assert_eq!(total.len(), 0);
+}
+
+pub fn test_storage_impl_authtoken(data: &dyn StorageImpl) {
+    // Create User
+    let user = data
+        .create_user_hashed(
+            None,
+            "testuser".to_string(),
+            Some("testpass".to_string()),
+            "testperms".to_string(),
+            None,
+            None,
+        )
+        .unwrap();
+    data.update_user(&user).unwrap();
+
+    // Create Authtoken
+    let authtoken = data.create_authtoken(user.id.clone()).unwrap();
+    assert!(authtoken.id.starts_with("auth_"));
+    assert_eq!(authtoken.id.len(), 41);
+    assert_eq!(authtoken.user_id, user.id);
+    assert_eq!(authtoken.salt_token, None);
+    assert!(authtoken.timestamp.timestamp() > 100000);
+
+    // Get Authtoken by id
+    let authtoken = data.get_authtoken_by_id(&authtoken.id).unwrap().unwrap();
+    assert_eq!(authtoken.id.len(), 41);
+    assert_eq!(authtoken.user_id, user.id);
+    assert_eq!(authtoken.salt_token, None);
+
+    // Update Authtoken
+    let salttoken = SaltToken {
+        token: "testtoken".to_string(),
+        start: 0.0,
+        expire: 99.9,
+        user: "testuser".to_string(),
+        eauth: "unittest".to_string(),
+        perms: serde_json::Value::Array(vec![]),
+    };
+    data.update_authtoken_salttoken(&authtoken.id, Some(&salttoken))
+        .unwrap();
+
+    let authtoken = data.get_authtoken_by_id(&authtoken.id).unwrap().unwrap();
+    assert_eq!(authtoken.id.len(), 41);
+    assert_eq!(authtoken.user_id, user.id);
+    assert_eq!(
+        authtoken.salt_token,
+        Some(serde_json::to_string(&salttoken).unwrap())
+    );
 }

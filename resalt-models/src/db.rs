@@ -13,7 +13,8 @@ pub struct AuthToken {
     pub id: String,
     pub user_id: String,
     pub timestamp: ResaltTime,
-    pub salt_token: Option<String>,
+    /// JSON-encoded string of the salt token
+    pub salt_token: Option<String>, // TODO: Convert to Option<SaltToken>
 }
 
 impl AuthToken {
