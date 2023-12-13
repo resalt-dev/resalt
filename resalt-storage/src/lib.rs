@@ -217,37 +217,54 @@ impl StorageImpl for Storage {
         self.storage.get_minion_by_id(id)
     }
 
-    fn update_minion(
+    fn update_minion(&self, minion: Minion) -> Result<(), String> {
+        self.storage.update_minion(minion)
+    }
+
+    fn update_minion_last_seen(&self, minion_id: String, time: ResaltTime) -> Result<(), String> {
+        self.storage.update_minion_last_seen(minion_id, time)
+    }
+
+    fn update_minion_grains(
         &self,
         minion_id: String,
         time: ResaltTime,
-        grains: Option<String>,
-        pillars: Option<String>,
-        pkgs: Option<String>,
-        conformity: Option<String>,
-        conformity_success: Option<i32>,
-        conformity_incorrect: Option<i32>,
-        conformity_error: Option<i32>,
-        last_updated_grains: Option<ResaltTime>,
-        last_updated_pillars: Option<ResaltTime>,
-        last_updated_pkgs: Option<ResaltTime>,
-        last_updated_conformity: Option<ResaltTime>,
+        grains: String,
+        os_type: String,
     ) -> Result<(), String> {
-        self.storage.update_minion(
-            minion_id,
-            time,
-            grains,
-            pillars,
-            pkgs,
-            conformity,
-            conformity_success,
-            conformity_incorrect,
-            conformity_error,
-            last_updated_grains,
-            last_updated_pillars,
-            last_updated_pkgs,
-            last_updated_conformity,
-        )
+        self.storage
+            .update_minion_grains(minion_id, time, grains, os_type)
+    }
+
+    fn update_minion_pillars(
+        &self,
+        minion_id: String,
+        time: ResaltTime,
+        pillars: String,
+    ) -> Result<(), String> {
+        self.storage.update_minion_pillars(minion_id, time, pillars)
+    }
+
+    fn update_minion_pkgs(
+        &self,
+        minion_id: String,
+        time: ResaltTime,
+        pkgs: String,
+    ) -> Result<(), String> {
+        self.storage.update_minion_pkgs(minion_id, time, pkgs)
+    }
+
+    fn update_minion_conformity(
+        &self,
+        minion_id: String,
+        time: ResaltTime,
+        conformity: String,
+        success: i32,
+        incorrect: i32,
+        error: i32,
+    ) -> Result<(), String> {
+        self.storage
+            .update_minion_conformity(minion_id, time, conformity, success, incorrect, error)
     }
 
     fn delete_minion(&self, id: String) -> Result<(), String> {

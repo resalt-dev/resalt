@@ -52,98 +52,31 @@ pub trait StorageImpl: Send + Sync {
 
     fn get_minion_by_id(&self, id: &str) -> Result<Option<Minion>, String>;
 
-    #[allow(clippy::too_many_arguments)]
-    fn update_minion(
-        &self,
-        minion_id: String,
-        time: ResaltTime,
-        grains: Option<String>,
-        pillars: Option<String>,
-        pkgs: Option<String>,
-        conformity: Option<String>,
-        conformity_success: Option<i32>,
-        conformity_incorrect: Option<i32>,
-        conformity_error: Option<i32>,
-        last_updated_grains: Option<ResaltTime>,
-        last_updated_pillars: Option<ResaltTime>,
-        last_updated_pkgs: Option<ResaltTime>,
-        last_updated_conformity: Option<ResaltTime>,
-    ) -> Result<(), String>;
+    fn update_minion(&self, minion: Minion) -> Result<(), String>;
 
-    fn update_minion_last_seen(&self, minion_id: String, time: ResaltTime) -> Result<(), String> {
-        self.update_minion(
-            minion_id, time, None, None, None, None, None, None, None, None, None, None, None,
-        )
-    }
+    fn update_minion_last_seen(&self, minion_id: String, time: ResaltTime) -> Result<(), String>;
 
     fn update_minion_grains(
         &self,
         minion_id: String,
         time: ResaltTime,
         grains: String,
-    ) -> Result<(), String> {
-        self.update_minion(
-            minion_id,
-            time,
-            Some(grains),
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-        )
-    }
+        os_type: String,
+    ) -> Result<(), String>;
 
     fn update_minion_pillars(
         &self,
         minion_id: String,
         time: ResaltTime,
         pillars: String,
-    ) -> Result<(), String> {
-        self.update_minion(
-            minion_id,
-            time,
-            None,
-            Some(pillars),
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-        )
-    }
+    ) -> Result<(), String>;
 
     fn update_minion_pkgs(
         &self,
         minion_id: String,
         time: ResaltTime,
         pkgs: String,
-    ) -> Result<(), String> {
-        self.update_minion(
-            minion_id,
-            time,
-            None,
-            None,
-            Some(pkgs),
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-        )
-    }
+    ) -> Result<(), String>;
 
     fn update_minion_conformity(
         &self,
@@ -153,23 +86,7 @@ pub trait StorageImpl: Send + Sync {
         success: i32,
         incorrect: i32,
         error: i32,
-    ) -> Result<(), String> {
-        self.update_minion(
-            minion_id,
-            time,
-            None,
-            None,
-            None,
-            Some(conformity),
-            Some(success),
-            Some(incorrect),
-            Some(error),
-            None,
-            None,
-            None,
-            None,
-        )
-    }
+    ) -> Result<(), String>;
 
     fn delete_minion(&self, id: String) -> Result<(), String>;
 

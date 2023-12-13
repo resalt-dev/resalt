@@ -110,21 +110,7 @@ pub fn import_backup(data: &Storage, config: &DataDump) -> Result<(), StatusCode
 
     // Import minions
     for minion in &config.minions {
-        match data.update_minion(
-            minion.id.clone(),
-            minion.last_seen,
-            minion.grains.clone(),
-            minion.pillars.clone(),
-            minion.pkgs.clone(),
-            minion.conformity.clone(),
-            minion.conformity_success,
-            minion.conformity_incorrect,
-            minion.conformity_error,
-            minion.last_updated_grains,
-            minion.last_updated_pillars,
-            minion.last_updated_pkgs,
-            minion.last_updated_conformity,
-        ) {
+        match data.update_minion(minion.clone()) {
             Ok(_) => {}
             Err(e) => {
                 error!("route_settings_import_post update_minion {:?}", e);

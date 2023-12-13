@@ -217,10 +217,24 @@ impl SaltEventListener {
                                 continue;
                             }
                         };
-                        let grains = match data.get("return") {
+                        let (grains, os_type) = match data.get("return") {
                             Some(grains) => match grains.as_object() {
                                 Some(grains) => match serde_json::to_string(grains) {
-                                    Ok(grains) => grains,
+                                    Ok(grains_str) => {
+                                        // Parse grains as JSON, and fetch osfullname+osrelease as os_type.
+                                        let osfullname = grains
+                                            .get("osfullname")
+                                            .map(|s| s.as_str().unwrap_or("Unknown"))
+                                            .unwrap_or("Unknown");
+                                        let osrelease = grains
+                                            .get("osrelease")
+                                            .map(|s| s.as_str().unwrap_or(""))
+                                            .unwrap_or("");
+                                        let os_type = format!("{} {}", osfullname, osrelease)
+                                            .trim()
+                                            .to_string();
+                                        (grains_str, os_type)
+                                    }
                                     Err(err) => {
                                         error!("Failed to serialize grains: {:?}", err);
                                         continue;
@@ -236,10 +250,12 @@ impl SaltEventListener {
                                 continue;
                             }
                         };
-                        match self
-                            .storage
-                            .update_minion_grains(minion_id.clone(), time, grains)
-                        {
+                        match self.storage.update_minion_grains(
+                            minion_id.clone(),
+                            time,
+                            grains,
+                            os_type,
+                        ) {
                             Ok(_) => {}
                             Err(e) => error!("Failed updating minion grains {:?}", e),
                         }

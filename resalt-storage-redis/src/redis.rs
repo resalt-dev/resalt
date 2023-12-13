@@ -370,71 +370,79 @@ impl StorageImpl for StorageRedis {
         Ok(Some(minion))
     }
 
-    fn update_minion(
-        &self,
-        minion_id: String,
-        time: ResaltTime,
-        grains: Option<String>,
-        pillars: Option<String>,
-        pkgs: Option<String>,
-        conformity: Option<String>,
-        conformity_success: Option<i32>,
-        conformity_incorrect: Option<i32>,
-        conformity_error: Option<i32>,
-        last_updated_grains: Option<ResaltTime>,
-        last_updated_pillars: Option<ResaltTime>,
-        last_updated_pkgs: Option<ResaltTime>,
-        last_updated_conformity: Option<ResaltTime>,
-    ) -> Result<(), String> {
+    fn update_minion(&self, minion: Minion) -> Result<(), String> {
         let mut connection = self.create_connection()?;
-
-        let last_updated_grains = grains.as_ref().map(|_| last_updated_grains.unwrap_or(time));
-        let last_updated_pillars = pillars
-            .as_ref()
-            .map(|_| last_updated_pillars.unwrap_or(time));
-        let last_updated_pkgs = pkgs.as_ref().map(|_| last_updated_pkgs.unwrap_or(time));
-        let last_updated_conformity = conformity
-            .as_ref()
-            .map(|_| last_updated_conformity.unwrap_or(time));
-
-        // Parse grains as JSON, and fetch osfullname+osrelease as os_type.
-        let parsed_grains = grains
-            .as_ref()
-            .map(|grains| serde_json::from_str::<serde_json::Value>(grains).unwrap());
-        let os_type = match parsed_grains {
-            Some(grains) => {
-                let osfullname = grains["osfullname"].as_str().unwrap_or("Unknown");
-                let osrelease = grains["osrelease"].as_str().unwrap_or("");
-                Some(format!("{} {}", osfullname, osrelease).trim().to_string())
-            }
-            None => None,
-        };
-
-        let minion = Minion {
-            id: minion_id.clone(),
-            last_seen: time,
-            grains,
-            pillars,
-            pkgs,
-            last_updated_grains,
-            last_updated_pillars,
-            last_updated_pkgs,
-            conformity,
-            conformity_success,
-            conformity_incorrect,
-            conformity_error,
-            last_updated_conformity,
-            os_type,
-        };
 
         let values = minion.hash();
 
         // Update if it exists, insert if it doesn't
         connection
-            .hset_multiple(format!("minion:{}", minion_id), values.as_slice())
+            .hset_multiple(format!("minion:{}", minion.id), values.as_slice())
             .map_err(|e| format!("{:?}", e))?;
 
         Ok(())
+    }
+
+    fn update_minion_last_seen(&self, minion_id: String, time: ResaltTime) -> Result<(), String> {
+        let mut minion = self.get_minion_by_id(&minion_id)?.unwrap();
+        minion.last_seen = time;
+        self.update_minion(minion)
+    }
+
+    fn update_minion_grains(
+        &self,
+        minion_id: String,
+        time: ResaltTime,
+        grains: String,
+        os_type: String,
+    ) -> Result<(), String> {
+        let mut minion = self.get_minion_by_id(&minion_id)?.unwrap();
+        minion.last_updated_grains = Some(time);
+        minion.grains = Some(grains);
+        minion.os_type = Some(os_type);
+        self.update_minion(minion)
+    }
+
+    fn update_minion_pillars(
+        &self,
+        minion_id: String,
+        time: ResaltTime,
+        pillars: String,
+    ) -> Result<(), String> {
+        let mut minion = self.get_minion_by_id(&minion_id)?.unwrap();
+        minion.last_updated_pillars = Some(time);
+        minion.pillars = Some(pillars);
+        self.update_minion(minion)
+    }
+
+    fn update_minion_pkgs(
+        &self,
+        minion_id: String,
+        time: ResaltTime,
+        pkgs: String,
+    ) -> Result<(), String> {
+        let mut minion = self.get_minion_by_id(&minion_id)?.unwrap();
+        minion.last_updated_pkgs = Some(time);
+        minion.pkgs = Some(pkgs);
+        self.update_minion(minion)
+    }
+
+    fn update_minion_conformity(
+        &self,
+        minion_id: String,
+        time: ResaltTime,
+        conformity: String,
+        success: i32,
+        incorrect: i32,
+        error: i32,
+    ) -> Result<(), String> {
+        let mut minion = self.get_minion_by_id(&minion_id)?.unwrap();
+        minion.last_updated_conformity = Some(time);
+        minion.conformity = Some(conformity);
+        minion.conformity_success = Some(success);
+        minion.conformity_incorrect = Some(incorrect);
+        minion.conformity_error = Some(error);
+        self.update_minion(minion)
     }
 
     // Delete minion

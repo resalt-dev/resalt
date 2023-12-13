@@ -602,68 +602,15 @@ impl StorageImpl for StorageMySQL {
             .map(|sql_minion| sql_minion.map(|sql_minion| sql_minion.into()))
     }
 
-    fn update_minion(
-        &self,
-        minion_id: String,
-        time: ResaltTime,
-        grains: Option<String>,
-        pillars: Option<String>,
-        pkgs: Option<String>,
-        conformity: Option<String>,
-        conformity_success: Option<i32>,
-        conformity_incorrect: Option<i32>,
-        conformity_error: Option<i32>,
-        last_updated_grains: Option<ResaltTime>,
-        last_updated_pillars: Option<ResaltTime>,
-        last_updated_pkgs: Option<ResaltTime>,
-        last_updated_conformity: Option<ResaltTime>,
-    ) -> Result<(), String> {
+    fn update_minion(&self, minion: Minion) -> Result<(), String> {
         let mut connection = self.create_connection()?;
 
-        let last_updated_grains = grains.as_ref().map(|_| last_updated_grains.unwrap_or(time));
-        let last_updated_pillars = pillars
-            .as_ref()
-            .map(|_| last_updated_pillars.unwrap_or(time));
-        let last_updated_pkgs = pkgs.as_ref().map(|_| last_updated_pkgs.unwrap_or(time));
-        let last_updated_conformity = conformity
-            .as_ref()
-            .map(|_| last_updated_conformity.unwrap_or(time));
-
-        // Parse grains as JSON, and fetch osfullname+osrelease as os_type.
-        let parsed_grains = grains
-            .as_ref()
-            .map(|grains| serde_json::from_str::<serde_json::Value>(grains).unwrap());
-        let os_type = match parsed_grains {
-            Some(grains) => {
-                let osfullname = grains["osfullname"].as_str().unwrap_or("Unknown");
-                let osrelease = grains["osrelease"].as_str().unwrap_or("");
-                Some(format!("{} {}", osfullname, osrelease).trim().to_string())
-            }
-            None => None,
-        };
-
-        let changeset: SQLMinion = Minion {
-            id: minion_id.clone(),
-            last_seen: time,
-            grains,
-            pillars,
-            pkgs,
-            last_updated_grains,
-            last_updated_pillars,
-            last_updated_pkgs,
-            conformity,
-            conformity_success,
-            conformity_incorrect,
-            conformity_error,
-            last_updated_conformity,
-            os_type,
-        }
-        .into();
+        let changeset: SQLMinion = minion.into();
 
         // Update if it exists, insert if it doesn't
 
         let result = diesel::update(minions::table)
-            .filter(minions::id.eq(&minion_id))
+            .filter(minions::id.eq(&changeset.id))
             .set(&changeset)
             .execute(&mut connection)
             .map_err(|e| format!("{:?}", e))?;
@@ -682,7 +629,7 @@ impl StorageImpl for StorageMySQL {
                         ) => {
                             // Maybe it was inserted between we checked, so lets try update with our info again
                             diesel::update(minions::table)
-                                .filter(minions::id.eq(minion_id))
+                                .filter(minions::id.eq(&changeset.id))
                                 .set(&changeset)
                                 .execute(&mut connection)
                                 .map_err(|e| format!("{:?}", e))?;
@@ -694,6 +641,98 @@ impl StorageImpl for StorageMySQL {
         }
 
         Ok(())
+    }
+
+    fn update_minion_last_seen(&self, minion_id: String, time: ResaltTime) -> Result<(), String> {
+        let mut connection = self.create_connection()?;
+        let time: NaiveDateTime = time.into();
+        diesel::update(minions::table)
+            .filter(minions::id.eq(minion_id))
+            .set(minions::last_seen.eq(time))
+            .execute(&mut connection)
+            .map_err(|e| format!("{:?}", e))
+            .map(|_| ())
+    }
+
+    fn update_minion_grains(
+        &self,
+        minion_id: String,
+        time: ResaltTime,
+        grains: String,
+        os_type: String,
+    ) -> Result<(), String> {
+        let mut connection = self.create_connection()?;
+        let time: NaiveDateTime = time.into();
+        diesel::update(minions::table)
+            .filter(minions::id.eq(minion_id))
+            .set((
+                minions::last_updated_grains.eq(time),
+                minions::grains.eq(grains),
+                minions::os_type.eq(os_type),
+            ))
+            .execute(&mut connection)
+            .map_err(|e| format!("{:?}", e))
+            .map(|_| ())
+    }
+
+    fn update_minion_pillars(
+        &self,
+        minion_id: String,
+        time: ResaltTime,
+        pillars: String,
+    ) -> Result<(), String> {
+        let mut connection = self.create_connection()?;
+        let time: NaiveDateTime = time.into();
+        diesel::update(minions::table)
+            .filter(minions::id.eq(minion_id))
+            .set((
+                minions::last_updated_pillars.eq(time),
+                minions::pillars.eq(pillars),
+            ))
+            .execute(&mut connection)
+            .map_err(|e| format!("{:?}", e))
+            .map(|_| ())
+    }
+
+    fn update_minion_pkgs(
+        &self,
+        minion_id: String,
+        time: ResaltTime,
+        pkgs: String,
+    ) -> Result<(), String> {
+        let mut connection = self.create_connection()?;
+        let time: NaiveDateTime = time.into();
+        diesel::update(minions::table)
+            .filter(minions::id.eq(minion_id))
+            .set((minions::last_updated_pkgs.eq(time), minions::pkgs.eq(pkgs)))
+            .execute(&mut connection)
+            .map_err(|e| format!("{:?}", e))
+            .map(|_| ())
+    }
+
+    fn update_minion_conformity(
+        &self,
+        minion_id: String,
+        time: ResaltTime,
+        conformity: String,
+        success: i32,
+        incorrect: i32,
+        error: i32,
+    ) -> Result<(), String> {
+        let mut connection = self.create_connection()?;
+        let time: NaiveDateTime = time.into();
+        diesel::update(minions::table)
+            .filter(minions::id.eq(minion_id))
+            .set((
+                minions::last_updated_conformity.eq(time),
+                minions::conformity.eq(conformity),
+                minions::conformity_success.eq(success),
+                minions::conformity_incorrect.eq(incorrect),
+                minions::conformity_error.eq(error),
+            ))
+            .execute(&mut connection)
+            .map_err(|e| format!("{:?}", e))
+            .map(|_| ())
     }
 
     fn delete_minion(&self, id: String) -> Result<(), String> {
