@@ -384,7 +384,7 @@ impl StorageImpl for StorageRedis {
     }
 
     fn upsert_minion_last_seen(&self, minion_id: &str, time: ResaltTime) -> Result<(), String> {
-        let mut minion = match self.get_minion_by_id(&minion_id)? {
+        let mut minion = match self.get_minion_by_id(minion_id)? {
             Some(minion) => minion,
             None => Minion::default_with_id(minion_id),
         };
@@ -399,7 +399,7 @@ impl StorageImpl for StorageRedis {
         grains: String,
         os_type: String,
     ) -> Result<(), String> {
-        let mut minion = match self.get_minion_by_id(&minion_id)? {
+        let mut minion = match self.get_minion_by_id(minion_id)? {
             Some(minion) => minion,
             None => Minion::default_with_id(minion_id),
         };
@@ -415,7 +415,7 @@ impl StorageImpl for StorageRedis {
         time: ResaltTime,
         pillars: String,
     ) -> Result<(), String> {
-        let mut minion = match self.get_minion_by_id(&minion_id)? {
+        let mut minion = match self.get_minion_by_id(minion_id)? {
             Some(minion) => minion,
             None => Minion::default_with_id(minion_id),
         };
@@ -430,7 +430,7 @@ impl StorageImpl for StorageRedis {
         time: ResaltTime,
         pkgs: String,
     ) -> Result<(), String> {
-        let mut minion = match self.get_minion_by_id(&minion_id)? {
+        let mut minion = match self.get_minion_by_id(minion_id)? {
             Some(minion) => minion,
             None => Minion::default_with_id(minion_id),
         };
@@ -448,7 +448,7 @@ impl StorageImpl for StorageRedis {
         incorrect: i32,
         error: i32,
     ) -> Result<(), String> {
-        let mut minion = match self.get_minion_by_id(&minion_id)? {
+        let mut minion = match self.get_minion_by_id(minion_id)? {
             Some(minion) => minion,
             None => Minion::default_with_id(minion_id),
         };

@@ -411,7 +411,7 @@ impl StorageImpl for StorageFiles {
     }
 
     fn upsert_minion_last_seen(&self, minion_id: &str, time: ResaltTime) -> Result<(), String> {
-        let mut minion = match self.get_minion_by_id(&minion_id)? {
+        let mut minion = match self.get_minion_by_id(minion_id)? {
             Some(minion) => minion,
             None => Minion::default_with_id(minion_id),
         };
@@ -428,7 +428,7 @@ impl StorageImpl for StorageFiles {
         grains: String,
         os_type: String,
     ) -> Result<(), String> {
-        let mut minion = match self.get_minion_by_id(&minion_id)? {
+        let mut minion = match self.get_minion_by_id(minion_id)? {
             Some(minion) => minion,
             None => Minion::default_with_id(minion_id),
         };
@@ -446,7 +446,7 @@ impl StorageImpl for StorageFiles {
         time: ResaltTime,
         pillars: String,
     ) -> Result<(), String> {
-        let mut minion = match self.get_minion_by_id(&minion_id)? {
+        let mut minion = match self.get_minion_by_id(minion_id)? {
             Some(minion) => minion,
             None => Minion::default_with_id(minion_id),
         };
@@ -463,7 +463,7 @@ impl StorageImpl for StorageFiles {
         time: ResaltTime,
         pkgs: String,
     ) -> Result<(), String> {
-        let mut minion = match self.get_minion_by_id(&minion_id)? {
+        let mut minion = match self.get_minion_by_id(minion_id)? {
             Some(minion) => minion,
             None => Minion::default_with_id(minion_id),
         };
@@ -483,7 +483,7 @@ impl StorageImpl for StorageFiles {
         incorrect: i32,
         error: i32,
     ) -> Result<(), String> {
-        let mut minion = match self.get_minion_by_id(&minion_id)? {
+        let mut minion = match self.get_minion_by_id(minion_id)? {
             Some(minion) => minion,
             None => Minion::default_with_id(minion_id),
         };
@@ -894,10 +894,7 @@ mod tests {
 
     fn get_temp_storage() -> (StorageFiles, String) {
         let random_path_under_tmp = std::env::temp_dir()
-            .join(format!(
-                "resalt-files-test-{}",
-                uuid::Uuid::new_v4().to_string()
-            ))
+            .join(format!("resalt-files-test-{}", uuid::Uuid::new_v4()))
             .to_str()
             .unwrap()
             .to_string();
