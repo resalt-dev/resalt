@@ -187,7 +187,7 @@ impl Serialize for SaltRunJob {
                 map.serialize_entry("tgt", tgt)?;
                 map.serialize_entry("fun", fun)?;
                 map.serialize_entry("arg", &arg.clone().unwrap_or_default())?;
-                map.serialize_entry("tgt_type", &tgt_type.clone().unwrap_or_default())?;
+                map.serialize_entry("tgt_type", &tgt_type.unwrap_or_default())?;
                 map.serialize_entry("kwarg", &kwarg.clone().unwrap_or_default())?;
             }
             SaltRunJob::LocalAsync {
@@ -201,7 +201,7 @@ impl Serialize for SaltRunJob {
                 map.serialize_entry("tgt", tgt)?;
                 map.serialize_entry("fun", fun)?;
                 map.serialize_entry("arg", &arg.clone().unwrap_or_default())?;
-                map.serialize_entry("tgt_type", &tgt_type.clone().unwrap_or_default())?;
+                map.serialize_entry("tgt_type", &tgt_type.unwrap_or_default())?;
                 map.serialize_entry("kwarg", &kwarg.clone().unwrap_or_default())?;
             }
             SaltRunJob::LocalBatch {
@@ -216,7 +216,7 @@ impl Serialize for SaltRunJob {
                 map.serialize_entry("tgt", tgt)?;
                 map.serialize_entry("fun", fun)?;
                 map.serialize_entry("arg", &arg.clone().unwrap_or_default())?;
-                map.serialize_entry("tgt_type", &tgt_type.clone().unwrap_or_default())?;
+                map.serialize_entry("tgt_type", &tgt_type.unwrap_or_default())?;
                 map.serialize_entry("kwarg", &kwarg.clone().unwrap_or_default())?;
                 map.serialize_entry("batch_size", batch_size)?;
             }
