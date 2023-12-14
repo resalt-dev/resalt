@@ -27,7 +27,13 @@ impl ResaltTime {
 
     #[inline]
     pub fn parse_from_rfc3339(s: &str) -> Result<ResaltTime, ParseError> {
-        match DateTime::parse_from_rfc3339(s) {
+        // Append Z if missing
+        let s = if s.ends_with('Z') {
+            s.to_string()
+        } else {
+            format!("{}Z", s)
+        };
+        match DateTime::parse_from_rfc3339(&s) {
             Ok(time) => Ok(ResaltTime { time: time.into() }),
             Err(e) => Err(e),
         }

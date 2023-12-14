@@ -95,7 +95,7 @@ impl SaltEventListener {
                     Some(time) => match ResaltTime::parse_from_rfc3339(time) {
                         Ok(time) => time,
                         Err(err) => {
-                            error!("Failed to parse timestamp: {:?}", err);
+                            error!("Failed to parse timestamp: {:?} {}", err, time);
                             continue;
                         }
                     },
