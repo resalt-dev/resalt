@@ -27,6 +27,10 @@ impl ResaltTime {
 
     #[inline]
     pub fn parse_from_rfc3339(s: &str) -> Result<ResaltTime, ParseError> {
+        // Trim
+        let s = s.trim();
+        // Replace space with T
+        let s = s.replace(' ', "T");
         // Append Z if missing
         let s = if s.ends_with('Z') {
             s.to_string()
@@ -141,8 +145,8 @@ impl Serialize for ResaltTime {
 impl<'de> Deserialize<'de> for ResaltTime {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         let time = String::deserialize(deserializer)?;
-        match DateTime::parse_from_rfc3339(&time) {
-            Ok(time) => Ok(ResaltTime { time: time.into() }),
+        match ResaltTime::parse_from_rfc3339(&time) {
+            Ok(time) => Ok(time),
             Err(_) => Err(serde::de::Error::custom(format!(
                 "Failed to parse time: {}",
                 time
