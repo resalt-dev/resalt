@@ -151,8 +151,7 @@ fn filter_minion(minion: &Minion, filters: &[Filter]) -> bool {
                 "last_seen" => {
                     if !filter_timestamp_logic(
                         minion.last_seen,
-                        ResaltTime::parse_from_str(&filter.value, "%Y-%m-%d %H:%M:%S")
-                            .unwrap_or_default(),
+                        ResaltTime::parse_from_rfc3339(&filter.value).unwrap_or_default(),
                         &filter.operand,
                     ) {
                         return false;

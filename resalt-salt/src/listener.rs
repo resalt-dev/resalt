@@ -9,8 +9,6 @@ use std::sync::{Arc, Mutex};
 
 pub const RESALT_SALT_SYSTEM_SERVICE_USERNAME: &str = "$superadmin/svc/resalt$";
 
-const TIME_FMT: &str = "%Y-%m-%dT%H:%M:%S.%f";
-
 #[derive(Debug, Clone)]
 pub struct SaltEventListenerStatus {
     pub connected: Arc<Mutex<bool>>,
@@ -94,7 +92,7 @@ impl SaltEventListener {
             // Unpack timestamp
             let time = match data.get("_stamp") {
                 Some(time) => match time.as_str() {
-                    Some(time) => match ResaltTime::parse_from_str(time, TIME_FMT) {
+                    Some(time) => match ResaltTime::parse_from_rfc3339(time) {
                         Ok(time) => time,
                         Err(err) => {
                             error!("Failed to parse timestamp: {:?}", err);

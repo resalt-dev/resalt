@@ -42,8 +42,7 @@ impl AuthToken {
             match key.as_str() {
                 "user_id" => auth_token.user_id = value,
                 "timestamp" => {
-                    auth_token.timestamp =
-                        ResaltTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap()
+                    auth_token.timestamp = ResaltTime::parse_from_rfc3339(&value).unwrap()
                 }
                 "salt_token" => auth_token.salt_token = Some(serde_json::from_str(&value).unwrap()),
                 _ => (),
@@ -83,10 +82,7 @@ impl Event {
         };
         for (key, value) in values {
             match key.as_str() {
-                "timestamp" => {
-                    event.timestamp =
-                        ResaltTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap()
-                }
+                "timestamp" => event.timestamp = ResaltTime::parse_from_rfc3339(&value).unwrap(),
                 "tag" => event.tag = value,
                 "data" => event.data = value,
                 _ => (),
@@ -131,9 +127,7 @@ impl Job {
         };
         for (key, value) in values {
             match key.as_str() {
-                "timestamp" => {
-                    job.timestamp = ResaltTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap()
-                }
+                "timestamp" => job.timestamp = ResaltTime::parse_from_rfc3339(&value).unwrap(),
                 "user" => job.user = Some(value),
                 "event_id" => job.event_id = Some(value),
                 _ => (),
@@ -183,8 +177,7 @@ impl JobReturn {
         for (key, value) in values {
             match key.as_str() {
                 "timestamp" => {
-                    job_return.timestamp =
-                        ResaltTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap()
+                    job_return.timestamp = ResaltTime::parse_from_rfc3339(&value).unwrap()
                 }
                 "jid" => job_return.jid = value,
                 "job_id" => job_return.job_id = value,
@@ -302,24 +295,20 @@ impl Minion {
         };
         for (key, value) in values {
             match key.as_str() {
-                "last_seen" => {
-                    minion.last_seen =
-                        ResaltTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap()
-                }
+                "last_seen" => minion.last_seen = ResaltTime::parse_from_rfc3339(&value).unwrap(),
                 "grains" => minion.grains = Some(value),
                 "pillars" => minion.pillars = Some(value),
                 "pkgs" => minion.pkgs = Some(value),
                 "last_updated_grains" => {
                     minion.last_updated_grains =
-                        Some(ResaltTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap())
+                        Some(ResaltTime::parse_from_rfc3339(&value).unwrap())
                 }
                 "last_updated_pillars" => {
                     minion.last_updated_pillars =
-                        Some(ResaltTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap())
+                        Some(ResaltTime::parse_from_rfc3339(&value).unwrap())
                 }
                 "last_updated_pkgs" => {
-                    minion.last_updated_pkgs =
-                        Some(ResaltTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap())
+                    minion.last_updated_pkgs = Some(ResaltTime::parse_from_rfc3339(&value).unwrap())
                 }
                 "conformity" => minion.conformity = Some(value),
                 "conformity_success" => {
@@ -331,7 +320,7 @@ impl Minion {
                 "conformity_error" => minion.conformity_error = Some(value.parse::<i32>().unwrap()),
                 "last_updated_conformity" => {
                     minion.last_updated_conformity =
-                        Some(ResaltTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap())
+                        Some(ResaltTime::parse_from_rfc3339(&value).unwrap())
                 }
                 "os_type" => minion.os_type = Some(value),
                 _ => (),
@@ -449,8 +438,7 @@ impl User {
                 "password" => user.password = Some(value),
                 "perms" => user.perms = value,
                 "last_login" => {
-                    user.last_login =
-                        Some(ResaltTime::parse_from_str(&value, "%Y-%m-%d %H:%M:%S").unwrap())
+                    user.last_login = Some(ResaltTime::parse_from_rfc3339(&value).unwrap())
                 }
                 "email" => user.email = Some(value),
                 _ => (),
