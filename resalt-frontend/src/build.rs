@@ -36,17 +36,26 @@ fn main() {
     let home = std::env::var("HOME").unwrap();
     let bun_path = format!("{}/.bun/bin/bun", home);
     if !std::path::Path::new(&bun_path).exists() {
+        let ls_home = Command::new("ls")
+            .arg("-la")
+            .arg(&home)
+            .output()
+            .expect("Failed to execute command");
         panic!(
             r#"
             ----------------------------------------
             Bun is not installed. Please install Bun from bun.sh and try again.
 
             HOME: {}
+            Bun path: {}
+            ls -la $HOME: {}
             
             curl -fsSL https://bun.sh/install | bash
             ----------------------------------------
         "#,
-            home
+            home,
+            bun_path,
+            String::from_utf8_lossy(&ls_home.stdout)
         );
     }
 

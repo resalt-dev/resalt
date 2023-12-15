@@ -9,6 +9,8 @@ RUN apt-get update && \
   apt-get install -y -o DPkg::Options::=--force-confold build-essential pkg-config libssl-dev mariadb-client libmariadb-dev default-libmysqlclient-dev
 COPY . .
 RUN curl -fsSL https://bun.sh/install | bash
+# Create fake node link pointing to bun
+RUN ln -s /root/.bun/bin/bun /usr/bin/node
 RUN cargo build --release
 
 
