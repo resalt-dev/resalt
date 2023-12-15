@@ -11,7 +11,7 @@ use std::{
     ops::{Add, Sub},
 };
 
-#[derive(Clone, Copy, Eq, Ord, Default)]
+#[derive(Clone, Copy, Eq, Default)]
 pub struct ResaltTime {
     time: DateTime<Utc>,
 }
@@ -97,18 +97,21 @@ impl PartialEq for ResaltTime {
     fn eq(&self, other: &Self) -> bool {
         self.to_string() == other.to_string()
     }
+}
 
-    fn ne(&self, other: &Self) -> bool {
-        !self.eq(other)
+impl Ord for ResaltTime {
+    #[inline]
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        // Drop too many nanoseconds by converting to string and back
+        let other = ResaltTime::parse_from_rfc3339(&other.to_string()).unwrap();
+        self.time.cmp(&other.time)
     }
 }
 
 impl PartialOrd for ResaltTime {
     #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        // Drop too many nanoseconds by converting to string and back
-        let other = ResaltTime::parse_from_rfc3339(&other.to_string()).unwrap();
-        self.time.partial_cmp(&other.time)
+        Some(self.cmp(other))
     }
 
     #[inline]
