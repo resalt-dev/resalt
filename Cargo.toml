@@ -9,7 +9,7 @@ default-members = [
 ]
 
 [workspace.package]
-version = "0.5.5"
+version = "0.6.0"
 authors = ["Max Faxälv <max@foorack.com>"]
 edition = "2021"
 license = "MIT"
