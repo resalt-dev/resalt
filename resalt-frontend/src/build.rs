@@ -17,10 +17,12 @@ fn run_command(command: &str) {
 
             Command: {}
             Error: {}
+            Output: {}
             ----------------------------------------
         "#,
             command,
-            String::from_utf8_lossy(&output.stderr)
+            String::from_utf8_lossy(&output.stderr),
+            String::from_utf8_lossy(&output.stdout)
         );
     }
 }
