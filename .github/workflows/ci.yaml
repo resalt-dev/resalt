@@ -66,6 +66,7 @@ jobs:
     name: Build
     steps:
       - uses: actions/checkout@v3
+      - uses: oven-sh/setup-bun@v1
       - name: 'Cache node_modules'
         uses: actions/cache@v3
         with:
