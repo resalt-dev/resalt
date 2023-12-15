@@ -6,7 +6,7 @@ WORKDIR /usr/src/app
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
   apt-get upgrade -y -o DPkg::Options::=--force-confold && \
-  apt-get install -y -o DPkg::Options::=--force-confold curl build-essential pkg-config libssl-dev mariadb-client libmariadb-dev default-libmysqlclient-dev
+  apt-get install -y -o DPkg::Options::=--force-confold curl unzip build-essential pkg-config libssl-dev mariadb-client libmariadb-dev default-libmysqlclient-dev
 COPY . .
 RUN curl -fsSL https://bun.sh/install | bash
 # Create fake node link pointing to bun
