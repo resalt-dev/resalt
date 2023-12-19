@@ -1,0 +1,35 @@
+{
+  "name": "resalt",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "bunx --bun vite dev --port 5555 --strictPort --host",
+    "build": "vite build",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "lint": "bunx prettier --check . && bunx eslint .",
+    "format": "bunx prettier --write ."
+  },
+  "dependencies": {
+    "@fluentui/react-components": "^9.43.0",
+    "@fluentui/react-icons": "^2.0.224",
+    "@fluentui/tokens": "^1.0.0-alpha.13",
+    "@preact/signals-react": "^2.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@preact/signals-react-transform": "^0.3.0",
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.55.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "prettier": "3.1.1",
+    "vite": "^5.0.8"
+  }
+}

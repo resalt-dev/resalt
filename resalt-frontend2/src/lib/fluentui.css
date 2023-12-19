@@ -1,0 +1,275 @@
+/* Resalt implementation of Fluent UI 2 in CSS */
+
+/* https://n8d.at/build-a-sharepoint-fluent-ui-compliant-grid-from-scratch */
+/* @function px-to-rem($pixel){
+    @return ($pixel / 16) * 1rem;
+} */
+
+.fl-grid {
+	display: grid;
+	grid-template-columns: repeat(12, 1fr);
+	margin: auto calc((8 / 16) * 1rem);
+
+	/* > 1366 pixel */
+	column-gap: calc((32 / 16) * 1rem);
+	row-gap: calc((32 / 16) * 1rem);
+
+	/* < 1366 pixel */
+	@media screen and (max-width: 1366px) {
+		column-gap: calc((24 / 16) * 1rem);
+		row-gap: calc((24 / 16) * 1rem);
+	}
+	/* <= 640 pixel */
+	@media screen and (max-width: 640px) {
+		column-gap: calc((16 / 16) * 1rem);
+		row-gap: calc((16 / 16) * 1rem);
+	}
+}
+
+/* @mixin flUI-span($span, $start: auto, $row: auto) {
+    grid-column: $start / span $span;
+    grid-row: $row;
+
+  // media query for small devices
+    @media screen and (max-width: 480px){
+        grid-column: 1 / span 12;
+        grid-row: auto;
+    }
+} */
+
+.fl-span12 {
+	grid-column: auto / span 12;
+}
+.fl-span11 {
+	grid-column: auto / span 11;
+}
+.fl-span10 {
+	grid-column: auto / span 10;
+}
+.fl-span9 {
+	grid-column: auto / span 9;
+}
+.fl-span8 {
+	grid-column: auto / span 8;
+}
+.fl-span7 {
+	grid-column: auto / span 7;
+}
+.fl-span6 {
+	grid-column: auto / span 6;
+}
+.fl-span5 {
+	grid-column: auto / span 5;
+}
+.fl-span4 {
+	grid-column: auto / span 4;
+}
+.fl-span3 {
+	grid-column: auto / span 3;
+}
+.fl-span2 {
+	grid-column: auto / span 2;
+}
+.fl-span1 {
+	grid-column: auto / span 1;
+}
+.fl-spanauto {
+	grid-column: auto / span auto;
+}
+.fl-span12,
+.fl-span11,
+.fl-span10,
+.fl-span9,
+.fl-span8,
+.fl-span7,
+.fl-span6,
+.fl-span5,
+.fl-span4,
+.fl-span3,
+.fl-span2,
+.fl-span1,
+.fl-spanauto {
+	grid-row: auto;
+}
+@media screen and (max-width: 480px) {
+	.fl-span12,
+	.fl-span11,
+	.fl-span10,
+	.fl-span9,
+	.fl-span8,
+	.fl-span7,
+	.fl-span6,
+	.fl-span5,
+	.fl-span4,
+	.fl-span3,
+	.fl-span2,
+	.fl-span1,
+	.fl-spanauto {
+		grid-column: auto / span 12;
+		grid-row: auto;
+	}
+}
+
+.m-0 {
+	margin: var(--spacingVerticalNone);
+}
+.m-xxs {
+	margin: var(--spacingVerticalXXS);
+}
+.m-xs {
+	margin: var(--spacingVerticalXS);
+}
+.m-snudge {
+	margin: var(--spacingVerticalSNudge);
+}
+.m-s {
+	margin: var(--spacingVerticalS);
+}
+.m-mnudge {
+	margin: var(--spacingVerticalMNudge);
+}
+.m-m {
+	margin: var(--spacingVerticalM);
+}
+.m-l {
+	margin: var(--spacingVerticalL);
+}
+.m-xl {
+	margin: var(--spacingVerticalXL);
+}
+.m-xxl {
+	margin: var(--spacingVerticalXXL);
+}
+.m-xxxl {
+	margin: var(--spacingVerticalXXXL);
+}
+
+.mx-auto {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.p-0 {
+	padding: var(--spacingVerticalNone);
+}
+.p-xxs {
+	padding: var(--spacingVerticalXXS);
+}
+.p-xs {
+	padding: var(--spacingVerticalXS);
+}
+.p-snudge {
+	padding: var(--spacingVerticalSNudge);
+}
+.p-s {
+	padding: var(--spacingVerticalS);
+}
+.p-mnudge {
+	padding: var(--spacingVerticalMNudge);
+}
+.p-m {
+	padding: var(--spacingVerticalM);
+}
+.p-l {
+	padding: var(--spacingVerticalL);
+}
+.p-xl {
+	padding: var(--spacingVerticalXL);
+}
+.p-xxl {
+	padding: var(--spacingVerticalXXL);
+}
+.p-xxxl {
+	padding: var(--spacingVerticalXXXL);
+}
+
+.py-0 {
+	padding-top: var(--spacingVerticalNone);
+	padding-bottom: var(--spacingVerticalNone);
+}
+.py-xxs {
+	padding-top: var(--spacingVerticalXXS);
+	padding-bottom: var(--spacingVerticalXXS);
+}
+.py-xs {
+	padding-top: var(--spacingVerticalXS);
+	padding-bottom: var(--spacingVerticalXS);
+}
+.py-snudge {
+	padding-top: var(--spacingVerticalSNudge);
+	padding-bottom: var(--spacingVerticalSNudge);
+}
+.py-s {
+	padding-top: var(--spacingVerticalS);
+	padding-bottom: var(--spacingVerticalS);
+}
+.py-mnudge {
+	padding-top: var(--spacingVerticalMNudge);
+	padding-bottom: var(--spacingVerticalMNudge);
+}
+.py-m {
+	padding-top: var(--spacingVerticalM);
+	padding-bottom: var(--spacingVerticalM);
+}
+.py-l {
+	padding-top: var(--spacingVerticalL);
+	padding-bottom: var(--spacingVerticalL);
+}
+.py-xl {
+	padding-top: var(--spacingVerticalXL);
+	padding-bottom: var(--spacingVerticalXL);
+}
+.py-xxl {
+	padding-top: var(--spacingVerticalXXL);
+	padding-bottom: var(--spacingVerticalXXL);
+}
+.py-xxxl {
+	padding-top: var(--spacingVerticalXXXL);
+	padding-bottom: var(--spacingVerticalXXXL);
+}
+
+.px-0 {
+	padding-left: var(--spacingHorizontalNone);
+	padding-right: var(--spacingHorizontalNone);
+}
+.px-xxs {
+	padding-left: var(--spacingHorizontalXXS);
+	padding-right: var(--spacingHorizontalXXS);
+}
+.px-xs {
+	padding-left: var(--spacingHorizontalXS);
+	padding-right: var(--spacingHorizontalXS);
+}
+.px-snudge {
+	padding-left: var(--spacingHorizontalSNudge);
+	padding-right: var(--spacingHorizontalSNudge);
+}
+.px-s {
+	padding-left: var(--spacingHorizontalS);
+	padding-right: var(--spacingHorizontalS);
+}
+.px-mnudge {
+	padding-left: var(--spacingHorizontalMNudge);
+	padding-right: var(--spacingHorizontalMNudge);
+}
+.px-m {
+	padding-left: var(--spacingHorizontalM);
+	padding-right: var(--spacingHorizontalM);
+}
+.px-l {
+	padding-left: var(--spacingHorizontalL);
+	padding-right: var(--spacingHorizontalL);
+}
+.px-xl {
+	padding-left: var(--spacingHorizontalXL);
+	padding-right: var(--spacingHorizontalXL);
+}
+.px-xxl {
+	padding-left: var(--spacingHorizontalXXL);
+	padding-right: var(--spacingHorizontalXXL);
+}
+.px-xxxl {
+	padding-left: var(--spacingHorizontalXXXL);
+	padding-right: var(--spacingHorizontalXXXL);
+}

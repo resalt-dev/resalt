@@ -7,6 +7,10 @@
         "editor.defaultFormatter": "svelte.svelte-vscode",
         "editor.formatOnSave": true
     },
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
     "svelte.plugin.svelte.compilerWarnings": {
         "a11y-aria-attributes": "ignore",
         "a11y-incorrect-aria-attribute-type": "ignore",
