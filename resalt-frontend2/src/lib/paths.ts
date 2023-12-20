@@ -35,7 +35,7 @@ export const paths = {
 	login: new Path('/login', 'Login', PersonKeyRegular),
 	logout: new Path('/logout', 'Logout', SignOutRegular),
 
-	dashboard: new Path('/dashboard', 'Dashboard', null),
+	dashboard: new Path('/', 'Dashboard', null),
 
 	minions: new Path('/minions', 'Minions', LaptopRegular),
 	minion: new Path('/minions/:minionId', 'Minion', ServerRegular),
