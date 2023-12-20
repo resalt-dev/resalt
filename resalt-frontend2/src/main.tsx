@@ -1,11 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './lib/fluentui.css';
-import { FluentProvider, webLightTheme } from '@fluentui/react-components';
+import {
+	FluentProvider,
+	makeStyles,
+	mergeClasses,
+	webLightTheme,
+} from '@fluentui/react-components';
 import { tokens } from '@fluentui/tokens';
 import ResaltHeader from './layout/ResaltHeader';
+import ResaltSidebar from './layout/ResaltSidebar';
+import { Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
 
-const styles = {
+const styles = makeStyles({
 	fluentProvider: {
 		backgroundColor: tokens.colorNeutralBackground4,
 	},
@@ -19,23 +26,49 @@ const styles = {
 		gridTemplateRows: 'auto',
 	},
 	bodySidebar: {
-		gridColumn: 'sidebar',
+		gridColumnStart: 'sidebar',
 		height: 'calc(100vh - 48px)',
 	},
 	mainArea: {
-		gridColumn: 'main-area',
-		// backgroundColor: tokens.colorNeutralBackground2,
+		gridColumnStart: 'main-area',
 	},
-};
+});
+
+const router = createBrowserRouter([
+	{
+		element: <RootLayout />,
+		children: [
+			{
+				path: '/',
+				element: <div>Home</div>,
+			},
+			{
+				path: '/about',
+				element: <div>About</div>,
+			},
+		],
+	},
+]);
+
+function RootLayout() {
+	const classes = styles();
+	return (
+		<FluentProvider theme={webLightTheme} className={classes.fluentProvider}>
+			<ResaltHeader />
+			<div className={mergeClasses(classes.bodyGrid, 'm-0')}>
+				<div className={classes.bodySidebar}>
+					<ResaltSidebar />
+				</div>
+				<div className={classes.mainArea}>
+					<Outlet />
+				</div>
+			</div>
+		</FluentProvider>
+	);
+}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
 	<React.StrictMode>
-		<FluentProvider theme={webLightTheme} style={styles.fluentProvider}>
-			<ResaltHeader />
-			<div className="m-0" style={styles.bodyGrid}>
-				<div style={styles.bodySidebar}>Sidebar</div>
-				<div style={styles.mainArea}>App</div>
-			</div>
-		</FluentProvider>
+		<RouterProvider router={router} />
 	</React.StrictMode>,
 );

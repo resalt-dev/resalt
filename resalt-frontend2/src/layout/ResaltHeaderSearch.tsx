@@ -7,10 +7,10 @@ const styles = makeStyles({
 	headerSearchGrid: {
 		display: 'flex',
 		alignItems: 'center',
-		// justifyContent: 'center',
+		justifyContent: 'center',
 	},
 	headerSearchField: {
-		width: '70%',
+		width: '80%',
 		...shorthands.borderColor(tokens.colorNeutralStroke1),
 		...shorthands.transition('width', tokens.durationNormal, tokens.curveEasyEase),
 	},
@@ -19,10 +19,10 @@ const styles = makeStyles({
 	},
 	headerSearchButton: {
 		width: '32px',
-		borderTopLeftRadius: '0px',
-		borderBottomLeftRadius: '0px',
-		// move it to the left 1px
-		marginLeft: '-3px',
+		borderTopLeftRadius: '0',
+		borderBottomLeftRadius: '0',
+		// move it to the left
+		marginLeft: '-12px',
 		// move it higher in the z-index
 		zIndex: 10,
 		...shorthands.transition('opacity', tokens.durationNormal, tokens.curveEasyEase),
@@ -31,8 +31,12 @@ const styles = makeStyles({
 	headerSearchButtonActive: {
 		opacity: '1',
 	},
+	headerSearchButtonIcon: {
+		...shorthands.margin('0', tokens.spacingHorizontalS, '0', '0'),
+	},
 	headerSearchDismissButton: {
 		cursor: 'pointer',
+		...shorthands.margin('0', tokens.spacingHorizontalS, '0', '0'),
 	},
 });
 
@@ -76,7 +80,13 @@ export default function ResaltHeaderSearch() {
 				onChange={(_e, data) => {
 					searchValue.value = data.value;
 				}}
-				contentBefore={false && hasTextOrActive.value ? <></> : <SearchRegular />}
+				contentBefore={
+					false && hasTextOrActive.value ? (
+						<></>
+					) : (
+						<SearchRegular className={classes.headerSearchButtonIcon} />
+					)
+				}
 				contentAfter={
 					searchValue.value.length > 0 ? (
 						<DismissRegular

@@ -1,11 +1,11 @@
 import ResaltLogo from '../components/ResaltLogo.tsx';
-import { tokens, typographyStyles } from '@fluentui/tokens';
+import { tokens } from '@fluentui/tokens';
 import {
 	Alert20Regular,
 	Megaphone20Regular,
 	Navigation20Regular,
 	Person28Filled,
-	Question20Regular,
+	Question20Filled,
 	Settings20Regular,
 } from '@fluentui/react-icons';
 import { GriffelStyle, makeStyles, mergeClasses, shorthands } from '@fluentui/react-components';
@@ -32,7 +32,7 @@ const styles = makeStyles({
 		display: 'grid',
 		gridTemplateColumns: `[header-collapse] 48px [header-logo] ${
 			280 - 48
-		}px [header-title] auto [header-search] 20vw [spacer] 2vw [header-settings] ${48 * 5}px`,
+		}px [spacer] auto [header-search] 25vw [spacer] auto [header-settings] ${48 * 5}px`,
 		gridTemplateRows: '48px',
 		alignItems: 'center',
 	},
@@ -44,12 +44,6 @@ const styles = makeStyles({
 		gridColumnStart: 'header-logo',
 		height: headerLogoHeight,
 		...shorthands.overflow('hidden'),
-	},
-	headerTitle: {
-		gridColumnStart: 'header-title',
-		...typographyStyles.subtitle2,
-		paddingLeft: tokens.spacingHorizontalS,
-		// backgroundColor: 'rgba(255, 0, 0, 0.5)', // DEBUG
 	},
 	headerSearch: {
 		gridColumnStart: 'header-search',
@@ -78,7 +72,6 @@ export default function ResaltHeader() {
 			<div className={classes.headerLogo}>
 				<ResaltLogo className="mx-auto" height={headerLogoHeight} />
 			</div>
-			<div className={classes.headerTitle}>Dashboard</div>
 			<div className={classes.headerSearch}>
 				<ResaltHeaderSearch />
 			</div>
@@ -93,7 +86,7 @@ export default function ResaltHeader() {
 					<Settings20Regular />
 				</div>
 				<div className={classes.headerSettingItem}>
-					<Question20Regular />
+					<Question20Filled />
 				</div>
 				<div className={classes.headerSettingItem}>
 					<Person28Filled />
