@@ -1,5 +1,8 @@
 import { tokens, typographyStyles } from '@fluentui/tokens';
-import { Tab, TabList, makeStyles, shorthands } from '@fluentui/react-components';
+import { Button, Tab, TabList, makeStyles, shorthands } from '@fluentui/react-components';
+import { HomeRegular } from '@fluentui/react-icons';
+import { paths, sidebar } from '../lib/paths';
+import { Link } from 'react-router-dom';
 
 const styles = makeStyles({
 	sidebarGrid: {
@@ -7,22 +10,67 @@ const styles = makeStyles({
 		gridTemplateColumns: 'auto',
 		gridTemplateRows: 'auto',
 	},
-	sidebarHeader: {
-		...typographyStyles.title1,
-		display: 'flex',
-		backgroundColor: 'rgba(255, 0, 0, 0.5)', // DEBUG
-	},
-	sidebarList: {
+	sidebarDashboardArea: {
 		display: 'flex',
 		alignItems: 'flex-start',
 		justifyContent: 'flex-start',
-		...shorthands.padding(tokens.spacingHorizontalM, tokens.spacingHorizontalXS),
+		...shorthands.padding(
+			tokens.spacingHorizontalXL,
+			tokens.spacingHorizontalXL,
+			tokens.spacingHorizontalS,
+		),
+		// backgroundColor: 'rgba(255, 255, 0, 0.5)', // DEBUG
+	},
+	sidebarDashboardButton: {
+		backgroundImage:
+			'linear-gradient(135deg, ' +
+			tokens.colorBrandBackground +
+			' 30%, ' +
+			tokens.colorBrandBackgroundSelected +
+			' 70%)',
+		color: tokens.colorNeutralForegroundInverted,
+	},
+	sidebarHeader: {
+		display: 'flex',
+		alignItems: 'flex-start',
+		justifyContent: 'flex-start',
+		...shorthands.padding(
+			tokens.spacingHorizontalL,
+			tokens.spacingHorizontalM,
+			tokens.spacingHorizontalS,
+		),
+		...typographyStyles.subtitle2Stronger,
+	},
+	sidebarListArea: {
+		display: 'flex',
+		alignItems: 'flex-start',
+		justifyContent: 'flex-start',
+		...shorthands.padding('0', '0', '0', tokens.spacingHorizontalXS),
 		rowGap: '20px',
-
-		backgroundColor: 'rgba(0, 255, 0, 0.5)', // DEBUG
+	},
+	sidebarList: {
+		width: '100%',
 	},
 	sidebarItem: {
-		width: '90%',
+		...shorthands.borderRadius(tokens.borderRadiusXLarge),
+		...shorthands.transition('background-color', tokens.durationNormal, tokens.curveEasyEase),
+		'&:hover': {
+			backgroundColor: tokens.colorNeutralBackground4Hover,
+			cursor: 'pointer',
+		},
+
+		// Target FIRST sub span
+		'& > span:first-child': {
+			...shorthands.overflow('visible'),
+			width: 'auto',
+		},
+	},
+	sidebarItemIconArea: {
+		display: 'flex',
+		// backgroundColor: 'rgba(0, 255, 255, 0.4)', // DEBUG
+	},
+	sidebarItemIcon: {
+		...shorthands.margin('0', '0', '0', tokens.spacingHorizontalS),
 	},
 });
 
@@ -31,13 +79,42 @@ export default function ResaltSidebar() {
 	const classes = styles();
 	return (
 		<div className={classes.sidebarGrid}>
-			<div className={classes.sidebarHeader}>Main</div>
-			<div className={classes.sidebarList}>
-				<TabList defaultSelectedValue="tab2" vertical>
-					<Tab value="tab1">First Tab</Tab>
-					<Tab value="tab2">Second Tab</Tab>
-					<Tab value="tab3">Third Tab</Tab>
-					<Tab value="tab4">Fourth Tab</Tab>
+			<div className={classes.sidebarDashboardArea}>
+				<Link to={paths.dashboard.path}>
+					<Button
+						shape="circular"
+						appearance="primary"
+						size="large"
+						icon={<HomeRegular />}
+						className={classes.sidebarDashboardButton}
+					>
+						{paths.dashboard.name}
+					</Button>
+				</Link>
+			</div>
+			<div className={classes.sidebarListArea}>
+				<TabList
+					defaultSelectedValue={paths.minions.path}
+					vertical
+					className={classes.sidebarList}
+					size="large"
+				>
+					{sidebar.map((section) => (
+						<>
+							<div className={classes.sidebarHeader}>{section.title}</div>
+							{section.items.map((item) => (
+								<Link to={item.path}>
+									<Tab
+										className={classes.sidebarItem}
+										icon={<item.Icon className={classes.sidebarItemIcon} />}
+										value={item.path}
+									>
+										{item.name}
+									</Tab>
+								</Link>
+							))}
+						</>
+					))}
 				</TabList>
 			</div>
 		</div>

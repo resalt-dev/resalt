@@ -7,6 +7,7 @@ use std::collections::HashMap;
 
 pub const P_ADMIN_SUPERADMIN: &str = "admin.superadmin";
 pub const P_ADMIN_GROUP: &str = "admin.group";
+pub const P_ADMIN_USER: &str = "admin.user";
 
 pub const P_RUN_LIVE: &str = "run.live";
 #[allow(dead_code)]
@@ -50,7 +51,6 @@ pub const P_SALTKEY_ACCEPT: &str = "saltkey.accept";
 pub const P_SALTKEY_REJECT: &str = "saltkey.reject";
 pub const P_SALTKEY_DELETE: &str = "saltkey.delete";
 
-pub const P_USER_ADMIN: &str = "user";
 pub const P_USER_LIST: &str = "user.list";
 #[allow(dead_code)]
 pub const P_USER_EMAIL: &str = "user.email";

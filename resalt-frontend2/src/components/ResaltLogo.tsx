@@ -22,7 +22,7 @@ export default function ResaltLogo(props: { className?: string; height?: string 
 					gradientUnits="objectBoundingBox"
 				>
 					<stop offset="0" stopColor={tokens.colorBrandBackground} />
-					<stop offset="1" stopColor={tokens.colorBrandBackground2Pressed} />
+					<stop offset="1" stopColor={tokens.colorBrandStroke2Hover} />
 				</linearGradient>
 			</defs>
 			<g transform="matrix(1, 0, 0, 1, -137.428162, -83.720596)">

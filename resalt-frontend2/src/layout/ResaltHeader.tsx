@@ -19,7 +19,6 @@ const iconStyles: GriffelStyle = {
 	alignItems: 'center',
 	justifyContent: 'center',
 	...shorthands.transition('background-color', tokens.durationNormal, tokens.curveEasyEase),
-	userSelect: 'none',
 	'&:hover': {
 		backgroundColor: tokens.colorNeutralForeground3Hover,
 		cursor: 'pointer',

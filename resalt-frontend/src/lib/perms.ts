@@ -2,6 +2,7 @@ import type User from '$model/User';
 
 export const P_ADMIN_SUPERADMIN = 'admin.superadmin';
 export const P_ADMIN_GROUP = 'admin.group';
+export const P_ADMIN_USER = 'admin.user';
 
 export const P_RUN_LIVE = 'run.live';
 export const P_RUN_APPROVAL_LIST = 'run.approval.list';
@@ -34,7 +35,6 @@ export const P_SALTKEY_ACCEPT = 'saltkey.accept';
 export const P_SALTKEY_REJECT = 'saltkey.reject';
 export const P_SALTKEY_DELETE = 'saltkey.delete';
 
-export const P_USER_ADMIN = 'user';
 export const P_USER_LIST = 'user.list';
 export const P_USER_EMAIL = 'user.email';
 export const P_USER_PASSWORD = 'user.password';
@@ -197,7 +197,7 @@ export const resaltWebPermissions: {
 		danger: true,
 	},
 	{
-		permission: P_USER_ADMIN,
+		permission: P_ADMIN_USER,
 		title: '[User] Admin',
 		description: 'Allow user to create, manage, and delete other users.',
 		danger: true,

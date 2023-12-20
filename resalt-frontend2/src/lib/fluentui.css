@@ -1,5 +1,21 @@
 /* Resalt implementation of Fluent UI 2 in CSS */
 
+a {
+	color: var(--colorBrandForegroundLink);
+	background-color: transparent;
+	cursor: pointer;
+	user-select: text;
+	text-decoration-line: none;
+}
+
+a:hover {
+	color: var(--colorBrandForegroundLinkHover);
+}
+a:active {
+	color: var(--colorBrandForegroundLinkPressed);
+	text-decoration-line: underline;
+}
+
 /* https://n8d.at/build-a-sharepoint-fluent-ui-compliant-grid-from-scratch */
 /* @function px-to-rem($pixel){
     @return ($pixel / 16) * 1rem;

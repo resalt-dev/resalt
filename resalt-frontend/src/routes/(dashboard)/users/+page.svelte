@@ -4,7 +4,7 @@
 	import TablePaginate from '$component/TablePaginate.svelte';
 	import { deleteUser, getUsers } from '$lib/api';
 	import paths from '$lib/paths';
-	import { P_USER_ADMIN, hasResaltPermission } from '$lib/perms';
+	import { P_ADMIN_USER, hasResaltPermission } from '$lib/perms';
 	import { currentUser, theme, toasts } from '$lib/stores';
 	import { MessageType } from '$model/MessageType';
 	import type User from '$model/User';
@@ -101,7 +101,7 @@ Search box here.
 							>
 								View
 							</a>
-							{#if hasResaltPermission($currentUser, P_USER_ADMIN)}
+							{#if hasResaltPermission($currentUser, P_ADMIN_USER)}
 								<Clickable
 									type="button"
 									event={() => _deleteUser(user.id)}

@@ -1,4 +1,4 @@
-import type User from './models/User';
+import type User from '../models/User';
 import {
 	P_ADMIN_GROUP,
 	P_ADMIN_SUPERADMIN,
@@ -17,7 +17,7 @@ import {
 	P_RUN_TEMPLATE_LIST,
 	P_RUN_TEMPLATE_LOCAL,
 	P_SALTKEY_LIST,
-	P_USER_ADMIN,
+	P_ADMIN_USER,
 	P_USER_LIST,
 	hasResaltPermission,
 } from './perms_old';
@@ -197,7 +197,7 @@ const paths = {
 	),
 
 	users_list: new Path(110, '/users', 'Users', 'user-circle', [P_USER_LIST]),
-	users_add: new Path(110, '/users/add', 'Add user', null, [P_USER_ADMIN]),
+	users_add: new Path(110, '/users/add', 'Add user', null, [P_ADMIN_USER]),
 
 	settings_config: new Path(120, '/settings', 'Settings', 'cog', []), // Config
 	settings_groups: new Path(121, '/settings/groups', 'Groups', null, [P_ADMIN_GROUP]),

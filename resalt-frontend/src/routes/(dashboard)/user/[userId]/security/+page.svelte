@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { getUserById, updateUserPassword } from '$lib/api';
-	import { P_USER_ADMIN, P_USER_PASSWORD, hasResaltPermission } from '$lib/perms';
+	import { P_ADMIN_USER, P_USER_PASSWORD, hasResaltPermission } from '$lib/perms';
 	import { currentUser, replacementParams, theme, toasts } from '$lib/stores';
 	import { MessageType } from '$model/MessageType';
 	import type User from '$model/User';
@@ -95,7 +95,7 @@
 	<h1>Loading...</h1>
 {:else}
 	<div class="row">
-		{#if hasResaltPermission($currentUser, P_USER_ADMIN) || ($currentUser?.id === $user.id && hasResaltPermission($currentUser, P_USER_PASSWORD))}
+		{#if hasResaltPermission($currentUser, P_ADMIN_USER) || ($currentUser?.id === $user.id && hasResaltPermission($currentUser, P_USER_PASSWORD))}
 			<div class="col-12 col-xxl-4 pb-3">
 				<div class="card h-100">
 					<div class="card-header">Password</div>

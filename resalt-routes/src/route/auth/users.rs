@@ -58,7 +58,7 @@ pub async fn route_users_post(
     Json(input): Json<UserCreateRequest>,
 ) -> Result<impl IntoResponse, StatusCode> {
     // Validate permission
-    if !has_resalt_permission(&auth, P_USER_ADMIN)? {
+    if !has_resalt_permission(&auth, P_ADMIN_USER)? {
         return Err(StatusCode::FORBIDDEN);
     }
 
@@ -104,7 +104,7 @@ pub async fn route_user_delete(
     Extension(auth): Extension<AuthStatus>,
 ) -> Result<impl IntoResponse, StatusCode> {
     // Validate permission
-    if !has_resalt_permission(&auth, P_USER_ADMIN)? {
+    if !has_resalt_permission(&auth, P_ADMIN_USER)? {
         return Err(StatusCode::FORBIDDEN);
     }
 
@@ -138,7 +138,7 @@ pub async fn route_user_password_post(
         }
     } else {
         #[allow(clippy::collapsible_else_if)]
-        if !has_resalt_permission(&auth, P_USER_ADMIN)? {
+        if !has_resalt_permission(&auth, P_ADMIN_USER)? {
             return Err(StatusCode::FORBIDDEN);
         }
     }
