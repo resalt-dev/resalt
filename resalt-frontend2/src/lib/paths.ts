@@ -100,14 +100,14 @@ export const sidebar: { title: string; items: Path[] }[] = [
 		title: 'Minions',
 		items: [paths.minions, paths.grains, paths.pillars, paths.packages],
 	},
-	// {
-	// 	title: 'Monitoring',
-	// 	items: [paths.jobs, paths.events],
-	// },
-	// {
-	// 	title: 'Access Control',
-	// 	items: [paths.users, paths.groups, paths.permissions],
-	// },
+	{
+		title: 'Monitoring',
+		items: [paths.jobs, paths.events],
+	},
+	{
+		title: 'Access Control',
+		items: [paths.users, paths.groups, paths.permissions],
+	},
 ];
 
 export default paths;
