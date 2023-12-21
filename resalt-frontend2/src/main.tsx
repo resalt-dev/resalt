@@ -13,7 +13,7 @@ import ResaltSidebar from './layout/ResaltSidebar';
 import './lib/fluentui.css';
 import paths from './lib/paths';
 
-const styles = makeStyles({
+const useStyles = makeStyles({
 	fluentProvider: {
 		backgroundColor: tokens.colorNeutralBackground4,
 	},
@@ -57,15 +57,15 @@ const router = createBrowserRouter([
 ]);
 
 function RootLayout() {
-	const classes = styles();
+	const styles = useStyles();
 	return (
-		<FluentProvider theme={webLightTheme} className={classes.fluentProvider}>
+		<FluentProvider theme={webLightTheme} className={styles.fluentProvider}>
 			<ResaltHeader />
-			<div className={mergeClasses(classes.bodyGrid, 'm-0')}>
-				<div className={classes.bodySidebar}>
+			<div className={mergeClasses(styles.bodyGrid, 'm-0')}>
+				<div className={styles.bodySidebar}>
 					<ResaltSidebar />
 				</div>
-				<div className={classes.mainArea}>
+				<div className={styles.mainArea}>
 					<Outlet />
 				</div>
 			</div>

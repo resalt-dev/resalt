@@ -1,10 +1,10 @@
 import { Button, Tab, TabList, makeStyles, shorthands } from '@fluentui/react-components';
 import { HomeRegular } from '@fluentui/react-icons';
 import { tokens, typographyStyles } from '@fluentui/tokens';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { paths, sidebar } from '../lib/paths';
 
-const styles = makeStyles({
+const useStyles = makeStyles({
 	sidebarGrid: {
 		display: 'grid',
 		gridTemplateColumns: 'auto',
@@ -76,38 +76,51 @@ const styles = makeStyles({
 
 export default function ResaltSidebar() {
 	console.log('render:ResaltSidebar');
-	const classes = styles();
+	const styles = useStyles();
+
+	// Detect current page
+	let location = useLocation();
+	let currentPath = paths.dashboard;
+	for (const section of sidebar) {
+		for (const item of section.items) {
+			if (location.pathname.startsWith(item.path) && item.path !== '/') {
+				currentPath = item;
+				break;
+			}
+		}
+	}
+
 	return (
-		<div className={classes.sidebarGrid}>
-			<div className={classes.sidebarDashboardArea}>
+		<div className={styles.sidebarGrid}>
+			<div className={styles.sidebarDashboardArea}>
 				<Link to={paths.dashboard.path}>
 					<Button
 						shape="circular"
 						appearance="primary"
 						size="large"
 						icon={<HomeRegular />}
-						className={classes.sidebarDashboardButton}
+						className={styles.sidebarDashboardButton}
 					>
 						{paths.dashboard.name}
 					</Button>
 				</Link>
 			</div>
-			<div className={classes.sidebarListArea}>
+			<div className={styles.sidebarListArea}>
 				<TabList
-					defaultSelectedValue={paths.minions.path}
+					defaultSelectedValue={currentPath.path}
 					vertical
-					className={classes.sidebarList}
+					className={styles.sidebarList}
 					size="large"
 				>
 					{sidebar.map((section) => (
 						<div key={section.title}>
-							<div className={classes.sidebarHeader}>{section.title}</div>
+							<div className={styles.sidebarHeader}>{section.title}</div>
 							{section.items.map((item) => (
 								<Link key={item.path} to={item.path}>
 									<Tab
 										key={item.path}
-										className={classes.sidebarItem}
-										icon={<item.Icon className={classes.sidebarItemIcon} />}
+										className={styles.sidebarItem}
+										icon={<item.Icon className={styles.sidebarItemIcon} />}
 										value={item.path}
 									>
 										{item.name}

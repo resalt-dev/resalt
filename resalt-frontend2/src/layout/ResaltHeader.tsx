@@ -1,5 +1,4 @@
-import ResaltLogo from '../components/ResaltLogo.tsx';
-import { tokens } from '@fluentui/tokens';
+import { GriffelStyle, makeStyles, mergeClasses, shorthands } from '@fluentui/react-components';
 import {
 	Alert20Regular,
 	Megaphone20Regular,
@@ -8,7 +7,8 @@ import {
 	Question20Filled,
 	Settings20Regular,
 } from '@fluentui/react-icons';
-import { GriffelStyle, makeStyles, mergeClasses, shorthands } from '@fluentui/react-components';
+import { tokens } from '@fluentui/tokens';
+import ResaltLogo from '../components/ResaltLogo.tsx';
 import ResaltHeaderSearch from './ResaltHeaderSearch.tsx';
 
 const headerLogoHeight = '20px';
@@ -24,7 +24,7 @@ const iconStyles: GriffelStyle = {
 		cursor: 'pointer',
 	},
 };
-const styles = makeStyles({
+const useStyles = makeStyles({
 	headerGrid: {
 		backgroundColor: '#000000',
 		color: '#ffffff',
@@ -61,33 +61,33 @@ const styles = makeStyles({
 
 export default function ResaltHeader() {
 	console.log('render:ResaltHeader');
-	const classes = styles();
+	const styles = useStyles();
 
 	return (
-		<div className={mergeClasses('m-0', classes.headerGrid)}>
-			<div className={classes.headerCollapse}>
+		<div className={mergeClasses('m-0', styles.headerGrid)}>
+			<div className={styles.headerCollapse}>
 				<Navigation20Regular />
 			</div>
-			<div className={classes.headerLogo}>
+			<div className={styles.headerLogo}>
 				<ResaltLogo className="mx-auto" height={headerLogoHeight} />
 			</div>
-			<div className={classes.headerSearch}>
+			<div className={styles.headerSearch}>
 				<ResaltHeaderSearch />
 			</div>
-			<div className={classes.headerSettings}>
-				<div className={classes.headerSettingItem}>
+			<div className={styles.headerSettings}>
+				<div className={styles.headerSettingItem}>
 					<Megaphone20Regular />
 				</div>
-				<div className={classes.headerSettingItem}>
+				<div className={styles.headerSettingItem}>
 					<Alert20Regular />
 				</div>
-				<div className={classes.headerSettingItem}>
+				<div className={styles.headerSettingItem}>
 					<Settings20Regular />
 				</div>
-				<div className={classes.headerSettingItem}>
+				<div className={styles.headerSettingItem}>
 					<Question20Filled />
 				</div>
-				<div className={classes.headerSettingItem}>
+				<div className={styles.headerSettingItem}>
 					<Person28Filled />
 				</div>
 			</div>
