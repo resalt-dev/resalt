@@ -8,10 +8,16 @@
         "editor.formatOnSave": true
     },
     "[typescript]": {
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+        },
         "editor.defaultFormatter": "esbenp.prettier-vscode",
         "editor.formatOnSave": true
     },
     "[typescriptreact]": {
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+        },
         "editor.defaultFormatter": "esbenp.prettier-vscode",
         "editor.formatOnSave": true
     },
@@ -42,5 +48,10 @@
     },
     "rust-analyzer.server.extraEnv": {
         "RUSTC_WRAPPER": "sccache"
+    },
+    "[typescript][typescriptreact]": {
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        }
     }
 }
