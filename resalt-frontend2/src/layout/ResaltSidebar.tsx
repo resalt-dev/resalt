@@ -1,8 +1,8 @@
-import { tokens, typographyStyles } from '@fluentui/tokens';
 import { Button, Tab, TabList, makeStyles, shorthands } from '@fluentui/react-components';
 import { HomeRegular } from '@fluentui/react-icons';
-import { paths, sidebar } from '../lib/paths';
+import { tokens, typographyStyles } from '@fluentui/tokens';
 import { Link } from 'react-router-dom';
+import { paths, sidebar } from '../lib/paths';
 
 const styles = makeStyles({
 	sidebarGrid: {
@@ -100,11 +100,12 @@ export default function ResaltSidebar() {
 					size="large"
 				>
 					{sidebar.map((section) => (
-						<>
+						<div key={section.title}>
 							<div className={classes.sidebarHeader}>{section.title}</div>
 							{section.items.map((item) => (
-								<Link to={item.path}>
+								<Link key={item.path} to={item.path}>
 									<Tab
+										key={item.path}
 										className={classes.sidebarItem}
 										icon={<item.Icon className={classes.sidebarItemIcon} />}
 										value={item.path}
@@ -113,7 +114,7 @@ export default function ResaltSidebar() {
 									</Tab>
 								</Link>
 							))}
-						</>
+						</div>
 					))}
 				</TabList>
 			</div>

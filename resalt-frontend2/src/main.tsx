@@ -1,6 +1,3 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './lib/fluentui.css';
 import {
 	FluentProvider,
 	makeStyles,
@@ -8,9 +5,13 @@ import {
 	webLightTheme,
 } from '@fluentui/react-components';
 import { tokens } from '@fluentui/tokens';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
 import ResaltHeader from './layout/ResaltHeader';
 import ResaltSidebar from './layout/ResaltSidebar';
-import { Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
+import './lib/fluentui.css';
+import paths from './lib/paths';
 
 const styles = makeStyles({
 	fluentProvider: {
@@ -36,17 +37,22 @@ const styles = makeStyles({
 
 const router = createBrowserRouter([
 	{
+		path: '/',
 		element: <RootLayout />,
-		children: [
-			{
-				path: '/',
-				element: <div>Home</div>,
-			},
-			{
-				path: '/about',
-				element: <div>About</div>,
-			},
-		],
+		children: Object.entries(paths).map(([_name, path]) => ({
+			path: path.path,
+			element: React.createElement(path.element as () => JSX.Element, null, null),
+		})),
+		// children: [
+		// 	{
+		// 		path: '/',
+		// 		element: <div>Home</div>,
+		// 	},
+		// 	{
+		// 		path: '/about',
+		// 		element: <div>About</div>,
+		// 	},
+		// ],
 	},
 ]);
 
