@@ -2,6 +2,7 @@ import {
 	FluentProvider,
 	makeStyles,
 	mergeClasses,
+	shorthands,
 	webLightTheme,
 } from '@fluentui/react-components';
 import { tokens } from '@fluentui/tokens';
@@ -32,6 +33,8 @@ const useStyles = makeStyles({
 	},
 	mainArea: {
 		gridColumnStart: 'main-area',
+		// backgroundColor: 'rgba(255, 0, 0, 0.2)', // DEBUG
+		...shorthands.overflow('auto'),
 	},
 });
 
@@ -65,7 +68,7 @@ function RootLayout() {
 				<div className={styles.bodySidebar}>
 					<ResaltSidebar />
 				</div>
-				<div className={styles.mainArea}>
+				<div id="mainArea" className={styles.mainArea}>
 					<Outlet />
 				</div>
 			</div>
