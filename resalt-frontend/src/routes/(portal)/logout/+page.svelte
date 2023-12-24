@@ -2,12 +2,12 @@
 	import { goto } from '$app/navigation';
 	import { logout } from '$lib/api';
 	import paths from '$lib/paths';
-	import { auth, toasts } from '$lib/stores';
+	import { currentUser, toasts } from '$lib/stores';
 	import { MessageType } from '$model/MessageType';
 	import { onMount } from 'svelte';
 
 	onMount(() => {
-		if ($auth === null) {
+		if ($currentUser === null) {
 			goto(paths.login.getPath());
 		} else {
 			_logout();
@@ -34,7 +34,7 @@
 	<title>Logout</title>
 </svelte:head>
 
-{#if $auth === null}
+{#if $currentUser === null}
 	<p class="fw-bold">Logged out.</p>
 {:else}
 	<p class="fw-bold">Logging out...</p>

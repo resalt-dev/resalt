@@ -1,5 +1,4 @@
 import constants from '$lib/constants';
-import type AuthToken from '$model/AuthToken';
 import type Config from '$model/Config';
 import Filter from '$model/Filter';
 import Message from '$model/Message';
@@ -16,7 +15,6 @@ const prefix = `${constants.appName.toLowerCase()}_`;
 
 export const sidebarCollapsed = persisted(`${prefix}sidebarCollapsed`, false);
 
-export const auth: Writable<AuthToken | null> = persisted(`${prefix}auth`, null);
 export const config: Writable<Config | null> = persisted(`${prefix}config`, null);
 /**
  * @deprecated

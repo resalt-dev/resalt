@@ -34,18 +34,30 @@ pub async fn middleware_auth(
     // PRE-REQUEST PROCESSING
     //
 
-    // Extract token from header or query params
-    let token = match req.headers().get("Authorization") {
-        Some(header) => header.to_str().unwrap().replace("Bearer ", ""),
-        None => {
-            // Try fetch value "token" from query params
-            let token = match params.token {
-                Some(token) => token.to_string(),
-                None => "".to_string(),
-            };
-            token
+    // Extract token from header (Cookie resalt-auth) or query params
+    let mut token = "".to_string();
+    req.headers().get_all("Cookie").iter().for_each(|header| {
+        debug!("Header: {:?}", header);
+        // Split by semicolon
+        let parts = header
+            .to_str()
+            .unwrap()
+            .split(";")
+            .map(|s| s.trim().to_string())
+            .collect::<Vec<String>>();
+        let header = parts.get(0).unwrap_or(&"".to_string()).to_string();
+        // Check if header contains resalt-auth
+        if header.contains("resalt-auth") {
+            token = header.replace("resalt-auth=", "");
         }
-    };
+    });
+    if token.is_empty() {
+        // Try fetch value "token" from query params
+        token = match params.token {
+            Some(token) => token.to_string(),
+            None => "".to_string(),
+        };
+    }
 
     // Resolve auth status
     let auth_status = match resolve_auth_status(data, salt, token).await {

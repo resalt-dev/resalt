@@ -3,7 +3,7 @@
 	import ResaltProgress from '$component/ResaltProgress.svelte';
 	import { login } from '$lib/api';
 	import paths from '$lib/paths';
-	import { auth, config, theme, toasts } from '$lib/stores';
+	import { config, theme, toasts } from '$lib/stores';
 	import type AuthToken from '$model/AuthToken';
 	import { MessageType } from '$model/MessageType';
 	import { onMount } from 'svelte';
@@ -38,7 +38,6 @@
 		let password = passwordFieldValue;
 		login(username, password)
 			.then((token: AuthToken) => {
-				auth.set(token);
 				goto(paths.dashboard.getPath());
 			})
 			.catch((err: unknown) => {

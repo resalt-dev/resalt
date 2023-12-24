@@ -113,6 +113,18 @@ pub async fn route_login_post(
         }
     };
 
+    // Set cookie
+    let mut headers = HeaderMap::new();
+    headers.insert(
+        "Set-Cookie",
+        format!(
+            "resalt-auth={}; Path=/; HttpOnly; SameSite=Strict",
+            authtoken.id
+        )
+        .parse()
+        .unwrap(),
+    );
+
     // Return
     let session_lifespan = *ResaltConfig::AUTH_SESSION_LIFESPAN;
     let response = LoginResponse {
@@ -120,5 +132,5 @@ pub async fn route_login_post(
         token: authtoken.id,
         expiry: (authtoken.timestamp.timestamp() as u64) + session_lifespan,
     };
-    Ok(Json(response))
+    Ok((headers, Json(response)))
 }

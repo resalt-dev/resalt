@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { getCurrentUser } from '$lib/api';
 	import paths from '$lib/paths';
-	import { auth, currentUser, toasts } from '$lib/stores';
+	import { currentUser, toasts } from '$lib/stores';
 	import { MessageType } from '$model/MessageType';
 	import type User from '$model/User';
 	import { onMount } from 'svelte';
@@ -10,10 +10,6 @@
 	import DashboardSidebar from './DashboardSidebar.svelte';
 
 	onMount(() => {
-		if ($auth == null) {
-			goto(paths.login.getPath());
-			return;
-		}
 		getCurrentUser()
 			.then((data: User) => {
 				currentUser.set(data);
@@ -23,7 +19,7 @@
 				toasts.add(
 					MessageType.WARNING,
 					'Logged out',
-					'You have been logged out due to the token being invalid.',
+					'You are being logged out due to the token being invalid.',
 				);
 				goto(paths.logout.getPath());
 			});

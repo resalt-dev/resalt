@@ -10,23 +10,21 @@ import type RunCommand from '$model/RunCommand';
 import SaltEvent from '$model/SaltEvent';
 import SystemStatus from '$model/SystemStatus';
 import User from '$model/User';
-import { get } from 'svelte/store';
 import constants from './constants';
-import { auth as authStore, currentUser as currentUserStore } from './stores';
+import { currentUser as currentUserStore } from './stores';
 
-function getToken(): string {
-	const auth = get(authStore);
-	if (!auth) {
-		throw new Error('Missing API token');
-	}
-	if (auth.expiry < Date.now() / 1000) {
-		throw new Error('Auth token has expired');
-	}
-	return auth.token;
-}
+async function sendRequest(method: string, path: string, data?: unknown): Promise<unknown> {
+	// console.log('Sending authenticated request', method, path, data);
+	const body = data ? JSON.stringify(data) : undefined;
+	// console.log('Sending body', body);
 
-async function sendRequest(url: string, options: RequestInit): Promise<unknown> {
-	const res = await fetch(url, options);
+	const res = await fetch(constants.apiUrl + path, {
+		method,
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body,
+	});
 
 	if (res.status === 200) {
 		const text = await res.text();
@@ -37,70 +35,34 @@ async function sendRequest(url: string, options: RequestInit): Promise<unknown> 
 	}
 }
 
-async function sendAuthenticatedRequest(
-	method: string,
-	path: string,
-	data?: unknown,
-): Promise<unknown> {
-	const token = getToken();
-	// console.log('Sending authenticated request', method, path, data);
-	const body = data ? JSON.stringify(data) : undefined;
-	// console.log('Sending body', body);
-	return await sendRequest(constants.apiAuthUrl + path, {
-		method,
-		headers: {
-			'Content-Type': 'application/json',
-			Authorization: `Bearer ${token}`,
-		},
-		body,
-	});
-}
-
-async function sendUnauthenticatedRequest(
-	method: string,
-	path: string,
-	body?: unknown,
-): Promise<unknown> {
-	return await sendRequest(constants.apiUrl + path, {
-		method,
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: body ? JSON.stringify(body) : undefined,
-	});
-}
-
 ///
 /// Auth
 ///
 
 export async function login(username: string, password: string): Promise<AuthToken> {
-	return await sendUnauthenticatedRequest('POST', '/login', {
+	return await sendRequest('POST', '/login', {
 		username,
 		password,
 	}).then((data: unknown) => AuthToken.fromObject(data));
 }
 
 export async function getConfig(): Promise<Config> {
-	return await sendUnauthenticatedRequest('GET', '/config').then((data: unknown) =>
-		Config.fromObject(data),
-	);
+	return await sendRequest('GET', '/config').then((data: unknown) => Config.fromObject(data));
 }
 
 export async function getSystemStatus(): Promise<SystemStatus> {
-	return await sendAuthenticatedRequest('GET', '/status').then((data: unknown) =>
+	return await sendRequest('GET', '/status').then((data: unknown) =>
 		SystemStatus.fromObject(data),
 	);
 }
 
 export async function getCurrentUser(): Promise<User> {
-	return sendAuthenticatedRequest('GET', '/myself').then((data) => User.fromObject(data));
+	return sendRequest('GET', '/myself').then((data) => User.fromObject(data));
 }
 
 export async function logout(): Promise<void> {
-	// No remote function call for this yet.
 	currentUserStore.set(null);
-	authStore.set(null);
+	await sendRequest('POST', '/logout');
 }
 
 ///
@@ -113,30 +75,28 @@ export async function getUsers(limit: number | null, offset: number | null): Pro
 	if (limit) args.append('limit', limit.toString());
 	if (offset) args.append('offset', offset.toString());
 
-	return sendAuthenticatedRequest('GET', `/users?${args.toString()}`).then((data: unknown) => {
+	return sendRequest('GET', `/users?${args.toString()}`).then((data: unknown) => {
 		return (data as Array<unknown>).map((u) => User.fromObject(u));
 	});
 }
 
 export async function createUser(username: string, email: string | null): Promise<User> {
-	return sendAuthenticatedRequest('POST', '/users', {
+	return sendRequest('POST', '/users', {
 		username,
 		email,
 	}).then((data: unknown) => User.fromObject(data));
 }
 
 export async function getUserById(userId: string): Promise<User> {
-	return sendAuthenticatedRequest('GET', `/users/${userId}`).then((data: unknown) =>
-		User.fromObject(data),
-	);
+	return sendRequest('GET', `/users/${userId}`).then((data: unknown) => User.fromObject(data));
 }
 
 export async function deleteUser(userId: string): Promise<void> {
-	await sendAuthenticatedRequest('DELETE', `/users/${userId}`);
+	await sendRequest('DELETE', `/users/${userId}`);
 }
 
 export async function updateUserPassword(userId: string, password: string): Promise<void> {
-	await sendAuthenticatedRequest(
+	await sendRequest(
 		'POST',
 		`/users/${userId}/password`,
 
@@ -145,14 +105,14 @@ export async function updateUserPassword(userId: string, password: string): Prom
 }
 
 export async function addUserToPermissionGroup(userId: string, groupId: string): Promise<void> {
-	await sendAuthenticatedRequest('POST', `/users/${userId}/permissions/${groupId}`);
+	await sendRequest('POST', `/users/${userId}/permissions/${groupId}`);
 }
 
 export async function removeUserFromPermissionGroup(
 	userId: string,
 	groupId: string,
 ): Promise<void> {
-	await sendAuthenticatedRequest('DELETE', `/users/${userId}/permissions/${groupId}`);
+	await sendRequest('DELETE', `/users/${userId}/permissions/${groupId}`);
 }
 
 ///
@@ -174,19 +134,19 @@ export async function getMinions(
 	if (limit) args.append('limit', limit.toString());
 	if (offset) args.append('offset', offset.toString());
 
-	return sendAuthenticatedRequest('GET', `/minions?${args.toString()}`).then((data: unknown) =>
+	return sendRequest('GET', `/minions?${args.toString()}`).then((data: unknown) =>
 		(data as Array<unknown>).map((m) => Minion.fromObject(m)),
 	);
 }
 
 export async function getMinionById(minionId: string): Promise<Minion> {
-	return sendAuthenticatedRequest('GET', `/minions/${minionId}`).then((data: unknown) =>
+	return sendRequest('GET', `/minions/${minionId}`).then((data: unknown) =>
 		Minion.fromObject(data),
 	);
 }
 
 export async function refreshMinion(minionId: string): Promise<void> {
-	await sendAuthenticatedRequest('POST', `/minions/${minionId}/refresh`);
+	await sendRequest('POST', `/minions/${minionId}/refresh`);
 }
 
 export async function searchGrains(query: string, filters: Filter[]): Promise<unknown[]> {
@@ -197,7 +157,7 @@ export async function searchGrains(query: string, filters: Filter[]): Promise<un
 	if (filteredFilters && filteredFilters.length > 0)
 		args.append('filter', encodeURIComponent(JSON.stringify(filteredFilters)));
 
-	return (await sendAuthenticatedRequest('GET', `/grains?${args.toString()}`)) as Array<unknown>;
+	return (await sendRequest('GET', `/grains?${args.toString()}`)) as Array<unknown>;
 }
 
 ///
@@ -205,14 +165,14 @@ export async function searchGrains(query: string, filters: Filter[]): Promise<un
 ///
 
 export async function getMinionPresets(): Promise<Array<MinionPreset>> {
-	return sendAuthenticatedRequest('GET', '/presets').then((data: unknown) =>
+	return sendRequest('GET', '/presets').then((data: unknown) =>
 		(data as Array<unknown>).map((p) => MinionPreset.fromObject(p)),
 	);
 }
 
 export async function createMinionPreset(name: string, filters: Filter[]): Promise<MinionPreset> {
 	const filteredFilters = filters.filter((f) => f.isValid());
-	return sendAuthenticatedRequest('POST', '/presets', {
+	return sendRequest('POST', '/presets', {
 		name,
 		filter: JSON.stringify(filteredFilters),
 	}).then((data: unknown) => MinionPreset.fromObject(data));
@@ -221,7 +181,7 @@ export async function createMinionPreset(name: string, filters: Filter[]): Promi
 export async function getMinionPresetById(id: string): Promise<MinionPreset> {
 	if (!id) return Promise.reject('Invalid preset ID');
 	if (id.length === 0) return Promise.reject('Invalid preset ID');
-	return sendAuthenticatedRequest('GET', `/presets/${id}`).then((data: unknown) =>
+	return sendRequest('GET', `/presets/${id}`).then((data: unknown) =>
 		MinionPreset.fromObject(data),
 	);
 }
@@ -232,14 +192,14 @@ export async function updateMinionPreset(
 	filters: Filter[],
 ): Promise<MinionPreset> {
 	const filteredFilters = filters.filter((f) => f.isValid());
-	return sendAuthenticatedRequest('PUT', `/presets/${id}`, {
+	return sendRequest('PUT', `/presets/${id}`, {
 		name,
 		filter: JSON.stringify(filteredFilters),
 	}).then((data: unknown) => MinionPreset.fromObject(data));
 }
 
 export async function deleteMinionPreset(id: string): Promise<void> {
-	await sendAuthenticatedRequest('DELETE', `/presets/${id}`);
+	await sendRequest('DELETE', `/presets/${id}`);
 }
 
 ///
@@ -255,7 +215,7 @@ export async function getEvents(
 	if (limit) args.append('limit', limit.toString());
 	if (offset) args.append('offset', offset.toString());
 
-	return sendAuthenticatedRequest('GET', `/events?${args.toString()}`).then((data: unknown) =>
+	return sendRequest('GET', `/events?${args.toString()}`).then((data: unknown) =>
 		(data as Array<unknown>).map((e) => SaltEvent.fromObject(e)),
 	);
 }
@@ -275,13 +235,13 @@ export async function getJobs(
 	if (limit) args.append('limit', limit.toString());
 	if (offset) args.append('offset', offset.toString());
 
-	return sendAuthenticatedRequest('GET', `/jobs?${args.toString()}`).then((data: unknown) =>
+	return sendRequest('GET', `/jobs?${args.toString()}`).then((data: unknown) =>
 		(data as Array<unknown>).map((j) => Job.fromObject(j)),
 	);
 }
 
 export async function runJob(command: RunCommand): Promise<unknown> {
-	return sendAuthenticatedRequest('POST', '/jobs', {
+	return sendRequest('POST', '/jobs', {
 		client: command.client,
 		tgtType: command.targetType,
 		tgt: command.target,
@@ -293,9 +253,7 @@ export async function runJob(command: RunCommand): Promise<unknown> {
 }
 
 export async function getJobById(jobId: string): Promise<Job> {
-	return sendAuthenticatedRequest('GET', `/jobs/${jobId}`).then((data: unknown) =>
-		Job.fromObject(data),
-	);
+	return sendRequest('GET', `/jobs/${jobId}`).then((data: unknown) => Job.fromObject(data));
 }
 
 ///
@@ -303,21 +261,21 @@ export async function getJobById(jobId: string): Promise<Job> {
 ///
 
 export async function getKeys(): Promise<Array<Key>> {
-	return sendAuthenticatedRequest('GET', '/keys').then((data: unknown) =>
+	return sendRequest('GET', '/keys').then((data: unknown) =>
 		(data as Array<unknown>).map((k) => Key.fromObject(k)),
 	);
 }
 
 export async function acceptKey(key: Key): Promise<void> {
-	await sendAuthenticatedRequest('PUT', `/keys/${key.state}/${key.id}/accept`);
+	await sendRequest('PUT', `/keys/${key.state}/${key.id}/accept`);
 }
 
 export async function rejectKey(key: Key): Promise<void> {
-	await sendAuthenticatedRequest('PUT', `/keys/${key.state}/${key.id}/reject`);
+	await sendRequest('PUT', `/keys/${key.state}/${key.id}/reject`);
 }
 
 export async function deleteKey(key: Key): Promise<void> {
-	await sendAuthenticatedRequest('DELETE', `/keys/${key.state}/${key.id}/delete`);
+	await sendRequest('DELETE', `/keys/${key.state}/${key.id}/delete`);
 }
 
 ///
@@ -333,25 +291,25 @@ export async function getPermissionGroups(
 	if (limit) args.append('limit', limit.toString());
 	if (offset) args.append('offset', offset.toString());
 
-	return sendAuthenticatedRequest('GET', `/permissions?${args.toString()}`).then(
-		(data: unknown) => (data as Array<unknown>).map((p) => PermissionGroup.fromObject(p)),
+	return sendRequest('GET', `/permissions?${args.toString()}`).then((data: unknown) =>
+		(data as Array<unknown>).map((p) => PermissionGroup.fromObject(p)),
 	);
 }
 
 export async function getPermissionGroup(id: string): Promise<PermissionGroup> {
-	return sendAuthenticatedRequest('GET', `/permissions/${id}`).then((data: unknown) =>
+	return sendRequest('GET', `/permissions/${id}`).then((data: unknown) =>
 		PermissionGroup.fromObject(data),
 	);
 }
 
 export async function createPermissionGroup(name: string): Promise<PermissionGroup> {
-	return sendAuthenticatedRequest('POST', '/permissions', {
+	return sendRequest('POST', '/permissions', {
 		name,
 	}).then((data: unknown) => PermissionGroup.fromObject(data));
 }
 
 export async function deletePermissionGroup(id: string): Promise<void> {
-	await sendAuthenticatedRequest('DELETE', `/permissions/${id}`);
+	await sendRequest('DELETE', `/permissions/${id}`);
 }
 
 export async function updatePermissionGroup(
@@ -359,7 +317,7 @@ export async function updatePermissionGroup(
 	name: string,
 	perms: fPerm[],
 ): Promise<void> {
-	await sendAuthenticatedRequest('PUT', `/permissions/${id}`, {
+	await sendRequest('PUT', `/permissions/${id}`, {
 		name,
 		perms: JSON.stringify(perms),
 	});
@@ -370,9 +328,9 @@ export async function updatePermissionGroup(
 ///
 
 export async function getExport(): Promise<unknown> {
-	return sendAuthenticatedRequest('GET', '/settings/export');
+	return sendRequest('GET', '/settings/export');
 }
 
 export async function importData(data: unknown): Promise<void> {
-	await sendAuthenticatedRequest('POST', '/settings/import', data);
+	await sendRequest('POST', '/settings/import', data);
 }

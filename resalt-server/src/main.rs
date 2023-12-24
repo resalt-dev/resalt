@@ -99,12 +99,12 @@ async fn start_server(
         .route("/", get(route_index_get))
         .route("/config", get(route_config_get))
         .route("/login", post(route_login_post))
+        .route("/logout", post(route_logout_post))
         .route("/metrics", get(route_metrics_get))
-        .route("/token", post(route_token_post))
-        .fallback(route_fallback_404);
+        .route("/token", post(route_token_post));
 
     let app = Router::new()
-        .nest("/api/auth", router_auth)
+        .nest("/api", router_auth)
         .nest("/api", router_noauth)
         // Embed web interface
         .fallback(route_frontend_get)

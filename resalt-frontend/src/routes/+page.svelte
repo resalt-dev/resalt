@@ -1,6 +1,5 @@
 <script>
 	import paths from '$lib/paths';
-	import { auth } from '$lib/stores';
 </script>
 
 <svelte:head>
@@ -11,8 +10,4 @@
 	/>
 </svelte:head>
 
-{#if $auth === null}
-	<meta http-equiv="refresh" content="0;url={paths.login.getPath()}" />
-{:else}
-	<meta http-equiv="refresh" content="0;url={paths.dashboard.getPath()}" />
-{/if}
+<meta http-equiv="refresh" content="0;url={paths.dashboard.getPath()}" />
