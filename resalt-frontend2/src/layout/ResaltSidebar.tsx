@@ -1,4 +1,4 @@
-import { Button, TabList, makeStyles, shorthands } from '@fluentui/react-components';
+import { Button, Tab, TabList, makeStyles, shorthands } from '@fluentui/react-components';
 import { HomeRegular } from '@fluentui/react-icons';
 import { tokens, typographyStyles } from '@fluentui/tokens';
 import { Link, useLocation } from 'react-router-dom';
@@ -118,7 +118,14 @@ export default function ResaltSidebar() {
 							<div className={styles.sidebarHeader}>{section.title}</div>
 							{section.items.map((item) => (
 								<Link key={item.path} to={item.path}>
-									{}
+									<Tab
+										key={item.path}
+										className={styles.sidebarItem}
+										icon={<item.Icon className={styles.sidebarItemIcon} />}
+										value={item.path}
+									>
+										{item.name}
+									</Tab>
 								</Link>
 							))}
 						</div>

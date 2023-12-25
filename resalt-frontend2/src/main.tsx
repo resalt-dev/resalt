@@ -59,8 +59,11 @@ const router = createBrowserRouter([
 	},
 ]);
 
+// const currentUser = signal<string | null>(null);
+
 function RootLayout() {
 	const styles = useStyles();
+
 	return (
 		<FluentProvider theme={webLightTheme} className={styles.fluentProvider}>
 			<ResaltHeader />

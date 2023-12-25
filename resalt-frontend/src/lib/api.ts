@@ -1,4 +1,3 @@
-import AuthToken from '$model/AuthToken';
 import Config from '$model/Config';
 import type Filter from '$model/Filter';
 import Job from '$model/Job';
@@ -39,11 +38,11 @@ async function sendRequest(method: string, path: string, data?: unknown): Promis
 /// Auth
 ///
 
-export async function login(username: string, password: string): Promise<AuthToken> {
-	return await sendRequest('POST', '/login', {
+export async function login(username: string, password: string): Promise<void> {
+	await sendRequest('POST', '/login', {
 		username,
 		password,
-	}).then((data: unknown) => AuthToken.fromObject(data));
+	});
 }
 
 export async function getConfig(): Promise<Config> {
