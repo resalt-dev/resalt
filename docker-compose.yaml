@@ -29,16 +29,30 @@ services:
     deploy:
       replicas: 3
 
+  # frontend:
+  #   image: oven/bun:1.0.17
+  #   volumes:
+  #     - ./resalt-frontend/.svelte-kit/tsconfig.json:/home/bun/app/.svelte-kit/tsconfig.json
+  #     - ./resalt-frontend/src:/home/bun/app/src
+  #     - ./resalt-frontend/static:/home/bun/app/static
+  #     - ./resalt-frontend/package.json:/home/bun/app/package.json
+  #     - ./resalt-frontend/svelte.config.js:/home/bun/app/svelte.config.js
+  #     - ./resalt-frontend/tsconfig.json:/home/bun/app/tsconfig.json
+  #     - ./resalt-frontend/vite.config.ts:/home/bun/app/vite.config.ts
+  #   command: /bin/sh -c "bun install && bun run dev"
+  #   restart: always
+  #   ports:
+  #     - "5555:5555"
   frontend:
     image: oven/bun:1.0.17
     volumes:
-      - ./resalt-frontend/.svelte-kit/tsconfig.json:/home/bun/app/.svelte-kit/tsconfig.json
-      - ./resalt-frontend/src:/home/bun/app/src
-      - ./resalt-frontend/static:/home/bun/app/static
-      - ./resalt-frontend/package.json:/home/bun/app/package.json
-      - ./resalt-frontend/svelte.config.js:/home/bun/app/svelte.config.js
-      - ./resalt-frontend/tsconfig.json:/home/bun/app/tsconfig.json
-      - ./resalt-frontend/vite.config.ts:/home/bun/app/vite.config.ts
+      - ./resalt-frontend2/public:/home/bun/app/public
+      - ./resalt-frontend2/src:/home/bun/app/src
+      - ./resalt-frontend2/index.html:/home/bun/app/index.html
+      - ./resalt-frontend2/package.json:/home/bun/app/package.json
+      - ./resalt-frontend2/tsconfig.json:/home/bun/app/tsconfig.json
+      - ./resalt-frontend2/tsconfig.node.json:/home/bun/app/tsconfig.node.json
+      - ./resalt-frontend2/vite.config.ts:/home/bun/app/vite.config.ts
     command: /bin/sh -c "bun install && bun run dev"
     restart: always
     ports:
