@@ -6,6 +6,7 @@ import {
 	webLightTheme,
 } from '@fluentui/react-components';
 import { tokens } from '@fluentui/tokens';
+import { signal } from '@preact/signals-react';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
@@ -13,6 +14,7 @@ import ResaltHeader from './layout/ResaltHeader';
 import ResaltSidebar from './layout/ResaltSidebar';
 import './lib/fluentui.css';
 import paths from './lib/paths';
+import User from './models/User';
 
 const useStyles = makeStyles({
 	fluentProvider: {
@@ -59,14 +61,14 @@ const router = createBrowserRouter([
 	},
 ]);
 
-// const currentUser = signal<string | null>(null);
+const currentUser = signal<User | null>(null);
 
 function RootLayout() {
 	const styles = useStyles();
 
 	return (
 		<FluentProvider theme={webLightTheme} className={styles.fluentProvider}>
-			<ResaltHeader />
+			<ResaltHeader currentUser={currentUser} />
 			<div className={mergeClasses(styles.bodyGrid, 'm-0')}>
 				<div className={styles.bodySidebar}>
 					<ResaltSidebar />

@@ -5,20 +5,38 @@ import {
 	Card,
 	CardFooter,
 	CardHeader,
+	Menu,
+	MenuItem,
+	MenuList,
+	MenuPopover,
+	MenuTrigger,
+	Toolbar,
+	ToolbarButton,
+	ToolbarDivider,
 	makeStyles,
+	shorthands,
+	tokens,
 	typographyStyles,
 } from '@fluentui/react-components';
-import { ArrowReplyRegular, MoreHorizontal20Regular, ShareRegular } from '@fluentui/react-icons';
+import {
+	ArrowReplyRegular,
+	FontDecrease24Regular,
+	FontIncrease24Regular,
+	MoreHorizontal24Filled,
+	ShareRegular,
+	TextFont24Regular,
+} from '@fluentui/react-icons';
 import { useGlobalStyles } from '../../lib/ui';
 
 const useStyles = makeStyles({
 	presetList: {},
+	presetListTitle: {
+		...typographyStyles.subtitle2Stronger,
+		...shorthands.padding(tokens.spacingHorizontalS),
+	},
 	presetItem: {},
 	presetItemTitle: {
 		...typographyStyles.body2,
-	},
-	presetItemCaption: {
-		...typographyStyles.caption1,
 	},
 });
 
@@ -37,30 +55,35 @@ export default function MinionsRoute() {
 			</div>
 			<div className="fl-grid">
 				<Card className="fl-span-3 p-0">
+					<CardHeader header={<>Presets</>} className={styles.presetListTitle} />
+					<Toolbar size="small">
+						<ToolbarButton appearance="primary" icon={<FontIncrease24Regular />} />
+						<ToolbarButton icon={<FontDecrease24Regular />} />
+						<ToolbarButton icon={<TextFont24Regular />} />
+						<ToolbarDivider />
+						<Menu>
+							<MenuTrigger>
+								<ToolbarButton
+									aria-label="More"
+									icon={<MoreHorizontal24Filled />}
+								/>
+							</MenuTrigger>
+
+							<MenuPopover>
+								<MenuList>
+									<MenuItem>New </MenuItem>
+									<MenuItem>New Window</MenuItem>
+									<MenuItem disabled>Open File</MenuItem>
+									<MenuItem>Open Folder</MenuItem>
+								</MenuList>
+							</MenuPopover>
+						</Menu>
+					</Toolbar>
 					{presets.map((preset) => (
-						<Card
-							onClick={() => console.log('clicked')}
-							appearance="subtle"
-							key={preset}
-							className={styles.presetItem}
-							orientation="horizontal"
-						>
-							<CardHeader
-								header={<div className={styles.presetItemTitle}>App Name</div>}
-								description={
-									<Caption1 className={styles.presetItemCaption}>
-										Developer
-									</Caption1>
-								}
-								action={
-									<Button
-										appearance="transparent"
-										icon={<MoreHorizontal20Regular />}
-										aria-label="More options"
-									/>
-								}
-							/>
-						</Card>
+						<div>
+							{preset}
+							<br />
+						</div>
 					))}
 				</Card>
 				<Card className="fl-span-9">

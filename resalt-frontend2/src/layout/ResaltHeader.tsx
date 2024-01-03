@@ -1,4 +1,14 @@
-import { GriffelStyle, makeStyles, mergeClasses, shorthands } from '@fluentui/react-components';
+import {
+	Button,
+	GriffelStyle,
+	Popover,
+	PopoverSurface,
+	PopoverTrigger,
+	SkeletonItem,
+	makeStyles,
+	mergeClasses,
+	shorthands,
+} from '@fluentui/react-components';
 import {
 	Alert20Regular,
 	Megaphone20Regular,
@@ -8,7 +18,11 @@ import {
 	Settings20Regular,
 } from '@fluentui/react-icons';
 import { tokens } from '@fluentui/tokens';
+import { Signal } from '@preact/signals-react';
+import { useNavigate } from 'react-router-dom';
 import ResaltLogo from '../components/ResaltLogo.tsx';
+import paths from '../lib/paths.ts';
+import User from '../models/User.ts';
 import ResaltHeaderSearch from './ResaltHeaderSearch.tsx';
 
 const headerLogoHeight = '20px';
@@ -57,11 +71,26 @@ const useStyles = makeStyles({
 	headerSettingItem: {
 		...iconStyles,
 	},
+	headerProfilePopover: {
+		...shorthands.padding('0'),
+		...shorthands.borderRadius('0'),
+		minWidth: '325px',
+	},
+	headerProfilePopoverGrid: {
+		// alignItems: 'center',
+	},
+	headerProfilePopoverUsername: {
+		...shorthands.padding(tokens.spacingHorizontalM),
+	},
+	headerProfilePopoverLogout: {
+		width: '100%',
+	},
 });
 
-export default function ResaltHeader() {
+export default function ResaltHeader(props: { currentUser: Signal<User | null> }) {
 	console.log('render:ResaltHeader');
 	const styles = useStyles();
+	const navigate = useNavigate();
 
 	return (
 		<div className={mergeClasses('m-0', styles.headerGrid)}>
@@ -87,9 +116,48 @@ export default function ResaltHeader() {
 				<div className={styles.headerSettingItem}>
 					<Question20Filled />
 				</div>
-				<div className={styles.headerSettingItem}>
-					<Person28Filled />
-				</div>
+				<Popover {...props}>
+					<PopoverTrigger>
+						<div className={styles.headerSettingItem}>
+							<Person28Filled />
+						</div>
+					</PopoverTrigger>
+
+					<PopoverSurface tabIndex={-1} className={styles.headerProfilePopover}>
+						<div
+							className={mergeClasses(
+								'fl-grid',
+								'm-0',
+								styles.headerProfilePopoverGrid,
+							)}
+						>
+							<div
+								className={mergeClasses(
+									'fl-span-8',
+									styles.headerProfilePopoverUsername,
+								)}
+							>
+								{props.currentUser.value === null ? (
+									<SkeletonItem />
+								) : (
+									<span>{props.currentUser.value.username}</span>
+								)}
+							</div>
+							<Button
+								appearance="subtle"
+								className={mergeClasses(
+									'fl-span-4',
+									styles.headerProfilePopoverLogout,
+								)}
+								onClick={() => {
+									navigate(paths.logout.path);
+								}}
+							>
+								Logout
+							</Button>
+						</div>
+					</PopoverSurface>
+				</Popover>
 			</div>
 		</div>
 	);

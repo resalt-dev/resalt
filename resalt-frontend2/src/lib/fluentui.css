@@ -158,7 +158,9 @@ a:active {
 }
 
 .m-0 {
-	margin: var(--spacingVerticalNone) !important;
+	margin: 0 !important;
+	column-gap: 0 !important;
+	row-gap: 0 !important;
 }
 .m-xxs {
 	margin: var(--spacingVerticalXXS);
@@ -319,4 +321,14 @@ a:active {
 .px-xxxl {
 	padding-left: var(--spacingHorizontalXXXL);
 	padding-right: var(--spacingHorizontalXXXL);
+}
+
+/* Backgrounds */
+
+.bg-red {
+	background-color: var(--colorPaletteRedBackground2);
+}
+
+.bg-yellow {
+	background-color: var(--colorPaletteYellowBackground2);
 }
