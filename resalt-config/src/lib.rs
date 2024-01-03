@@ -19,8 +19,6 @@ enum ResaltConfigKey {
     SaltApiTlsSkipverify,
     SaltApiSystemServiceToken,
     HttpPort,
-    HttpFrontendThemeEnabled,
-    HttpFrontendThemeColor,
 }
 
 impl ResaltConfigKey {
@@ -39,8 +37,6 @@ impl ResaltConfigKey {
             ResaltConfigKey::SaltApiTlsSkipverify => "RESALT_SALT_API_TLS_SKIPVERIFY",
             ResaltConfigKey::SaltApiSystemServiceToken => "RESALT_SALT_API_TOKEN",
             ResaltConfigKey::HttpPort => "RESALT_HTTP_PORT",
-            ResaltConfigKey::HttpFrontendThemeEnabled => "RESALT_HTTP_FRONTEND_THEME_ENABLED",
-            ResaltConfigKey::HttpFrontendThemeColor => "RESALT_HTTP_FRONTEND_THEME_COLOR",
         }
     }
 
@@ -59,8 +55,6 @@ impl ResaltConfigKey {
             ResaltConfigKey::SaltApiTlsSkipverify => "false",
             ResaltConfigKey::SaltApiSystemServiceToken => SYSTEM_TOKEN_FALLBACK.as_str(),
             ResaltConfigKey::HttpPort => "8000",
-            ResaltConfigKey::HttpFrontendThemeEnabled => "true",
-            ResaltConfigKey::HttpFrontendThemeColor => "primary",
         }
     }
 }
@@ -124,10 +118,6 @@ pub mod ResaltConfig {
     pub static SALT_API_SYSTEM_SERVICE_TOKEN: Lazy<String> =
         Lazy::new(ResaltConfigInternal::salt_api_system_service_token);
     pub static HTTP_PORT: Lazy<u16> = Lazy::new(ResaltConfigInternal::http_port);
-    pub static HTTP_FRONTEND_THEME_ENABLED: Lazy<bool> =
-        Lazy::new(ResaltConfigInternal::http_frontend_theme_enabled);
-    pub static HTTP_FRONTEND_THEME_COLOR: Lazy<String> =
-        Lazy::new(ResaltConfigInternal::http_frontend_theme_color);
 }
 
 pub struct ResaltConfigInternal {}
@@ -182,14 +172,6 @@ impl ResaltConfigInternal {
 
     fn http_port() -> u16 {
         conf::<u16>(ResaltConfigKey::HttpPort)
-    }
-
-    fn http_frontend_theme_enabled() -> bool {
-        conf::<bool>(ResaltConfigKey::HttpFrontendThemeEnabled)
-    }
-
-    fn http_frontend_theme_color() -> String {
-        conf::<String>(ResaltConfigKey::HttpFrontendThemeColor)
     }
 }
 

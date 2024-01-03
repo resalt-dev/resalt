@@ -45,6 +45,10 @@ export async function login(username: string, password: string): Promise<void> {
 	});
 }
 
+export async function logout(): Promise<void> {
+	await sendRequest('POST', '/logout');
+}
+
 export async function getConfig(): Promise<Config> {
 	return await sendRequest('GET', '/config').then((data: unknown) => Config.fromObject(data));
 }
@@ -57,10 +61,6 @@ export async function getSystemStatus(): Promise<SystemStatus> {
 
 export async function getCurrentUser(): Promise<User> {
 	return sendRequest('GET', '/myself').then((data) => User.fromObject(data));
-}
-
-export async function logout(): Promise<void> {
-	await sendRequest('POST', '/logout');
 }
 
 ///

@@ -44,7 +44,7 @@ export default function MinionsRoute() {
 	const globalStyles = useGlobalStyles();
 	const styles = useStyles();
 
-	const presets = ['ALL MINIONS', 'NO - Oslo', 'SE - Lund'];
+	const presets = ['ALL MINIONS', 'NO - Oslo', 'SE - Lund', '1', '2', '3', '4', '5', '6'];
 
 	return (
 		<div>
@@ -54,55 +54,64 @@ export default function MinionsRoute() {
 				</div>
 			</div>
 			<div className="fl-grid">
-				<Card className="fl-span-3 p-0">
-					<CardHeader header={<>Presets</>} className={styles.presetListTitle} />
-					<Toolbar size="small">
-						<ToolbarButton appearance="primary" icon={<FontIncrease24Regular />} />
-						<ToolbarButton icon={<FontDecrease24Regular />} />
-						<ToolbarButton icon={<TextFont24Regular />} />
-						<ToolbarDivider />
-						<Menu>
-							<MenuTrigger>
-								<ToolbarButton
-									aria-label="More"
-									icon={<MoreHorizontal24Filled />}
-								/>
-							</MenuTrigger>
-
-							<MenuPopover>
-								<MenuList>
-									<MenuItem>New </MenuItem>
-									<MenuItem>New Window</MenuItem>
-									<MenuItem disabled>Open File</MenuItem>
-									<MenuItem>Open Folder</MenuItem>
-								</MenuList>
-							</MenuPopover>
-						</Menu>
-					</Toolbar>
-					{presets.map((preset) => (
+				<div className="fl-span-3">
+					<Card>
 						<div>
-							{preset}
-							<br />
+							<div className={styles.presetListTitle}>Presets</div>
+							<Toolbar size="small">
+								<ToolbarButton
+									appearance="primary"
+									icon={<FontIncrease24Regular />}
+								/>
+								<ToolbarButton icon={<FontDecrease24Regular />} />
+								<ToolbarButton icon={<TextFont24Regular />} />
+								<ToolbarDivider />
+								<Menu>
+									<MenuTrigger>
+										<ToolbarButton
+											aria-label="More"
+											icon={<MoreHorizontal24Filled />}
+										/>
+									</MenuTrigger>
+
+									<MenuPopover>
+										<MenuList>
+											<MenuItem>New </MenuItem>
+											<MenuItem>New Window</MenuItem>
+											<MenuItem disabled>Open File</MenuItem>
+											<MenuItem>Open Folder</MenuItem>
+										</MenuList>
+									</MenuPopover>
+								</Menu>
+							</Toolbar>
+							{presets.map((preset) => (
+								<div>
+									{preset}
+									<br />
+								</div>
+							))}
 						</div>
-					))}
-				</Card>
-				<Card className="fl-span-9">
-					<CardHeader
-						header={
-							<Body1>
-								<b>Elvia Atkins</b> mentioned you
-							</Body1>
-						}
-						description={<Caption1>5h ago · About us - Overview</Caption1>}
-					/>
+					</Card>
+				</div>
+				<div className="fl-span-9">
+					<Card>
+						<CardHeader
+							header={
+								<Body1>
+									<b>Elvia Atkins</b> mentioned you
+								</Body1>
+							}
+							description={<Caption1>5h ago · About us - Overview</Caption1>}
+						/>
 
-					<p>Hi lorum ipsum dolor etat</p>
+						<p>Hi lorum ipsum dolor etat</p>
 
-					<CardFooter>
-						<Button icon={<ArrowReplyRegular fontSize={16} />}>Reply</Button>
-						<Button icon={<ShareRegular fontSize={16} />}>Share</Button>
-					</CardFooter>
-				</Card>
+						<CardFooter>
+							<Button icon={<ArrowReplyRegular fontSize={16} />}>Reply</Button>
+							<Button icon={<ShareRegular fontSize={16} />}>Share</Button>
+						</CardFooter>
+					</Card>
+				</div>
 			</div>
 		</div>
 	);

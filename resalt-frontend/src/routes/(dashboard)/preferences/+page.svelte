@@ -3,13 +3,13 @@
 	import Icon from '$component/Icon.svelte';
 	import constants from '$lib/constants';
 	import { P_ADMIN_SUPERADMIN, hasResaltPermission } from '$lib/perms';
-	import { config, currentUser, theme, toasts } from '$lib/stores';
+	import { currentUser, theme, toasts } from '$lib/stores';
 	import { MessageType } from '$model/MessageType';
 
 	function selectColor(color: string): void {
 		console.log('selectColor', color);
 		if (color === 'reset') {
-			$theme.color = $config?.themeDefaultColor ?? 'primary';
+			$theme.color = 'primary';
 		} else {
 			$theme.color = color;
 		}
@@ -20,42 +20,34 @@
 	<title>Preferences</title>
 </svelte:head>
 
-{#if $config?.themeEnableSwitching ?? true}
-	<div class="card mb-3">
-		<div class="card-header">Color</div>
-		<div class="card-body">
-			<div class="row">
-				{#each constants.themeColors as color}
-					<div class="col-auto">
-						<Clickable
-							type="div"
-							event={() => selectColor(color)}
-							class="theme-selector-box bg-{color} mb-4 border-light"
-						>
-							{#if $theme.color === color}
-								<Icon
-									name="check"
-									style="color: {color === 'yellow'
-										? 'black'
-										: 'white'} !important;"
-									size="3"
-								/>
-							{/if}
-						</Clickable>
-					</div>
-				{/each}
-			</div>
-
-			<button
-				type="button"
-				class="btn btn-{$theme.color}"
-				on:click={() => selectColor('reset')}
-			>
-				Reset
-			</button>
+<div class="card mb-3">
+	<div class="card-header">Color</div>
+	<div class="card-body">
+		<div class="row">
+			{#each constants.themeColors as color}
+				<div class="col-auto">
+					<Clickable
+						type="div"
+						event={() => selectColor(color)}
+						class="theme-selector-box bg-{color} mb-4 border-light"
+					>
+						{#if $theme.color === color}
+							<Icon
+								name="check"
+								style="color: {color === 'yellow' ? 'black' : 'white'} !important;"
+								size="3"
+							/>
+						{/if}
+					</Clickable>
+				</div>
+			{/each}
 		</div>
+
+		<button type="button" class="btn btn-{$theme.color}" on:click={() => selectColor('reset')}>
+			Reset
+		</button>
 	</div>
-{/if}
+</div>
 
 {#if hasResaltPermission($currentUser, P_ADMIN_SUPERADMIN)}
 	<div class="card mb-0">

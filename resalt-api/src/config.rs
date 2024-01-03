@@ -14,10 +14,6 @@ pub struct ApiConfig {
     latest_version: String,
     #[serde(rename = "latestNews")]
     latest_news: Vec<String>,
-    #[serde(rename = "themeDefaultColor")]
-    theme_default_color: String,
-    #[serde(rename = "themeEnableSwitching")]
-    theme_enable_switching: bool,
 }
 
 pub async fn get_config(use_cache: bool) -> Result<ApiConfig, StatusCode> {
@@ -45,8 +41,6 @@ pub async fn get_config(use_cache: bool) -> Result<ApiConfig, StatusCode> {
                 Vec::new()
             }
         },
-        theme_default_color: ResaltConfig::HTTP_FRONTEND_THEME_COLOR.clone(),
-        theme_enable_switching: *ResaltConfig::HTTP_FRONTEND_THEME_ENABLED,
     };
     Ok(config)
 }

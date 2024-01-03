@@ -25,11 +25,7 @@
 				config.set(data);
 				// set default color if theme.color is null
 				if (!$theme.color) {
-					$theme.color = data.themeDefaultColor;
-				}
-				// reset color if switching is disabled
-				if (!data.themeEnableSwitching) {
-					$theme.color = data.themeDefaultColor;
+					$theme.color = 'primary';
 				}
 			})
 			.catch((err: unknown) => {
