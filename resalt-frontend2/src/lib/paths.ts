@@ -47,7 +47,7 @@ export class Path {
 
 	Icon: FluentIcon;
 
-	constructor(path: string, name: string, element: () => any, icon: FluentIcon | null) {
+	constructor(path: string, name: string, element: () => unknown, icon: FluentIcon | null) {
 		this.path = path;
 		this.name = name;
 		this.element = element;
@@ -109,5 +109,3 @@ export const sidebar: { title: string; items: Path[] }[] = [
 		items: [paths.users, paths.groups, paths.permissions],
 	},
 ];
-
-export default paths;

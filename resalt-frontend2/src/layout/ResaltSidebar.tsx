@@ -80,7 +80,7 @@ export default function ResaltSidebar() {
 	const styles = useStyles();
 
 	// Detect current page
-	let location = useLocation();
+	const location = useLocation();
 	let currentPath = paths.dashboard;
 	for (const section of sidebar) {
 		for (const item of section.items) {

@@ -85,7 +85,7 @@ export default function MinionsRoute() {
 								</Menu>
 							</Toolbar>
 							{presets.map((preset) => (
-								<div>
+								<div key={preset} className={styles.presetItem}>
 									{preset}
 									<br />
 								</div>

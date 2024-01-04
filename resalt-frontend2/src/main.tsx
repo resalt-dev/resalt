@@ -1,52 +1,22 @@
-import {
-	FluentProvider,
-	makeStyles,
-	mergeClasses,
-	shorthands,
-	webLightTheme,
-} from '@fluentui/react-components';
-import { tokens } from '@fluentui/tokens';
 import { signal } from '@preact/signals-react';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { Outlet, RouterProvider, createBrowserRouter } from 'react-router-dom';
-import ResaltHeader from './layout/ResaltHeader';
-import ResaltSidebar from './layout/ResaltSidebar';
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import RootLayout from './layout/ResaltRootLayout';
 import './lib/fluentui.css';
-import paths from './lib/paths';
+import { paths } from './lib/paths';
 import User from './models/User';
 
-const useStyles = makeStyles({
-	fluentProvider: {
-		backgroundColor: tokens.colorNeutralBackground4,
-	},
-
-	//
-	// Body
-	//
-	bodyGrid: {
-		display: 'grid',
-		gridTemplateColumns: '[sidebar] 280px [main-area] auto',
-		gridTemplateRows: 'auto',
-	},
-	bodySidebar: {
-		gridColumnStart: 'sidebar',
-		height: 'calc(100vh - 48px)',
-	},
-	mainArea: {
-		gridColumnStart: 'main-area',
-		// backgroundColor: 'rgba(255, 0, 0, 0.2)', // DEBUG
-		...shorthands.overflow('auto'),
-	},
-});
+const currentUser = signal<User | null>(null);
 
 const router = createBrowserRouter([
 	{
 		path: '/',
-		element: <RootLayout />,
+		element: <RootLayout currentUser={currentUser} />,
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		children: Object.entries(paths).map(([_name, path]) => ({
 			path: path.path,
-			element: React.createElement(path.element as () => JSX.Element, null, null),
+			element: React.createElement(path.element as () => JSX.Element, { currentUser }, null),
 		})),
 		// children: [
 		// 	{
@@ -60,26 +30,6 @@ const router = createBrowserRouter([
 		// ],
 	},
 ]);
-
-const currentUser = signal<User | null>(null);
-
-function RootLayout() {
-	const styles = useStyles();
-
-	return (
-		<FluentProvider theme={webLightTheme} className={styles.fluentProvider}>
-			<ResaltHeader currentUser={currentUser} />
-			<div className={mergeClasses(styles.bodyGrid, 'm-0')}>
-				<div className={styles.bodySidebar}>
-					<ResaltSidebar />
-				</div>
-				<div id="mainArea" className={styles.mainArea}>
-					<Outlet />
-				</div>
-			</div>
-		</FluentProvider>
-	);
-}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
 	<React.StrictMode>

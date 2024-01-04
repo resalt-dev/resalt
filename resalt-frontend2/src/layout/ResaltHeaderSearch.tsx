@@ -80,13 +80,7 @@ export default function ResaltHeaderSearch() {
 				onChange={(_e, data) => {
 					searchValue.value = data.value;
 				}}
-				contentBefore={
-					false && hasTextOrActive.value ? (
-						<></>
-					) : (
-						<SearchRegular className={styles.headerSearchButtonIcon} />
-					)
-				}
+				contentBefore={<SearchRegular className={styles.headerSearchButtonIcon} />}
 				contentAfter={
 					searchValue.value.length > 0 ? (
 						<DismissRegular

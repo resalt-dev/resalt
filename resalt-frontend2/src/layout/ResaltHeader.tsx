@@ -19,9 +19,11 @@ import {
 } from '@fluentui/react-icons';
 import { tokens } from '@fluentui/tokens';
 import { Signal } from '@preact/signals-react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import ResaltLogo from '../components/ResaltLogo.tsx';
-import paths from '../lib/paths.ts';
+import { getCurrentUser } from '../lib/api.ts';
+import { paths } from '../lib/paths.ts';
 import User from '../models/User.ts';
 import ResaltHeaderSearch from './ResaltHeaderSearch.tsx';
 
@@ -87,10 +89,40 @@ const useStyles = makeStyles({
 	},
 });
 
+const popupUser = new Signal<boolean>(false);
+
 export default function ResaltHeader(props: { currentUser: Signal<User | null> }) {
 	console.log('render:ResaltHeader');
-	const styles = useStyles();
+	// Navigation
+	const location = useLocation();
 	const navigate = useNavigate();
+	const params = useParams();
+	// Styles
+	const styles = useStyles();
+
+	useEffect(() => {
+		console.log('aaa');
+		if (props.currentUser.value !== null) {
+			return;
+		}
+		const from = location.pathname + location.search;
+		const to = paths.login.path + '?redirect=' + encodeURIComponent(from);
+
+		getCurrentUser()
+			.then((user: User) => {
+				console.log('Got current user', user);
+				props.currentUser.value = user;
+			})
+			.catch((err) => {
+				console.error('Failed to get current user', err);
+				if (location.pathname === paths.login.path) {
+					return;
+				}
+				console.log('Redirecting to', to);
+				navigate(to, { replace: true });
+			});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [location, params]);
 
 	return (
 		<div className={mergeClasses('m-0', styles.headerGrid)}>
@@ -116,7 +148,10 @@ export default function ResaltHeader(props: { currentUser: Signal<User | null> }
 				<div className={styles.headerSettingItem}>
 					<Question20Filled />
 				</div>
-				<Popover {...props}>
+				<Popover
+					open={popupUser.value}
+					onOpenChange={() => (popupUser.value = !popupUser.value)}
+				>
 					<PopoverTrigger>
 						<div className={styles.headerSettingItem}>
 							<Person28Filled />
@@ -151,9 +186,10 @@ export default function ResaltHeader(props: { currentUser: Signal<User | null> }
 								)}
 								onClick={() => {
 									navigate(paths.logout.path);
+									popupUser.value = false;
 								}}
 							>
-								Logout
+								Sign out
 							</Button>
 						</div>
 					</PopoverSurface>
