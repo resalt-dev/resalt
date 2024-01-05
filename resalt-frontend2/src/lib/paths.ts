@@ -43,11 +43,11 @@ export class Path {
 
 	name: string;
 
-	element: () => unknown;
+	element: Function;
 
 	Icon: FluentIcon;
 
-	constructor(path: string, name: string, element: () => unknown, icon: FluentIcon | null) {
+	constructor(path: string, name: string, element: Function, icon: FluentIcon | null) {
 		this.path = path;
 		this.name = name;
 		this.element = element;
