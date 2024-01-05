@@ -5,14 +5,19 @@ import {
 	Card,
 	CardFooter,
 	CardHeader,
+	DataGrid,
+	DataGridBody,
+	DataGridCell,
+	DataGridRow,
 	Menu,
 	MenuItem,
 	MenuList,
 	MenuPopover,
 	MenuTrigger,
-	Skeleton,
-	SkeletonItem,
+	TableCellLayout,
+	TableColumnDefinition,
 	ToolbarButton,
+	createTableColumn,
 	makeStyles,
 	shorthands,
 	tokens,
@@ -33,7 +38,6 @@ import { useGlobalStyles } from '../../lib/ui';
 import MinionPreset from '../../models/MinionPreset';
 
 const useStyles = makeStyles({
-	presetList: {},
 	presetListTitle: {
 		...typographyStyles.subtitle2Stronger,
 		...shorthands.padding(tokens.spacingHorizontalS),
@@ -73,6 +77,21 @@ function presetError(err: any) {
 }
 
 const AddIcon = bundleIcon(AddFilled, AddRegular);
+
+const columns: TableColumnDefinition<MinionPreset>[] = [
+	createTableColumn<MinionPreset>({
+		columnId: 'name',
+		compare: (a, b) => {
+			return a.name.localeCompare(b.name);
+		},
+		renderHeaderCell: () => {
+			return 'File';
+		},
+		renderCell: (item) => {
+			return <TableCellLayout>{item.name}</TableCellLayout>;
+		},
+	}),
+];
 
 export default function MinionsRoute() {
 	const globalStyles = useGlobalStyles();
@@ -114,21 +133,29 @@ export default function MinionsRoute() {
 								</Menu>
 							}
 						/>
-						<div>
-							{(presets.value ?? emptyPresets).map((preset) => (
-								<div key={preset.id} className={styles.presetItem}>
-									{preset.name.length === 0 ? (
-										<Skeleton>
-											<SkeletonItem />
-										</Skeleton>
-									) : (
-										<span>{preset.name}</span>
-									)}
-									<br />
-									<br />
-								</div>
-							))}
-						</div>
+						<DataGrid
+							items={presets.value ?? emptyPresets}
+							columns={columns}
+							selectionMode="single"
+							getRowId={(item) => item.id}
+							onSelectionChange={(_e, data) => console.warn(data)}
+							focusMode="composite"
+						>
+							<DataGridBody<MinionPreset>>
+								{({ item, rowId }) => (
+									<DataGridRow<MinionPreset>
+										key={rowId}
+										selectionCell={{
+											checkboxIndicator: { 'aria-label': 'Select row' },
+										}}
+									>
+										{({ renderCell }) => (
+											<DataGridCell>{renderCell(item)}</DataGridCell>
+										)}
+									</DataGridRow>
+								)}
+							</DataGridBody>
+						</DataGrid>
 					</Card>
 				</div>
 				<div className="fl-span-9">
