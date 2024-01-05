@@ -17,6 +17,20 @@ class MinionPresetRaw {
 export default class MinionPreset {
 	static fromObject(data: unknown): MinionPreset {
 		const { id, name, filter } = data as MinionPresetRaw;
+		return new MinionPreset(id, name, filter);
+	}
+
+	id: string;
+
+	name: string;
+
+	filters: Filter[];
+
+	invalidData: boolean;
+
+	constructor(id: string, name: string, filter: string) {
+		this.id = id;
+		this.name = name;
 
 		const parsedFilters: Filter[] = [];
 		let invalidData = false;
@@ -34,21 +48,8 @@ export default class MinionPreset {
 			console.warn('Failed to parse filter data:', e);
 			invalidData = true;
 		}
-		return new MinionPreset(id, name, parsedFilters, invalidData);
-	}
 
-	id: string;
-
-	name: string;
-
-	filters: Filter[];
-
-	invalidData: boolean;
-
-	constructor(id: string, name: string, filters: Filter[], invalidData: boolean) {
-		this.id = id;
-		this.name = name;
-		this.filters = filters;
+		this.filters = parsedFilters;
 		this.invalidData = invalidData;
 	}
 }

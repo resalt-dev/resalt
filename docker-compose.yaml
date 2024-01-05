@@ -2,13 +2,13 @@ version: '3'
 
 services:
   redis:
-    image: redis:7-alpine
+    image: docker.io/library/redis:7-alpine
     command: redis-server --save 60 1 --requirepass resalt
     ports:
       - "6379:6379"
 
   master:
-    image: saltstack/salt:3006.4
+    image: docker.io/saltstack/salt:3006.4
     hostname: master
     volumes:
       - ./docs/docker/saltconfig/etc/master:/etc/salt/master:ro
@@ -20,7 +20,7 @@ services:
     ports:
       - "8080:8080"
   minion:
-    image: saltstack/salt:3006.4
+    image: docker.io/saltstack/salt:3006.4
     command: salt-minion -l info
     volumes:
       - ./docs/docker/saltconfig/etc/minion:/etc/salt/minion:ro
@@ -44,7 +44,7 @@ services:
   #   ports:
   #     - "5555:5555"
   frontend:
-    image: oven/bun:1.0.17
+    image: docker.io/oven/bun:1.0.21
     volumes:
       - ./resalt-frontend2/public:/home/bun/app/public
       - ./resalt-frontend2/src:/home/bun/app/src
@@ -113,7 +113,7 @@ services:
       - "8000:8000"
 
   proxy:
-    image: nginx:alpine-slim
+    image: docker.io/library/nginx:alpine-slim
     volumes:
       - ./docs/docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     ports:

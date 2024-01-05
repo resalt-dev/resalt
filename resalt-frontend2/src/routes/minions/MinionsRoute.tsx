@@ -10,23 +10,27 @@ import {
 	MenuList,
 	MenuPopover,
 	MenuTrigger,
-	Toolbar,
+	Skeleton,
+	SkeletonItem,
 	ToolbarButton,
-	ToolbarDivider,
 	makeStyles,
 	shorthands,
 	tokens,
 	typographyStyles,
 } from '@fluentui/react-components';
 import {
+	AddFilled,
+	AddRegular,
 	ArrowReplyRegular,
-	FontDecrease24Regular,
-	FontIncrease24Regular,
 	MoreHorizontal24Filled,
 	ShareRegular,
-	TextFont24Regular,
+	bundleIcon,
 } from '@fluentui/react-icons';
+import { signal } from '@preact/signals-react';
+import { useEffect } from 'react';
+import { createMinionPreset, getMinionPresets } from '../../lib/api';
 import { useGlobalStyles } from '../../lib/ui';
+import MinionPreset from '../../models/MinionPreset';
 
 const useStyles = makeStyles({
 	presetList: {},
@@ -40,14 +44,44 @@ const useStyles = makeStyles({
 	},
 });
 
+const emptyPresets = [
+	new MinionPreset('e1', '', '[]'),
+	new MinionPreset('e2', '', '[]'),
+	new MinionPreset('e3', '', '[]'),
+	new MinionPreset('e4', '', '[]'),
+	new MinionPreset('e5', '', '[]'),
+];
+const presets = signal<MinionPreset[] | null>(null);
+
+function loadPresets() {
+	getMinionPresets()
+		.then((v) => {
+			console.log('Got presets', presets);
+			presets.value = v;
+		})
+		.catch((err) => {
+			console.error('Failed to get presets', err);
+		});
+}
+
+function newPreset() {
+	createMinionPreset('#NewPreset#', []).then(loadPresets).catch(presetError);
+}
+
+function presetError(err: any) {
+	console.error('Minion Presets Error', err);
+}
+
+const AddIcon = bundleIcon(AddFilled, AddRegular);
+
 export default function MinionsRoute() {
 	const globalStyles = useGlobalStyles();
 	const styles = useStyles();
 
-	const presets = ['ALL MINIONS', 'NO - Oslo', 'SE - Lund', '1', '2', '3', '4', '5', '6'];
+	useEffect(loadPresets, []);
 
 	return (
-		<div>
+		<>
 			<div className="fl-grid">
 				<div className="fl-span-2">
 					<div className={globalStyles.title}>Minions</div>
@@ -56,16 +90,9 @@ export default function MinionsRoute() {
 			<div className="fl-grid">
 				<div className="fl-span-3">
 					<Card>
-						<div>
-							<div className={styles.presetListTitle}>Presets</div>
-							<Toolbar size="small">
-								<ToolbarButton
-									appearance="primary"
-									icon={<FontIncrease24Regular />}
-								/>
-								<ToolbarButton icon={<FontDecrease24Regular />} />
-								<ToolbarButton icon={<TextFont24Regular />} />
-								<ToolbarDivider />
+						<CardHeader
+							header={<span className={styles.presetListTitle}>Presets</span>}
+							action={
 								<Menu>
 									<MenuTrigger>
 										<ToolbarButton
@@ -76,17 +103,28 @@ export default function MinionsRoute() {
 
 									<MenuPopover>
 										<MenuList>
-											<MenuItem>New </MenuItem>
-											<MenuItem>New Window</MenuItem>
-											<MenuItem disabled>Open File</MenuItem>
-											<MenuItem>Open Folder</MenuItem>
+											<MenuItem icon={<AddIcon />} onClick={newPreset}>
+												New Preset
+											</MenuItem>
+											<MenuItem>Copy Preset</MenuItem>
+											<MenuItem>Save Preset</MenuItem>
+											<MenuItem disabled>Delete Presets</MenuItem>
 										</MenuList>
 									</MenuPopover>
 								</Menu>
-							</Toolbar>
-							{presets.map((preset) => (
-								<div key={preset} className={styles.presetItem}>
-									{preset}
+							}
+						/>
+						<div>
+							{(presets.value ?? emptyPresets).map((preset) => (
+								<div key={preset.id} className={styles.presetItem}>
+									{preset.name.length === 0 ? (
+										<Skeleton>
+											<SkeletonItem />
+										</Skeleton>
+									) : (
+										<span>{preset.name}</span>
+									)}
+									<br />
 									<br />
 								</div>
 							))}
@@ -113,6 +151,6 @@ export default function MinionsRoute() {
 					</Card>
 				</div>
 			</div>
-		</div>
+		</>
 	);
 }

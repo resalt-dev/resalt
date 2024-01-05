@@ -67,14 +67,14 @@ export async function getCurrentUser(): Promise<User> {
 /// Users
 ///
 
-export async function getUsers(limit: number | null, offset: number | null): Promise<Array<User>> {
+export async function getUsers(limit: number | null, offset: number | null): Promise<User[]> {
 	const args = new URLSearchParams();
 
 	if (limit) args.append('limit', limit.toString());
 	if (offset) args.append('offset', offset.toString());
 
 	return sendRequest('GET', `/users?${args.toString()}`).then((data: unknown) => {
-		return (data as Array<unknown>).map((u) => User.fromObject(u));
+		return (data as unknown[]).map((u) => User.fromObject(u));
 	});
 }
 
@@ -122,7 +122,7 @@ export async function getMinions(
 	sort: string | null,
 	limit: number | null,
 	offset: number | null,
-): Promise<Array<Minion>> {
+): Promise<Minion[]> {
 	const filteredFilters = filters.filter((f) => f.isValid());
 	const args = new URLSearchParams();
 
@@ -133,7 +133,7 @@ export async function getMinions(
 	if (offset) args.append('offset', offset.toString());
 
 	return sendRequest('GET', `/minions?${args.toString()}`).then((data: unknown) =>
-		(data as Array<unknown>).map((m) => Minion.fromObject(m)),
+		(data as unknown[]).map((m) => Minion.fromObject(m)),
 	);
 }
 
@@ -155,16 +155,16 @@ export async function searchGrains(query: string, filters: Filter[]): Promise<un
 	if (filteredFilters && filteredFilters.length > 0)
 		args.append('filter', encodeURIComponent(JSON.stringify(filteredFilters)));
 
-	return (await sendRequest('GET', `/grains?${args.toString()}`)) as Array<unknown>;
+	return (await sendRequest('GET', `/grains?${args.toString()}`)) as unknown[];
 }
 
 ///
 /// Minion Presets
 ///
 
-export async function getMinionPresets(): Promise<Array<MinionPreset>> {
+export async function getMinionPresets(): Promise<MinionPreset[]> {
 	return sendRequest('GET', '/presets').then((data: unknown) =>
-		(data as Array<unknown>).map((p) => MinionPreset.fromObject(p)),
+		(data as unknown[]).map((p) => MinionPreset.fromObject(p)),
 	);
 }
 
@@ -204,17 +204,14 @@ export async function deleteMinionPreset(id: string): Promise<void> {
 /// Events
 ///
 
-export async function getEvents(
-	limit: number | null,
-	offset: number | null,
-): Promise<Array<SaltEvent>> {
+export async function getEvents(limit: number | null, offset: number | null): Promise<SaltEvent[]> {
 	const args = new URLSearchParams();
 
 	if (limit) args.append('limit', limit.toString());
 	if (offset) args.append('offset', offset.toString());
 
 	return sendRequest('GET', `/events?${args.toString()}`).then((data: unknown) =>
-		(data as Array<unknown>).map((e) => SaltEvent.fromObject(e)),
+		(data as unknown[]).map((e) => SaltEvent.fromObject(e)),
 	);
 }
 
@@ -226,7 +223,7 @@ export async function getJobs(
 	sort: string | null,
 	limit: number | null,
 	offset: number | null,
-): Promise<Array<Job>> {
+): Promise<Job[]> {
 	const args = new URLSearchParams();
 
 	if (sort) args.append('sort', sort);
@@ -234,7 +231,7 @@ export async function getJobs(
 	if (offset) args.append('offset', offset.toString());
 
 	return sendRequest('GET', `/jobs?${args.toString()}`).then((data: unknown) =>
-		(data as Array<unknown>).map((j) => Job.fromObject(j)),
+		(data as unknown[]).map((j) => Job.fromObject(j)),
 	);
 }
 
@@ -258,9 +255,9 @@ export async function getJobById(jobId: string): Promise<Job> {
 /// Keys
 ///
 
-export async function getKeys(): Promise<Array<Key>> {
+export async function getKeys(): Promise<Key[]> {
 	return sendRequest('GET', '/keys').then((data: unknown) =>
-		(data as Array<unknown>).map((k) => Key.fromObject(k)),
+		(data as unknown[]).map((k) => Key.fromObject(k)),
 	);
 }
 
@@ -283,14 +280,14 @@ export async function deleteKey(key: Key): Promise<void> {
 export async function getPermissionGroups(
 	limit: number | null,
 	offset: number | null,
-): Promise<Array<PermissionGroup>> {
+): Promise<PermissionGroup[]> {
 	const args = new URLSearchParams();
 
 	if (limit) args.append('limit', limit.toString());
 	if (offset) args.append('offset', offset.toString());
 
 	return sendRequest('GET', `/permissions?${args.toString()}`).then((data: unknown) =>
-		(data as Array<unknown>).map((p) => PermissionGroup.fromObject(p)),
+		(data as unknown[]).map((p) => PermissionGroup.fromObject(p)),
 	);
 }
 
