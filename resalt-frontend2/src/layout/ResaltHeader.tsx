@@ -97,7 +97,7 @@ const useStyles = makeStyles({
 	},
 	headerLogoImage2: {
 		height: headerLogoHeight,
-		...shorthands.padding(tokens.spacingHorizontalM, tokens.spacingHorizontalSNudge),
+		...shorthands.padding(tokens.spacingHorizontalL, tokens.spacingHorizontalSNudge),
 	},
 	headerButton: {
 		...headerButtonStyles,
