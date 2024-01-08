@@ -1,4 +1,5 @@
 import {
+	Badge,
 	Button,
 	Card,
 	CardFooter,
@@ -12,31 +13,54 @@ import {
 	MenuList,
 	MenuPopover,
 	MenuTrigger,
+	Select,
+	SkeletonItem,
+	Table,
+	TableBody,
+	TableCell,
 	TableCellLayout,
 	TableColumnDefinition,
+	TableColumnId,
+	TableHeader,
+	TableHeaderCell,
+	TableRow,
 	TableRowId,
 	ToolbarButton,
 	createTableColumn,
 	makeStyles,
+	mergeClasses,
 	shorthands,
 	tokens,
 	typographyStyles,
+	useTableFeatures,
+	useTableSort,
 } from '@fluentui/react-components';
 import {
 	AddFilled,
 	AddRegular,
+	AppsFilled,
+	AppsRegular,
+	ArrowMinimizeFilled,
+	ArrowMinimizeRegular,
 	ArrowReplyRegular,
+	InfoFilled,
+	InfoRegular,
 	MoreHorizontal24Filled,
+	ServerFilled,
+	ServerRegular,
 	ShareRegular,
-	VideoSwitchRegular,
+	SwipeDownFilled,
+	SwipeDownRegular,
 	bundleIcon,
 } from '@fluentui/react-icons';
 import { signal } from '@preact/signals-react';
 import { useEffect } from 'react';
 import { createMinionPreset, getMinionPresets, getMinions } from '../../lib/api';
 import { showError } from '../../lib/error';
-import { useGlobalStyles } from '../../lib/ui';
+import { SKEL, formatDate, useGlobalStyles } from '../../lib/ui';
 import Filter from '../../models/Filter';
+import { FilterFieldType } from '../../models/FilterFieldType';
+import { FilterOperand } from '../../models/FilterOperand';
 import Minion from '../../models/Minion';
 import MinionPreset from '../../models/MinionPreset';
 
@@ -60,6 +84,7 @@ function loadPresets() {
 		.then((v) => {
 			console.log('Got presets', presets);
 			presets.value = v;
+			presetsLoaded.value = true;
 		})
 		.catch((err) => showError('Error loading Presets', err));
 }
@@ -77,6 +102,10 @@ function selectPreset(selectedItems: Set<TableRowId>) {
 	}
 
 	const id = selectedItems.values().next().value as string;
+	if (id.startsWith('ä')) {
+		console.log('Ignoring skeleton item');
+		return;
+	}
 	const preset = presets.value?.find((p) => p.id === id);
 	if (!preset) {
 		console.error('Failed to find preset', id);
@@ -93,34 +122,91 @@ function selectPreset(selectedItems: Set<TableRowId>) {
 }
 
 //
+// Filters
+//
+
+function addFilter() {
+	filters.value = [...filters.value, Filter.newEmpty()];
+}
+
+function updateFilter(f: Filter, fieldType: string, newValue: string): void {
+	const copy: Filter[] = JSON.parse(JSON.stringify(filters.value)).map((f2: unknown) =>
+		Filter.fromObject(f2),
+	);
+	const filter = copy.filter((f2) => f2.id === f.id)[0];
+	console.log('Updating filter', f, filter);
+	if (!filter) {
+		console.error('Failed to find filter', f);
+		return;
+	}
+	switch (fieldType) {
+		case 'fieldType':
+			filter.fieldType = newValue as FilterFieldType;
+			break;
+		case 'operand':
+			filter.operand = newValue as FilterOperand;
+			break;
+		case 'value':
+			filter.value = newValue;
+			break;
+		default:
+			console.error('Unknown filter field', fieldType);
+			return;
+	}
+	filters.value = copy;
+}
+
+function toggleFiltersExpand() {
+	filtersExpanded.value = !filtersExpanded.value;
+}
+
+//
 // Minions
 //
 
 function loadMinions() {
-	let filters: Filter[] = [];
 	let sort = null; // TODO
 	let limit = null; // TODO
 	let offset = null; // TODO
-	getMinions(filters, sort, limit, offset)
+	getMinions(filters.value, sort, limit, offset)
 		.then((v) => {
 			console.log('Got minions', v);
+			minions.value = v;
+			minionsLoaded.value = true;
 		})
 		.catch((err) => showError('Error loading Minions', err));
 }
 
 // Used for Skeleton
 const emptyPresets = [
-	new MinionPreset('e1', '', '[]'),
-	new MinionPreset('e2', '', '[]'),
-	new MinionPreset('e3', '', '[]'),
-	new MinionPreset('e4', '', '[]'),
-	new MinionPreset('e5', '', '[]'),
+	new MinionPreset(`${SKEL}1`, '', '[]'),
+	new MinionPreset(`${SKEL}2`, '', '[]'),
+	new MinionPreset(`${SKEL}3`, '', '[]'),
+	new MinionPreset(`${SKEL}4`, '', '[]'),
+	new MinionPreset(`${SKEL}5`, '', '[]'),
+];
+const emptyMinions = [
+	new Minion(`${SKEL}1`, ''),
+	new Minion(`${SKEL}2`, ''),
+	new Minion(`${SKEL}3`, ''),
+	new Minion(`${SKEL}4`, ''),
+	new Minion(`${SKEL}5`, ''),
 ];
 
 const presets = signal<MinionPreset[] | null>(null);
+const presetsLoaded = signal(false);
 const selectedPreset = signal<MinionPreset | null>(null);
+const minions = signal<Minion[] | null>(null);
+const minionsLoaded = signal(false);
+const filters = signal<Filter[]>([]);
+const filtersExpanded = signal(true);
 
 const AddIcon = bundleIcon(AddFilled, AddRegular);
+const CollapseIcon = bundleIcon(ArrowMinimizeFilled, ArrowMinimizeRegular);
+const ExpandIcon = bundleIcon(SwipeDownFilled, SwipeDownRegular);
+const FilterMinionIcon = bundleIcon(ServerFilled, ServerRegular);
+const FilterGrainIcon = bundleIcon(InfoFilled, InfoRegular);
+const FilterPackageIcon = bundleIcon(AppsFilled, AppsRegular);
 
 const presetColumns: TableColumnDefinition<MinionPreset>[] = [
 	createTableColumn<MinionPreset>({
@@ -156,6 +242,30 @@ export default function MinionsRoute() {
 	const styles = useStyles();
 
 	useEffect(loadPresets, []);
+	useEffect(loadMinions, []);
+
+	// Minions table
+	const {
+		getRows,
+		sort: { getSortDirection, toggleColumnSort, sort },
+	} = useTableFeatures(
+		{
+			columns: minionColumns,
+			items: minions.value ?? (minionsLoaded.value ? [] : emptyMinions),
+		},
+		[
+			useTableSort({
+				defaultSortState: { sortColumn: 'id', sortDirection: 'ascending' },
+			}),
+		],
+	);
+	const headerSortProps = (columnId: TableColumnId) => ({
+		onClick: (e: React.MouseEvent) => {
+			toggleColumnSort(e, columnId);
+		},
+		sortDirection: getSortDirection(columnId),
+	});
+	const rows = sort(getRows());
 
 	return (
 		<>
@@ -191,8 +301,9 @@ export default function MinionsRoute() {
 								</Menu>
 							}
 						/>
+
 						<DataGrid
-							items={presets.value ?? emptyPresets}
+							items={presets.value ?? (presetsLoaded.value ? [] : emptyPresets)}
 							columns={presetColumns}
 							sortable
 							sortState={{ sortColumn: 'name', sortDirection: 'ascending' }}
@@ -205,15 +316,21 @@ export default function MinionsRoute() {
 							selectedItems={selectedPreset.value ? [selectedPreset.value.id] : []}
 						>
 							<DataGridBody<MinionPreset>>
-								{({ item, rowId }) => (
+								{({ item }) => (
 									<DataGridRow<MinionPreset>
-										key={rowId}
+										key={item.id}
 										selectionCell={{
 											checkboxIndicator: { 'aria-label': 'Select row' },
 										}}
 									>
 										{({ renderCell }) => (
-											<DataGridCell>{renderCell(item)}</DataGridCell>
+											<DataGridCell>
+												{item.id.startsWith(SKEL) ? (
+													<SkeletonItem />
+												) : (
+													renderCell(item)
+												)}
+											</DataGridCell>
 										)}
 									</DataGridRow>
 								)}
@@ -224,16 +341,79 @@ export default function MinionsRoute() {
 				<div className="fl-span-9">
 					<Card>
 						<CardHeader
-							header={<span className={globalStyles.cardHeaderTitle}>Filters</span>}
-							action={<ToolbarButton icon={<VideoSwitchRegular />} />}
+							className="mouse-pointer"
+							onClick={toggleFiltersExpand}
+							header={
+								<>
+									<span
+										className={mergeClasses(
+											globalStyles.cardHeaderTitle,
+											'mouse-pointer',
+										)}
+									>
+										Search
+									</span>
+									{filters.value.filter((f) => f.isValid()).length > 0 && (
+										<Badge
+											color="brand"
+											size="large"
+											shape="rounded"
+											className="mx-s my-snudge"
+										>
+											Filters active!
+										</Badge>
+									)}
+								</>
+							}
+							action={
+								<ToolbarButton
+									icon={filtersExpanded.value ? <CollapseIcon /> : <ExpandIcon />}
+								/>
+							}
 						/>
 
-						<p>Hi lorum ipsum dolor etat</p>
+						{filtersExpanded.value && (
+							<>
+								{filters.value.map((f) => (
+									<div key={f.id} className="fl-grid mx-0">
+										<Select
+											className="fl-span-3"
+											onChange={(_e, data) =>
+												updateFilter(f, 'fieldType', data.value)
+											}
+											value={f.fieldType}
+										>
+											<option value={FilterFieldType.NONE}>None</option>
+											<option value={FilterFieldType.OBJECT}>Minion</option>
+											<option value={FilterFieldType.GRAIN}>Grain</option>
+											<option value={FilterFieldType.PACKAGE}>Package</option>
+										</Select>
+										{f.fieldType === FilterFieldType.OBJECT && (
+											<Select className="fl-span-3">
+												<option value="id">Minion ID</option>
+												<option value="os_type">OS Type</option>
+												<option value="last_seen">Last seen</option>
+												<option value="conformity_success">
+													Conformity Success
+												</option>
+												<option value="conformity_incorrect">
+													Conformity Incorrect
+												</option>
+												<option value="conformity_error">
+													Conformity Error
+												</option>
+											</Select>
+										)}
+									</div>
+								))}
 
-						<CardFooter>
-							<Button icon={<ArrowReplyRegular fontSize={16} />}>Reply</Button>
-							<Button icon={<ShareRegular fontSize={16} />}>Share</Button>
-						</CardFooter>
+								<CardFooter>
+									<Button icon={<AddIcon />} onClick={addFilter}>
+										Add Filter
+									</Button>
+								</CardFooter>
+							</>
+						)}
 					</Card>
 					<br />
 					<Card>
@@ -241,7 +421,86 @@ export default function MinionsRoute() {
 							header={<span className={globalStyles.cardHeaderTitle}>Minions</span>}
 						/>
 
-						<p>Hi lorum ipsum dolor etat</p>
+						<Table sortable aria-label="Table with sort">
+							<TableHeader>
+								<TableRow>
+									<TableHeaderCell {...headerSortProps('id')}>ID</TableHeaderCell>
+									<TableHeaderCell {...headerSortProps('osType')}>
+										OS
+									</TableHeaderCell>
+									<TableHeaderCell {...headerSortProps('lastUpdated')}>
+										Last seen
+									</TableHeaderCell>
+									<TableHeaderCell {...headerSortProps('conformity')}>
+										Conformity
+									</TableHeaderCell>
+								</TableRow>
+							</TableHeader>
+							<TableBody>
+								{rows.map(({ item }) =>
+									item.id.startsWith(SKEL) ? (
+										<tr key={item.id}>
+											<td className="p-m">
+												<SkeletonItem size={16} />
+											</td>
+											<td className="p-m">
+												<SkeletonItem size={16} />
+											</td>
+											<td className="p-m">
+												<SkeletonItem size={16} />
+											</td>
+											<td className="p-m">
+												<SkeletonItem size={16} />
+											</td>
+										</tr>
+									) : (
+										<TableRow key={item.id}>
+											<TableCell>{item.id}</TableCell>
+											<TableCell>{item.osType ?? 'Unknown'}</TableCell>
+											<TableCell>{formatDate(item.lastSeen)}</TableCell>
+											<TableCell>
+												{item.lastUpdatedConformity === null ? (
+													<Badge
+														color="important"
+														size="large"
+														shape="rounded"
+													>
+														Unknown
+													</Badge>
+												) : (
+													<>
+														<Badge
+															color="success"
+															size="large"
+															shape="rounded"
+														>
+															{item.conformitySuccess}
+														</Badge>
+														{' / '}
+														<Badge
+															color="warning"
+															size="large"
+															shape="rounded"
+														>
+															{item.conformityIncorrect}
+														</Badge>
+														{' / '}
+														<Badge
+															color="danger"
+															size="large"
+															shape="rounded"
+														>
+															{item.conformityError}
+														</Badge>
+													</>
+												)}
+											</TableCell>
+											<TableCell>Actions</TableCell>
+										</TableRow>
+									),
+								)}
+							</TableBody>
+						</Table>
 
 						<CardFooter>
 							<Button icon={<ArrowReplyRegular fontSize={16} />}>Reply</Button>

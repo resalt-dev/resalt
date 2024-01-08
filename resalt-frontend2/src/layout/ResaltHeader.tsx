@@ -4,7 +4,6 @@ import {
 	Popover,
 	PopoverSurface,
 	PopoverTrigger,
-	Skeleton,
 	SkeletonItem,
 	makeStyles,
 	mergeClasses,
@@ -250,9 +249,7 @@ export default function ResaltHeader(props: { currentUser: Signal<User | null> }
 								)}
 							>
 								{props.currentUser.value === null ? (
-									<Skeleton>
-										<SkeletonItem />
-									</Skeleton>
+									<SkeletonItem />
 								) : (
 									<span>{props.currentUser.value.username}</span>
 								)}

@@ -32,7 +32,7 @@ export default class Filter {
 		return new Filter(fieldType, field, operand, value);
 	}
 
-	id: string = Math.random().toString(36).substring(7);
+	id: string = Math.random().toString(36).substring(2);
 
 	fieldType: FilterFieldType;
 

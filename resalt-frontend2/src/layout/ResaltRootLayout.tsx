@@ -37,8 +37,9 @@ const useStyles = makeStyles({
 	},
 	mainArea: {
 		gridColumnStart: 'main-area',
-		// backgroundColor: 'rgba(255, 0, 0, 0.2)', // DEBUG
+		height: 'calc(100vh - 48px)',
 		...shorthands.overflow('auto'),
+		// backgroundColor: 'rgba(255, 0, 0, 0.2)', // DEBUG
 	},
 });
 

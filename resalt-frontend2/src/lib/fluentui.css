@@ -1,5 +1,7 @@
 /* Resalt implementation of Fluent UI 2 in CSS */
 
+/* Links */
+
 a {
 	color: var(--colorBrandForegroundLink);
 	background-color: transparent;
@@ -15,6 +17,8 @@ a:active {
 	color: var(--colorBrandForegroundLinkPressed);
 	text-decoration-line: underline;
 }
+
+/* Scrollbar */
 
 #mainArea::-webkit-scrollbar {
 	width: 14px;
@@ -157,6 +161,12 @@ a:active {
 	}
 }
 
+.mx-auto {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+
 .m-0 {
 	margin: 0 !important;
 	column-gap: 0 !important;
@@ -193,10 +203,94 @@ a:active {
 	margin: var(--spacingVerticalXXXL);
 }
 
-.mx-auto {
-	display: block;
-	margin-left: auto;
-	margin-right: auto;
+.mx-0 {
+	margin-left: var(--spacingHorizontalNone);
+	margin-right: var(--spacingHorizontalNone);
+}
+.mx-xxs {
+	margin-left: var(--spacingHorizontalXXS);
+	margin-right: var(--spacingHorizontalXXS);
+}
+.mx-xs {
+	margin-left: var(--spacingHorizontalXS);
+	margin-right: var(--spacingHorizontalXS);
+}
+.mx-snudge {
+	margin-left: var(--spacingHorizontalSNudge);
+	margin-right: var(--spacingHorizontalSNudge);
+}
+.mx-s {
+	margin-left: var(--spacingHorizontalS);
+	margin-right: var(--spacingHorizontalS);
+}
+.mx-mnudge {
+	margin-left: var(--spacingHorizontalMNudge);
+	margin-right: var(--spacingHorizontalMNudge);
+}
+.mx-m {
+	margin-left: var(--spacingHorizontalM);
+	margin-right: var(--spacingHorizontalM);
+}
+.mx-l {
+	margin-left: var(--spacingHorizontalL);
+	margin-right: var(--spacingHorizontalL);
+}
+.mx-xl {
+	margin-left: var(--spacingHorizontalXL);
+	margin-right: var(--spacingHorizontalXL);
+}
+.mx-xxl {
+	margin-left: var(--spacingHorizontalXXL);
+	margin-right: var(--spacingHorizontalXXL);
+}
+.mx-xxxl {
+	margin-left: var(--spacingHorizontalXXXL);
+	margin-right: var(--spacingHorizontalXXXL);
+}
+
+.my-0 {
+	margin-top: var(--spacingVerticalNone);
+	margin-bottom: var(--spacingVerticalNone);
+}
+.my-xxs {
+	margin-top: var(--spacingVerticalXXS);
+	margin-bottom: var(--spacingVerticalXXS);
+}
+.my-xs {
+	margin-top: var(--spacingVerticalXS);
+	margin-bottom: var(--spacingVerticalXS);
+}
+.my-snudge {
+	margin-top: var(--spacingVerticalSNudge);
+	margin-bottom: var(--spacingVerticalSNudge);
+}
+.my-s {
+	margin-top: var(--spacingVerticalS);
+	margin-bottom: var(--spacingVerticalS);
+}
+.my-mnudge {
+	margin-top: var(--spacingVerticalMNudge);
+	margin-bottom: var(--spacingVerticalMNudge);
+}
+.my-m {
+	margin-top: var(--spacingVerticalM);
+	margin-bottom: var(--spacingVerticalM);
+}
+.my-l {
+	margin-top: var(--spacingVerticalL);
+	margin-bottom: var(--spacingVerticalL);
+}
+.my-xl {
+	margin-top: var(--spacingVerticalXL);
+	margin-bottom: var(--spacingVerticalXL);
+}
+.my-xxl {
+	margin-top: var(--spacingVerticalXXL);
+	margin-bottom: var(--spacingVerticalXXL);
+}
+.my-xxxl {
+	margin-top: var(--spacingVerticalXXXL);
+	margin-bottom: var(--spacingVerticalXXXL);
 }
 
 .p-0 {
@@ -231,6 +325,52 @@ a:active {
 }
 .p-xxxl {
 	padding: var(--spacingVerticalXXXL);
+}
+
+
+.px-0 {
+	padding-left: var(--spacingHorizontalNone);
+	padding-right: var(--spacingHorizontalNone);
+}
+.px-xxs {
+	padding-left: var(--spacingHorizontalXXS);
+	padding-right: var(--spacingHorizontalXXS);
+}
+.px-xs {
+	padding-left: var(--spacingHorizontalXS);
+	padding-right: var(--spacingHorizontalXS);
+}
+.px-snudge {
+	padding-left: var(--spacingHorizontalSNudge);
+	padding-right: var(--spacingHorizontalSNudge);
+}
+.px-s {
+	padding-left: var(--spacingHorizontalS);
+	padding-right: var(--spacingHorizontalS);
+}
+.px-mnudge {
+	padding-left: var(--spacingHorizontalMNudge);
+	padding-right: var(--spacingHorizontalMNudge);
+}
+.px-m {
+	padding-left: var(--spacingHorizontalM);
+	padding-right: var(--spacingHorizontalM);
+}
+.px-l {
+	padding-left: var(--spacingHorizontalL);
+	padding-right: var(--spacingHorizontalL);
+}
+.px-xl {
+	padding-left: var(--spacingHorizontalXL);
+	padding-right: var(--spacingHorizontalXL);
+}
+.px-xxl {
+	padding-left: var(--spacingHorizontalXXL);
+	padding-right: var(--spacingHorizontalXXL);
+}
+.px-xxxl {
+	padding-left: var(--spacingHorizontalXXXL);
+	padding-right: var(--spacingHorizontalXXXL);
 }
 
 .py-0 {
@@ -278,57 +418,6 @@ a:active {
 	padding-bottom: var(--spacingVerticalXXXL);
 }
 
-.px-0 {
-	padding-left: var(--spacingHorizontalNone);
-	padding-right: var(--spacingHorizontalNone);
-}
-.px-xxs {
-	padding-left: var(--spacingHorizontalXXS);
-	padding-right: var(--spacingHorizontalXXS);
-}
-.px-xs {
-	padding-left: var(--spacingHorizontalXS);
-	padding-right: var(--spacingHorizontalXS);
-}
-.px-snudge {
-	padding-left: var(--spacingHorizontalSNudge);
-	padding-right: var(--spacingHorizontalSNudge);
-}
-.px-s {
-	padding-left: var(--spacingHorizontalS);
-	padding-right: var(--spacingHorizontalS);
-}
-.px-mnudge {
-	padding-left: var(--spacingHorizontalMNudge);
-	padding-right: var(--spacingHorizontalMNudge);
-}
-.px-m {
-	padding-left: var(--spacingHorizontalM);
-	padding-right: var(--spacingHorizontalM);
-}
-.px-l {
-	padding-left: var(--spacingHorizontalL);
-	padding-right: var(--spacingHorizontalL);
-}
-.px-xl {
-	padding-left: var(--spacingHorizontalXL);
-	padding-right: var(--spacingHorizontalXL);
-}
-.px-xxl {
-	padding-left: var(--spacingHorizontalXXL);
-	padding-right: var(--spacingHorizontalXXL);
-}
-.px-xxxl {
-	padding-left: var(--spacingHorizontalXXXL);
-	padding-right: var(--spacingHorizontalXXXL);
-}
-
-/* Backgrounds */
-
-.bg-red {
-	background-color: var(--colorPaletteRedBackground2);
-}
-
-.bg-yellow {
-	background-color: var(--colorPaletteYellowBackground2);
+.mouse-pointer {
+	cursor: pointer;
 }
