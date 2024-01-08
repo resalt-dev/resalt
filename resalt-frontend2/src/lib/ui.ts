@@ -5,4 +5,8 @@ export const useGlobalStyles = makeStyles({
 		...typographyStyles.subtitle1,
 		...shorthands.padding(tokens.spacingHorizontalXXL, tokens.spacingHorizontalSNudge),
 	},
+	cardHeaderTitle: {
+		...typographyStyles.subtitle2Stronger,
+		...shorthands.padding(tokens.spacingHorizontalS),
+	},
 });

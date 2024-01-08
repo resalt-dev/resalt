@@ -1,5 +1,6 @@
 import {
 	FluentProvider,
+	Toaster,
 	makeStyles,
 	mergeClasses,
 	shorthands,
@@ -48,6 +49,7 @@ export default function RootLayout(props: { currentUser: Signal<User | null> }) 
 	const isLoginPage = location.pathname.startsWith(paths.login.path);
 	return (
 		<FluentProvider theme={webLightTheme} className={styles.fluentProvider}>
+			<Toaster limit={5} />
 			<ResaltHeader currentUser={props.currentUser} />
 			<div
 				className={mergeClasses(

@@ -55,8 +55,8 @@ const useStyles = makeStyles({
 		backgroundColor: '#000000',
 		color: '#ffffff',
 		display: 'grid',
-		gridTemplateColumns: `[header-collapse] 48px [header-logo] ${
-			280 - 48
+		gridTemplateColumns: `[header-collapse] 48px [header-logo1] 48px [header-logo2] ${
+			280 - 48 - 48
 		}px [spacer] auto [header-search] 25vw [spacer] auto [header-settings] ${48 * 5}px`,
 		gridTemplateRows: '48px',
 		alignItems: 'center',
@@ -68,10 +68,15 @@ const useStyles = makeStyles({
 		gridColumnStart: 'header-collapse',
 		// backgroundColor: 'rgba(255, 0, 0, 0.5)', // DEBUG
 	},
-	headerLogo: {
-		gridColumnStart: 'header-logo',
-		height: headerLogoHeight,
+	headerLogoArea1: {
+		gridColumnStart: 'header-logo1',
+		height: '48px',
 		...shorthands.overflow('hidden'),
+	},
+	headerLogoArea2: {
+		gridColumnStart: 'header-logo2',
+		height: '48px',
+		display: 'flex',
 	},
 	headerSearch: {
 		gridColumnStart: 'header-search',
@@ -86,6 +91,14 @@ const useStyles = makeStyles({
 	//
 	// All "Icons"
 	//
+	headerLogoImage1: {
+		height: 'calc(48px - 16px)',
+		display: 'block',
+	},
+	headerLogoImage2: {
+		height: headerLogoHeight,
+		...shorthands.padding(tokens.spacingHorizontalM, tokens.spacingHorizontalSNudge),
+	},
 	headerButton: {
 		...headerButtonStyles,
 	},
@@ -161,8 +174,19 @@ export default function ResaltHeader(props: { currentUser: Signal<User | null> }
 					className={styles.headerButton}
 				/>
 			</div>
-			<div className={styles.headerLogo}>
-				<ResaltLogo className="mx-auto" height={headerLogoHeight} />
+			<div className={styles.headerLogoArea1}>
+				<Button
+					appearance="transparent"
+					shape="square"
+					icon={
+						<img src="/resalt.png" className={styles.headerLogoImage1} alt="Resalt" />
+					}
+					onClick={() => console.log('header:icon:nav')}
+					className={styles.headerButton}
+				/>
+			</div>
+			<div className={styles.headerLogoArea2}>
+				<ResaltLogo className={styles.headerLogoImage2} />
 			</div>
 			<div className={styles.headerSearch}>
 				<ResaltHeaderSearch />
