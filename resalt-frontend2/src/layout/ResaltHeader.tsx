@@ -130,7 +130,7 @@ const PersonIcon = Person28Filled;
 const popupUser = new Signal<boolean>(false);
 
 export default function ResaltHeader(props: { currentUser: Signal<User | null> }) {
-	console.log('render:ResaltHeader');
+	// console.log('render:ResaltHeader');
 	// Navigation
 	const location = useLocation();
 	const navigate = useNavigate();
@@ -139,7 +139,6 @@ export default function ResaltHeader(props: { currentUser: Signal<User | null> }
 	const styles = useStyles();
 
 	useEffect(() => {
-		console.log('aaa');
 		if (props.currentUser.value !== null) {
 			return;
 		}

@@ -76,7 +76,7 @@ const useStyles = makeStyles({
 });
 
 export default function ResaltSidebar() {
-	console.log('render:ResaltSidebar');
+	// console.log('render:ResaltSidebar');
 	const styles = useStyles();
 
 	// Detect current page

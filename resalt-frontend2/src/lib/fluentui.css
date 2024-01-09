@@ -77,6 +77,28 @@ a:active {
 	}
 }
 
+.fl-grid-small {
+	display: grid;
+	grid-template-columns: repeat(12, 1fr);
+	margin: auto 1rem;
+
+	/* > 1366 pixel */
+	column-gap: calc((24 / 16) * 1rem);
+	row-gap: calc((24 / 16) * 1rem);
+
+	/* < 1366 pixel */
+	@media screen and (max-width: 1366px) {
+		column-gap: calc((16 / 16) * 1rem);
+		row-gap: calc((16 / 16) * 1rem);
+	}
+	/* <= 640 pixel */
+	@media screen and (max-width: 640px) {
+		column-gap: calc((8 / 16) * 1rem);
+		row-gap: calc((8 / 16) * 1rem);
+	}
+
+}
+
 /* @mixin flUI-span($span, $start: auto, $row: auto) {
     grid-column: $start / span $span;
     grid-row: $row;

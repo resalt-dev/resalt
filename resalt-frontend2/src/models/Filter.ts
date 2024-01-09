@@ -6,7 +6,7 @@ export default class Filter {
 		return new Filter(FilterFieldType.NONE, '', FilterOperand.CONTAINS, '');
 	}
 	static fromObject(data: unknown): Filter {
-		const { fieldType, field, operand, value } = data as Filter;
+		const { fieldType, field, operand, value, id } = data as Filter;
 		if (typeof fieldType !== 'string') {
 			throw new Error('Invalid filter fieldType, expected string, was ' + typeof fieldType);
 		}
@@ -29,10 +29,10 @@ export default class Filter {
 			throw new Error('Invalid filter data, invalid operand');
 		}
 
-		return new Filter(fieldType, field, operand, value);
+		return new Filter(fieldType, field, operand, value, id);
 	}
 
-	id: string = Math.random().toString(36).substring(2);
+	id: string;
 
 	fieldType: FilterFieldType;
 
@@ -42,7 +42,14 @@ export default class Filter {
 
 	value: string;
 
-	constructor(fieldType: FilterFieldType, field: string, operand: FilterOperand, value: string) {
+	constructor(
+		fieldType: FilterFieldType,
+		field: string,
+		operand: FilterOperand,
+		value: string,
+		id?: string,
+	) {
+		this.id = id || Math.random().toString(36).substring(2);
 		this.fieldType = fieldType;
 		this.field = field;
 		this.operand = operand;

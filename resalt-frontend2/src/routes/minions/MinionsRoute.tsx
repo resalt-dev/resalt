@@ -8,6 +8,7 @@ import {
 	DataGridBody,
 	DataGridCell,
 	DataGridRow,
+	Input,
 	Menu,
 	MenuItem,
 	MenuList,
@@ -102,7 +103,7 @@ function selectPreset(selectedItems: Set<TableRowId>) {
 	}
 
 	const id = selectedItems.values().next().value as string;
-	if (id.startsWith('ä')) {
+	if (id.startsWith(SKEL)) {
 		console.log('Ignoring skeleton item');
 		return;
 	}
@@ -130,11 +131,9 @@ function addFilter() {
 }
 
 function updateFilter(f: Filter, fieldType: string, newValue: string): void {
-	const copy: Filter[] = JSON.parse(JSON.stringify(filters.value)).map((f2: unknown) =>
-		Filter.fromObject(f2),
-	);
+	const copy: Filter[] = JSON.parse(JSON.stringify(filters.value)).map(Filter.fromObject);
 	const filter = copy.filter((f2) => f2.id === f.id)[0];
-	console.log('Updating filter', f, filter);
+	console.log('Updating filter', f, copy);
 	if (!filter) {
 		console.error('Failed to find filter', f);
 		return;
@@ -142,6 +141,22 @@ function updateFilter(f: Filter, fieldType: string, newValue: string): void {
 	switch (fieldType) {
 		case 'fieldType':
 			filter.fieldType = newValue as FilterFieldType;
+			filter.field = filter.fieldType === FilterFieldType.OBJECT ? 'id' : '';
+			filter.operand = FilterOperand.CONTAINS;
+			filter.value = '';
+			break;
+		case 'field':
+			filter.field = newValue;
+			if (
+				[
+					'last_seen',
+					'conformity_success',
+					'conformity_incorrect',
+					'conformity_error',
+				].includes(newValue)
+			) {
+				filter.operand = FilterOperand.GREATER_THAN_OR_EQUAL;
+			}
 			break;
 		case 'operand':
 			filter.operand = newValue as FilterOperand;
@@ -154,6 +169,7 @@ function updateFilter(f: Filter, fieldType: string, newValue: string): void {
 			return;
 	}
 	filters.value = copy;
+	loadMinions();
 }
 
 function toggleFiltersExpand() {
@@ -164,13 +180,20 @@ function toggleFiltersExpand() {
 // Minions
 //
 
+let loadMinionsTaskID: string | null = null;
 function loadMinions() {
 	let sort = null; // TODO
 	let limit = null; // TODO
 	let offset = null; // TODO
+	let taskID = Math.random().toString(36).substring(2);
+	loadMinionsTaskID = taskID;
 	getMinions(filters.value, sort, limit, offset)
 		.then((v) => {
 			console.log('Got minions', v);
+			if (loadMinionsTaskID !== taskID) {
+				console.log('Ignoring minions response, newer request in progress');
+				return;
+			}
 			minions.value = v;
 			minionsLoaded.value = true;
 		})
@@ -372,47 +395,130 @@ export default function MinionsRoute() {
 							}
 						/>
 
-						{filtersExpanded.value && (
-							<>
-								{filters.value.map((f) => (
-									<div key={f.id} className="fl-grid mx-0">
-										<Select
-											className="fl-span-3"
-											onChange={(_e, data) =>
-												updateFilter(f, 'fieldType', data.value)
-											}
-											value={f.fieldType}
-										>
-											<option value={FilterFieldType.NONE}>None</option>
-											<option value={FilterFieldType.OBJECT}>Minion</option>
-											<option value={FilterFieldType.GRAIN}>Grain</option>
-											<option value={FilterFieldType.PACKAGE}>Package</option>
-										</Select>
-										{f.fieldType === FilterFieldType.OBJECT && (
-											<Select className="fl-span-3">
-												<option value="id">Minion ID</option>
-												<option value="os_type">OS Type</option>
-												<option value="last_seen">Last seen</option>
-												<option value="conformity_success">
-													Conformity Success
-												</option>
-												<option value="conformity_incorrect">
-													Conformity Incorrect
-												</option>
-												<option value="conformity_error">
-													Conformity Error
-												</option>
-											</Select>
-										)}
-									</div>
-								))}
+						{(filtersExpanded.value ? filters.value : []).map((f) => (
+							<div key={f.id} className="fl-grid-small mx-0">
+								<Select
+									className="fl-span-2"
+									onChange={(_e, data) =>
+										updateFilter(f, 'fieldType', data.value)
+									}
+									value={f.fieldType}
+								>
+									<option value={FilterFieldType.NONE}>None</option>
+									<option value={FilterFieldType.OBJECT}>Minion</option>
+									<option value={FilterFieldType.GRAIN}>Grain</option>
+									<option value={FilterFieldType.PACKAGE}>Package</option>
+								</Select>
 
-								<CardFooter>
-									<Button icon={<AddIcon />} onClick={addFilter}>
-										Add Filter
-									</Button>
-								</CardFooter>
-							</>
+								{f.fieldType === FilterFieldType.OBJECT && (
+									<Select
+										className="fl-span-3"
+										onChange={(_e, data) =>
+											updateFilter(f, 'field', data.value)
+										}
+										value={f.field}
+									>
+										<option value="id">Minion ID</option>
+										<option value="os_type">OS Type</option>
+										<option value="last_seen">Last seen</option>
+										<option value="conformity_success">
+											Conformity Success
+										</option>
+										<option value="conformity_incorrect">
+											Conformity Incorrect
+										</option>
+										<option value="conformity_error">Conformity Error</option>
+									</Select>
+								)}
+								{(f.fieldType === FilterFieldType.GRAIN ||
+									f.fieldType === FilterFieldType.PACKAGE) && (
+									<Input
+										className="fl-span-3"
+										onChange={(_e, data) =>
+											updateFilter(f, 'field', data.value)
+										}
+										value={f.field}
+										placeholder={
+											f.fieldType === FilterFieldType.GRAIN
+												? 'Grain name'
+												: 'Package name'
+										}
+									/>
+								)}
+
+								{f.fieldType !== FilterFieldType.NONE && (
+									<Select
+										className="fl-span-2"
+										onChange={(_e, data) =>
+											updateFilter(f, 'operand', data.value)
+										}
+										value={f.operand}
+									>
+										{!(
+											f.fieldType === FilterFieldType.OBJECT &&
+											[
+												'last_seen',
+												'conformity_success',
+												'conformity_incorrect',
+												'conformity_error',
+											].includes(f.field)
+										) && (
+											<>
+												<option value={FilterOperand.CONTAINS}>
+													Contains
+												</option>
+												<option value={FilterOperand.NOT_CONTAINS}>
+													Not contains
+												</option>
+											</>
+										)}
+										<option value={FilterOperand.EQUALS}>Equals</option>
+										<option value={FilterOperand.NOT_EQUALS}>Not equals</option>
+										{!(
+											f.fieldType === FilterFieldType.OBJECT &&
+											[
+												'last_seen',
+												'conformity_success',
+												'conformity_incorrect',
+												'conformity_error',
+											].includes(f.field)
+										) && (
+											<>
+												<option value={FilterOperand.STARTS_WITH}>
+													Starts with
+												</option>
+												<option value={FilterOperand.ENDS_WITH}>
+													Ends with
+												</option>
+											</>
+										)}
+										<option value={FilterOperand.GREATER_THAN_OR_EQUAL}>
+											&gt;=
+										</option>
+										<option value={FilterOperand.LESS_THAN_OR_EQUAL}>
+											&lt;=
+										</option>
+									</Select>
+								)}
+
+								{f.fieldType !== FilterFieldType.NONE && (
+									<Input
+										className="fl-span-4"
+										onChange={(_e, data) =>
+											updateFilter(f, 'value', data.value)
+										}
+										value={f.value}
+										placeholder="Value"
+									/>
+								)}
+							</div>
+						))}
+						{filtersExpanded.value && (
+							<CardFooter>
+								<Button icon={<AddIcon />} onClick={addFilter}>
+									Add Filter
+								</Button>
+							</CardFooter>
 						)}
 					</Card>
 					<br />

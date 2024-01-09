@@ -44,7 +44,7 @@ const searchFocused = signal(false);
 const searchValue: Signal<string> = signal('');
 
 export default function ResaltHeaderSearch() {
-	console.log('render:ResaltHeaderSearch');
+	// console.log('render:ResaltHeaderSearch');
 	const styles = useStyles();
 
 	function searchSubmit(e: React.FormEvent<HTMLFormElement>) {
