@@ -1,11 +1,4 @@
-import {
-	FluentProvider,
-	Toaster,
-	makeStyles,
-	mergeClasses,
-	shorthands,
-	webLightTheme,
-} from '@fluentui/react-components';
+import { makeStyles, mergeClasses, shorthands } from '@fluentui/react-components';
 import { tokens } from '@fluentui/tokens';
 import { Signal } from '@preact/signals-react';
 import { Outlet, useLocation } from 'react-router-dom';
@@ -16,13 +9,9 @@ import { paths } from '../lib/paths';
 import User from '../models/User';
 
 const useStyles = makeStyles({
-	fluentProvider: {
+	rootLayout: {
 		backgroundColor: tokens.colorNeutralBackground4,
 	},
-
-	//
-	// Body
-	//
 	bodyGrid: {
 		display: 'grid',
 		gridTemplateColumns: '[sidebar] 280px [main-area] auto',
@@ -49,8 +38,7 @@ export default function RootLayout(props: { currentUser: Signal<User | null> }) 
 
 	const isLoginPage = location.pathname.startsWith(paths.login.path);
 	return (
-		<FluentProvider theme={webLightTheme} className={styles.fluentProvider}>
-			<Toaster limit={5} />
+		<div className={styles.rootLayout}>
 			<ResaltHeader currentUser={props.currentUser} />
 			<div
 				className={mergeClasses(
@@ -67,6 +55,6 @@ export default function RootLayout(props: { currentUser: Signal<User | null> }) 
 					<Outlet />
 				</div>
 			</div>
-		</FluentProvider>
+		</div>
 	);
 }

@@ -28,177 +28,31 @@ import {
 	TableRowId,
 	ToolbarButton,
 	createTableColumn,
-	makeStyles,
 	mergeClasses,
-	shorthands,
-	tokens,
-	typographyStyles,
 	useTableFeatures,
 	useTableSort,
 } from '@fluentui/react-components';
 import {
 	AddFilled,
 	AddRegular,
-	AppsFilled,
-	AppsRegular,
 	ArrowMinimizeFilled,
 	ArrowMinimizeRegular,
 	ArrowReplyRegular,
-	InfoFilled,
-	InfoRegular,
 	MoreHorizontal24Filled,
-	ServerFilled,
-	ServerRegular,
 	ShareRegular,
 	SwipeDownFilled,
 	SwipeDownRegular,
 	bundleIcon,
 } from '@fluentui/react-icons';
-import { signal } from '@preact/signals-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { createMinionPreset, getMinionPresets, getMinions } from '../../lib/api';
-import { showError } from '../../lib/error';
+import { ToastController } from '../../lib/toast';
 import { SKEL, formatDate, useGlobalStyles } from '../../lib/ui';
 import Filter from '../../models/Filter';
 import { FilterFieldType } from '../../models/FilterFieldType';
 import { FilterOperand } from '../../models/FilterOperand';
 import Minion from '../../models/Minion';
 import MinionPreset from '../../models/MinionPreset';
-
-const useStyles = makeStyles({
-	aaa: {
-		...typographyStyles.subtitle2Stronger,
-		...shorthands.padding(tokens.spacingHorizontalS),
-	},
-	bbb: {},
-	ccc: {
-		...typographyStyles.body2,
-	},
-});
-
-//
-// Presets
-//
-
-function loadPresets() {
-	getMinionPresets()
-		.then((v) => {
-			console.log('Got presets', presets);
-			presets.value = v;
-			presetsLoaded.value = true;
-		})
-		.catch((err) => showError('Error loading Presets', err));
-}
-
-function newPreset() {
-	createMinionPreset('#NewPreset#', [])
-		.then(loadPresets)
-		.catch((err) => showError('Error creating new Preset', err));
-}
-
-function selectPreset(selectedItems: Set<TableRowId>) {
-	if (selectedItems.size === 0) {
-		selectedPreset.value = null;
-		return;
-	}
-
-	const id = selectedItems.values().next().value as string;
-	if (id.startsWith(SKEL)) {
-		console.log('Ignoring skeleton item');
-		return;
-	}
-	const preset = presets.value?.find((p) => p.id === id);
-	if (!preset) {
-		console.error('Failed to find preset', id);
-		return;
-	}
-
-	if (selectedPreset.value === preset) {
-		console.log('Unselecting preset');
-		selectedPreset.value = null; // Unselect the item
-	} else {
-		console.log('Selecting preset', preset);
-		selectedPreset.value = preset;
-	}
-}
-
-//
-// Filters
-//
-
-function addFilter() {
-	filters.value = [...filters.value, Filter.newEmpty()];
-}
-
-function updateFilter(f: Filter, fieldType: string, newValue: string): void {
-	const copy: Filter[] = JSON.parse(JSON.stringify(filters.value)).map(Filter.fromObject);
-	const filter = copy.filter((f2) => f2.id === f.id)[0];
-	console.log('Updating filter', f, copy);
-	if (!filter) {
-		console.error('Failed to find filter', f);
-		return;
-	}
-	switch (fieldType) {
-		case 'fieldType':
-			filter.fieldType = newValue as FilterFieldType;
-			filter.field = filter.fieldType === FilterFieldType.OBJECT ? 'id' : '';
-			filter.operand = FilterOperand.CONTAINS;
-			filter.value = '';
-			break;
-		case 'field':
-			filter.field = newValue;
-			if (
-				[
-					'last_seen',
-					'conformity_success',
-					'conformity_incorrect',
-					'conformity_error',
-				].includes(newValue)
-			) {
-				filter.operand = FilterOperand.GREATER_THAN_OR_EQUAL;
-			}
-			break;
-		case 'operand':
-			filter.operand = newValue as FilterOperand;
-			break;
-		case 'value':
-			filter.value = newValue;
-			break;
-		default:
-			console.error('Unknown filter field', fieldType);
-			return;
-	}
-	filters.value = copy;
-	loadMinions();
-}
-
-function toggleFiltersExpand() {
-	filtersExpanded.value = !filtersExpanded.value;
-}
-
-//
-// Minions
-//
-
-let loadMinionsTaskID: string | null = null;
-function loadMinions() {
-	let sort = null; // TODO
-	let limit = null; // TODO
-	let offset = null; // TODO
-	let taskID = Math.random().toString(36).substring(2);
-	loadMinionsTaskID = taskID;
-	getMinions(filters.value, sort, limit, offset)
-		.then((v) => {
-			console.log('Got minions', v);
-			if (loadMinionsTaskID !== taskID) {
-				console.log('Ignoring minions response, newer request in progress');
-				return;
-			}
-			minions.value = v;
-			minionsLoaded.value = true;
-		})
-		.catch((err) => showError('Error loading Minions', err));
-}
 
 // Used for Skeleton
 const emptyPresets = [
@@ -216,20 +70,12 @@ const emptyMinions = [
 	new Minion(`${SKEL}5`, ''),
 ];
 
-const presets = signal<MinionPreset[] | null>(null);
-const presetsLoaded = signal(false);
-const selectedPreset = signal<MinionPreset | null>(null);
-const minions = signal<Minion[] | null>(null);
-const minionsLoaded = signal(false);
-const filters = signal<Filter[]>([]);
-const filtersExpanded = signal(true);
-
 const AddIcon = bundleIcon(AddFilled, AddRegular);
 const CollapseIcon = bundleIcon(ArrowMinimizeFilled, ArrowMinimizeRegular);
 const ExpandIcon = bundleIcon(SwipeDownFilled, SwipeDownRegular);
-const FilterMinionIcon = bundleIcon(ServerFilled, ServerRegular);
-const FilterGrainIcon = bundleIcon(InfoFilled, InfoRegular);
-const FilterPackageIcon = bundleIcon(AppsFilled, AppsRegular);
+// const FilterMinionIcon = bundleIcon(ServerFilled, ServerRegular);
+// const FilterGrainIcon = bundleIcon(InfoFilled, InfoRegular);
+// const FilterPackageIcon = bundleIcon(AppsFilled, AppsRegular);
 
 const presetColumns: TableColumnDefinition<MinionPreset>[] = [
 	createTableColumn<MinionPreset>({
@@ -260,12 +106,146 @@ const minionColumns: TableColumnDefinition<Minion>[] = [
 	}),
 ];
 
-export default function MinionsRoute() {
-	const globalStyles = useGlobalStyles();
-	const styles = useStyles();
+export default function MinionsRoute(props: { toastController: ToastController }) {
+	const { toastController } = props;
+	const [presetsLoaded, setPresetsLoaded] = useState(false);
+	const [presets, setPresets] = useState<MinionPreset[] | null>(null);
+	const [selectedPreset, setSelectedPreset] = useState<MinionPreset | null>(null);
+	const [minionsLoaded, setMinionsLoaded] = useState(false);
+	const [minions, setMinions] = useState<Minion[] | null>(null);
+	const [filtersExpanded, setFiltersExpanded] = useState(true);
+	const [filters, setFilters] = useState<Filter[]>([]);
 
-	useEffect(loadPresets, []);
-	useEffect(loadMinions, []);
+	const globalStyles = useGlobalStyles();
+
+	//
+	// Presets
+	//
+
+	useEffect(() => {
+		const abort = new AbortController();
+		getMinionPresets(abort.signal)
+			.then((v) => {
+				console.log('Got presets', v);
+				setPresets(v);
+				setPresetsLoaded(true);
+			})
+			.catch(
+				(err) =>
+					!abort.signal.aborted && toastController.error('Error loading Presets', err),
+			);
+		return () => {
+			abort.abort();
+		};
+	}, []);
+
+	function newPreset() {
+		createMinionPreset('#NewPreset#', []).catch((err) =>
+			toastController.error('Error creating new Preset', err),
+		);
+	}
+
+	function selectPreset(selectedItems: Set<TableRowId>) {
+		if (selectedItems.size === 0) {
+			setSelectedPreset(null);
+			return;
+		}
+
+		const id = selectedItems.values().next().value as string;
+		if (id.startsWith(SKEL)) {
+			console.log('Ignoring skeleton item');
+			return;
+		}
+		const preset = presets?.find((p) => p.id === id);
+		if (!preset) {
+			console.error('Failed to find preset', id);
+			return;
+		}
+
+		if (selectedPreset === preset) {
+			console.log('Unselecting preset');
+			// Unselect the item
+			setSelectedPreset(null);
+		} else {
+			console.log('Selecting preset', preset);
+			setSelectedPreset(preset);
+		}
+	}
+
+	//
+	// Filters
+	//
+
+	function addFilter() {
+		setFilters((filters) => [...filters, Filter.newEmpty()]);
+	}
+
+	function updateFilter(f: Filter, fieldType: string, newValue: string): void {
+		setFilters((filters) => {
+			const copy: Filter[] = JSON.parse(JSON.stringify(filters)).map(Filter.fromObject);
+			const filter = copy.filter((f2) => f2.id === f.id)[0];
+			console.log('Updating filter', f, copy);
+			if (!filter) {
+				console.error('Failed to find filter', f);
+				return filters;
+			}
+			switch (fieldType) {
+				case 'fieldType':
+					filter.fieldType = newValue as FilterFieldType;
+					filter.field = filter.fieldType === FilterFieldType.OBJECT ? 'id' : '';
+					filter.operand = FilterOperand.CONTAINS;
+					filter.value = '';
+					break;
+				case 'field':
+					filter.field = newValue;
+					if (
+						[
+							'last_seen',
+							'conformity_success',
+							'conformity_incorrect',
+							'conformity_error',
+						].includes(newValue)
+					) {
+						filter.operand = FilterOperand.GREATER_THAN_OR_EQUAL;
+					}
+					break;
+				case 'operand':
+					filter.operand = newValue as FilterOperand;
+					break;
+				case 'value':
+					filter.value = newValue;
+					break;
+				default:
+					console.error('Unknown filter field', fieldType);
+					return filters;
+			}
+			return copy;
+		});
+	}
+
+	//
+	// Minions
+	//
+
+	useEffect(() => {
+		let sort = null; // TODO
+		let limit = null; // TODO
+		let offset = null; // TODO
+		const abort = new AbortController();
+		getMinions(filters, sort, limit, offset, abort.signal)
+			.then((v) => {
+				console.log('Got minions', v);
+				setMinions(v);
+				setMinionsLoaded(true);
+			})
+			.catch(
+				(err) =>
+					!abort.signal.aborted && toastController.error('Error loading Minions', err),
+			);
+		return () => {
+			abort.abort();
+		};
+	}, [filters]);
 
 	// Minions table
 	const {
@@ -274,7 +254,7 @@ export default function MinionsRoute() {
 	} = useTableFeatures(
 		{
 			columns: minionColumns,
-			items: minions.value ?? (minionsLoaded.value ? [] : emptyMinions),
+			items: minions ?? (minionsLoaded ? [] : emptyMinions),
 		},
 		[
 			useTableSort({
@@ -326,7 +306,7 @@ export default function MinionsRoute() {
 						/>
 
 						<DataGrid
-							items={presets.value ?? (presetsLoaded.value ? [] : emptyPresets)}
+							items={presets ?? (presetsLoaded ? [] : emptyPresets)}
 							columns={presetColumns}
 							sortable
 							sortState={{ sortColumn: 'name', sortDirection: 'ascending' }}
@@ -336,7 +316,7 @@ export default function MinionsRoute() {
 							focusMode="composite"
 							size="small"
 							subtleSelection={true}
-							selectedItems={selectedPreset.value ? [selectedPreset.value.id] : []}
+							selectedItems={selectedPreset ? [selectedPreset.id] : []}
 						>
 							<DataGridBody<MinionPreset>>
 								{({ item }) => (
@@ -365,7 +345,7 @@ export default function MinionsRoute() {
 					<Card>
 						<CardHeader
 							className="mouse-pointer"
-							onClick={toggleFiltersExpand}
+							onClick={() => setFiltersExpanded((v) => !v)}
 							header={
 								<>
 									<span
@@ -376,7 +356,7 @@ export default function MinionsRoute() {
 									>
 										Search
 									</span>
-									{filters.value.filter((f) => f.isValid()).length > 0 && (
+									{filters.filter((f) => f.isValid()).length > 0 && (
 										<Badge
 											color="brand"
 											size="large"
@@ -390,12 +370,12 @@ export default function MinionsRoute() {
 							}
 							action={
 								<ToolbarButton
-									icon={filtersExpanded.value ? <CollapseIcon /> : <ExpandIcon />}
+									icon={filtersExpanded ? <CollapseIcon /> : <ExpandIcon />}
 								/>
 							}
 						/>
 
-						{(filtersExpanded.value ? filters.value : []).map((f) => (
+						{(filtersExpanded ? filters : []).map((f) => (
 							<div key={f.id} className="fl-grid-small mx-0">
 								<Select
 									className="fl-span-2"
@@ -513,7 +493,7 @@ export default function MinionsRoute() {
 								)}
 							</div>
 						))}
-						{filtersExpanded.value && (
+						{filtersExpanded && (
 							<CardFooter>
 								<Button icon={<AddIcon />} onClick={addFilter}>
 									Add Filter

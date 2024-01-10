@@ -12,7 +12,12 @@ import User from '../models/User';
 
 const API_URL = '/api';
 
-async function sendRequest(method: string, path: string, data?: unknown): Promise<unknown> {
+async function sendRequest(
+	method: string,
+	path: string,
+	data?: unknown,
+	signal?: AbortSignal,
+): Promise<unknown> {
 	// console.log('Sending authenticated request', method, path, data);
 	const body = data ? JSON.stringify(data) : undefined;
 	// console.log('Sending body', body);
@@ -23,6 +28,7 @@ async function sendRequest(method: string, path: string, data?: unknown): Promis
 			'Content-Type': 'application/json',
 		},
 		body,
+		signal,
 	});
 
 	if (res.status === 200) {
@@ -122,6 +128,7 @@ export async function getMinions(
 	sort: string | null,
 	limit: number | null,
 	offset: number | null,
+	abort: AbortSignal,
 ): Promise<Minion[]> {
 	const filteredFilters = filters.filter((f) => f.isValid());
 	const args = new URLSearchParams();
@@ -132,8 +139,8 @@ export async function getMinions(
 	if (limit) args.append('limit', limit.toString());
 	if (offset) args.append('offset', offset.toString());
 
-	return sendRequest('GET', `/minions?${args.toString()}`).then((data: unknown) =>
-		(data as unknown[]).map((m) => Minion.fromObject(m)),
+	return sendRequest('GET', `/minions?${args.toString()}`, undefined, abort).then(
+		(data: unknown) => (data as unknown[]).map((m) => Minion.fromObject(m)),
 	);
 }
 
@@ -162,8 +169,8 @@ export async function searchGrains(query: string, filters: Filter[]): Promise<un
 /// Minion Presets
 ///
 
-export async function getMinionPresets(): Promise<MinionPreset[]> {
-	return sendRequest('GET', '/presets').then((data: unknown) =>
+export async function getMinionPresets(abort: AbortSignal): Promise<MinionPreset[]> {
+	return sendRequest('GET', '/presets', undefined, abort).then((data: unknown) =>
 		(data as unknown[]).map((p) => MinionPreset.fromObject(p)),
 	);
 }
