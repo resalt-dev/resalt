@@ -45,7 +45,12 @@ import {
 	bundleIcon,
 } from '@fluentui/react-icons';
 import { useEffect, useState } from 'react';
-import { createMinionPreset, getMinionPresets, getMinions } from '../../lib/api';
+import {
+	createMinionPreset,
+	deleteMinionPreset,
+	getMinionPresets,
+	getMinions,
+} from '../../lib/api';
 import { ToastController } from '../../lib/toast';
 import { SKEL, formatDate, useGlobalStyles } from '../../lib/ui';
 import Filter from '../../models/Filter';
@@ -108,9 +113,10 @@ const minionColumns: TableColumnDefinition<Minion>[] = [
 
 export default function MinionsRoute(props: { toastController: ToastController }) {
 	const { toastController } = props;
+	const [presetsLastRequested, setPresetsLastRequested] = useState(0);
 	const [presetsLoaded, setPresetsLoaded] = useState(false);
 	const [presets, setPresets] = useState<MinionPreset[] | null>(null);
-	const [selectedPreset, setSelectedPreset] = useState<MinionPreset | null>(null);
+	const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
 	const [minionsLoaded, setMinionsLoaded] = useState(false);
 	const [minions, setMinions] = useState<Minion[] | null>(null);
 	const [filtersExpanded, setFiltersExpanded] = useState(true);
@@ -130,19 +136,32 @@ export default function MinionsRoute(props: { toastController: ToastController }
 				setPresets(v);
 				setPresetsLoaded(true);
 			})
-			.catch(
-				(err) =>
-					!abort.signal.aborted && toastController.error('Error loading Presets', err),
-			);
+			.catch((err) => toastController.error('Error loading Minion Presets', err));
 		return () => {
 			abort.abort();
 		};
-	}, []);
+	}, [presetsLastRequested]);
 
 	function newPreset() {
-		createMinionPreset('#NewPreset#', []).catch((err) =>
-			toastController.error('Error creating new Preset', err),
-		);
+		const abort = new AbortController();
+		createMinionPreset('#NewPreset#', [], abort.signal)
+			.then((v) => {
+				toastController.success('Created new Minion Preset');
+				setPresetsLastRequested(Date.now());
+				setSelectedPreset(v.id);
+			})
+			.catch((err) => toastController.error('Error creating new Minion Preset', err));
+	}
+
+	function deletePreset() {
+		const abort = new AbortController();
+		deleteMinionPreset(selectedPreset ?? '', abort.signal)
+			.then(() => {
+				toastController.success('Deleted Minion Preset');
+				setPresetsLastRequested(Date.now());
+				setSelectedPreset(null);
+			})
+			.catch((err) => toastController.error('Error deleting Minion Preset', err));
 	}
 
 	function selectPreset(selectedItems: Set<TableRowId>) {
@@ -153,22 +172,16 @@ export default function MinionsRoute(props: { toastController: ToastController }
 
 		const id = selectedItems.values().next().value as string;
 		if (id.startsWith(SKEL)) {
-			console.log('Ignoring skeleton item');
-			return;
-		}
-		const preset = presets?.find((p) => p.id === id);
-		if (!preset) {
-			console.error('Failed to find preset', id);
 			return;
 		}
 
-		if (selectedPreset === preset) {
+		if (selectedPreset === id) {
 			console.log('Unselecting preset');
 			// Unselect the item
 			setSelectedPreset(null);
 		} else {
-			console.log('Selecting preset', preset);
-			setSelectedPreset(preset);
+			console.log('Selecting preset', id);
+			setSelectedPreset(id);
 		}
 	}
 
@@ -238,10 +251,7 @@ export default function MinionsRoute(props: { toastController: ToastController }
 				setMinions(v);
 				setMinionsLoaded(true);
 			})
-			.catch(
-				(err) =>
-					!abort.signal.aborted && toastController.error('Error loading Minions', err),
-			);
+			.catch((err) => toastController.error('Error loading Minions', err));
 		return () => {
 			abort.abort();
 		};
@@ -298,7 +308,12 @@ export default function MinionsRoute(props: { toastController: ToastController }
 											</MenuItem>
 											<MenuItem>Copy Preset</MenuItem>
 											<MenuItem>Save Preset</MenuItem>
-											<MenuItem disabled>Delete Presets</MenuItem>
+											<MenuItem
+												disabled={selectedPreset === null}
+												onClick={deletePreset}
+											>
+												Delete Presets
+											</MenuItem>
 										</MenuList>
 									</MenuPopover>
 								</Menu>
@@ -316,7 +331,7 @@ export default function MinionsRoute(props: { toastController: ToastController }
 							focusMode="composite"
 							size="small"
 							subtleSelection={true}
-							selectedItems={selectedPreset ? [selectedPreset.id] : []}
+							selectedItems={selectedPreset ? [selectedPreset] : []}
 						>
 							<DataGridBody<MinionPreset>>
 								{({ item }) => (

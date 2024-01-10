@@ -1,6 +1,5 @@
 import {
 	Button,
-	GriffelStyle,
 	Popover,
 	PopoverSurface,
 	PopoverTrigger,
@@ -20,11 +19,11 @@ import {
 	Question20Filled,
 	Question20Regular,
 	Settings20Filled,
+	Settings20Regular,
 	bundleIcon,
 } from '@fluentui/react-icons';
 import { tokens } from '@fluentui/tokens';
-import { Signal } from '@preact/signals-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import ResaltLogo from '../components/ResaltLogo.tsx';
 import { getCurrentUser } from '../lib/api.ts';
@@ -32,23 +31,6 @@ import { paths } from '../lib/paths.ts';
 import User from '../models/User.ts';
 import ResaltHeaderSearch from './ResaltHeaderSearch.tsx';
 
-const headerLogoHeight = '20px';
-const headerButtonStyles: GriffelStyle = {
-	height: '48px',
-	width: '48px',
-	maxWidth: '48px',
-	color: '#ffffff',
-	...shorthands.transition('background-color', tokens.durationNormal, tokens.curveEasyEase),
-	'&:hover': {
-		backgroundColor: tokens.colorNeutralForeground3Hover,
-		cursor: 'pointer',
-		color: '#ffffff',
-	},
-	'&:active': {
-		backgroundColor: tokens.colorNeutralForeground2Pressed + ' !important',
-		color: '#ffffff !important',
-	},
-};
 const useStyles = makeStyles({
 	headerGrid: {
 		backgroundColor: '#000000',
@@ -95,11 +77,24 @@ const useStyles = makeStyles({
 		display: 'block',
 	},
 	headerLogoImage2: {
-		height: headerLogoHeight,
+		height: '20px',
 		...shorthands.padding(tokens.spacingHorizontalL, tokens.spacingHorizontalSNudge),
 	},
 	headerButton: {
-		...headerButtonStyles,
+		height: '48px',
+		width: '48px',
+		maxWidth: '48px',
+		color: '#ffffff',
+		...shorthands.transition('background-color', tokens.durationNormal, tokens.curveEasyEase),
+		'&:hover': {
+			backgroundColor: tokens.colorNeutralForeground3Hover,
+			cursor: 'pointer',
+			color: '#ffffff',
+		},
+		'&:active': {
+			backgroundColor: tokens.colorNeutralForeground2Pressed + ' !important',
+			color: '#ffffff !important',
+		},
 	},
 	//
 	// Profile Popover
@@ -123,14 +118,16 @@ const useStyles = makeStyles({
 const NavigationIcon = bundleIcon(Navigation20Filled, Navigation20Regular);
 const MegaphoneIcon = bundleIcon(Megaphone20Filled, Megaphone20Regular);
 const AlertIcon = bundleIcon(Alert20Filled, Alert20Regular);
-const SettingsIcon = Settings20Filled;
+const SettingsIcon = bundleIcon(Settings20Filled, Settings20Regular);
 const QuestionIcon = bundleIcon(Question20Filled, Question20Regular);
 const PersonIcon = Person28Filled;
 
-const popupUser = new Signal<boolean>(false);
+export default function ResaltHeader(props: {
+	currentUser: User | null;
+	setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
+}) {
+	const [userPopupOpen, setUserPopupOpen] = useState(false);
 
-export default function ResaltHeader(props: { currentUser: Signal<User | null> }) {
-	// console.log('render:ResaltHeader');
 	// Navigation
 	const location = useLocation();
 	const navigate = useNavigate();
@@ -138,17 +135,19 @@ export default function ResaltHeader(props: { currentUser: Signal<User | null> }
 	// Styles
 	const styles = useStyles();
 
+	// Load current user if not already loaded
 	useEffect(() => {
-		if (props.currentUser.value !== null) {
+		if (props.currentUser !== null) {
 			return;
 		}
 		const from = location.pathname + location.search;
 		const to = paths.login.path + '?redirect=' + encodeURIComponent(from);
 
-		getCurrentUser()
+		const abort = new AbortController();
+		getCurrentUser(abort.signal)
 			.then((user: User) => {
 				console.log('Got current user', user);
-				props.currentUser.value = user;
+				props.setCurrentUser(user);
 			})
 			.catch((err) => {
 				console.error('Failed to get current user', err);
@@ -158,7 +157,9 @@ export default function ResaltHeader(props: { currentUser: Signal<User | null> }
 				console.log('Redirecting to', to);
 				navigate(to, { replace: true });
 			});
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		return () => {
+			abort.abort();
+		};
 	}, [location, params]);
 
 	return (
@@ -218,10 +219,7 @@ export default function ResaltHeader(props: { currentUser: Signal<User | null> }
 					onClick={() => console.log('header:icon:help')}
 					className={styles.headerButton}
 				/>
-				<Popover
-					open={popupUser.value}
-					onOpenChange={() => (popupUser.value = !popupUser.value)}
-				>
+				<Popover open={userPopupOpen} onOpenChange={() => setUserPopupOpen((v) => !v)}>
 					<PopoverTrigger>
 						<Button
 							appearance="transparent"
@@ -247,10 +245,10 @@ export default function ResaltHeader(props: { currentUser: Signal<User | null> }
 									styles.headerProfilePopoverUsername,
 								)}
 							>
-								{props.currentUser.value === null ? (
+								{props.currentUser === null ? (
 									<SkeletonItem />
 								) : (
-									<span>{props.currentUser.value.username}</span>
+									<span>{props.currentUser.username}</span>
 								)}
 							</div>
 							<Button
@@ -261,7 +259,7 @@ export default function ResaltHeader(props: { currentUser: Signal<User | null> }
 								)}
 								onClick={() => {
 									navigate(paths.logout.path);
-									popupUser.value = false;
+									setUserPopupOpen(false);
 								}}
 							>
 								Sign out

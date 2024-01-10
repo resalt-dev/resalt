@@ -18,24 +18,24 @@ export class ToastController {
 		this._setToasts = setToasts;
 	}
 
-	public info(title: string, body: string) {
+	public info(title: string, body?: string) {
 		console.log('Toast:INFO', title, body);
-		this.dispatchToast(new ToastMessage(title, body, 'info'));
+		this.dispatchToast(new ToastMessage(title, body || '', 'info'));
 	}
 
-	public success(title: string, body: string) {
+	public success(title: string, body?: string) {
 		console.log('Toast:SUCCESS', title, body);
-		this.dispatchToast(new ToastMessage(title, body, 'success'));
+		this.dispatchToast(new ToastMessage(title, body || '', 'success'));
 	}
 
-	public error(title: string, err: Error) {
+	public error(title: string, err?: Error) {
 		console.error('Toast:ERROR', title, err);
-		this.dispatchToast(new ToastMessage(title, err.message, 'error'));
+		this.dispatchToast(new ToastMessage(title, err?.message || '', 'error'));
 	}
 
-	public warning(title: string, body: string) {
+	public warning(title: string, body?: string) {
 		console.warn('Toast:WARNING', title, body);
-		this.dispatchToast(new ToastMessage(title, body, 'warning'));
+		this.dispatchToast(new ToastMessage(title, body || '', 'warning'));
 	}
 
 	dispatchToast(toast: ToastMessage) {

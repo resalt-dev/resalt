@@ -1,6 +1,5 @@
 import { makeStyles, mergeClasses, shorthands } from '@fluentui/react-components';
 import { tokens } from '@fluentui/tokens';
-import { Signal } from '@preact/signals-react';
 import { Outlet, useLocation } from 'react-router-dom';
 import ResaltHeader from '../layout/ResaltHeader';
 import ResaltSidebar from '../layout/ResaltSidebar';
@@ -32,14 +31,17 @@ const useStyles = makeStyles({
 	},
 });
 
-export default function RootLayout(props: { currentUser: Signal<User | null> }) {
+export default function RootLayout(props: {
+	currentUser: User | null;
+	setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
+}) {
 	const styles = useStyles();
 	const location = useLocation();
 
 	const isLoginPage = location.pathname.startsWith(paths.login.path);
 	return (
 		<div className={styles.rootLayout}>
-			<ResaltHeader currentUser={props.currentUser} />
+			<ResaltHeader currentUser={props.currentUser} setCurrentUser={props.setCurrentUser} />
 			<div
 				className={mergeClasses(
 					styles.bodyGrid,
