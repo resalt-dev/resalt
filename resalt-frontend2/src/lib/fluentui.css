@@ -96,7 +96,6 @@ a:active {
 		column-gap: calc((8 / 16) * 1rem);
 		row-gap: calc((8 / 16) * 1rem);
 	}
-
 }
 
 /* @mixin flUI-span($span, $start: auto, $row: auto) {
@@ -348,7 +347,6 @@ a:active {
 .p-xxxl {
 	padding: var(--spacingVerticalXXXL);
 }
-
 
 .px-0 {
 	padding-left: var(--spacingHorizontalNone);
