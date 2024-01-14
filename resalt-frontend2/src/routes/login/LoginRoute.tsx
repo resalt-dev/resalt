@@ -51,7 +51,8 @@ export default function LoginRoute() {
 		console.log('Login submitted');
 		const username = (document.getElementById(loginUsername) as HTMLInputElement).value;
 		const password = (document.getElementById(loginPassword) as HTMLInputElement).value;
-		login(username, password)
+		const abort = new AbortController();
+		login(username, password, abort.signal)
 			.then(() => {
 				console.log('Logged in');
 				const redirect = params.redirect || paths.dashboard.path;

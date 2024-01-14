@@ -24,7 +24,7 @@ import {
 } from '@fluentui/react-icons';
 import { tokens } from '@fluentui/tokens';
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import ResaltLogo from '../components/ResaltLogo.tsx';
 import { getCurrentUser } from '../lib/api.ts';
 import { paths } from '../lib/paths.ts';
@@ -126,41 +126,45 @@ export default function ResaltHeader(props: {
 	currentUser: User | null;
 	setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
 }) {
+	const { currentUser, setCurrentUser } = props;
 	const [userPopupOpen, setUserPopupOpen] = useState(false);
 
 	// Navigation
 	const location = useLocation();
 	const navigate = useNavigate();
-	const params = useParams();
 	// Styles
 	const styles = useStyles();
 
 	// Load current user if not already loaded
 	useEffect(() => {
-		if (props.currentUser !== null) {
+		// Don't load if already loaded
+		if (currentUser !== null) {
 			return;
 		}
-		const from = location.pathname + location.search;
-		const to = paths.login.path + '?redirect=' + encodeURIComponent(from);
-
+		// Load current user
 		const abort = new AbortController();
 		getCurrentUser(abort.signal)
 			.then((user: User) => {
 				console.log('Got current user', user);
-				props.setCurrentUser(user);
+				setCurrentUser(user);
 			})
 			.catch((err) => {
 				console.error('Failed to get current user', err);
 				if (location.pathname === paths.login.path) {
 					return;
 				}
+
+				// Don't load if on login page
+				const from = location.pathname + location.search;
+				const to = paths.login.path + '?redirect=' + encodeURIComponent(from);
+
 				console.log('Redirecting to', to);
 				navigate(to, { replace: true });
 			});
 		return () => {
 			abort.abort();
 		};
-	}, [location, params]);
+	}, [currentUser, location, navigate, setCurrentUser]);
 
 	return (
 		<div className={mergeClasses('m-0', styles.headerGrid)}>

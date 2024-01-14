@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../../lib/api';
 import { paths } from '../../lib/paths';
@@ -8,6 +8,7 @@ import User from '../../models/User';
 export default function LogoutRoute(props: {
 	setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
 }) {
+	const { setCurrentUser } = props;
 	const [logoutSuccess, setLogoutSuccess] = useState(false);
 	const navigate = useNavigate();
 
@@ -15,22 +16,26 @@ export default function LogoutRoute(props: {
 	useEffect(() => {
 		const abort = new AbortController();
 		logout(abort.signal).then(() => {
-			props.setCurrentUser(null);
+			setCurrentUser(null);
 			setLogoutSuccess(true);
 			console.log('Logged out.');
 		});
 		return () => abort.abort();
-	}, []);
+	}, [setCurrentUser]);
 
 	// Redirect the user
+	const startTime = useRef(Date.now());
 	useEffect(() => {
 		if (!logoutSuccess) return;
-		const timer = setTimeout(() => {
-			console.log('Redirecting to', paths.login.path);
-			navigate(paths.login.path, { replace: true });
-		}, 1500);
+		const timer = setTimeout(
+			() => {
+				console.log('Redirecting to', paths.login.path);
+				navigate(paths.login.path, { replace: true });
+			},
+			1500 - (Date.now() - startTime.current),
+		);
 		return () => clearTimeout(timer);
-	}, [logoutSuccess]);
+	}, [logoutSuccess, navigate]);
 
 	const globalStyles = useGlobalStyles();
 	return (
