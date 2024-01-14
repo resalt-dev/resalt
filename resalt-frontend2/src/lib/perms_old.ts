@@ -241,6 +241,7 @@ type funcSection =
 	| func
 	| {
 			[fun: string]: string[] | funcSectionArgs | funcSectionKwargs | funcSectionArgsKwargs;
+			// eslint-disable-next-line no-mixed-spaces-and-tabs
 	  };
 // "funSection" covers:
 // - "fun"
@@ -252,6 +253,7 @@ type targetSection =
 	| func
 	| {
 			[host: string]: funcSection[];
+			// eslint-disable-next-line no-mixed-spaces-and-tabs
 	  };
 
 export function hasPermission(

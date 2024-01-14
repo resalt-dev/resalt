@@ -140,7 +140,7 @@ export default function MinionsRoute(props: { toastController: ToastController }
 		return () => {
 			abort.abort();
 		};
-	}, [presetsLastRequested]);
+	}, [presetsLastRequested, toastController]);
 
 	function newPreset() {
 		const abort = new AbortController();
@@ -241,9 +241,9 @@ export default function MinionsRoute(props: { toastController: ToastController }
 	//
 
 	useEffect(() => {
-		let sort = null; // TODO
-		let limit = null; // TODO
-		let offset = null; // TODO
+		const sort = null; // TODO
+		const limit = null; // TODO
+		const offset = null; // TODO
 		const abort = new AbortController();
 		getMinions(filters, sort, limit, offset, abort.signal)
 			.then((v) => {
@@ -255,7 +255,7 @@ export default function MinionsRoute(props: { toastController: ToastController }
 		return () => {
 			abort.abort();
 		};
-	}, [filters]);
+	}, [filters, toastController]);
 
 	// Minions table
 	const {
