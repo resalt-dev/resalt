@@ -35,9 +35,7 @@ export default class PermissionGroup {
 			}
 			const block = rawBlock as { [key: string]: string[] }; // Assuming @resalt permissions are string[]-only!
 
-			return Object.keys(block).some(
-				(key) => key === '@resalt' && (block[key] ?? []).includes(perm),
-			);
+			return Object.keys(block).some((key) => key === '@resalt' && block[key].includes(perm));
 		});
 	}
 }

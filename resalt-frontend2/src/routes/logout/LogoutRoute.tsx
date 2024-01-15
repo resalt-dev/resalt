@@ -2,26 +2,34 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../../lib/api';
 import { paths } from '../../lib/paths';
+import { ToastController } from '../../lib/toast';
 import { useGlobalStyles } from '../../lib/ui';
 import User from '../../models/User';
 
 export default function LogoutRoute(props: {
 	setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
+	toastController: ToastController;
 }) {
-	const { setCurrentUser } = props;
+	const { setCurrentUser, toastController } = props;
 	const [logoutSuccess, setLogoutSuccess] = useState(false);
 	const navigate = useNavigate();
 
 	// Log the user out
 	useEffect(() => {
 		const abort = new AbortController();
-		logout(abort.signal).then(() => {
-			setCurrentUser(null);
-			setLogoutSuccess(true);
-			console.log('Logged out.');
-		});
-		return () => abort.abort();
-	}, [setCurrentUser]);
+		logout(abort.signal)
+			.then(() => {
+				setCurrentUser(null);
+				setLogoutSuccess(true);
+				console.log('Logged out.');
+			})
+			.catch((err: Error) => {
+				toastController.error('Error logging out!', err);
+			});
+		return () => {
+			abort.abort();
+		};
+	}, [setCurrentUser, toastController]);
 
 	// Redirect the user
 	const startTime = useRef(Date.now());
@@ -34,7 +42,9 @@ export default function LogoutRoute(props: {
 			},
 			1500 - (Date.now() - startTime.current),
 		);
-		return () => clearTimeout(timer);
+		return () => {
+			clearTimeout(timer);
+		};
 	}, [logoutSuccess, navigate]);
 
 	const globalStyles = useGlobalStyles();

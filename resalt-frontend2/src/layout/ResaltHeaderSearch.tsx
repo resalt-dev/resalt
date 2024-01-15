@@ -64,7 +64,12 @@ export default function ResaltHeaderSearch() {
 		hasTextOrActive.value ? styles.headerSearchButtonActive : '',
 	);
 	return (
-		<form className={styles.headerSearchGrid} onSubmit={(e) => searchSubmit(e)}>
+		<form
+			className={styles.headerSearchGrid}
+			onSubmit={(e) => {
+				searchSubmit(e);
+			}}
+		>
 			<Input
 				className={searchFieldClasses}
 				size="medium"
@@ -84,7 +89,9 @@ export default function ResaltHeaderSearch() {
 					searchValue.length > 0 ? (
 						<DismissRegular
 							className={styles.headerSearchDismissButton}
-							onClick={() => setSearchValue('')}
+							onClick={() => {
+								setSearchValue('');
+							}}
 						/>
 					) : (
 						<></>

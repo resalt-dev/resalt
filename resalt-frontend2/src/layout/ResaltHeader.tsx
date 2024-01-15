@@ -173,6 +173,7 @@ export default function ResaltHeader(props: {
 					appearance="transparent"
 					shape="square"
 					icon={<NavigationIcon />}
+					// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
 					onClick={() => console.log('header:icon:nav')}
 					className={styles.headerButton}
 				/>
@@ -184,6 +185,7 @@ export default function ResaltHeader(props: {
 					icon={
 						<img src="/resalt.png" className={styles.headerLogoImage1} alt="Resalt" />
 					}
+					// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
 					onClick={() => console.log('header:icon:nav')}
 					className={styles.headerButton}
 				/>
@@ -199,6 +201,7 @@ export default function ResaltHeader(props: {
 					appearance="transparent"
 					shape="square"
 					icon={<MegaphoneIcon />}
+					// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
 					onClick={() => console.log('header:icon:nav')}
 					className={styles.headerButton}
 				/>
@@ -206,6 +209,7 @@ export default function ResaltHeader(props: {
 					appearance="transparent"
 					shape="square"
 					icon={<AlertIcon />}
+					// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
 					onClick={() => console.log('header:icon:alert')}
 					className={styles.headerButton}
 				/>
@@ -213,6 +217,7 @@ export default function ResaltHeader(props: {
 					appearance="transparent"
 					shape="square"
 					icon={<SettingsIcon />}
+					// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
 					onClick={() => console.log('header:icon:settings')}
 					className={styles.headerButton}
 				/>
@@ -220,16 +225,23 @@ export default function ResaltHeader(props: {
 					appearance="transparent"
 					shape="square"
 					icon={<QuestionIcon />}
+					// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
 					onClick={() => console.log('header:icon:help')}
 					className={styles.headerButton}
 				/>
-				<Popover open={userPopupOpen} onOpenChange={() => setUserPopupOpen((v) => !v)}>
+				<Popover
+					open={userPopupOpen}
+					onOpenChange={() => {
+						setUserPopupOpen((v) => !v);
+					}}
+				>
 					<PopoverTrigger>
 						<Button
 							appearance="transparent"
 							shape="square"
 							size="large"
 							icon={<PersonIcon />}
+							// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
 							onClick={() => console.log('header:icon:user')}
 							className={styles.headerButton}
 						/>
