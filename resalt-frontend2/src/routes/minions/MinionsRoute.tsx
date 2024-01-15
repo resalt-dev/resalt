@@ -50,6 +50,7 @@ import {
 	deleteMinionPreset,
 	getMinionPresets,
 	getMinions,
+	updateMinionPreset,
 } from '../../lib/api';
 import { ToastController } from '../../lib/toast';
 import { SKEL, formatDate, useGlobalStyles } from '../../lib/ui';
@@ -121,6 +122,7 @@ export default function MinionsRoute(props: { toastController: ToastController }
 	const [minions, setMinions] = useState<Minion[] | null>(null);
 	const [filtersExpanded, setFiltersExpanded] = useState(true);
 	const [filters, setFilters] = useState<Filter[]>([]);
+	const [filtersModified, setFiltersModified] = useState(false);
 
 	const globalStyles = useGlobalStyles();
 
@@ -142,7 +144,7 @@ export default function MinionsRoute(props: { toastController: ToastController }
 		};
 	}, [presetsLastRequested]);
 
-	function newPreset() {
+	function addPreset() {
 		const abort = new AbortController();
 		createMinionPreset('#NewPreset#', [], abort.signal)
 			.then((v) => {
@@ -151,6 +153,43 @@ export default function MinionsRoute(props: { toastController: ToastController }
 				setSelectedPreset(v.id);
 			})
 			.catch((err) => toastController.error('Error creating new Minion Preset', err));
+	}
+
+	function copyPreset() {
+		if (selectedPreset === null) {
+			return;
+		}
+		const preset = presets?.filter((p) => p.id === selectedPreset)[0];
+		if (!preset) {
+			console.error('Failed to find preset', selectedPreset);
+			return;
+		}
+		const abort = new AbortController();
+		createMinionPreset(preset.name + ' (Copy)', preset.filters, abort.signal)
+			.then((v) => {
+				toastController.success('Copied Minion Preset');
+				setPresetsLastRequested(Date.now());
+				setSelectedPreset(v.id);
+			})
+			.catch((err) => toastController.error('Error copying Minion Preset', err));
+	}
+
+	function savePreset() {
+		if (selectedPreset === null) {
+			return;
+		}
+		const preset = presets?.filter((p) => p.id === selectedPreset)[0];
+		if (!preset) {
+			console.error('Failed to find preset', selectedPreset);
+			return;
+		}
+		const abort = new AbortController();
+		updateMinionPreset(preset.id, preset.name, filters, abort.signal)
+			.then(() => {
+				toastController.success('Saved Minion Preset');
+				setPresetsLastRequested(Date.now());
+			})
+			.catch((err) => toastController.error('Error saving Minion Preset', err));
 	}
 
 	function deletePreset() {
@@ -189,13 +228,43 @@ export default function MinionsRoute(props: { toastController: ToastController }
 	// Filters
 	//
 
+	useEffect(() => {
+		// Update filters when new preset selected
+		if (selectedPreset === null) {
+			setFilters([]);
+			return;
+		}
+		const preset = presets?.filter((p) => p.id === selectedPreset)[0];
+		if (!preset) {
+			console.error('Failed to find preset', selectedPreset);
+			return;
+		}
+		setFilters(preset.filters.map(Filter.fromObject));
+	}, [selectedPreset]);
+
 	function addFilter() {
 		setFilters((filters) => [...filters, Filter.newEmpty()]);
 	}
 
+	useEffect(() => {
+		// Update filtersModified when filters change
+		if (selectedPreset === null) {
+			setFiltersModified(false);
+			return;
+		}
+		const preset = presets?.filter((p) => p.id === selectedPreset)[0];
+		if (!preset) {
+			console.error('Failed to find preset', selectedPreset);
+			return;
+		}
+		const cmp1 = JSON.stringify(preset.filters);
+		const cmp2 = JSON.stringify(filters);
+		setFiltersModified(cmp1 !== cmp2);
+	}, [filters, selectedPreset, presets]);
+
 	function updateFilter(f: Filter, fieldType: string, newValue: string): void {
 		setFilters((filters) => {
-			const copy: Filter[] = JSON.parse(JSON.stringify(filters)).map(Filter.fromObject);
+			const copy: Filter[] = filters.map(Filter.fromObject);
 			const filter = copy.filter((f2) => f2.id === f.id)[0];
 			console.log('Updating filter', f, copy);
 			if (!filter) {
@@ -303,11 +372,21 @@ export default function MinionsRoute(props: { toastController: ToastController }
 
 									<MenuPopover>
 										<MenuList>
-											<MenuItem icon={<AddIcon />} onClick={newPreset}>
+											<MenuItem icon={<AddIcon />} onClick={addPreset}>
 												New Preset
 											</MenuItem>
-											<MenuItem>Copy Preset</MenuItem>
-											<MenuItem>Save Preset</MenuItem>
+											<MenuItem
+												disabled={selectedPreset === null}
+												onClick={copyPreset}
+											>
+												Copy Preset
+											</MenuItem>
+											<MenuItem
+												disabled={selectedPreset === null}
+												onClick={savePreset}
+											>
+												Save Preset
+											</MenuItem>
 											<MenuItem
 												disabled={selectedPreset === null}
 												onClick={deletePreset}
@@ -371,13 +450,17 @@ export default function MinionsRoute(props: { toastController: ToastController }
 									>
 										Search
 									</span>
-									{filters.filter((f) => f.isValid()).length > 0 && (
+									{selectedPreset && (
 										<Badge
-											color="brand"
-											size="large"
+											color="success"
 											shape="rounded"
-											className="mx-s my-snudge"
+											className="mx-xs my-s"
 										>
+											Preset{filtersModified ? ' (modified)' : ''}
+										</Badge>
+									)}
+									{filters.filter((f) => f.isValid()).length > 0 && (
+										<Badge color="brand" shape="rounded" className="mx-xs my-s">
 											Filters active!
 										</Badge>
 									)}
@@ -399,7 +482,6 @@ export default function MinionsRoute(props: { toastController: ToastController }
 									}
 									value={f.fieldType}
 								>
-									<option value={FilterFieldType.NONE}>None</option>
 									<option value={FilterFieldType.OBJECT}>Minion</option>
 									<option value={FilterFieldType.GRAIN}>Grain</option>
 									<option value={FilterFieldType.PACKAGE}>Package</option>
@@ -441,71 +523,59 @@ export default function MinionsRoute(props: { toastController: ToastController }
 									/>
 								)}
 
-								{f.fieldType !== FilterFieldType.NONE && (
-									<Select
-										className="fl-span-2"
-										onChange={(_e, data) =>
-											updateFilter(f, 'operand', data.value)
-										}
-										value={f.operand}
-									>
-										{!(
-											f.fieldType === FilterFieldType.OBJECT &&
-											[
-												'last_seen',
-												'conformity_success',
-												'conformity_incorrect',
-												'conformity_error',
-											].includes(f.field)
-										) && (
-											<>
-												<option value={FilterOperand.CONTAINS}>
-													Contains
-												</option>
-												<option value={FilterOperand.NOT_CONTAINS}>
-													Not contains
-												</option>
-											</>
-										)}
-										<option value={FilterOperand.EQUALS}>Equals</option>
-										<option value={FilterOperand.NOT_EQUALS}>Not equals</option>
-										{!(
-											f.fieldType === FilterFieldType.OBJECT &&
-											[
-												'last_seen',
-												'conformity_success',
-												'conformity_incorrect',
-												'conformity_error',
-											].includes(f.field)
-										) && (
-											<>
-												<option value={FilterOperand.STARTS_WITH}>
-													Starts with
-												</option>
-												<option value={FilterOperand.ENDS_WITH}>
-													Ends with
-												</option>
-											</>
-										)}
-										<option value={FilterOperand.GREATER_THAN_OR_EQUAL}>
-											&gt;=
-										</option>
-										<option value={FilterOperand.LESS_THAN_OR_EQUAL}>
-											&lt;=
-										</option>
-									</Select>
-								)}
+								<Select
+									className="fl-span-2"
+									onChange={(_e, data) => updateFilter(f, 'operand', data.value)}
+									value={f.operand}
+								>
+									{!(
+										f.fieldType === FilterFieldType.OBJECT &&
+										[
+											'last_seen',
+											'conformity_success',
+											'conformity_incorrect',
+											'conformity_error',
+										].includes(f.field)
+									) && (
+										<>
+											<option value={FilterOperand.CONTAINS}>Contains</option>
+											<option value={FilterOperand.NOT_CONTAINS}>
+												Not contains
+											</option>
+										</>
+									)}
+									<option value={FilterOperand.EQUALS}>Equals</option>
+									<option value={FilterOperand.NOT_EQUALS}>Not equals</option>
+									{!(
+										f.fieldType === FilterFieldType.OBJECT &&
+										[
+											'last_seen',
+											'conformity_success',
+											'conformity_incorrect',
+											'conformity_error',
+										].includes(f.field)
+									) && (
+										<>
+											<option value={FilterOperand.STARTS_WITH}>
+												Starts with
+											</option>
+											<option value={FilterOperand.ENDS_WITH}>
+												Ends with
+											</option>
+										</>
+									)}
+									<option value={FilterOperand.GREATER_THAN_OR_EQUAL}>
+										&gt;=
+									</option>
+									<option value={FilterOperand.LESS_THAN_OR_EQUAL}>&lt;=</option>
+								</Select>
 
-								{f.fieldType !== FilterFieldType.NONE && (
-									<Input
-										className="fl-span-4"
-										onChange={(_e, data) =>
-											updateFilter(f, 'value', data.value)
-										}
-										value={f.value}
-										placeholder="Value"
-									/>
-								)}
+								<Input
+									className="fl-span-4"
+									onChange={(_e, data) => updateFilter(f, 'value', data.value)}
+									value={f.value}
+									placeholder="Value"
+								/>
 							</div>
 						))}
 						{filtersExpanded && (

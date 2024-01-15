@@ -3,7 +3,7 @@ import { FilterOperand } from './FilterOperand';
 
 export default class Filter {
 	static newEmpty(): Filter {
-		return new Filter(FilterFieldType.NONE, '', FilterOperand.CONTAINS, '');
+		return new Filter(FilterFieldType.OBJECT, '', FilterOperand.CONTAINS, '');
 	}
 	static fromObject(data: unknown): Filter {
 		const { fieldType, field, operand, value, id } = data as Filter;
@@ -62,7 +62,10 @@ export default class Filter {
 			op === FilterOperand.NOT_EQUALS ||
 			op === FilterOperand.GREATER_THAN_OR_EQUAL ||
 			op === FilterOperand.LESS_THAN_OR_EQUAL;
-		if (this.fieldType === FilterFieldType.NONE) return false;
+		// Check if fieldType is valid enum
+		if (!Object.values(FilterFieldType).includes(this.fieldType)) return false;
+		// Check if operand is valid enum
+		if (!Object.values(FilterOperand).includes(this.operand)) return false;
 		if (this.field === '') return false;
 		if (this.field === 'last_seen' && this.value === '') return false;
 		if (this.field === 'conformity_success' && !isNumOp(this.operand)) return false;
