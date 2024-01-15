@@ -25,10 +25,10 @@ import {
 import { tokens } from '@fluentui/tokens';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import ResaltLogo from '../components/ResaltLogo.tsx';
-import { getCurrentUser } from '../lib/api.ts';
-import { paths } from '../lib/paths.ts';
-import User from '../models/User.ts';
+import ResaltLogo from '../../components/ResaltLogo.tsx';
+import { getCurrentUser } from '../../lib/api.ts';
+import { paths } from '../../lib/paths.ts';
+import User from '../../models/User.ts';
 import ResaltHeaderSearch from './ResaltHeaderSearch.tsx';
 
 const useStyles = makeStyles({
@@ -75,6 +75,8 @@ const useStyles = makeStyles({
 	headerLogoImage1: {
 		height: 'calc(48px - 16px)',
 		display: 'block',
+		userDrag: 'none',
+		userSelect: 'none',
 	},
 	headerLogoImage2: {
 		height: '20px',
@@ -94,6 +96,9 @@ const useStyles = makeStyles({
 		'&:active': {
 			backgroundColor: tokens.colorNeutralForeground2Pressed + ' !important',
 			color: '#ffffff !important',
+		},
+		'&>span': {
+			width: '32px',
 		},
 	},
 	//
@@ -125,8 +130,9 @@ const PersonIcon = Person28Filled;
 export default function ResaltHeader(props: {
 	currentUser: User | null;
 	setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
+	setSidebarCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-	const { currentUser, setCurrentUser } = props;
+	const { currentUser, setCurrentUser, setSidebarCollapsed } = props;
 	const [userPopupOpen, setUserPopupOpen] = useState(false);
 
 	// Navigation
@@ -173,8 +179,9 @@ export default function ResaltHeader(props: {
 					appearance="transparent"
 					shape="square"
 					icon={<NavigationIcon />}
-					// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-					onClick={() => console.log('header:icon:nav')}
+					onClick={() => {
+						setSidebarCollapsed((v) => !v);
+					}}
 					className={styles.headerButton}
 				/>
 			</div>
@@ -188,7 +195,7 @@ export default function ResaltHeader(props: {
 					// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
 					onClick={() => console.log('header:icon:nav')}
 					className={styles.headerButton}
-				/>
+				></Button>
 			</div>
 			<div className={styles.headerLogoArea2}>
 				<ResaltLogo className={styles.headerLogoImage2} />

@@ -1,7 +1,6 @@
 import { Button, Input, makeStyles, mergeClasses, shorthands } from '@fluentui/react-components';
 import { ArrowRightRegular, DismissRegular, SearchRegular } from '@fluentui/react-icons';
 import { tokens } from '@fluentui/tokens';
-import { useComputed } from '@preact/signals-react';
 import { useState } from 'react';
 
 const useStyles = makeStyles({
@@ -51,17 +50,14 @@ export default function ResaltHeaderSearch() {
 		e.preventDefault();
 	}
 
-	// searchFocused.value || searchValue.value.length > 0
-	const hasTextOrActive = useComputed(() => {
-		return searchFocused || searchValue.length > 0;
-	});
+	const hasTextOrActive = searchFocused || searchValue.length > 0;
 	const searchFieldClasses = mergeClasses(
 		styles.headerSearchField,
-		hasTextOrActive.value ? styles.headerSearchFieldActive : '',
+		hasTextOrActive ? styles.headerSearchFieldActive : '',
 	);
 	const searchButtonClasses = mergeClasses(
 		styles.headerSearchButton,
-		hasTextOrActive.value ? styles.headerSearchButtonActive : '',
+		hasTextOrActive ? styles.headerSearchButtonActive : '',
 	);
 	return (
 		<form

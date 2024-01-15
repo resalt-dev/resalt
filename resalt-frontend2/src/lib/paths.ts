@@ -96,17 +96,20 @@ export const paths = {
 	// // settings: new Path('/settings', 'Settings', null, ServerRegular),
 };
 
-export const sidebar: { title: string; items: Path[] }[] = [
+export const sidebar: { title: string; shortTitle: string; items: Path[] }[] = [
 	{
 		title: 'Minions',
+		shortTitle: 'Min',
 		items: [paths.minions, paths.grains, paths.pillars, paths.packages],
 	},
 	{
 		title: 'Monitoring',
+		shortTitle: 'Mon',
 		items: [paths.jobs, paths.events],
 	},
 	{
 		title: 'Access Control',
+		shortTitle: 'AC',
 		items: [paths.users, paths.groups, paths.permissions],
 	},
 ];

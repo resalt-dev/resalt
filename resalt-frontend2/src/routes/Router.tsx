@@ -10,7 +10,6 @@ import {
 import React, { useEffect } from 'react';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import RootLayout from '../layout/ResaltRootLayout';
-import '../lib/fluentui.css';
 import { paths } from '../lib/paths';
 import { ToastController, ToastMessage } from '../lib/toast';
 import User from '../models/User';

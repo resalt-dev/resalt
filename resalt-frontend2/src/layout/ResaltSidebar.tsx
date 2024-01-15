@@ -32,14 +32,34 @@ const useStyles = makeStyles({
 	},
 	sidebarHeader: {
 		display: 'flex',
-		alignItems: 'flex-start',
 		justifyContent: 'flex-start',
+		...typographyStyles.subtitle2Stronger,
 		...shorthands.padding(
 			tokens.spacingHorizontalL,
 			tokens.spacingHorizontalM,
 			tokens.spacingHorizontalS,
 		),
-		...typographyStyles.subtitle2Stronger,
+		...shorthands.transition('padding', '3s', tokens.curveEasyEase),
+		// animate justify content
+		"&[data-collapsed='true']": {
+			...shorthands.padding(
+				tokens.spacingHorizontalL,
+				tokens.spacingHorizontalNone,
+				tokens.spacingHorizontalS,
+			),
+			// justifyContent: 'center',
+			animationName: 'sidebarHeaderCollapsed',
+			animationDuration: '3s',
+			'@keyframes sidebarHeaderCollapsed': {
+				// TODO: Fix this!!!!!!!
+				'0%': {
+					justifyContent: 'flex-start',
+				},
+				'100%': {
+					justifyContent: 'center !important',
+				},
+			},
+		},
 	},
 	sidebarListArea: {
 		display: 'flex',
@@ -72,11 +92,15 @@ const useStyles = makeStyles({
 	},
 	sidebarItemIcon: {
 		...shorthands.margin('0', '0', '0', tokens.spacingHorizontalS),
+		...shorthands.transition('margin', tokens.durationNormal, tokens.curveEasyEase),
+		"&[data-collapsed='true']": {
+			...shorthands.margin('0', '0', '0', '0'),
+		},
 	},
 });
 
-export default function ResaltSidebar() {
-	// console.log('render:ResaltSidebar');
+export default function ResaltSidebar(props: { collapsed: boolean }) {
+	const { collapsed } = props;
 	const styles = useStyles();
 
 	// Detect current page
@@ -115,16 +139,23 @@ export default function ResaltSidebar() {
 				>
 					{sidebar.map((section) => (
 						<div key={section.title}>
-							<div className={styles.sidebarHeader}>{section.title}</div>
+							<div className={styles.sidebarHeader} data-collapsed={collapsed}>
+								{collapsed ? section.shortTitle : section.title}
+							</div>
 							{section.items.map((item) => (
 								<Link key={item.path} to={item.path}>
 									<Tab
 										key={item.path}
 										className={styles.sidebarItem}
-										icon={<item.Icon className={styles.sidebarItemIcon} />}
+										icon={
+											<item.Icon
+												className={styles.sidebarItemIcon}
+												data-collapsed={collapsed}
+											/>
+										}
 										value={item.path}
 									>
-										{item.name}
+										{collapsed ? '' : item.name}
 									</Tab>
 								</Link>
 							))}
