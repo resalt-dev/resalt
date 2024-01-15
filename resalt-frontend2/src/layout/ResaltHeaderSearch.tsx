@@ -1,7 +1,8 @@
 import { Button, Input, makeStyles, mergeClasses, shorthands } from '@fluentui/react-components';
 import { ArrowRightRegular, DismissRegular, SearchRegular } from '@fluentui/react-icons';
 import { tokens } from '@fluentui/tokens';
-import { Signal, signal, useComputed } from '@preact/signals-react';
+import { useComputed } from '@preact/signals-react';
+import { useState } from 'react';
 
 const useStyles = makeStyles({
 	headerSearchGrid: {
@@ -40,21 +41,19 @@ const useStyles = makeStyles({
 	},
 });
 
-const searchFocused = signal(false);
-const searchValue: Signal<string> = signal('');
-
 export default function ResaltHeaderSearch() {
-	// console.log('render:ResaltHeaderSearch');
+	const [searchFocused, setSearchFocused] = useState(false);
+	const [searchValue, setSearchValue] = useState('');
 	const styles = useStyles();
 
 	function searchSubmit(e: React.FormEvent<HTMLFormElement>) {
-		console.log('Search submitted: ' + searchValue.value);
+		console.log('Search submitted: ' + searchValue);
 		e.preventDefault();
 	}
 
 	// searchFocused.value || searchValue.value.length > 0
 	const hasTextOrActive = useComputed(() => {
-		return searchFocused.value || searchValue.value.length > 0;
+		return searchFocused || searchValue.length > 0;
 	});
 	const searchFieldClasses = mergeClasses(
 		styles.headerSearchField,
@@ -65,28 +64,33 @@ export default function ResaltHeaderSearch() {
 		hasTextOrActive.value ? styles.headerSearchButtonActive : '',
 	);
 	return (
-		<form className={styles.headerSearchGrid} onSubmit={(e) => searchSubmit(e)}>
+		<form
+			className={styles.headerSearchGrid}
+			onSubmit={(e) => {
+				searchSubmit(e);
+			}}
+		>
 			<Input
 				className={searchFieldClasses}
 				size="medium"
 				placeholder="Search Minion"
 				onFocus={() => {
-					searchFocused.value = true;
+					setSearchFocused(true);
 				}}
 				onBlur={() => {
-					searchFocused.value = false;
+					setSearchFocused(false);
 				}}
-				value={searchValue.value}
+				value={searchValue}
 				onChange={(_e, data) => {
-					searchValue.value = data.value;
+					setSearchValue(data.value);
 				}}
 				contentBefore={<SearchRegular className={styles.headerSearchButtonIcon} />}
 				contentAfter={
-					searchValue.value.length > 0 ? (
+					searchValue.length > 0 ? (
 						<DismissRegular
 							className={styles.headerSearchDismissButton}
 							onClick={() => {
-								searchValue.value = '';
+								setSearchValue('');
 							}}
 						/>
 					) : (

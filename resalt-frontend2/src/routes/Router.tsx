@@ -39,7 +39,7 @@ export function MainRouter() {
 	// dispatch toasts
 	const { dispatchToast } = useToastController();
 	useEffect(() => {
-		for (let toast of toasts) {
+		for (const toast of toasts) {
 			dispatchToast(
 				<Toast>
 					<ToastTitle>{toast.title}</ToastTitle>

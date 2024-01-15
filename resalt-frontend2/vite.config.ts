@@ -1,18 +1,12 @@
-import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { UserConfig, defineConfig } from 'vite';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-	plugins: [
-		react({
-			babel: {
-				plugins: [['module:@preact/signals-react-transform']],
-			},
-		}),
-	],
+	plugins: [react()],
 	server: {
 		hmr: {
 			port: 5555,
 		},
 	},
-});
+} as UserConfig);

@@ -35,7 +35,7 @@ export default class MinionPreset {
 		const parsedFilters: Filter[] = [];
 		let invalidData = false;
 		try {
-			const filters = JSON.parse(filter);
+			const filters: unknown = JSON.parse(filter);
 			if (Array.isArray(filters)) {
 				for (const f of filters) {
 					parsedFilters.push(Filter.fromObject(f));

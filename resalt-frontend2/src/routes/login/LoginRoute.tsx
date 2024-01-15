@@ -51,7 +51,8 @@ export default function LoginRoute() {
 		console.log('Login submitted');
 		const username = (document.getElementById(loginUsername) as HTMLInputElement).value;
 		const password = (document.getElementById(loginPassword) as HTMLInputElement).value;
-		login(username, password)
+		const abort = new AbortController();
+		login(username, password, abort.signal)
 			.then(() => {
 				console.log('Logged in');
 				const redirect = params.redirect || paths.dashboard.path;
@@ -69,7 +70,11 @@ export default function LoginRoute() {
 			<div className="fl-span-12">
 				<Dialog modalType="alert" open={true} defaultOpen={true}>
 					<DialogSurface>
-						<form onSubmit={(e) => loginSubmit(e)}>
+						<form
+							onSubmit={(e) => {
+								loginSubmit(e);
+							}}
+						>
 							<DialogBody>
 								<DialogTitle>Sign in</DialogTitle>
 								<DialogContent>

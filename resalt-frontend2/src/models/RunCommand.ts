@@ -1,4 +1,4 @@
-import { RunClientType, isRCTAsync } from '$model/RunClientType';
+import { RunClientType, isRCTAsync } from './RunClientType.ts';
 
 export interface ToCommandLineParams {
 	forceWheel?: boolean;
@@ -85,9 +85,12 @@ export default class RunCommand {
 			result += 'salt-run';
 		} else if (
 			this.client === RunClientType.WHEEL ||
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 			this.client === RunClientType.WHEEL_ASYNC
 		) {
 			result += 'salt-wheel';
+		} else {
+			return '# Unknown client #';
 		}
 
 		// Async
@@ -106,7 +109,7 @@ export default class RunCommand {
 		// Args
 		if (this.arg.length > 0) {
 			result += ` ${this.arg
-				.map((arg) => (arg.indexOf(' ') == -1 ? arg : `"${arg}"`))
+				.map((arg) => (!arg.includes(' ') ? arg : `"${arg}"`))
 				.join(' ')}`;
 		}
 

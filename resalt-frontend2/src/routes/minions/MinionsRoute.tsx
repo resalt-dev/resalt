@@ -138,11 +138,13 @@ export default function MinionsRoute(props: { toastController: ToastController }
 				setPresets(v);
 				setPresetsLoaded(true);
 			})
-			.catch((err) => toastController.error('Error loading Minion Presets', err));
+			.catch((err: Error) => {
+				toastController.error('Error loading Minion Presets', err);
+			});
 		return () => {
 			abort.abort();
 		};
-	}, [presetsLastRequested]);
+	}, [presetsLastRequested, toastController]);
 
 	function addPreset() {
 		const abort = new AbortController();
@@ -152,7 +154,9 @@ export default function MinionsRoute(props: { toastController: ToastController }
 				setPresetsLastRequested(Date.now());
 				setSelectedPreset(v.id);
 			})
-			.catch((err) => toastController.error('Error creating new Minion Preset', err));
+			.catch((err: Error) => {
+				toastController.error('Error creating new Minion Preset', err);
+			});
 	}
 
 	function copyPreset() {
@@ -200,7 +204,9 @@ export default function MinionsRoute(props: { toastController: ToastController }
 				setPresetsLastRequested(Date.now());
 				setSelectedPreset(null);
 			})
-			.catch((err) => toastController.error('Error deleting Minion Preset', err));
+			.catch((err: Error) => {
+				toastController.error('Error deleting Minion Preset', err);
+			});
 	}
 
 	function selectPreset(selectedItems: Set<TableRowId>) {
@@ -264,13 +270,14 @@ export default function MinionsRoute(props: { toastController: ToastController }
 
 	function updateFilter(f: Filter, fieldType: string, newValue: string): void {
 		setFilters((filters) => {
-			const copy: Filter[] = filters.map(Filter.fromObject);
-			const filter = copy.filter((f2) => f2.id === f.id)[0];
+			const copy: Filter[] = structuredClone(filters);
+			const foundFilters = copy.filter((f2) => f2.id === f.id);
 			console.log('Updating filter', f, copy);
-			if (!filter) {
+			if (foundFilters.length !== 1) {
 				console.error('Failed to find filter', f);
 				return filters;
 			}
+			const filter = foundFilters[0];
 			switch (fieldType) {
 				case 'fieldType':
 					filter.fieldType = newValue as FilterFieldType;
@@ -310,9 +317,9 @@ export default function MinionsRoute(props: { toastController: ToastController }
 	//
 
 	useEffect(() => {
-		let sort = null; // TODO
-		let limit = null; // TODO
-		let offset = null; // TODO
+		const sort = null; // TODO
+		const limit = null; // TODO
+		const offset = null; // TODO
 		const abort = new AbortController();
 		getMinions(filters, sort, limit, offset, abort.signal)
 			.then((v) => {
@@ -320,11 +327,13 @@ export default function MinionsRoute(props: { toastController: ToastController }
 				setMinions(v);
 				setMinionsLoaded(true);
 			})
-			.catch((err) => toastController.error('Error loading Minions', err));
+			.catch((err: Error) => {
+				toastController.error('Error loading Minions', err);
+			});
 		return () => {
 			abort.abort();
 		};
-	}, [filters]);
+	}, [filters, toastController]);
 
 	// Minions table
 	const {
@@ -405,8 +414,10 @@ export default function MinionsRoute(props: { toastController: ToastController }
 							sortable
 							sortState={{ sortColumn: 'name', sortDirection: 'ascending' }}
 							selectionMode="single"
-							getRowId={(item) => item.id}
-							onSelectionChange={(_e, data) => selectPreset(data.selectedItems)}
+							getRowId={(item) => (item as MinionPreset).id as TableRowId}
+							onSelectionChange={(_e, data) => {
+								selectPreset(data.selectedItems);
+							}}
 							focusMode="composite"
 							size="small"
 							subtleSelection={true}
@@ -439,7 +450,9 @@ export default function MinionsRoute(props: { toastController: ToastController }
 					<Card>
 						<CardHeader
 							className="mouse-pointer"
-							onClick={() => setFiltersExpanded((v) => !v)}
+							onClick={() => {
+								setFiltersExpanded((v) => !v);
+							}}
 							header={
 								<>
 									<span
@@ -477,9 +490,9 @@ export default function MinionsRoute(props: { toastController: ToastController }
 							<div key={f.id} className="fl-grid-small mx-0">
 								<Select
 									className="fl-span-2"
-									onChange={(_e, data) =>
-										updateFilter(f, 'fieldType', data.value)
-									}
+									onChange={(_e, data) => {
+										updateFilter(f, 'fieldType', data.value);
+									}}
 									value={f.fieldType}
 								>
 									<option value={FilterFieldType.OBJECT}>Minion</option>
@@ -490,9 +503,9 @@ export default function MinionsRoute(props: { toastController: ToastController }
 								{f.fieldType === FilterFieldType.OBJECT && (
 									<Select
 										className="fl-span-3"
-										onChange={(_e, data) =>
-											updateFilter(f, 'field', data.value)
-										}
+										onChange={(_e, data) => {
+											updateFilter(f, 'field', data.value);
+										}}
 										value={f.field}
 									>
 										<option value="id">Minion ID</option>
@@ -511,9 +524,9 @@ export default function MinionsRoute(props: { toastController: ToastController }
 									f.fieldType === FilterFieldType.PACKAGE) && (
 									<Input
 										className="fl-span-3"
-										onChange={(_e, data) =>
-											updateFilter(f, 'field', data.value)
-										}
+										onChange={(_e, data) => {
+											updateFilter(f, 'field', data.value);
+										}}
 										value={f.field}
 										placeholder={
 											f.fieldType === FilterFieldType.GRAIN
@@ -525,7 +538,9 @@ export default function MinionsRoute(props: { toastController: ToastController }
 
 								<Select
 									className="fl-span-2"
-									onChange={(_e, data) => updateFilter(f, 'operand', data.value)}
+									onChange={(_e, data) => {
+										updateFilter(f, 'operand', data.value);
+									}}
 									value={f.operand}
 								>
 									{!(
@@ -572,7 +587,9 @@ export default function MinionsRoute(props: { toastController: ToastController }
 
 								<Input
 									className="fl-span-4"
-									onChange={(_e, data) => updateFilter(f, 'value', data.value)}
+									onChange={(_e, data) => {
+										updateFilter(f, 'value', data.value);
+									}}
 									value={f.value}
 									placeholder="Value"
 								/>

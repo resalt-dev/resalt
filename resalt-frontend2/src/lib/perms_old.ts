@@ -241,6 +241,7 @@ type funcSection =
 	| func
 	| {
 			[fun: string]: string[] | funcSectionArgs | funcSectionKwargs | funcSectionArgsKwargs;
+			// eslint-disable-next-line no-mixed-spaces-and-tabs
 	  };
 // "funSection" covers:
 // - "fun"
@@ -252,6 +253,7 @@ type targetSection =
 	| func
 	| {
 			[host: string]: funcSection[];
+			// eslint-disable-next-line no-mixed-spaces-and-tabs
 	  };
 
 export function hasPermission(
@@ -323,10 +325,7 @@ export function hasPermission(
 	//   }
 	// ]
 
-	let permissions: targetSection[] = [];
-	if (user && user.perms) {
-		permissions = user.perms as unknown as targetSection[];
-	}
+	const permissions = user.perms as unknown as targetSection[];
 
 	// Both target and fun are REGEX, e.g "log*" or "pkg.*".
 

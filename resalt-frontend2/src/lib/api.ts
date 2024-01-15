@@ -177,7 +177,7 @@ export async function getMinions(
 	const filteredFilters = filters.filter((f) => f.isValid());
 	const args = new URLSearchParams();
 
-	if (filteredFilters && filteredFilters.length > 0)
+	if (filteredFilters.length > 0)
 		args.append('filter', encodeURIComponent(JSON.stringify(filteredFilters)));
 	if (sort) args.append('sort', sort);
 	if (limit) args.append('limit', limit.toString());
@@ -207,7 +207,7 @@ export async function searchGrains(
 	const args = new URLSearchParams();
 
 	if (query) args.append('query', encodeURIComponent(query));
-	if (filteredFilters && filteredFilters.length > 0)
+	if (filteredFilters.length > 0)
 		args.append('filter', encodeURIComponent(JSON.stringify(filteredFilters)));
 
 	return (await sendRequest('GET', `/grains?${args.toString()}`, u, abort)) as unknown[];

@@ -24,7 +24,7 @@ import {
 } from '@fluentui/react-icons';
 import { tokens } from '@fluentui/tokens';
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import ResaltLogo from '../components/ResaltLogo.tsx';
 import { getCurrentUser } from '../lib/api.ts';
 import { paths } from '../lib/paths.ts';
@@ -126,41 +126,45 @@ export default function ResaltHeader(props: {
 	currentUser: User | null;
 	setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
 }) {
+	const { currentUser, setCurrentUser } = props;
 	const [userPopupOpen, setUserPopupOpen] = useState(false);
 
 	// Navigation
 	const location = useLocation();
 	const navigate = useNavigate();
-	const params = useParams();
 	// Styles
 	const styles = useStyles();
 
 	// Load current user if not already loaded
 	useEffect(() => {
-		if (props.currentUser !== null) {
+		// Don't load if already loaded
+		if (currentUser !== null) {
 			return;
 		}
-		const from = location.pathname + location.search;
-		const to = paths.login.path + '?redirect=' + encodeURIComponent(from);
-
+		// Load current user
 		const abort = new AbortController();
 		getCurrentUser(abort.signal)
 			.then((user: User) => {
 				console.log('Got current user', user);
-				props.setCurrentUser(user);
+				setCurrentUser(user);
 			})
 			.catch((err) => {
 				console.error('Failed to get current user', err);
 				if (location.pathname === paths.login.path) {
 					return;
 				}
+
+				// Don't load if on login page
+				const from = location.pathname + location.search;
+				const to = paths.login.path + '?redirect=' + encodeURIComponent(from);
+
 				console.log('Redirecting to', to);
 				navigate(to, { replace: true });
 			});
 		return () => {
 			abort.abort();
 		};
-	}, [location, params]);
+	}, [currentUser, location, navigate, setCurrentUser]);
 
 	return (
 		<div className={mergeClasses('m-0', styles.headerGrid)}>
@@ -169,6 +173,7 @@ export default function ResaltHeader(props: {
 					appearance="transparent"
 					shape="square"
 					icon={<NavigationIcon />}
+					// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
 					onClick={() => console.log('header:icon:nav')}
 					className={styles.headerButton}
 				/>
@@ -180,6 +185,7 @@ export default function ResaltHeader(props: {
 					icon={
 						<img src="/resalt.png" className={styles.headerLogoImage1} alt="Resalt" />
 					}
+					// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
 					onClick={() => console.log('header:icon:nav')}
 					className={styles.headerButton}
 				/>
@@ -195,6 +201,7 @@ export default function ResaltHeader(props: {
 					appearance="transparent"
 					shape="square"
 					icon={<MegaphoneIcon />}
+					// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
 					onClick={() => console.log('header:icon:nav')}
 					className={styles.headerButton}
 				/>
@@ -202,6 +209,7 @@ export default function ResaltHeader(props: {
 					appearance="transparent"
 					shape="square"
 					icon={<AlertIcon />}
+					// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
 					onClick={() => console.log('header:icon:alert')}
 					className={styles.headerButton}
 				/>
@@ -209,6 +217,7 @@ export default function ResaltHeader(props: {
 					appearance="transparent"
 					shape="square"
 					icon={<SettingsIcon />}
+					// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
 					onClick={() => console.log('header:icon:settings')}
 					className={styles.headerButton}
 				/>
@@ -216,16 +225,23 @@ export default function ResaltHeader(props: {
 					appearance="transparent"
 					shape="square"
 					icon={<QuestionIcon />}
+					// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
 					onClick={() => console.log('header:icon:help')}
 					className={styles.headerButton}
 				/>
-				<Popover open={userPopupOpen} onOpenChange={() => setUserPopupOpen((v) => !v)}>
+				<Popover
+					open={userPopupOpen}
+					onOpenChange={() => {
+						setUserPopupOpen((v) => !v);
+					}}
+				>
 					<PopoverTrigger>
 						<Button
 							appearance="transparent"
 							shape="square"
 							size="large"
 							icon={<PersonIcon />}
+							// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
 							onClick={() => console.log('header:icon:user')}
 							className={styles.headerButton}
 						/>
