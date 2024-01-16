@@ -16,8 +16,7 @@ const useStyles = makeStyles({
 		gridTemplateRows: 'auto',
 		...shorthands.transition(
 			'grid-template-columns',
-			// tokens.durationNormal,
-			'3s',
+			tokens.durationNormal,
 			tokens.curveEasyEase,
 		),
 		"&[data-sidebar-collapsed='true']": {

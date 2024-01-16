@@ -11,9 +11,6 @@ const useStyles = makeStyles({
 		gridTemplateRows: 'auto',
 	},
 	sidebarDashboardArea: {
-		display: 'flex',
-		alignItems: 'flex-start',
-		justifyContent: 'flex-start',
 		...shorthands.padding(
 			tokens.spacingHorizontalXL,
 			tokens.spacingHorizontalXL,
@@ -31,40 +28,30 @@ const useStyles = makeStyles({
 		color: tokens.colorNeutralForegroundInverted,
 	},
 	sidebarHeader: {
-		display: 'flex',
-		justifyContent: 'flex-start',
 		...typographyStyles.subtitle2Stronger,
+
 		...shorthands.padding(
 			tokens.spacingHorizontalL,
 			tokens.spacingHorizontalM,
 			tokens.spacingHorizontalS,
 		),
-		...shorthands.transition('padding', '3s', tokens.curveEasyEase),
-		// animate justify content
+		...shorthands.transition([
+			['padding', tokens.durationNormal, tokens.curveEasyEase],
+			['width', tokens.durationNormal, tokens.curveEasyEase],
+		]),
+		width: '0',
+		whiteSpace: 'nowrap', // when the text is more than one word
+		textAlign: 'center',
 		"&[data-collapsed='true']": {
 			...shorthands.padding(
 				tokens.spacingHorizontalL,
 				tokens.spacingHorizontalNone,
 				tokens.spacingHorizontalS,
 			),
-			// justifyContent: 'center',
-			animationName: 'sidebarHeaderCollapsed',
-			animationDuration: '3s',
-			'@keyframes sidebarHeaderCollapsed': {
-				// TODO: Fix this!!!!!!!
-				'0%': {
-					justifyContent: 'flex-start',
-				},
-				'100%': {
-					justifyContent: 'center !important',
-				},
-			},
+			width: '100%',
 		},
 	},
 	sidebarListArea: {
-		display: 'flex',
-		alignItems: 'flex-start',
-		justifyContent: 'flex-start',
 		...shorthands.padding('0', '0', '0', tokens.spacingHorizontalXS),
 		rowGap: '20px',
 	},
@@ -85,10 +72,6 @@ const useStyles = makeStyles({
 			...shorthands.overflow('visible'),
 			width: 'auto',
 		},
-	},
-	sidebarItemIconArea: {
-		display: 'flex',
-		// backgroundColor: 'rgba(0, 255, 255, 0.4)', // DEBUG
 	},
 	sidebarItemIcon: {
 		...shorthands.margin('0', '0', '0', tokens.spacingHorizontalS),
