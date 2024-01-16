@@ -1,7 +1,7 @@
 import { Button, Tab, TabList, makeStyles, shorthands } from '@fluentui/react-components';
 import { HomeFilled, HomeRegular, bundleIcon } from '@fluentui/react-icons';
 import { tokens, typographyStyles } from '@fluentui/tokens';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { paths, sidebar } from '../lib/paths';
 
 const useStyles = makeStyles({
@@ -86,6 +86,7 @@ const HomeIcon = bundleIcon(HomeFilled, HomeRegular);
 export default function ResaltSidebar(props: { collapsed: boolean }) {
 	const { collapsed } = props;
 	const styles = useStyles();
+	const navigate = useNavigate();
 
 	// Detect current page
 	const location = useLocation();
@@ -103,7 +104,15 @@ export default function ResaltSidebar(props: { collapsed: boolean }) {
 		<div className={styles.sidebarGrid}>
 			<div className={styles.sidebarDashboardArea} data-collapsed={collapsed}>
 				<Link to={paths.dashboard.path}>
-					<Button shape="circular" appearance="primary" size="large" icon={<HomeIcon />}>
+					<Button
+						shape="circular"
+						appearance="primary"
+						size="large"
+						icon={<HomeIcon />}
+						onClick={() => {
+							navigate(paths.dashboard.path);
+						}}
+					>
 						{collapsed ? '' : paths.dashboard.name}
 					</Button>
 				</Link>

@@ -36,8 +36,8 @@ const useStyles = makeStyles({
 		backgroundColor: '#000000',
 		color: '#ffffff',
 		display: 'grid',
-		gridTemplateColumns: `[header-collapse] 48px [header-logo1] 48px [header-logo2] ${
-			280 - 48 - 48
+		gridTemplateColumns: `[header-collapse] 48px [header-logo] ${
+			280 - 48
 		}px [spacer] auto [header-search] 25vw [spacer] auto [header-settings] ${48 * 5}px`,
 		gridTemplateRows: '48px',
 		alignItems: 'center',
@@ -56,15 +56,10 @@ const useStyles = makeStyles({
 			transform: 'rotate(90deg)',
 		},
 	},
-	headerLogoArea1: {
-		gridColumnStart: 'header-logo1',
+	headerLogoArea: {
+		gridColumnStart: 'header-logo',
 		height: '48px',
 		...shorthands.overflow('hidden'),
-	},
-	headerLogoArea2: {
-		gridColumnStart: 'header-logo2',
-		height: '48px',
-		display: 'flex',
 	},
 	headerSearch: {
 		gridColumnStart: 'header-search',
@@ -79,16 +74,6 @@ const useStyles = makeStyles({
 	//
 	// All "Icons"
 	//
-	headerLogoImage1: {
-		height: 'calc(48px - 16px)',
-		display: 'block',
-		userDrag: 'none',
-		userSelect: 'none',
-	},
-	headerLogoImage2: {
-		height: '20px',
-		...shorthands.padding(tokens.spacingHorizontalL, tokens.spacingHorizontalSNudge),
-	},
 	headerButton: {
 		height: '48px',
 		width: '48px',
@@ -107,6 +92,31 @@ const useStyles = makeStyles({
 		'&>span': {
 			width: '32px',
 		},
+	},
+	//
+	// Header Logo
+	//
+	headerLogoButton: {
+		width: '100%',
+		maxWidth: '100%',
+		'&>span': {
+			display: 'block',
+			...shorthands.margin('0'),
+			height: '32px',
+			width: '32px',
+		},
+	},
+	headerLogoImage1: {
+		height: '32px',
+		width: '32px',
+		display: 'block',
+		userSelect: 'none',
+	},
+	headerLogoImage2: {
+		display: 'block',
+		height: '20px',
+		maxHeight: '20px',
+		...shorthands.padding('0', tokens.spacingHorizontalS),
 	},
 	//
 	// Profile Popover
@@ -193,20 +203,25 @@ export default function ResaltHeader(props: {
 					className={styles.headerButton}
 				/>
 			</div>
-			<div className={styles.headerLogoArea1}>
+			<div className={styles.headerLogoArea}>
 				<Button
 					appearance="transparent"
 					shape="square"
 					icon={
-						<img src="/resalt.png" className={styles.headerLogoImage1} alt="Resalt" />
+						<img
+							src="/resalt.png"
+							className={styles.headerLogoImage1}
+							alt="Resalt"
+							width="32px"
+						/>
 					}
-					// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-					onClick={() => console.log('header:icon:nav')}
-					className={styles.headerButton}
-				></Button>
-			</div>
-			<div className={styles.headerLogoArea2}>
-				<ResaltLogo className={styles.headerLogoImage2} />
+					onClick={() => {
+						navigate(paths.dashboard.path);
+					}}
+					className={mergeClasses(styles.headerButton, styles.headerLogoButton)}
+				>
+					<ResaltLogo className={styles.headerLogoImage2} />
+				</Button>
 			</div>
 			<div className={styles.headerSearch}>
 				<ResaltHeaderSearch />
