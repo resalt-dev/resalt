@@ -45,9 +45,16 @@ const useStyles = makeStyles({
 	//
 	// Areas
 	//
-	headerCompose: {
+	headerCollapse: {
 		gridColumnStart: 'header-collapse',
 		// backgroundColor: 'rgba(255, 0, 0, 0.5)', // DEBUG
+		'&>button>span': {
+			display: 'block',
+			...shorthands.transition('transform', tokens.durationNormal, tokens.curveEasyEase),
+		},
+		'&[data-collapsed="true"]>button>span': {
+			transform: 'rotate(90deg)',
+		},
 	},
 	headerLogoArea1: {
 		gridColumnStart: 'header-logo1',
@@ -130,9 +137,10 @@ const PersonIcon = Person28Filled;
 export default function ResaltHeader(props: {
 	currentUser: User | null;
 	setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
+	sidebarCollapsed: boolean;
 	setSidebarCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-	const { currentUser, setCurrentUser, setSidebarCollapsed } = props;
+	const { currentUser, setCurrentUser, sidebarCollapsed, setSidebarCollapsed } = props;
 	const [userPopupOpen, setUserPopupOpen] = useState(false);
 
 	// Navigation
@@ -174,7 +182,7 @@ export default function ResaltHeader(props: {
 
 	return (
 		<div className={mergeClasses('m-0', styles.headerGrid)}>
-			<div className={styles.headerCompose}>
+			<div className={styles.headerCollapse} data-collapsed={sidebarCollapsed}>
 				<Button
 					appearance="transparent"
 					shape="square"
@@ -268,10 +276,10 @@ export default function ResaltHeader(props: {
 									styles.headerProfilePopoverUsername,
 								)}
 							>
-								{props.currentUser === null ? (
+								{currentUser === null ? (
 									<SkeletonItem />
 								) : (
-									<span>{props.currentUser.username}</span>
+									<span>{currentUser.username}</span>
 								)}
 							</div>
 							<Button

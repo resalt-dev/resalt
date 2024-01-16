@@ -54,6 +54,7 @@ export default function RootLayout(props: {
 			<ResaltHeader
 				currentUser={props.currentUser}
 				setCurrentUser={props.setCurrentUser}
+				sidebarCollapsed={sidebarCollapsed}
 				setSidebarCollapsed={setSidebarCollapsed}
 			/>
 			<div

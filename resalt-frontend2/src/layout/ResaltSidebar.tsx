@@ -1,5 +1,5 @@
 import { Button, Tab, TabList, makeStyles, shorthands } from '@fluentui/react-components';
-import { HomeRegular } from '@fluentui/react-icons';
+import { HomeFilled, HomeRegular, bundleIcon } from '@fluentui/react-icons';
 import { tokens, typographyStyles } from '@fluentui/tokens';
 import { Link, useLocation } from 'react-router-dom';
 import { paths, sidebar } from '../lib/paths';
@@ -16,16 +16,15 @@ const useStyles = makeStyles({
 			tokens.spacingHorizontalXL,
 			tokens.spacingHorizontalS,
 		),
+		...shorthands.transition('padding', tokens.durationNormal, tokens.curveEasyEase),
+		'&[data-collapsed="true"]': {
+			...shorthands.padding(
+				tokens.spacingHorizontalXL,
+				tokens.spacingHorizontalXS,
+				tokens.spacingHorizontalS,
+			),
+		},
 		// backgroundColor: 'rgba(255, 255, 0, 0.5)', // DEBUG
-	},
-	sidebarDashboardButton: {
-		backgroundImage:
-			'linear-gradient(135deg, ' +
-			tokens.colorBrandBackground +
-			' 30%, ' +
-			tokens.colorBrandBackgroundSelected +
-			' 70%)',
-		color: tokens.colorNeutralForegroundInverted,
 	},
 	sidebarHeader: {
 		...typographyStyles.subtitle2Stronger,
@@ -82,6 +81,8 @@ const useStyles = makeStyles({
 	},
 });
 
+const HomeIcon = bundleIcon(HomeFilled, HomeRegular);
+
 export default function ResaltSidebar(props: { collapsed: boolean }) {
 	const { collapsed } = props;
 	const styles = useStyles();
@@ -100,16 +101,10 @@ export default function ResaltSidebar(props: { collapsed: boolean }) {
 
 	return (
 		<div className={styles.sidebarGrid}>
-			<div className={styles.sidebarDashboardArea}>
+			<div className={styles.sidebarDashboardArea} data-collapsed={collapsed}>
 				<Link to={paths.dashboard.path}>
-					<Button
-						shape="circular"
-						appearance="primary"
-						size="large"
-						icon={<HomeRegular />}
-						className={styles.sidebarDashboardButton}
-					>
-						{paths.dashboard.name}
+					<Button shape="circular" appearance="primary" size="large" icon={<HomeIcon />}>
+						{collapsed ? '' : paths.dashboard.name}
 					</Button>
 				</Link>
 			</div>
