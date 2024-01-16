@@ -37,8 +37,8 @@ export default function LogoutRoute(props: {
 		if (!logoutSuccess) return;
 		const timer = setTimeout(
 			() => {
-				console.log('Redirecting to', paths.login.path);
-				navigate(paths.login.path, { replace: true });
+				console.log('Redirecting to', paths.login.getPath());
+				navigate(paths.login.getPath(), { replace: true });
 			},
 			1500 - (Date.now() - startTime.current),
 		);

@@ -10,12 +10,14 @@ import {
 	DataGridRow,
 	Input,
 	Menu,
+	MenuButtonProps,
 	MenuItem,
 	MenuList,
 	MenuPopover,
 	MenuTrigger,
 	Select,
 	SkeletonItem,
+	SplitButton,
 	Table,
 	TableBody,
 	TableCell,
@@ -45,6 +47,7 @@ import {
 	bundleIcon,
 } from '@fluentui/react-icons';
 import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
 	createMinionPreset,
 	deleteMinionPreset,
@@ -52,6 +55,7 @@ import {
 	getMinions,
 	updateMinionPreset,
 } from '../../lib/api';
+import { paths } from '../../lib/paths';
 import { ToastController } from '../../lib/toast';
 import { SKEL, formatDate, useGlobalStyles } from '../../lib/ui';
 import Filter from '../../models/Filter';
@@ -114,10 +118,11 @@ const minionColumns: TableColumnDefinition<Minion>[] = [
 
 export default function MinionsRoute(props: { toastController: ToastController }) {
 	const { toastController } = props;
+	const [searchParams, setSearchParams] = useSearchParams();
 	const [presetsLastRequested, setPresetsLastRequested] = useState(0);
 	const [presetsLoaded, setPresetsLoaded] = useState(false);
 	const [presets, setPresets] = useState<MinionPreset[] | null>(null);
-	const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
+	const [selectedPreset, setSelectedPreset] = useState<string | null>(searchParams.get('preset'));
 	const [minionsLoaded, setMinionsLoaded] = useState(false);
 	const [minions, setMinions] = useState<Minion[] | null>(null);
 	const [filtersExpanded, setFiltersExpanded] = useState(true);
@@ -125,6 +130,7 @@ export default function MinionsRoute(props: { toastController: ToastController }
 	const [filtersModified, setFiltersModified] = useState(false);
 
 	const globalStyles = useGlobalStyles();
+	const navigate = useNavigate();
 
 	//
 	// Presets
@@ -145,6 +151,21 @@ export default function MinionsRoute(props: { toastController: ToastController }
 			abort.abort();
 		};
 	}, [presetsLastRequested, toastController]);
+
+	// Update URL when selectedPreset changes
+	useEffect(() => {
+		if (selectedPreset === null) {
+			setSearchParams((search) => {
+				search.delete('preset');
+				return search;
+			});
+		} else {
+			setSearchParams((search) => {
+				search.set('preset', selectedPreset);
+				return search;
+			});
+		}
+	}, [setSearchParams, selectedPreset]);
 
 	function addPreset() {
 		const abort = new AbortController();
@@ -240,6 +261,10 @@ export default function MinionsRoute(props: { toastController: ToastController }
 			setFilters([]);
 			return;
 		}
+		if (presets === null) {
+			// Presets not loaded yet
+			return;
+		}
 		const preset = presets?.filter((p) => p.id === selectedPreset)[0];
 		if (!preset) {
 			console.error('Failed to find preset', selectedPreset);
@@ -256,6 +281,10 @@ export default function MinionsRoute(props: { toastController: ToastController }
 		// Update filtersModified when filters change
 		if (selectedPreset === null) {
 			setFiltersModified(false);
+			return;
+		}
+		if (presets === null) {
+			// Presets not loaded yet
 			return;
 		}
 		const preset = presets?.filter((p) => p.id === selectedPreset)[0];
@@ -683,7 +712,43 @@ export default function MinionsRoute(props: { toastController: ToastController }
 													</>
 												)}
 											</TableCell>
-											<TableCell>Actions</TableCell>
+											<TableCell>
+												<Menu positioning="below-end">
+													<MenuTrigger disableButtonEnhancement>
+														{(triggerProps: MenuButtonProps) => (
+															<SplitButton
+																appearance="primary"
+																menuButton={triggerProps}
+																primaryActionButton={{
+																	onClick: () => {
+																		navigate(
+																			paths.minion.getPath({
+																				minionId: item.id,
+																			}),
+																		);
+																	},
+																	onAuxClick: () => {
+																		navigate(
+																			paths.minion.getPath({
+																				minionId: item.id,
+																			}),
+																		);
+																	},
+																}}
+															>
+																View
+															</SplitButton>
+														)}
+													</MenuTrigger>
+
+													<MenuPopover>
+														<MenuList>
+															<MenuItem>Resync</MenuItem>
+															<MenuItem>Terminal</MenuItem>
+														</MenuList>
+													</MenuPopover>
+												</Menu>
+											</TableCell>
 										</TableRow>
 									),
 								)}

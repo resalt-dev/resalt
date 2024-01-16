@@ -1,3 +1,12 @@
+import { useParams } from 'react-router-dom';
+import MinionHeader from '../MinionHeader';
+
 export default function MinionGrainsRoute() {
-	return <div>MinionGrains</div>;
+	const { minionId } = useParams();
+
+	return (
+		<>
+			<MinionHeader tab="grains" minionId={minionId!} />
+		</>
+	);
 }

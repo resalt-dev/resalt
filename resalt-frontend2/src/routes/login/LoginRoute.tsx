@@ -16,7 +16,7 @@ import {
 	typographyStyles,
 	useId,
 } from '@fluentui/react-components';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import loginBackground from '../../assets/images/login-background.jpg';
 import { login } from '../../lib/api';
 import { paths } from '../../lib/paths';
@@ -40,7 +40,8 @@ const useStyles = makeStyles({
 export default function LoginRoute() {
 	// Navigate
 	const navigate = useNavigate();
-	const params = useParams();
+	const [searchParams] = useSearchParams();
+	const redirect = searchParams.get('redirect') || paths.dashboard.path;
 	// ID's
 	const loginUsername = useId('loginUsername');
 	const loginPassword = useId('loginPassword');
@@ -55,7 +56,6 @@ export default function LoginRoute() {
 		login(username, password, abort.signal)
 			.then(() => {
 				console.log('Logged in');
-				const redirect = params.redirect || paths.dashboard.path;
 				navigate(redirect, { replace: true });
 			})
 			.catch((err) => {

@@ -1,5 +1,4 @@
 import { Button, Tab, TabList, makeStyles, shorthands } from '@fluentui/react-components';
-import { HomeFilled, HomeRegular, bundleIcon } from '@fluentui/react-icons';
 import { tokens, typographyStyles } from '@fluentui/tokens';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { paths, sidebar } from '../lib/paths';
@@ -81,8 +80,6 @@ const useStyles = makeStyles({
 	},
 });
 
-const HomeIcon = bundleIcon(HomeFilled, HomeRegular);
-
 export default function ResaltSidebar(props: { collapsed: boolean }) {
 	const { collapsed } = props;
 	const styles = useStyles();
@@ -108,7 +105,7 @@ export default function ResaltSidebar(props: { collapsed: boolean }) {
 						shape="circular"
 						appearance="primary"
 						size="large"
-						icon={<HomeIcon />}
+						icon={<paths.dashboard.Icon />}
 						onClick={() => {
 							navigate(paths.dashboard.path);
 						}}

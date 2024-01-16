@@ -48,7 +48,7 @@ export default function RootLayout(props: {
 	const styles = useStyles();
 	const location = useLocation();
 
-	const isLoginPage = location.pathname.startsWith(paths.login.path);
+	const isLoginPage = location.pathname.startsWith(paths.login.getPath());
 	return (
 		<div className={styles.rootLayout}>
 			<ResaltHeader

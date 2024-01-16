@@ -1,3 +1,12 @@
+import { useParams } from 'react-router-dom';
+import MinionHeader from '../MinionHeader';
+
 export default function MinionPillarsRoute() {
-	return <div>MinionPillars</div>;
+	const { minionId } = useParams();
+
+	return (
+		<>
+			<MinionHeader tab="pillars" minionId={minionId!} />
+		</>
+	);
 }

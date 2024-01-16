@@ -116,7 +116,7 @@ const useStyles = makeStyles({
 		display: 'block',
 		height: '20px',
 		maxHeight: '20px',
-		...shorthands.padding('0', tokens.spacingHorizontalS),
+		...shorthands.padding('0', tokens.spacingHorizontalM),
 	},
 	//
 	// Profile Popover
@@ -174,13 +174,13 @@ export default function ResaltHeader(props: {
 			})
 			.catch((err) => {
 				console.error('Failed to get current user', err);
-				if (location.pathname === paths.login.path) {
+				if (location.pathname === paths.login.getPath()) {
 					return;
 				}
 
 				// Don't load if on login page
 				const from = location.pathname + location.search;
-				const to = paths.login.path + '?redirect=' + encodeURIComponent(from);
+				const to = paths.login.getPath() + '?redirect=' + encodeURIComponent(from);
 
 				console.log('Redirecting to', to);
 				navigate(to, { replace: true });
@@ -216,7 +216,7 @@ export default function ResaltHeader(props: {
 						/>
 					}
 					onClick={() => {
-						navigate(paths.dashboard.path);
+						navigate(paths.dashboard.getPath());
 					}}
 					className={mergeClasses(styles.headerButton, styles.headerLogoButton)}
 				>

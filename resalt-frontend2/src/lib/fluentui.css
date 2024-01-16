@@ -9,13 +9,15 @@ a {
 	user-select: text;
 	text-decoration-line: none;
 }
-
 a:hover {
 	color: var(--colorBrandForegroundLinkHover);
 }
 a:active {
 	color: var(--colorBrandForegroundLinkPressed);
 	text-decoration-line: underline;
+}
+button > a {
+	color: inherit !important;
 }
 
 /* Images */

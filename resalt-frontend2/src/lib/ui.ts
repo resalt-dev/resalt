@@ -6,10 +6,14 @@ export const useGlobalStyles = makeStyles({
 	title: {
 		...typographyStyles.subtitle1,
 		...shorthands.padding(tokens.spacingHorizontalXXL, tokens.spacingHorizontalSNudge),
+		alignItems: 'center',
+		display: 'flex',
 	},
 	cardHeaderTitle: {
 		...typographyStyles.subtitle2Stronger,
 		...shorthands.padding(tokens.spacingHorizontalS),
+		alignItems: 'center',
+		display: 'flex',
 	},
 });
 
