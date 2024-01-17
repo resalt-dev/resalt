@@ -38,6 +38,7 @@ export default function MinionHeader(props: { tab: MinionTab; minionId: string }
 						</Link>
 					</TabList>
 				</div>
+				<div className="fl-span-12" />
 			</div>
 		</>
 	);

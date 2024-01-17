@@ -21,3 +21,17 @@ export const formatDate = (datetime: string) => {
 	// Convert ISO-8601 to YYYY-MM-DD HH:MM:SS
 	return datetime.replace('T', ' ').replace(/\.\d+Z$/, '');
 };
+
+export const multilineText = (text: string | number | boolean) => {
+	const textStr = text.toString();
+	return (
+		<>
+			{textStr.split(/\n|\r\n/).map((segment, index) => (
+				<>
+					{index > 0 && <br />}
+					{segment}
+				</>
+			))}
+		</>
+	);
+};
