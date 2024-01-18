@@ -1,20 +1,25 @@
-import { Tab, TabList } from '@fluentui/react-components';
+import { Badge, Tab, TabList } from '@fluentui/react-components';
 import { Link } from 'react-router-dom';
 import { paths } from '../../../lib/paths';
 import { useGlobalStyles } from '../../../lib/ui';
 
 export type MinionTab = '' | 'grains' | 'conformity' | 'pillars' | 'packages';
-export default function MinionHeader(props: { tab: MinionTab; minionId: string }) {
-	const { tab, minionId } = props;
+export default function MinionHeader(props: { tab: MinionTab; minionId: string; error?: Error }) {
+	const { tab, minionId, error } = props;
 	const globalStyles = useGlobalStyles();
 
 	return (
 		<>
 			<div className="fl-grid">
-				<div className="fl-span-3">
+				<div className="fl-span-6">
 					<div className={globalStyles.title}>
 						<paths.minion.Icon />
-						{minionId}
+						<span>{minionId}</span>
+						{error && (
+							<Badge color="danger" shape="rounded" className="mx-s">
+								{error.message}
+							</Badge>
+						)}
 					</div>
 				</div>
 			</div>
@@ -38,8 +43,8 @@ export default function MinionHeader(props: { tab: MinionTab; minionId: string }
 						</Link>
 					</TabList>
 				</div>
-				<div className="fl-span-12" />
 			</div>
+			<br />
 		</>
 	);
 }

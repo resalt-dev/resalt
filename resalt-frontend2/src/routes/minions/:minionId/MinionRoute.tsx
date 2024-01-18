@@ -1,6 +1,7 @@
 import {
 	Card,
 	CardHeader,
+	SkeletonItem,
 	Table,
 	TableBody,
 	TableCell,
@@ -18,9 +19,9 @@ import MinionHeader from './MinionHeader';
 
 type Value = string | number | boolean | null | undefined;
 type KeyValue = { k: string; v: Value; v2?: Value };
-function InfoTable(props: { header?: KeyValue; items: KeyValue[] }) {
+function InfoTable(props: { loading: boolean; header?: KeyValue; items: KeyValue[] }) {
 	return (
-		<Table>
+		<Table size="small">
 			{props.header && (
 				<TableHeader>
 					<TableRow>
@@ -41,11 +42,13 @@ function InfoTable(props: { header?: KeyValue; items: KeyValue[] }) {
 			<TableBody>
 				{props.items.map((item) => (
 					<TableRow key={item.k}>
-						<TableCell>
+						<TableCell style={{ width: '8rem' }}>
 							<strong>{item.k}</strong>
 						</TableCell>
 						<TableCell>
-							{item.v && item.v.toString().length > 0 ? (
+							{props.loading ? (
+								<SkeletonItem />
+							) : item.v && item.v.toString().length > 0 ? (
 								multilineText(item.v)
 							) : (
 								<i>Unknown</i>
@@ -58,34 +61,42 @@ function InfoTable(props: { header?: KeyValue; items: KeyValue[] }) {
 	);
 }
 
-function InfoCard(props: { title: string; header?: KeyValue; items: KeyValue[] }) {
+function InfoCard(props: {
+	loading: boolean;
+	title: string;
+	header?: KeyValue;
+	items: KeyValue[];
+}) {
 	const globalStyles = useGlobalStyles();
 	return (
-		<Card>
+		<Card style={{ height: '100%' }}>
 			<CardHeader
 				header={<span className={globalStyles.cardHeaderTitle}>{props.title}</span>}
 			/>
-			<InfoTable header={props.header} items={props.items} />
+			<InfoTable loading={props.loading} header={props.header} items={props.items} />
 		</Card>
 	);
 }
 
 export default function MinionRoute(props: { toastController: ToastController }) {
 	const { toastController } = props;
+	const [loadingError, setLoadingError] = useState<Error | undefined>(undefined);
 	const [minion, setMinion] = useState<Minion | null>(null);
 	const [grains, setGrains] = useState<any>({});
 	const minionId = useParams().minionId!;
 
 	useEffect(() => {
 		// Fetch minion
+		console.log('MinionRoute:useEffect', minionId);
 		const abort = new AbortController();
 		getMinionById(minionId, abort.signal)
 			.then((minion) => {
 				setMinion(minion);
 				setGrains(JSON.parse(minion?.grains ?? '{}'));
 			})
-			.catch((err) => {
-				toastController.error('Error loading Minion', err);
+			.catch((err: Error) => {
+				setLoadingError(err);
+				toastController.error('Error loading minion', err);
 			});
 		return () => {
 			abort.abort();
@@ -94,10 +105,11 @@ export default function MinionRoute(props: { toastController: ToastController })
 
 	return (
 		<>
-			<MinionHeader tab="" minionId={minionId!} />
+			<MinionHeader tab="" minionId={minionId!} error={loadingError} />
 			<div className="fl-grid">
 				<div className="fl-span-3">
 					<InfoCard
+						loading={!minion}
 						title="Common"
 						items={[
 							{ k: 'ID', v: minion?.id },
@@ -110,6 +122,7 @@ export default function MinionRoute(props: { toastController: ToastController })
 				</div>
 				<div className="fl-span-3">
 					<InfoCard
+						loading={!minion}
 						title="Hardware"
 						items={[
 							{ k: 'CPU', v: grains.cpu_model },
@@ -122,6 +135,7 @@ export default function MinionRoute(props: { toastController: ToastController })
 				</div>
 				<div className="fl-span-3">
 					<InfoCard
+						loading={!minion}
 						title="DNS"
 						items={[
 							{
@@ -141,6 +155,7 @@ export default function MinionRoute(props: { toastController: ToastController })
 				</div>
 				<div className="fl-span-3">
 					<InfoCard
+						loading={!minion}
 						title="Timings"
 						items={[
 							{ k: 'Last seen', v: minion?.lastSeen },
@@ -153,6 +168,7 @@ export default function MinionRoute(props: { toastController: ToastController })
 				</div>
 				<div className="fl-span-12">
 					<InfoCard
+						loading={!minion}
 						title="Network"
 						header={{ k: 'Interface', v: 'Address', v2: 'MAC' }}
 						items={Object.entries(

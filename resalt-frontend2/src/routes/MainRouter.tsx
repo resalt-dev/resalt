@@ -17,7 +17,8 @@ import User from '../models/User';
 export function MainRouter() {
 	const [currentUser, setCurrentUser] = React.useState<User | null>(null);
 	const [toasts, setToasts] = React.useState<ToastMessage[]>([]);
-	const toastController = new ToastController(setToasts);
+	const toastControllerRef = React.useRef<ToastController>(new ToastController(setToasts));
+	const toastController = toastControllerRef.current;
 
 	const router = createBrowserRouter([
 		{

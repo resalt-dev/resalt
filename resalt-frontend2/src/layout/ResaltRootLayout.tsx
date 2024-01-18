@@ -35,6 +35,7 @@ const useStyles = makeStyles({
 		gridColumnStart: 'main-area',
 		height: 'calc(100vh - 48px)',
 		...shorthands.overflow('auto'),
+		paddingBottom: tokens.spacingHorizontalXXL,
 		backgroundColor: tokens.colorNeutralBackground3,
 		// backgroundColor: 'rgba(255, 0, 0, 0.2)', // DEBUG
 	},

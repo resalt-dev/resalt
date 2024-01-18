@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './lib/fluentui.css';
-import { MainRouter } from './routes/Router';
+import { MainRouter } from './routes/MainRouter';
 
 const root = document.getElementById('root');
 if (!root) {

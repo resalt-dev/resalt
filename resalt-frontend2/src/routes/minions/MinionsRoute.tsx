@@ -10,14 +10,13 @@ import {
 	DataGridRow,
 	Input,
 	Menu,
-	MenuButtonProps,
 	MenuItem,
 	MenuList,
 	MenuPopover,
 	MenuTrigger,
 	Select,
 	SkeletonItem,
-	SplitButton,
+	Spinner,
 	Table,
 	TableBody,
 	TableCell,
@@ -29,6 +28,7 @@ import {
 	TableRow,
 	TableRowId,
 	ToolbarButton,
+	Tooltip,
 	createTableColumn,
 	mergeClasses,
 	useTableFeatures,
@@ -40,19 +40,26 @@ import {
 	ArrowMinimizeFilled,
 	ArrowMinimizeRegular,
 	ArrowReplyRegular,
+	CloudSyncFilled,
+	CloudSyncRegular,
 	MoreHorizontal24Filled,
+	OpenFilled,
+	OpenRegular,
+	PlayFilled,
+	PlayRegular,
 	ShareRegular,
 	SwipeDownFilled,
 	SwipeDownRegular,
 	bundleIcon,
 } from '@fluentui/react-icons';
 import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
 	createMinionPreset,
 	deleteMinionPreset,
 	getMinionPresets,
 	getMinions,
+	refreshMinion,
 	updateMinionPreset,
 } from '../../lib/api';
 import { paths } from '../../lib/paths';
@@ -83,9 +90,9 @@ const emptyMinions = [
 const AddIcon = bundleIcon(AddFilled, AddRegular);
 const CollapseIcon = bundleIcon(ArrowMinimizeFilled, ArrowMinimizeRegular);
 const ExpandIcon = bundleIcon(SwipeDownFilled, SwipeDownRegular);
-// const FilterMinionIcon = bundleIcon(ServerFilled, ServerRegular);
-// const FilterGrainIcon = bundleIcon(InfoFilled, InfoRegular);
-// const FilterPackageIcon = bundleIcon(AppsFilled, AppsRegular);
+const OpenIcon = bundleIcon(OpenFilled, OpenRegular);
+const ResyncIcon = bundleIcon(CloudSyncFilled, CloudSyncRegular);
+const PlayIcon = bundleIcon(PlayFilled, PlayRegular);
 
 const presetColumns: TableColumnDefinition<MinionPreset>[] = [
 	createTableColumn<MinionPreset>({
@@ -123,14 +130,15 @@ export default function MinionsRoute(props: { toastController: ToastController }
 	const [presetsLoaded, setPresetsLoaded] = useState(false);
 	const [presets, setPresets] = useState<MinionPreset[] | null>(null);
 	const [selectedPreset, setSelectedPreset] = useState<string | null>(searchParams.get('preset'));
+	const [minionsLastRequested, setMinionsLastRequested] = useState(0);
 	const [minionsLoaded, setMinionsLoaded] = useState(false);
 	const [minions, setMinions] = useState<Minion[] | null>(null);
+	const [syncingMinions, setSyncingMinions] = useState<Set<string>>(new Set());
 	const [filtersExpanded, setFiltersExpanded] = useState(true);
 	const [filters, setFilters] = useState<Filter[]>([]);
 	const [filtersModified, setFiltersModified] = useState(false);
 
 	const globalStyles = useGlobalStyles();
-	const navigate = useNavigate();
 
 	//
 	// Presets
@@ -145,7 +153,7 @@ export default function MinionsRoute(props: { toastController: ToastController }
 				setPresetsLoaded(true);
 			})
 			.catch((err: Error) => {
-				toastController.error('Error loading Minion Presets', err);
+				toastController.error('Error loading minion presets', err);
 			});
 		return () => {
 			abort.abort();
@@ -171,12 +179,12 @@ export default function MinionsRoute(props: { toastController: ToastController }
 		const abort = new AbortController();
 		createMinionPreset('#NewPreset#', [], abort.signal)
 			.then((v) => {
-				toastController.success('Created new Minion Preset');
+				toastController.success('Created new minion preset');
 				setPresetsLastRequested(Date.now());
 				setSelectedPreset(v.id);
 			})
 			.catch((err: Error) => {
-				toastController.error('Error creating new Minion Preset', err);
+				toastController.error('Error creating new minion preset', err);
 			});
 	}
 
@@ -192,11 +200,11 @@ export default function MinionsRoute(props: { toastController: ToastController }
 		const abort = new AbortController();
 		createMinionPreset(preset.name + ' (Copy)', preset.filters, abort.signal)
 			.then((v) => {
-				toastController.success('Copied Minion Preset');
+				toastController.success('Copied minion preset');
 				setPresetsLastRequested(Date.now());
 				setSelectedPreset(v.id);
 			})
-			.catch((err) => toastController.error('Error copying Minion Preset', err));
+			.catch((err) => toastController.error('Error copying minion preset', err));
 	}
 
 	function savePreset() {
@@ -211,10 +219,10 @@ export default function MinionsRoute(props: { toastController: ToastController }
 		const abort = new AbortController();
 		updateMinionPreset(preset.id, preset.name, filters, abort.signal)
 			.then(() => {
-				toastController.success('Saved Minion Preset');
+				toastController.success('Saved minion preset');
 				setPresetsLastRequested(Date.now());
 			})
-			.catch((err) => toastController.error('Error saving Minion Preset', err));
+			.catch((err) => toastController.error('Error saving minion mreset', err));
 	}
 
 	function deletePreset() {
@@ -226,7 +234,7 @@ export default function MinionsRoute(props: { toastController: ToastController }
 				setSelectedPreset(null);
 			})
 			.catch((err: Error) => {
-				toastController.error('Error deleting Minion Preset', err);
+				toastController.error('Error deleting minion preset', err);
 			});
 	}
 
@@ -357,12 +365,46 @@ export default function MinionsRoute(props: { toastController: ToastController }
 				setMinionsLoaded(true);
 			})
 			.catch((err: Error) => {
-				toastController.error('Error loading Minions', err);
+				toastController.error('Error loading minions', err);
 			});
 		return () => {
 			abort.abort();
 		};
-	}, [filters, toastController]);
+	}, [minionsLastRequested, filters, toastController]);
+
+	function resyncMinion(minionId: string) {
+		console.log('Resyncing minion', minionId);
+
+		const startUISync = () =>
+			setSyncingMinions((syncingMinions) => {
+				const copy = new Set(syncingMinions);
+				copy.add(minionId);
+				return copy;
+			});
+		const stopUISync = () =>
+			setSyncingMinions((syncingMinions) => {
+				const copy = new Set(syncingMinions);
+				copy.delete(minionId);
+				return copy;
+			});
+
+		startUISync();
+		const abort = new AbortController();
+		refreshMinion(minionId, abort.signal)
+			.then(() => {
+				toastController.success('Resynced minion');
+				setMinionsLastRequested(Date.now());
+				stopUISync();
+			})
+			.catch((err: Error) => {
+				toastController.error('Error resyncing minion', err);
+				stopUISync();
+			});
+		return () => {
+			abort.abort();
+			stopUISync();
+		};
+	}
 
 	// Minions table
 	const {
@@ -411,25 +453,25 @@ export default function MinionsRoute(props: { toastController: ToastController }
 									<MenuPopover>
 										<MenuList>
 											<MenuItem icon={<AddIcon />} onClick={addPreset}>
-												New Preset
+												New preset
 											</MenuItem>
 											<MenuItem
 												disabled={selectedPreset === null}
 												onClick={copyPreset}
 											>
-												Copy Preset
+												Copy preset
 											</MenuItem>
 											<MenuItem
 												disabled={selectedPreset === null}
 												onClick={savePreset}
 											>
-												Save Preset
+												Save preset
 											</MenuItem>
 											<MenuItem
 												disabled={selectedPreset === null}
 												onClick={deletePreset}
 											>
-												Delete Presets
+												Delete presets
 											</MenuItem>
 										</MenuList>
 									</MenuPopover>
@@ -627,7 +669,7 @@ export default function MinionsRoute(props: { toastController: ToastController }
 						{filtersExpanded && (
 							<CardFooter>
 								<Button icon={<AddIcon />} onClick={addFilter}>
-									Add Filter
+									Add filter
 								</Button>
 							</CardFooter>
 						)}
@@ -641,6 +683,9 @@ export default function MinionsRoute(props: { toastController: ToastController }
 						<Table sortable aria-label="Table with sort">
 							<TableHeader>
 								<TableRow>
+									<TableHeaderCell style={{ width: '3rem' }}>
+										{/* ViewButton */}
+									</TableHeaderCell>
 									<TableHeaderCell {...headerSortProps('id')}>ID</TableHeaderCell>
 									<TableHeaderCell {...headerSortProps('osType')}>
 										OS
@@ -651,6 +696,7 @@ export default function MinionsRoute(props: { toastController: ToastController }
 									<TableHeaderCell {...headerSortProps('conformity')}>
 										Conformity
 									</TableHeaderCell>
+									<TableHeaderCell>{/* Cog */}</TableHeaderCell>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
@@ -669,9 +715,26 @@ export default function MinionsRoute(props: { toastController: ToastController }
 											<td className="p-m">
 												<SkeletonItem size={16} />
 											</td>
+											<td className="p-m">
+												<SkeletonItem size={16} />
+											</td>
 										</tr>
 									) : (
 										<TableRow key={item.id}>
+											<TableCell>
+												<Link
+													to={paths.minion.getPath({
+														minionId: item.id,
+													})}
+												>
+													<Tooltip
+														content="Open Minion"
+														relationship="label"
+													>
+														<Button icon={<OpenIcon />} />
+													</Tooltip>
+												</Link>
+											</TableCell>
 											<TableCell>{item.id}</TableCell>
 											<TableCell>{item.osType ?? 'Unknown'}</TableCell>
 											<TableCell>{formatDate(item.lastSeen)}</TableCell>
@@ -713,41 +776,45 @@ export default function MinionsRoute(props: { toastController: ToastController }
 												)}
 											</TableCell>
 											<TableCell>
-												<Menu positioning="below-end">
-													<MenuTrigger disableButtonEnhancement>
-														{(triggerProps: MenuButtonProps) => (
-															<SplitButton
-																appearance="primary"
-																menuButton={triggerProps}
-																primaryActionButton={{
-																	onClick: () => {
-																		navigate(
-																			paths.minion.getPath({
-																				minionId: item.id,
-																			}),
-																		);
-																	},
-																	onAuxClick: () => {
-																		navigate(
-																			paths.minion.getPath({
-																				minionId: item.id,
-																			}),
-																		);
-																	},
-																}}
-															>
-																View
-															</SplitButton>
-														)}
-													</MenuTrigger>
-
-													<MenuPopover>
-														<MenuList>
-															<MenuItem>Resync</MenuItem>
-															<MenuItem>Terminal</MenuItem>
-														</MenuList>
-													</MenuPopover>
-												</Menu>
+												{!syncingMinions.has(item.id) ? (
+													<Tooltip
+														content="Resync minion"
+														relationship="label"
+													>
+														<Button
+															appearance="transparent"
+															icon={<ResyncIcon />}
+															onClick={() => {
+																resyncMinion(item.id);
+															}}
+														/>
+													</Tooltip>
+												) : (
+													<Tooltip
+														content="Syncing..."
+														relationship="label"
+													>
+														<Button
+															appearance="transparent"
+															icon={<Spinner size="tiny" />}
+														/>
+													</Tooltip>
+												)}{' '}
+												<Tooltip
+													content="Open in Terminal"
+													relationship="label"
+												>
+													<Link
+														to={paths.terminal.getPath({
+															minionId: item.id,
+														})}
+													>
+														<Button
+															appearance="transparent"
+															icon={<PlayIcon />}
+														/>
+													</Link>
+												</Tooltip>
 											</TableCell>
 										</TableRow>
 									),

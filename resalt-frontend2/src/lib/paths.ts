@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import {
+	AppsFilled,
+	AppsRegular,
 	BookInformationFilled,
 	BookInformationRegular,
-	CubeFilled,
-	CubeRegular,
 	FluentIcon,
 	GroupFilled,
 	GroupRegular,
@@ -87,7 +87,7 @@ const MinionIcon = bundleIcon(ServerFilled, ServerRegular);
 const GrainsIcon = bundleIcon(BookInformationFilled, BookInformationRegular);
 const ConformityIcon = bundleIcon(TaskListSquareRtlFilled, TaskListSquareRtlRegular);
 const PillarsIcon = bundleIcon(VaultFilled, VaultRegular);
-const PackagesIcon = bundleIcon(CubeFilled, CubeRegular);
+const PackagesIcon = bundleIcon(AppsFilled, AppsRegular);
 const TerminalIcon = bundleIcon(WindowPlayFilled, WindowPlayRegular);
 const JobsIcon = bundleIcon(TasksAppFilled, TasksAppRegular);
 const EventsIcon = bundleIcon(ListFilled, ListRegular);
@@ -96,43 +96,53 @@ const GroupIcon = bundleIcon(GroupFilled, GroupRegular);
 const PermissionsIcon = bundleIcon(LockClosedKeyFilled, LockClosedKeyRegular);
 
 export const paths = {
-	login: new Path('/login', 'Login', LoginRoute, LoginIcon),
-	logout: new Path('/logout', 'Logout', LogoutRoute, LogoutIcon),
-	dashboard: new Path('/', 'Dashboard', DashboardRoute, DashboardIcon),
-	minions: new Path('/minions', 'Minions', MinionsRoute, MinionIcon),
+	login: new Path<{}>('/login', 'Login', LoginRoute, LoginIcon),
+	logout: new Path<{}>('/logout', 'Logout', LogoutRoute, LogoutIcon),
+	dashboard: new Path<{}>('/', 'Dashboard', DashboardRoute, DashboardIcon),
+	minions: new Path<{}>('/minions', 'Minions', MinionsRoute, MinionIcon),
 	minion: new Path<{ minionId: string }>('/minions/:minionId', 'Minion', MinionRoute, MinionIcon),
-	minion_grains: new Path('/minions/:minionId/grains', 'Grains', MinionGrainsRoute, GrainsIcon),
-	minion_conformity: new Path(
+	minion_grains: new Path<{ minionId: string }>(
+		'/minions/:minionId/grains',
+		'Grains',
+		MinionGrainsRoute,
+		GrainsIcon,
+	),
+	minion_conformity: new Path<{ minionId: string }>(
 		'/minions/:minionId/conformity',
 		'Conformity',
 		MinionConformityRoute,
 		ConformityIcon,
 	),
-	minion_pillars: new Path(
+	minion_pillars: new Path<{ minionId: string }>(
 		'/minions/:minionId/pillars',
 		'Pillars',
 		MinionPillarsRoute,
 		PillarsIcon,
 	),
-	minion_packages: new Path(
+	minion_packages: new Path<{ minionId: string }>(
 		'/minions/:minionId/packages',
 		'Packages',
 		MinionPackagesRoute,
 		PackagesIcon,
 	),
-	grains: new Path('/grains', 'Grains', GrainsRoute, GrainsIcon),
-	pillars: new Path('/pillars', 'Pillars', PillarsRoute, PillarsIcon),
-	packages: new Path('/packages', 'Packages', PackagesRoute, PackagesIcon),
-	terminal: new Path('/terminal', 'Terminal', TerminalIcon, TerminalIcon),
-	jobs: new Path('/jobs', 'Jobs', JobsRoute, JobsIcon),
-	job: new Path('/jobs/:jobId', 'Job', JobRoute, JobsIcon),
-	events: new Path('/events', 'Events', EventsRoute, EventsIcon),
-	event: new Path('/events/:eventId', 'Event', EventRoute, EventsIcon),
-	users: new Path('/users', 'Users', UsersRoute, UsersIcon),
-	user: new Path('/users/:userId', 'User', UserRoute, UsersIcon),
-	groups: new Path('/groups', 'Groups', GroupsRoute, GroupIcon),
-	group: new Path('/groups/:groupId', 'Group', GroupRoute, GroupIcon),
-	permissions: new Path('/permissions', 'Permissions', PermissionsRoute, PermissionsIcon),
+	grains: new Path<{}>('/grains', 'Grains', GrainsRoute, GrainsIcon),
+	pillars: new Path<{}>('/pillars', 'Pillars', PillarsRoute, PillarsIcon),
+	packages: new Path<{}>('/packages', 'Packages', PackagesRoute, PackagesIcon),
+	terminal: new Path<{ minionId?: string }>(
+		'/terminal/:minionId?',
+		'Terminal',
+		TerminalIcon,
+		TerminalIcon,
+	),
+	jobs: new Path<{}>('/jobs', 'Jobs', JobsRoute, JobsIcon),
+	job: new Path<{ jobId: string }>('/jobs/:jobId', 'Job', JobRoute, JobsIcon),
+	events: new Path<{}>('/events', 'Events', EventsRoute, EventsIcon),
+	event: new Path<{ eventId: string }>('/events/:eventId', 'Event', EventRoute, EventsIcon),
+	users: new Path<{}>('/users', 'Users', UsersRoute, UsersIcon),
+	user: new Path<{ userId: string }>('/users/:userId', 'User', UserRoute, UsersIcon),
+	groups: new Path<{}>('/groups', 'Groups', GroupsRoute, GroupIcon),
+	group: new Path<{ groupId: string }>('/groups/:groupId', 'Group', GroupRoute, GroupIcon),
+	permissions: new Path<{}>('/permissions', 'Permissions', PermissionsRoute, PermissionsIcon),
 	// // settings: new Path('/settings', 'Settings', null, ServerIcon),
 };
 
