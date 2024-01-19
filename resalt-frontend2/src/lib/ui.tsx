@@ -9,12 +9,6 @@ export const useGlobalStyles = makeStyles({
 		alignItems: 'center',
 		display: 'flex',
 	},
-	cardHeaderTitle: {
-		...typographyStyles.subtitle2Stronger,
-		...shorthands.padding(tokens.spacingHorizontalS),
-		alignItems: 'center',
-		display: 'flex',
-	},
 });
 
 export const jsonPalette = {

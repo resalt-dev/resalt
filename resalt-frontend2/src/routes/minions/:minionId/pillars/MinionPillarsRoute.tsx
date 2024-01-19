@@ -4,7 +4,7 @@ import { ObjectView } from 'react-object-view';
 import { useParams } from 'react-router-dom';
 import { getMinionById } from '../../../../lib/api';
 import { ToastController } from '../../../../lib/toast';
-import { jsonPalette, useGlobalStyles } from '../../../../lib/ui';
+import { jsonPalette } from '../../../../lib/ui';
 import MinionHeader from '../MinionHeader';
 
 export default function MinionPillarsRoute(props: { toastController: ToastController }) {
@@ -12,7 +12,6 @@ export default function MinionPillarsRoute(props: { toastController: ToastContro
 	const [loadingError, setLoadingError] = useState<Error | undefined>(undefined);
 	const [pillars, setPillars] = useState<any | null | undefined>(undefined);
 	const minionId = useParams().minionId!;
-	const globalStyles = useGlobalStyles();
 
 	useEffect(() => {
 		// Fetch minion
@@ -40,9 +39,7 @@ export default function MinionPillarsRoute(props: { toastController: ToastContro
 			<div className="fl-grid">
 				<div className="fl-span-12">
 					<Card style={{ height: '100%' }}>
-						<CardHeader
-							header={<span className={globalStyles.cardHeaderTitle}>Pillars</span>}
-						/>
+						<CardHeader header="Pillars" />
 						{pillars === undefined ? (
 							<SkeletonItem />
 						) : pillars === null ? (

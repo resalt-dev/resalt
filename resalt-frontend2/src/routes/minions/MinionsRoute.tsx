@@ -30,7 +30,6 @@ import {
 	ToolbarButton,
 	Tooltip,
 	createTableColumn,
-	mergeClasses,
 	useTableFeatures,
 	useTableSort,
 } from '@fluentui/react-components';
@@ -440,7 +439,7 @@ export default function MinionsRoute(props: { toastController: ToastController }
 				<div className="fl-span-3">
 					<Card>
 						<CardHeader
-							header={<span className={globalStyles.cardHeaderTitle}>Presets</span>}
+							header="Presets"
 							action={
 								<Menu>
 									<MenuTrigger>
@@ -526,14 +525,7 @@ export default function MinionsRoute(props: { toastController: ToastController }
 							}}
 							header={
 								<>
-									<span
-										className={mergeClasses(
-											globalStyles.cardHeaderTitle,
-											'mouse-pointer',
-										)}
-									>
-										Search
-									</span>
+									<span className="mouse-pointer">Search</span>
 									{selectedPreset && (
 										<Badge
 											color="success"
@@ -676,9 +668,7 @@ export default function MinionsRoute(props: { toastController: ToastController }
 					</Card>
 					<br />
 					<Card>
-						<CardHeader
-							header={<span className={globalStyles.cardHeaderTitle}>Minions</span>}
-						/>
+						<CardHeader header="Minions" />
 
 						<Table sortable aria-label="Table with sort">
 							<TableHeader>

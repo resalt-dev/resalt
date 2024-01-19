@@ -23,7 +23,7 @@ export function CopyButton(props: {
 				size="small"
 				icon={<CopyIcon />}
 				onClick={copy}
-				style={{ marginLeft: tokens.spacingHorizontalS }}
+				style={{ marginLeft: tokens.spacingHorizontalXS }}
 			/>
 		</Tooltip>
 	);

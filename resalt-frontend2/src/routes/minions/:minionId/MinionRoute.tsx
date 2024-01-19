@@ -11,15 +11,21 @@ import {
 } from '@fluentui/react-components';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { CopyButton } from '../../../components/CopyButton';
 import { getMinionById } from '../../../lib/api';
 import { ToastController } from '../../../lib/toast';
-import { multilineText, useGlobalStyles } from '../../../lib/ui';
+import { multilineText } from '../../../lib/ui';
 import Minion from '../../../models/Minion';
 import MinionHeader from './MinionHeader';
 
 type Value = string | number | boolean | null | undefined;
-type KeyValue = { k: string; v: Value; v2?: Value };
-function InfoTable(props: { loading: boolean; header?: KeyValue; items: KeyValue[] }) {
+type KeyValue = { k: string; v: Value; v2?: Value; copyable?: boolean };
+function InfoTable(props: {
+	toastController: ToastController;
+	loading: boolean;
+	header?: KeyValue;
+	items: KeyValue[];
+}) {
 	return (
 		<Table size="small">
 			{props.header && (
@@ -42,8 +48,15 @@ function InfoTable(props: { loading: boolean; header?: KeyValue; items: KeyValue
 			<TableBody>
 				{props.items.map((item) => (
 					<TableRow key={item.k}>
-						<TableCell style={{ width: '8rem' }}>
+						<TableCell style={{ width: '7rem', alignItems: 'center' }}>
 							<strong>{item.k}</strong>
+							{item.copyable && (
+								<CopyButton
+									name="ID"
+									value={item.k}
+									toastController={props.toastController}
+								/>
+							)}
 						</TableCell>
 						<TableCell>
 							{props.loading ? (
@@ -62,18 +75,21 @@ function InfoTable(props: { loading: boolean; header?: KeyValue; items: KeyValue
 }
 
 function InfoCard(props: {
+	toastController: ToastController;
 	loading: boolean;
 	title: string;
 	header?: KeyValue;
 	items: KeyValue[];
 }) {
-	const globalStyles = useGlobalStyles();
 	return (
 		<Card style={{ height: '100%' }}>
-			<CardHeader
-				header={<span className={globalStyles.cardHeaderTitle}>{props.title}</span>}
+			<CardHeader header={props.title} />
+			<InfoTable
+				toastController={props.toastController}
+				loading={props.loading}
+				header={props.header}
+				items={props.items}
 			/>
-			<InfoTable loading={props.loading} header={props.header} items={props.items} />
 		</Card>
 	);
 }
@@ -87,10 +103,9 @@ export default function MinionRoute(props: { toastController: ToastController })
 
 	useEffect(() => {
 		// Fetch minion
-		console.log('MinionRoute:useEffect', minionId);
 		const abort = new AbortController();
 		getMinionById(minionId, abort.signal)
-			.then((minion) => {
+			.then((minion: Minion) => {
 				setMinion(minion);
 				setGrains(JSON.parse(minion?.grains ?? '{}'));
 			})
@@ -109,10 +124,11 @@ export default function MinionRoute(props: { toastController: ToastController })
 			<div className="fl-grid">
 				<div className="fl-span-3">
 					<InfoCard
+						toastController={toastController}
 						loading={!minion}
 						title="Common"
 						items={[
-							{ k: 'ID', v: minion?.id },
+							{ k: 'ID', v: minion?.id, copyable: true },
 							{ k: 'F.Q.D.N', v: grains?.fqdn },
 							{ k: 'OS', v: grains?.os },
 							{ k: 'OS Version', v: grains?.osrelease },
@@ -122,11 +138,12 @@ export default function MinionRoute(props: { toastController: ToastController })
 				</div>
 				<div className="fl-span-3">
 					<InfoCard
+						toastController={toastController}
 						loading={!minion}
 						title="Hardware"
 						items={[
 							{ k: 'CPU', v: grains.cpu_model },
-							{ k: 'Number of CPUs', v: grains.num_cpus },
+							{ k: 'Num of CPUs', v: grains.num_cpus },
 							{ k: 'Memory', v: grains.mem_total },
 							{ k: 'Swap', v: grains.swap_total },
 							{ k: 'Virtual', v: grains.virtual },
@@ -135,6 +152,7 @@ export default function MinionRoute(props: { toastController: ToastController })
 				</div>
 				<div className="fl-span-3">
 					<InfoCard
+						toastController={toastController}
 						loading={!minion}
 						title="DNS"
 						items={[
@@ -155,6 +173,7 @@ export default function MinionRoute(props: { toastController: ToastController })
 				</div>
 				<div className="fl-span-3">
 					<InfoCard
+						toastController={toastController}
 						loading={!minion}
 						title="Timings"
 						items={[
@@ -168,6 +187,7 @@ export default function MinionRoute(props: { toastController: ToastController })
 				</div>
 				<div className="fl-span-12">
 					<InfoCard
+						toastController={toastController}
 						loading={!minion}
 						title="Network"
 						header={{ k: 'Interface', v: 'Address', v2: 'MAC' }}

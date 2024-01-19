@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import { CopyButton } from '../../../../components/CopyButton';
 import { getMinionById } from '../../../../lib/api';
 import { ToastController } from '../../../../lib/toast';
-import { jsonPalette, useGlobalStyles } from '../../../../lib/ui';
+import { jsonPalette } from '../../../../lib/ui';
 import MinionHeader from '../MinionHeader';
 
 export default function MinionGrainsRoute(props: { toastController: ToastController }) {
@@ -13,7 +13,6 @@ export default function MinionGrainsRoute(props: { toastController: ToastControl
 	const [loadingError, setLoadingError] = useState<Error | undefined>(undefined);
 	const [grains, setGrains] = useState<any | null | undefined>(undefined);
 	const minionId = useParams().minionId!;
-	const globalStyles = useGlobalStyles();
 
 	useEffect(() => {
 		// Fetch minion
@@ -43,14 +42,14 @@ export default function MinionGrainsRoute(props: { toastController: ToastControl
 					<Card style={{ height: '100%' }}>
 						<CardHeader
 							header={
-								<span className={globalStyles.cardHeaderTitle}>
+								<>
 									Grains
 									<CopyButton
 										name="grains"
 										value={JSON.stringify(grains, null, '\t')}
 										toastController={toastController}
 									/>
-								</span>
+								</>
 							}
 						/>
 						{grains === undefined ? (

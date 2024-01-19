@@ -1,5 +1,33 @@
 /* Resalt implementation of Fluent UI 2 in CSS */
 
+/* Checkbox */
+
+.checkbox-success > input:checked ~ div {
+	background-color: var(--colorStatusSuccessBorderActive);
+	border-color: var(--colorStatusSuccessBorder2);
+}
+.checkbox-warning > input:checked ~ div {
+	background-color: var(--colorStatusWarningBorderActive);
+	border-color: var(--colorStatusWarningBorder2);
+}
+.checkbox-danger > input:checked ~ div {
+	background-color: var(--colorStatusDangerBorderActive);
+	border-color: var(--colorStatusDangerBorder2);
+}
+
+
+/* Cards */
+
+.fui-CardHeader > div {
+	align-items: center;
+	display: flex;
+	/* subtitle2Stronger */
+	font-family: var(--fontFamilyBase);
+	font-size: var(--fontSizeBase400);
+	font-weight: var(--fontWeightBold);
+	line-height: var(--lineHeightBase400);
+}
+
 /* Links */
 
 a {
