@@ -490,7 +490,7 @@ export default function MinionsRoute(props: { toastController: ToastController }
 							}}
 							focusMode="composite"
 							size="small"
-							subtleSelection={true}
+							subtleSelection={false}
 							selectedItems={selectedPreset ? [selectedPreset] : []}
 						>
 							<DataGridBody<MinionPreset>>

@@ -3,16 +3,20 @@
 /* Checkbox */
 
 .checkbox-success > input:checked ~ div {
-	background-color: var(--colorStatusSuccessBorderActive);
-	border-color: var(--colorStatusSuccessBorder2);
+	background-color: var(--colorStatusSuccessBackground3);
+	border-color: var(--colorStatusSuccessBackground3);
 }
 .checkbox-warning > input:checked ~ div {
-	background-color: var(--colorStatusWarningBorderActive);
-	border-color: var(--colorStatusWarningBorder2);
+	background-color: var(--colorStatusWarningBackground3);
+	border-color: var(--colorStatusWarningBackground3);
 }
 .checkbox-danger > input:checked ~ div {
-	background-color: var(--colorStatusDangerBorderActive);
-	border-color: var(--colorStatusDangerBorder2);
+	background-color: var(--colorStatusDangerBackground3);
+	border-color: var(--colorStatusDangerBackground3);
+}
+.checkbox-yellow > input:checked ~ div {
+	background-color: var(--colorPaletteYellowBackground3);
+	border-color: var(--colorPaletteYellowBackground3);
 }
 
 

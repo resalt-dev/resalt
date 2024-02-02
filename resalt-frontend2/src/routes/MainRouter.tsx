@@ -5,7 +5,7 @@ import {
 	ToastTitle,
 	Toaster,
 	useToastController,
-	webLightTheme,
+	webDarkTheme,
 } from '@fluentui/react-components';
 import React, { useEffect } from 'react';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
@@ -52,7 +52,7 @@ export function MainRouter() {
 	});
 
 	return (
-		<FluentProvider theme={webLightTheme}>
+		<FluentProvider theme={webDarkTheme}>
 			<Toaster limit={5} pauseOnHover={true} position="top-end" />
 			<RouterProvider router={router} />
 		</FluentProvider>

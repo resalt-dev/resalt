@@ -6,6 +6,7 @@ import {
 	Radio,
 	RadioGroup,
 	SkeletonItem,
+	tokens,
 } from '@fluentui/react-components';
 import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
@@ -15,6 +16,31 @@ import { ToastController } from '../../../../lib/toast';
 import Minion from '../../../../models/Minion';
 import MinionHeader from '../MinionHeader';
 import { Conformity, ConformitySortOrder, parseConformity } from './ConformityTypes';
+
+// Recursive function to render conformity changes
+// for example output:
+//     ----------
+//     sudoku:
+//         ----------
+//         new:
+//             1.0.5-2build3
+//         old:
+function MinionConformityChanges(data: unknown, pad: number): string {
+	// If data is object, then print out "----------" and then the object
+	if (typeof data === 'object') {
+		return (
+			' '.repeat(pad) +
+			'----------\n' +
+			Object.entries(data as object)
+				.map(([key, value]) => {
+					return `${' '.repeat(pad)}${key}:\n${MinionConformityChanges(value, pad + 4)}`;
+				})
+				.join('\n')
+		);
+	}
+	// If data is not object, then print out the data
+	return `${' '.repeat(pad)}${data}`;
+}
 
 export default function MinionConformityRoute(props: { toastController: ToastController }) {
 	const { toastController } = props;
@@ -133,18 +159,22 @@ export default function MinionConformityRoute(props: { toastController: ToastCon
 								label="Show succeeded"
 								className="checkbox-success"
 							/>
+							<br />
 							<Checkbox
 								checked={showIncorrect}
 								onChange={() => setShowIncorrect(!showIncorrect)}
 								label="Show incorrect"
-								className="checkbox-warning"
+								className="checkbox-yellow"
 							/>
+							<br />
 							<Checkbox
 								checked={showError}
 								onChange={() => setShowError(!showError)}
 								label="Show errors"
 								className="checkbox-danger"
 							/>
+							<br />
+							<br />
 							<Checkbox
 								checked={showCollapsed}
 								onChange={() => setShowCollapsed(!showCollapsed)}
@@ -163,7 +193,68 @@ export default function MinionConformityRoute(props: { toastController: ToastCon
 						<SkeletonItem />
 					) : (
 						conformity.map((c) => {
-							return <TerminalCard key={c.title}>Hi!</TerminalCard>;
+							console.log(c);
+							const color =
+								c.status === 'success'
+									? tokens.colorStatusSuccessBackground3
+									: c.status === 'incorrect'
+										? tokens.colorPaletteYellowBackground3
+										: c.status === 'error'
+											? tokens.colorStatusDangerBackground3
+											: tokens.colorPalettePurpleBorderActive;
+							const pad = 15;
+							const title = c.data.__sls__ + ' // ' + c.data.__id__;
+							return (
+								<TerminalCard
+									key={c.title}
+									title={title}
+									style={{ borderLeft: `5px solid ${color}`, rowGap: '0' }}
+								>
+									<div
+										style={{
+											color: color,
+											lineHeight: '1.5',
+											lineHeightStep: '0',
+										}}
+									>
+										<pre>
+											{'ID: '.padStart(pad)}
+											{c.data.__id__}
+											<br />
+											{'Function: '.padStart(pad)}
+											{c.fun}
+											<br />
+											{'Name: '.padStart(pad)}
+											{c.data.name}
+											<br />
+											{'Result: '.padStart(pad)}
+											{c.data.result == true
+												? 'True'
+												: c.data.result == false
+													? 'False'
+													: 'None'}
+											<br />
+											{'Comment: '.padStart(pad)}
+											{c.data.comment
+												.split('\n')
+												.map((line: string) => {
+													return line + '\n' + ' '.repeat(pad);
+												})
+												.join('')
+												.trim()}
+											<br />
+											{'Started: '.padStart(pad)}
+											{c.data.start_time}
+											<br />
+											{'Duration: '.padStart(pad)}
+											{c.data.duration}
+											<br />
+											{'Changes: '.padStart(pad)}
+											{MinionConformityChanges(c.data.changes, pad).trim()}
+										</pre>
+									</div>
+								</TerminalCard>
+							);
 						})
 					)}
 				</div>

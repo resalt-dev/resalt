@@ -63,7 +63,7 @@ export function parseConformityData(data: unknown): ConformityData | null {
 export type Conformity = {
 	title: string;
 	fun: string;
-	color: 'success' | 'warning' | 'danger';
+	status: 'success' | 'incorrect' | 'error';
 	data: ConformityData;
 };
 
@@ -85,9 +85,9 @@ export function parseConformity(
 		let conform: Conformity = {
 			title: key,
 			fun: parts[0] + '.' + parts[parts.length - 1],
-			// color should be success/warning/danger based on true/null/false
-			color:
-				value.result === true ? 'success' : value.result === false ? 'danger' : 'warning',
+			// status should be success/incorrect/error based on true/null/false
+			status:
+				value.result === true ? 'success' : value.result === false ? 'error' : 'incorrect',
 			data: {
 				__id__: value.__id__ ?? parts[1] ?? 'UKNOWN ID',
 				// eslint-disable-next-line camelcase
