@@ -6,6 +6,7 @@ import {
 	Toaster,
 	useToastController,
 	webDarkTheme,
+	webLightTheme,
 } from '@fluentui/react-components';
 import React, { useEffect } from 'react';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
@@ -51,8 +52,14 @@ export function MainRouter() {
 		toasts.length = 0;
 	});
 
+	// Theme
+	const browserTheme = window.matchMedia?.('(prefers-color-scheme: dark)').matches
+		? 'dark'
+		: 'light';
+	const themeName = currentUser?.preferences.theme || browserTheme;
+	const theme = themeName === 'dark' ? webDarkTheme : webLightTheme;
 	return (
-		<FluentProvider theme={webDarkTheme}>
+		<FluentProvider theme={theme}>
 			<Toaster limit={5} pauseOnHover={true} position="top-end" />
 			<RouterProvider router={router} />
 		</FluentProvider>

@@ -7,13 +7,13 @@ import {
 	DialogSurface,
 	DialogTitle,
 	DialogTrigger,
-	makeStyles,
+	Label,
+	SkeletonItem,
+	Switch,
+	useId,
 } from '@fluentui/react-components';
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
 import User from '../../models/User';
-
-const useStyles = makeStyles({});
 
 export function ResaltHeaderSettings(props: {
 	children: React.ReactNode;
@@ -22,15 +22,14 @@ export function ResaltHeaderSettings(props: {
 	const { currentUser, children } = props;
 	const [settingsPopupOpen, setSettingsPopupOpen] = useState(false);
 
-	const location = useLocation();
-	const navigate = useNavigate();
-	const styles = useStyles();
-
 	// Close popup when navigating
 	useEffect(() => {
 		setSettingsPopupOpen(false);
 	}, [location]);
 
+	console.log('currentUser', currentUser);
+
+	const themeSetting = useId('themeSetting');
 	return (
 		<Dialog open={settingsPopupOpen} onOpenChange={() => setSettingsPopupOpen((v) => !v)}>
 			<DialogTrigger disableButtonEnhancement>{children as React.ReactElement}</DialogTrigger>
@@ -38,10 +37,23 @@ export function ResaltHeaderSettings(props: {
 				<DialogBody>
 					<DialogTitle>Settings</DialogTitle>
 					<DialogContent>
-						Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam
-						exercitationem cumque repellendus eaque est dolor eius expedita nulla ullam?
-						Tenetur reprehenderit aut voluptatum impedit voluptates in natus iure cumque
-						eaque? Hi :D
+						{!currentUser ? (
+							<SkeletonItem />
+						) : (
+							<>
+								<Label htmlFor={themeSetting}>Dark Theme</Label>
+								<Switch
+									id={themeSetting}
+									onChange={(_e, data) =>
+										(currentUser.preferences.theme = data.checked
+											? 'dark'
+											: 'light')
+									}
+								/>
+								<br />
+								<br />
+							</>
+						)}
 					</DialogContent>
 					<DialogActions>
 						<DialogTrigger disableButtonEnhancement>

@@ -7,7 +7,7 @@ export default class UserPreferences {
 
 	theme: PrefTheme;
 
-	constructor(theme: PrefTheme) {
-		this.theme = theme;
+	constructor(theme: PrefTheme | null) {
+		this.theme = theme || 'light';
 	}
 }
