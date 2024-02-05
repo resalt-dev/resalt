@@ -136,11 +136,11 @@ pub struct User {
     #[serde(rename = "lastLogin")]
     pub last_login: Option<ResaltTime>,
     pub email: Option<String>,
-    #[serde(default = "preferences_default")]
+    #[serde(default = "user_preferences_default")]
     pub preferences: String,
 }
 
-fn preferences_default() -> String {
+fn user_preferences_default() -> String {
     "{}".to_string()
 }
 
