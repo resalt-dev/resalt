@@ -130,7 +130,6 @@ export default function MinionsRoute(props: { toastController: ToastController }
 	const [presets, setPresets] = useState<MinionPreset[] | null>(null);
 	const [selectedPreset, setSelectedPreset] = useState<string | null>(searchParams.get('preset'));
 	const [minionsLastRequested, setMinionsLastRequested] = useState(0);
-	const [minionsLoaded, setMinionsLoaded] = useState(false);
 	const [minions, setMinions] = useState<Minion[] | null>(null);
 	const [syncingMinions, setSyncingMinions] = useState<Set<string>>(new Set());
 	const [filtersExpanded, setFiltersExpanded] = useState(true);
@@ -361,7 +360,6 @@ export default function MinionsRoute(props: { toastController: ToastController }
 			.then((v) => {
 				console.log('Got minions', v);
 				setMinions(v);
-				setMinionsLoaded(true);
 			})
 			.catch((err: Error) => {
 				toastController.error('Error loading minions', err);
@@ -412,7 +410,7 @@ export default function MinionsRoute(props: { toastController: ToastController }
 	} = useTableFeatures(
 		{
 			columns: minionColumns,
-			items: minions ?? (minionsLoaded ? [] : emptyMinions),
+			items: minions === undefined ? emptyMinions : minions ?? [],
 		},
 		[
 			useTableSort({
@@ -443,10 +441,7 @@ export default function MinionsRoute(props: { toastController: ToastController }
 							action={
 								<Menu>
 									<MenuTrigger>
-										<ToolbarButton
-											aria-label="More"
-											icon={<MoreHorizontal24Filled />}
-										/>
+										<ToolbarButton icon={<MoreHorizontal24Filled />} />
 									</MenuTrigger>
 
 									<MenuPopover>
@@ -495,12 +490,7 @@ export default function MinionsRoute(props: { toastController: ToastController }
 						>
 							<DataGridBody<MinionPreset>>
 								{({ item }) => (
-									<DataGridRow<MinionPreset>
-										key={item.id}
-										selectionCell={{
-											checkboxIndicator: { 'aria-label': 'Select row' },
-										}}
-									>
+									<DataGridRow<MinionPreset> key={item.id}>
 										{({ renderCell }) => (
 											<DataGridCell>
 												{item.id.startsWith(SKEL) ? (
@@ -670,7 +660,7 @@ export default function MinionsRoute(props: { toastController: ToastController }
 					<Card>
 						<CardHeader header="Minions" />
 
-						<Table sortable aria-label="Table with sort">
+						<Table sortable>
 							<TableHeader>
 								<TableRow>
 									<TableHeaderCell style={{ width: '3rem' }}>

@@ -15,7 +15,7 @@ import {
 	Megaphone20Regular,
 	Navigation20Filled,
 	Navigation20Regular,
-	Person28Filled,
+	Person24Filled,
 	Question20Filled,
 	Question20Regular,
 	Settings20Filled,
@@ -81,12 +81,12 @@ const useStyles = makeStyles({
 		color: '#ffffff',
 		...shorthands.transition('background-color', tokens.durationNormal, tokens.curveEasyEase),
 		'&:hover': {
-			backgroundColor: tokens.colorNeutralForeground3Hover,
+			backgroundColor: '#424242', // tokens.colorNeutralForeground3Hover
 			cursor: 'pointer',
 			color: '#ffffff',
 		},
 		'&:active': {
-			backgroundColor: tokens.colorNeutralForeground2Pressed + ' !important',
+			backgroundColor: '#242424 !important', // tokens.colorNeutralForeground2Pressed + ' !important'
 			color: '#ffffff !important',
 		},
 		'&>span': {
@@ -142,7 +142,7 @@ const MegaphoneIcon = bundleIcon(Megaphone20Filled, Megaphone20Regular);
 const AlertIcon = bundleIcon(Alert20Filled, Alert20Regular);
 const SettingsIcon = bundleIcon(Settings20Filled, Settings20Regular);
 const QuestionIcon = bundleIcon(Question20Filled, Question20Regular);
-const PersonIcon = Person28Filled;
+const PersonIcon = Person24Filled;
 
 export default function ResaltHeader(props: {
 	currentUser: User | null;

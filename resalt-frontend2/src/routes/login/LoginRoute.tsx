@@ -85,6 +85,7 @@ export default function LoginRoute() {
 									<div className={styles.loginFieldsArea}>
 										<Label htmlFor={loginUsername}>Username</Label>
 										<Input id={loginUsername} />
+										<br />
 										<Label htmlFor={loginPassword}>Password</Label>
 										<Input id={loginPassword} type="password" />
 									</div>
