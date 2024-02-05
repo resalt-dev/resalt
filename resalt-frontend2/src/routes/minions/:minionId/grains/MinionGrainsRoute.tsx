@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import { CopyButton } from '../../../../components/CopyButton';
 import { getMinionById } from '../../../../lib/api';
 import { ToastController } from '../../../../lib/toast';
-import { jsonPalette } from '../../../../lib/ui';
+import { jsonPalette, sortedObject } from '../../../../lib/ui';
 import MinionHeader from '../MinionHeader';
 
 export default function MinionGrainsRoute(props: { toastController: ToastController }) {
@@ -58,7 +58,7 @@ export default function MinionGrainsRoute(props: { toastController: ToastControl
 							<i>Unknown</i>
 						) : (
 							<ObjectView
-								data={grains}
+								data={sortedObject(grains)}
 								options={{
 									hideDataTypes: true,
 								}}

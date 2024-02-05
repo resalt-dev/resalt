@@ -44,3 +44,16 @@ export const multilineText = (text: string | number | boolean) => {
 		</>
 	);
 };
+
+export const sortedObject = (obj: any) => {
+	// Use Proxy
+	return new Proxy(obj, {
+		ownKeys: (target) => Reflect.ownKeys(target).sort(),
+		get: (target, prop) => {
+			if (typeof prop === 'string' && !isNaN(parseInt(prop))) {
+				return target[prop];
+			}
+			return Reflect.get(target, prop);
+		},
+	});
+};

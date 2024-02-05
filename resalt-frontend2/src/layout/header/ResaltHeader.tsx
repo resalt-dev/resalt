@@ -1,13 +1,4 @@
-import {
-	Button,
-	Popover,
-	PopoverSurface,
-	PopoverTrigger,
-	SkeletonItem,
-	makeStyles,
-	mergeClasses,
-	shorthands,
-} from '@fluentui/react-components';
+import { Button, makeStyles, mergeClasses, shorthands } from '@fluentui/react-components';
 import {
 	Alert20Filled,
 	Alert20Regular,
@@ -23,13 +14,15 @@ import {
 	bundleIcon,
 } from '@fluentui/react-icons';
 import { tokens } from '@fluentui/tokens';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ResaltLogo from '../../components/ResaltLogo.tsx';
 import { getCurrentUser } from '../../lib/api.ts';
 import { paths } from '../../lib/paths.ts';
 import User from '../../models/User.ts';
 import ResaltHeaderSearch from './ResaltHeaderSearch.tsx';
+import { ResaltHeaderSettings } from './ResaltHeaderSettings.tsx';
+import { ResaltHeaderUser } from './ResaltHeaderUser.tsx';
 
 const useStyles = makeStyles({
 	headerGrid: {
@@ -151,7 +144,6 @@ export default function ResaltHeader(props: {
 	setSidebarCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
 	const { currentUser, setCurrentUser, sidebarCollapsed, setSidebarCollapsed } = props;
-	const [userPopupOpen, setUserPopupOpen] = useState(false);
 
 	// Navigation
 	const location = useLocation();
@@ -232,7 +224,7 @@ export default function ResaltHeader(props: {
 					shape="square"
 					icon={<MegaphoneIcon />}
 					// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-					onClick={() => console.log('header:icon:nav')}
+					onClick={() => console.log('header:icon:mega')}
 					className={styles.headerButton}
 				/>
 				<Button
@@ -240,17 +232,17 @@ export default function ResaltHeader(props: {
 					shape="square"
 					icon={<AlertIcon />}
 					// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-					onClick={() => console.log('header:icon:alert')}
+					onClick={() => console.log('header:icon:notif')}
 					className={styles.headerButton}
 				/>
-				<Button
-					appearance="transparent"
-					shape="square"
-					icon={<SettingsIcon />}
-					// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-					onClick={() => console.log('header:icon:settings')}
-					className={styles.headerButton}
-				/>
+				<ResaltHeaderSettings currentUser={currentUser}>
+					<Button
+						appearance="transparent"
+						shape="square"
+						icon={<SettingsIcon />}
+						className={styles.headerButton}
+					/>
+				</ResaltHeaderSettings>
 				<Button
 					appearance="transparent"
 					shape="square"
@@ -259,60 +251,15 @@ export default function ResaltHeader(props: {
 					onClick={() => console.log('header:icon:help')}
 					className={styles.headerButton}
 				/>
-				<Popover
-					open={userPopupOpen}
-					onOpenChange={() => {
-						setUserPopupOpen((v) => !v);
-					}}
-				>
-					<PopoverTrigger>
-						<Button
-							appearance="transparent"
-							shape="square"
-							size="large"
-							icon={<PersonIcon />}
-							// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
-							onClick={() => console.log('header:icon:user')}
-							className={styles.headerButton}
-						/>
-					</PopoverTrigger>
-
-					<PopoverSurface tabIndex={-1} className={styles.headerProfilePopover}>
-						<div
-							className={mergeClasses(
-								'fl-grid',
-								'm-0',
-								styles.headerProfilePopoverGrid,
-							)}
-						>
-							<div
-								className={mergeClasses(
-									'fl-span-8',
-									styles.headerProfilePopoverUsername,
-								)}
-							>
-								{currentUser === null ? (
-									<SkeletonItem />
-								) : (
-									<span>{currentUser.username}</span>
-								)}
-							</div>
-							<Button
-								appearance="subtle"
-								className={mergeClasses(
-									'fl-span-4',
-									styles.headerProfilePopoverLogout,
-								)}
-								onClick={() => {
-									navigate(paths.logout.path);
-									setUserPopupOpen(false);
-								}}
-							>
-								Sign out
-							</Button>
-						</div>
-					</PopoverSurface>
-				</Popover>
+				<ResaltHeaderUser currentUser={currentUser}>
+					<Button
+						appearance="transparent"
+						shape="square"
+						size="large"
+						icon={<PersonIcon />}
+						className={styles.headerButton}
+					/>
+				</ResaltHeaderUser>
 			</div>
 		</div>
 	);

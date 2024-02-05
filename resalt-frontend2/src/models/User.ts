@@ -1,8 +1,10 @@
 import type { fPerm } from './PermissionGroup';
+import UserPreferences from './UserPreferences';
 export default class User {
 	static fromObject(data: unknown): User {
 		const { id, username, perms, lastLogin, permissionGroups, email } = data as User;
-		return new User(id, username, perms, lastLogin, permissionGroups, email);
+		const { preferences } = data as { preferences: string };
+		return new User(id, username, perms, lastLogin, permissionGroups, email, preferences);
 	}
 
 	id: string;
@@ -17,6 +19,8 @@ export default class User {
 
 	readonly permissionGroups: { readonly id: string; readonly name: string }[];
 
+	readonly preferences: UserPreferences;
+
 	constructor(
 		id: string,
 		username: string,
@@ -24,6 +28,7 @@ export default class User {
 		lastLogin: string | null,
 		permissionGroups: { id: string; name: string }[],
 		email: string | null,
+		preferences: string,
 	) {
 		this.id = id;
 		this.username = username;
@@ -31,5 +36,6 @@ export default class User {
 		this.lastLogin = lastLogin;
 		this.permissionGroups = permissionGroups;
 		this.email = email;
+		this.preferences = UserPreferences.fromObject(preferences);
 	}
 }

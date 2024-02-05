@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import { CopyButton } from '../../../../components/CopyButton';
 import { getMinionById } from '../../../../lib/api';
 import { ToastController } from '../../../../lib/toast';
-import { jsonPalette } from '../../../../lib/ui';
+import { jsonPalette, sortedObject } from '../../../../lib/ui';
 import MinionHeader from '../MinionHeader';
 
 export default function MinionPackagesRoute(props: { toastController: ToastController }) {
@@ -58,7 +58,7 @@ export default function MinionPackagesRoute(props: { toastController: ToastContr
 							<i>Unknown</i>
 						) : (
 							<ObjectView
-								data={packages}
+								data={sortedObject(packages)}
 								options={{
 									hideDataTypes: true,
 								}}

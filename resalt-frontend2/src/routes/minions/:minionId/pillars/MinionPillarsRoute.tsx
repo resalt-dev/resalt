@@ -4,7 +4,7 @@ import { ObjectView } from 'react-object-view';
 import { useParams } from 'react-router-dom';
 import { getMinionById } from '../../../../lib/api';
 import { ToastController } from '../../../../lib/toast';
-import { jsonPalette } from '../../../../lib/ui';
+import { jsonPalette, sortedObject } from '../../../../lib/ui';
 import MinionHeader from '../MinionHeader';
 
 export default function MinionPillarsRoute(props: { toastController: ToastController }) {
@@ -46,7 +46,7 @@ export default function MinionPillarsRoute(props: { toastController: ToastContro
 							<i>Unknown</i>
 						) : (
 							<ObjectView
-								data={pillars}
+								data={sortedObject(pillars)}
 								options={{
 									hideDataTypes: true,
 								}}
