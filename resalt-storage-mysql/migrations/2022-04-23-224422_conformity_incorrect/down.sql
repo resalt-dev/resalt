@@ -1,1 +1,0 @@
-ALTER TABLE minions CHANGE conformity_incorrect conformity_invalid int(11) DEFAULT 0 NOT NULL;

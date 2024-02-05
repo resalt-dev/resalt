@@ -1,1 +1,0 @@
-ALTER TABLE minions MODIFY COLUMN last_seen timestamp NULL DEFAULT NULL;
