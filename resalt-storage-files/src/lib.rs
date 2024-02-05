@@ -187,6 +187,7 @@ impl StorageImpl for StorageFiles {
         perms: String,
         last_login: Option<ResaltTime>,
         email: Option<String>,
+        preferences: String,
     ) -> Result<User, String> {
         let id = id.unwrap_or(format!("usr_{}", uuid::Uuid::new_v4()));
         let user = User {
@@ -196,6 +197,7 @@ impl StorageImpl for StorageFiles {
             perms,
             last_login,
             email: email.clone(),
+            preferences: preferences.clone(),
         };
 
         let path = format!("users/{}", id);

@@ -17,6 +17,7 @@ pub fn create_user(
         "[]".to_string(),
         None,
         email,
+        "{}".to_string(),
     )
     .map_err(|e| {
         error!("api.create_user {:?}", e);

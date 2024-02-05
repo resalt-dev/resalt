@@ -30,6 +30,7 @@ pub trait StorageImpl: Send + Sync {
         perms: String,
         last_login: Option<ResaltTime>,
         email: Option<String>,
+        preferences: String,
     ) -> Result<User, String>;
 
     fn list_users(&self, paginate: Paginate) -> Result<Vec<User>, String>;
@@ -221,6 +222,7 @@ pub fn test_storage_impl_users(data: &dyn StorageImpl) {
             "testperms".to_string(),
             None,
             None,
+            "testprefs".to_string(),
         )
         .unwrap();
     assert!(user.id.starts_with("usr_"));
@@ -281,6 +283,7 @@ pub fn test_storage_impl_authtoken(data: &dyn StorageImpl) {
             "testperms".to_string(),
             None,
             None,
+            "testprefs".to_string(),
         )
         .unwrap();
     data.update_user(&user).unwrap();

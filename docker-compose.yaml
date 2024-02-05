@@ -76,7 +76,6 @@ services:
       - ./resalt-server:/usr/src/app/resalt-server:ro
       - ./resalt-storage:/usr/src/app/resalt-storage:ro
       - ./resalt-storage-files:/usr/src/app/resalt-storage-files:ro
-      - ./resalt-storage-mysql:/usr/src/app/resalt-storage-mysql:ro
       - ./resalt-storage-redis:/usr/src/app/resalt-storage-redis:ro
       - ./resalt-update:/usr/src/app/resalt-update:ro
       # The following is because Bun does not support reading files which are mounted as read-only

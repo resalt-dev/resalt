@@ -1,6 +1,7 @@
 use r2d2::{Pool, PooledConnection};
-use redis::{Client, Commands, Iter};
+use redis::{Client, Commands, Iter, JsonCommands};
 use resalt_models::*;
+use serde_json;
 
 #[derive(Clone)]
 pub struct StorageRedis {
@@ -108,6 +109,7 @@ impl StorageImpl for StorageRedis {
         perms: String,
         last_login: Option<ResaltTime>,
         email: Option<String>,
+        preferences: String,
     ) -> Result<User, String> {
         let mut connection = self.create_connection()?;
         let id = id.unwrap_or(format!("usr_{}", uuid::Uuid::new_v4()));
@@ -118,12 +120,12 @@ impl StorageImpl for StorageRedis {
             perms,
             last_login,
             email: email.clone(),
+            preferences: preferences.clone(),
         };
 
-        let values = user.hash();
-
+        let user_json = serde_json::to_string(&user).map_err(|e| format!("{:?}", e))?;
         connection
-            .hset_multiple(format!("user:{}", id), values.as_slice())
+            .set(format!("user:{}", id), &user_json)
             .map_err(|e| format!("{:?}", e))?;
 
         Ok(user)
@@ -133,7 +135,7 @@ impl StorageImpl for StorageRedis {
         let mut connection = self.create_connection()?;
         let mut users: Vec<User> = Vec::new();
 
-        // Loop over user:*, which are HashMaps
+        // Loop over user:*, which are JSON strings
         let mut keys: Vec<String> = connection.keys("user:*").map_err(|e| format!("{:?}", e))?;
         keys.sort();
 
@@ -147,12 +149,12 @@ impl StorageImpl for StorageRedis {
         }
 
         for key in keys {
-            let id: String = key.split(':').last().unwrap().to_string();
-            // Fields are stored as HashMap
-            let values = connection
-                .hgetall(key.as_str())
+            // Fields are stored as JSON strings
+            let user_json: String = connection
+                .get(key.as_str())
                 .map_err(|e| format!("{:?}", e))?;
-            let user: User = User::dehash(id, values);
+            let user: User =
+                serde_json::from_str(user_json.as_str()).map_err(|e| format!("{:?}", e))?;
             users.push(user);
         }
 
@@ -162,15 +164,17 @@ impl StorageImpl for StorageRedis {
     fn get_user_by_id(&self, id: &str) -> Result<Option<User>, String> {
         let mut connection = self.create_connection()?;
         // If user doesn't exist, return None
-        let values: Vec<(String, String)> = connection
-            .hgetall(format!("user:{}", id))
-            .map_err(|e| format!("{:?}", e))?;
-        if values.is_empty() {
+        if !connection
+            .exists(format!("user:{}", id).as_str())
+            .map_err(|e| format!("{:?}", e))?
+        {
             return Ok(None);
         }
-
-        let user: User = User::dehash(id.to_string(), values);
-
+        let user_json: String = connection
+            .get(format!("user:{}", id))
+            .map_err(|e| format!("{:?}", e))?;
+        let user: User =
+            serde_json::from_str(user_json.as_str()).map_err(|e| format!("{:?}", e))?;
         Ok(Some(user))
     }
 
@@ -179,21 +183,18 @@ impl StorageImpl for StorageRedis {
         let mut conn_lookup = self.create_connection()?;
         // If user doesn't exist, return None
 
-        // Search for Hashmap where user:*.username == username
-        let keys: Iter<'_, String> = conn_iter
+        let keys: Vec<String> = conn_iter
             .scan_match("user:*")
+            .map_err(|e| format!("{:?}", e))?
+            .collect();
+
+        let user_jsons: Vec<String> = conn_lookup
+            .mget(keys.as_slice())
             .map_err(|e| format!("{:?}", e))?;
 
-        for key in keys {
-            let id: String = key.split(':').last().unwrap().to_string();
-            let values: Vec<(String, String)> = conn_lookup
-                .hgetall(key.as_str())
-                .map_err(|e| format!("{:?}", e))?;
-            if values.is_empty() {
-                continue;
-            }
-
-            let user: User = User::dehash(id, values);
+        for user_json in user_jsons {
+            let user: User =
+                serde_json::from_str(user_json.as_str()).map_err(|e| format!("{:?}", e))?;
 
             if user.username == username {
                 return Ok(Some(user));
@@ -205,9 +206,9 @@ impl StorageImpl for StorageRedis {
 
     fn update_user(&self, user: &User) -> Result<(), String> {
         let mut connection = self.create_connection()?;
-        let values = user.hash();
+        let user_json = serde_json::to_string(user).map_err(|e| format!("{:?}", e))?;
         connection
-            .hset_multiple(format!("user:{}", user.id), values.as_slice())
+            .set(format!("user:{}", user.id), &user_json)
             .map_err(|e| format!("{:?}", e))?;
         Ok(())
     }
@@ -228,25 +229,24 @@ impl StorageImpl for StorageRedis {
         let mut connection = self.create_connection()?;
         let id = format!("auth_{}", uuid::Uuid::new_v4());
         let authtoken = AuthToken {
-            id,
+            id: id.clone(),
             user_id: user_id.clone(),
             timestamp: ResaltTime::now(),
             salt_token: None,
         };
 
-        let values = authtoken.hash();
-
         // Insert auth token
+        let auth_token_json = serde_json::to_string(&authtoken).map_err(|e| format!("{:?}", e))?;
         connection
-            .hset_multiple(format!("authtoken:{}", authtoken.id), values.as_slice())
+            .set(format!("authtoken:{}", id), &auth_token_json)
             .map_err(|e| format!("{:?}", e))?;
 
         // Update user's last_login
         connection
-            .hset(
+            .json_set(
                 format!("user:{}", user_id),
-                "last_login",
-                authtoken.timestamp.format("%Y-%m-%d %H:%M:%S").to_string(),
+                ".last_login",
+                &authtoken.timestamp.format("%Y-%m-%d %H:%M:%S").to_string(),
             )
             .map_err(|e| format!("{:?}", e))?;
 
@@ -256,14 +256,18 @@ impl StorageImpl for StorageRedis {
     fn get_authtoken_by_id(&self, id: &str) -> Result<Option<AuthToken>, String> {
         let mut connection = self.create_connection()?;
         // If authtoken doesn't exist, return None
-        let values: Vec<(String, String)> = connection
-            .hgetall(format!("authtoken:{}", id))
-            .map_err(|e| format!("{:?}", e))?;
-        if values.is_empty() {
+        if !connection
+            .exists(format!("authtoken:{}", id).as_str())
+            .map_err(|e| format!("{:?}", e))?
+        {
             return Ok(None);
         }
 
-        let authtoken: AuthToken = AuthToken::dehash(id.to_string(), values);
+        let authtoken_json: String = connection
+            .get(format!("authtoken:{}", id))
+            .map_err(|e| format!("{:?}", e))?;
+        let authtoken: AuthToken =
+            serde_json::from_str(authtoken_json.as_str()).map_err(|e| format!("{:?}", e))?;
 
         Ok(Some(authtoken))
     }
@@ -281,10 +285,10 @@ impl StorageImpl for StorageRedis {
 
         // Update authtoken with salt_token
         connection
-            .hset(
+            .json_set(
                 format!("authtoken:{}", auth_token),
-                "salt_token",
-                salt_token_str,
+                ".salt_token",
+                &salt_token_str,
             )
             .map_err(|e| format!("{:?}", e))?;
 
@@ -323,12 +327,11 @@ impl StorageImpl for StorageRedis {
         }
 
         for key in &keys {
-            let id: String = key.split(':').last().unwrap().to_string();
-            // Fields are stored as HashMap
-            let values = connection
-                .hgetall(key.as_str())
+            let minion_json: String = connection
+                .get(key.as_str())
                 .map_err(|e| format!("{:?}", e))?;
-            let minion: Minion = Minion::dehash(id, values);
+            let minion: Minion =
+                serde_json::from_str(minion_json.as_str()).map_err(|e| format!("{:?}", e))?;
             minions.push(minion);
         }
 
@@ -358,14 +361,18 @@ impl StorageImpl for StorageRedis {
     fn get_minion_by_id(&self, id: &str) -> Result<Option<Minion>, String> {
         let mut connection = self.create_connection()?;
         // If minion doesn't exist, return None
-        let values: Vec<(String, String)> = connection
-            .hgetall(format!("minion:{}", id))
-            .map_err(|e| format!("{:?}", e))?;
-        if values.is_empty() {
+        if !connection
+            .exists(format!("minion:{}", id).as_str())
+            .map_err(|e| format!("{:?}", e))?
+        {
             return Ok(None);
         }
 
-        let minion: Minion = Minion::dehash(id.to_string(), values);
+        let minion_json: String = connection
+            .get(format!("minion:{}", id))
+            .map_err(|e| format!("{:?}", e))?;
+        let minion: Minion =
+            serde_json::from_str(minion_json.as_str()).map_err(|e| format!("{:?}", e))?;
 
         Ok(Some(minion))
     }
@@ -373,23 +380,25 @@ impl StorageImpl for StorageRedis {
     fn upsert_minion(&self, minion: Minion) -> Result<(), String> {
         let mut connection = self.create_connection()?;
 
-        let values = minion.hash();
-
         // Update if it exists, insert if it doesn't
+        let minion_json = serde_json::to_string(&minion).map_err(|e| format!("{:?}", e))?;
         connection
-            .hset_multiple(format!("minion:{}", minion.id), values.as_slice())
+            .set(format!("minion:{}", minion.id), &minion_json)
             .map_err(|e| format!("{:?}", e))?;
 
         Ok(())
     }
 
     fn upsert_minion_last_seen(&self, minion_id: &str, time: ResaltTime) -> Result<(), String> {
-        let mut minion = match self.get_minion_by_id(minion_id)? {
-            Some(minion) => minion,
-            None => Minion::default_with_id(minion_id),
-        };
-        minion.last_seen = time;
-        self.upsert_minion(minion)
+        let mut connection = self.create_connection()?;
+        connection
+            .json_set(
+                format!("minion:{}", minion_id),
+                ".last_seen",
+                &time.to_string(),
+            )
+            .map_err(|e| format!("{:?}", e))?;
+        Ok(())
     }
 
     fn upsert_minion_grains(
@@ -399,14 +408,21 @@ impl StorageImpl for StorageRedis {
         grains: String,
         os_type: String,
     ) -> Result<(), String> {
-        let mut minion = match self.get_minion_by_id(minion_id)? {
-            Some(minion) => minion,
-            None => Minion::default_with_id(minion_id),
-        };
-        minion.last_updated_grains = Some(time);
-        minion.grains = Some(grains);
-        minion.os_type = Some(os_type);
-        self.upsert_minion(minion)
+        let mut connection = self.create_connection()?;
+        connection
+            .json_set(
+                format!("minion:{}", minion_id),
+                ".last_updated_grains",
+                &time.to_string(),
+            )
+            .map_err(|e| format!("{:?}", e))?;
+        connection
+            .json_set(format!("minion:{}", minion_id), ".grains", &grains)
+            .map_err(|e| format!("{:?}", e))?;
+        connection
+            .json_set(format!("minion:{}", minion_id), ".os_type", &os_type)
+            .map_err(|e| format!("{:?}", e))?;
+        Ok(())
     }
 
     fn upsert_minion_pillars(
@@ -415,13 +431,18 @@ impl StorageImpl for StorageRedis {
         time: ResaltTime,
         pillars: String,
     ) -> Result<(), String> {
-        let mut minion = match self.get_minion_by_id(minion_id)? {
-            Some(minion) => minion,
-            None => Minion::default_with_id(minion_id),
-        };
-        minion.last_updated_pillars = Some(time);
-        minion.pillars = Some(pillars);
-        self.upsert_minion(minion)
+        let mut connection = self.create_connection()?;
+        connection
+            .json_set(
+                format!("minion:{}", minion_id),
+                ".last_updated_pillars",
+                &time.to_string(),
+            )
+            .map_err(|e| format!("{:?}", e))?;
+        connection
+            .json_set(format!("minion:{}", minion_id), ".pillars", &pillars)
+            .map_err(|e| format!("{:?}", e))?;
+        Ok(())
     }
 
     fn upsert_minion_pkgs(
@@ -430,13 +451,18 @@ impl StorageImpl for StorageRedis {
         time: ResaltTime,
         pkgs: String,
     ) -> Result<(), String> {
-        let mut minion = match self.get_minion_by_id(minion_id)? {
-            Some(minion) => minion,
-            None => Minion::default_with_id(minion_id),
-        };
-        minion.last_updated_pkgs = Some(time);
-        minion.pkgs = Some(pkgs);
-        self.upsert_minion(minion)
+        let mut connection = self.create_connection()?;
+        connection
+            .json_set(
+                format!("minion:{}", minion_id),
+                ".last_updated_pkgs",
+                &time.to_string(),
+            )
+            .map_err(|e| format!("{:?}", e))?;
+        connection
+            .json_set(format!("minion:{}", minion_id), ".pkgs", &pkgs)
+            .map_err(|e| format!("{:?}", e))?;
+        Ok(())
     }
 
     fn upsert_minion_conformity(
@@ -448,16 +474,35 @@ impl StorageImpl for StorageRedis {
         incorrect: i32,
         error: i32,
     ) -> Result<(), String> {
-        let mut minion = match self.get_minion_by_id(minion_id)? {
-            Some(minion) => minion,
-            None => Minion::default_with_id(minion_id),
-        };
-        minion.last_updated_conformity = Some(time);
-        minion.conformity = Some(conformity);
-        minion.conformity_success = Some(success);
-        minion.conformity_incorrect = Some(incorrect);
-        minion.conformity_error = Some(error);
-        self.upsert_minion(minion)
+        let mut connection = self.create_connection()?;
+        connection
+            .json_set(
+                format!("minion:{}", minion_id),
+                ".last_updated_conformity",
+                &time.to_string(),
+            )
+            .map_err(|e| format!("{:?}", e))?;
+        connection
+            .json_set(format!("minion:{}", minion_id), ".conformity", &conformity)
+            .map_err(|e| format!("{:?}", e))?;
+        connection
+            .json_set(
+                format!("minion:{}", minion_id),
+                ".conformity_success",
+                &success,
+            )
+            .map_err(|e| format!("{:?}", e))?;
+        connection
+            .json_set(
+                format!("minion:{}", minion_id),
+                ".conformity_incorrect",
+                &incorrect,
+            )
+            .map_err(|e| format!("{:?}", e))?;
+        connection
+            .json_set(format!("minion:{}", minion_id), ".conformity_error", &error)
+            .map_err(|e| format!("{:?}", e))?;
+        Ok(())
     }
 
     // Delete minion
@@ -488,10 +533,9 @@ impl StorageImpl for StorageRedis {
             data,
         };
 
-        let values = event.hash();
-
+        let event_json = serde_json::to_string(&event).map_err(|e| format!("{:?}", e))?;
         connection
-            .hset_multiple(format!("event:{}", id), values.as_slice())
+            .set(format!("event:{}", id), &event_json)
             .map_err(|e| format!("{:?}", e))?;
         Ok(id)
     }
@@ -514,12 +558,11 @@ impl StorageImpl for StorageRedis {
         }
 
         for key in keys {
-            let id: String = key.split(':').last().unwrap().to_string();
-            // Fields are stored as HashMap
-            let values = connection
-                .hgetall(key.as_str())
+            let event_json: String = connection
+                .get(key.as_str())
                 .map_err(|e| format!("{:?}", e))?;
-            let event: Event = Event::dehash(id, values);
+            let event: Event =
+                serde_json::from_str(event_json.as_str()).map_err(|e| format!("{:?}", e))?;
             events.push(event);
         }
 
@@ -529,15 +572,18 @@ impl StorageImpl for StorageRedis {
     fn get_event_by_id(&self, id: &str) -> Result<Option<Event>, String> {
         let mut connection = self.create_connection()?;
         // If event doesn't exist, return None
-        let values: Vec<(String, String)> = connection
-            .hgetall(format!("event:{}", id))
-            .map_err(|e| format!("{:?}", e))?;
-        if values.is_empty() {
+        if !connection
+            .exists(format!("event:{}", id).as_str())
+            .map_err(|e| format!("{:?}", e))?
+        {
             return Ok(None);
         }
 
-        let event: Event = Event::dehash(id.to_string(), values);
-
+        let event_json: String = connection
+            .get(format!("event:{}", id))
+            .map_err(|e| format!("{:?}", e))?;
+        let event: Event =
+            serde_json::from_str(event_json.as_str()).map_err(|e| format!("{:?}", e))?;
         Ok(Some(event))
     }
 
@@ -561,10 +607,9 @@ impl StorageImpl for StorageRedis {
             event_id,
         };
 
-        let values = job.hash();
-
+        let job_json = serde_json::to_string(&job).map_err(|e| format!("{:?}", e))?;
         connection
-            .hset_multiple(format!("job:{}", jid), values.as_slice())
+            .set(format!("job:{}", jid), &job_json)
             .map_err(|e| format!("{:?}", e))?;
         Ok(())
     }
@@ -587,12 +632,11 @@ impl StorageImpl for StorageRedis {
         }
 
         for key in keys {
-            let id: String = key.split(':').last().unwrap().to_string();
-            // Fields are stored as HashMap
-            let values = connection
-                .hgetall(key.as_str())
+            let job_json: String = connection
+                .get(key.as_str())
                 .map_err(|e| format!("{:?}", e))?;
-            let job: Job = Job::dehash(id, values);
+            let job: Job =
+                serde_json::from_str(job_json.as_str()).map_err(|e| format!("{:?}", e))?;
             jobs.push(job);
         }
 
@@ -607,15 +651,17 @@ impl StorageImpl for StorageRedis {
     fn get_job_by_jid(&self, jid: &str) -> Result<Option<Job>, String> {
         let mut connection = self.create_connection()?;
         // If job doesn't exist, return None
-        let values: Vec<(String, String)> = connection
-            .hgetall(format!("job:{}", jid))
-            .map_err(|e| format!("{:?}", e))?;
-        if values.is_empty() {
+        if !connection
+            .exists(format!("job:{}", jid).as_str())
+            .map_err(|e| format!("{:?}", e))?
+        {
             return Ok(None);
         }
 
-        let job: Job = Job::dehash(jid.to_string(), values);
-
+        let job_json: String = connection
+            .get(format!("job:{}", jid))
+            .map_err(|e| format!("{:?}", e))?;
+        let job: Job = serde_json::from_str(job_json.as_str()).map_err(|e| format!("{:?}", e))?;
         Ok(Some(job))
     }
 
@@ -642,10 +688,9 @@ impl StorageImpl for StorageRedis {
             minion_id,
         };
 
-        let values = job_return.hash();
-
+        let job_return_json = serde_json::to_string(&job_return).map_err(|e| format!("{:?}", e))?;
         connection
-            .hset_multiple(format!("job_return:{}:{}", jid, id), values.as_slice())
+            .set(format!("job_return:{}", id), &job_return_json)
             .map_err(|e| format!("{:?}", e))?;
         Ok(())
     }
@@ -661,12 +706,11 @@ impl StorageImpl for StorageRedis {
         keys.sort();
 
         for key in keys {
-            let id: String = key.split(':').last().unwrap().to_string();
-            // Fields are stored as HashMap
-            let values = connection
-                .hgetall(key.as_str())
+            let job_return_json: String = connection
+                .get(key.as_str())
                 .map_err(|e| format!("{:?}", e))?;
-            let job_return: JobReturn = JobReturn::dehash(id, values);
+            let job_return: JobReturn =
+                serde_json::from_str(job_return_json.as_str()).map_err(|e| format!("{:?}", e))?;
             job_returns.push(job_return);
         }
 
@@ -691,10 +735,10 @@ impl StorageImpl for StorageRedis {
             perms: perms.unwrap_or("[]".to_string()),
         };
 
-        let values = permission_group.hash();
-
+        let permission_group_json =
+            serde_json::to_string(&permission_group).map_err(|e| format!("{:?}", e))?;
         connection
-            .hset_multiple(format!("permission_group:{}", id), values.as_slice())
+            .set(format!("permission_group:{}", id), &permission_group_json)
             .map_err(|e| format!("{:?}", e))?;
         Ok(id)
     }
@@ -719,12 +763,12 @@ impl StorageImpl for StorageRedis {
         }
 
         for key in keys {
-            let id: String = key.split(':').last().unwrap().to_string();
-            // Fields are stored as HashMap
-            let values = connection
-                .hgetall(key.as_str())
+            let permission_group_json: String = connection
+                .get(key.as_str())
                 .map_err(|e| format!("{:?}", e))?;
-            let permission_group: PermissionGroup = PermissionGroup::dehash(id, values);
+            let permission_group: PermissionGroup =
+                serde_json::from_str(permission_group_json.as_str())
+                    .map_err(|e| format!("{:?}", e))?;
             permission_groups.push(permission_group);
         }
 
@@ -734,15 +778,18 @@ impl StorageImpl for StorageRedis {
     fn get_permission_group_by_id(&self, id: &str) -> Result<Option<PermissionGroup>, String> {
         let mut connection = self.create_connection()?;
         // If permission_group doesn't exist, return None
-        let values: Vec<(String, String)> = connection
-            .hgetall(format!("permission_group:{}", id))
-            .map_err(|e| format!("{:?}", e))?;
-        if values.is_empty() {
+        if !connection
+            .exists(format!("permission_group:{}", id).as_str())
+            .map_err(|e| format!("{:?}", e))?
+        {
             return Ok(None);
         }
 
-        let permission_group: PermissionGroup = PermissionGroup::dehash(id.to_string(), values);
-
+        let permission_group_json: String = connection
+            .get(format!("permission_group:{}", id))
+            .map_err(|e| format!("{:?}", e))?;
+        let permission_group: PermissionGroup =
+            serde_json::from_str(permission_group_json.as_str()).map_err(|e| format!("{:?}", e))?;
         Ok(Some(permission_group))
     }
 
@@ -760,11 +807,12 @@ impl StorageImpl for StorageRedis {
 
     fn update_permission_group(&self, permission_group: &PermissionGroup) -> Result<(), String> {
         let mut connection = self.create_connection()?;
-        let values = permission_group.hash();
+        let permission_group_json =
+            serde_json::to_string(permission_group).map_err(|e| format!("{:?}", e))?;
         connection
-            .hset_multiple(
+            .set(
                 format!("permission_group:{}", permission_group.id),
-                values.as_slice(),
+                &permission_group_json,
             )
             .map_err(|e| format!("{:?}", e))?;
         Ok(())
@@ -801,15 +849,15 @@ impl StorageImpl for StorageRedis {
             .map_err(|e| format!("{:?}", e))?;
 
         for key in keys {
-            let group_id: String = key.split(':').last().unwrap().to_string();
-            let values: Vec<(String, String)> = conn_lookup
-                .hgetall(format!("permission_group:{}", group_id))
+            let permission_group_json: String = conn_lookup
+                .get(format!(
+                    "permission_group:{}",
+                    key.split(':').last().unwrap()
+                ))
                 .map_err(|e| format!("{:?}", e))?;
-            if values.is_empty() {
-                continue;
-            }
-
-            let permission_group: PermissionGroup = PermissionGroup::dehash(group_id, values);
+            let permission_group: PermissionGroup =
+                serde_json::from_str(permission_group_json.as_str())
+                    .map_err(|e| format!("{:?}", e))?;
             permission_groups.push(permission_group);
         }
 
@@ -827,15 +875,11 @@ impl StorageImpl for StorageRedis {
             .map_err(|e| format!("{:?}", e))?;
 
         for key in keys {
-            let user_id: String = key.split(':').nth(1).unwrap().to_string();
-            let values: Vec<(String, String)> = conn_lookup
-                .hgetall(format!("user:{}", user_id))
+            let user_json: String = conn_lookup
+                .get(key.as_str())
                 .map_err(|e| format!("{:?}", e))?;
-            if values.is_empty() {
-                continue;
-            }
-
-            let user: User = User::dehash(user_id, values);
+            let user: User =
+                serde_json::from_str(user_json.as_str()).map_err(|e| format!("{:?}", e))?;
             users.push(user);
         }
 
@@ -869,10 +913,10 @@ impl StorageImpl for StorageRedis {
             filter: filter.to_string(),
         };
 
-        let values = minion_preset.hash();
-
+        let minion_preset_json =
+            serde_json::to_string(&minion_preset).map_err(|e| format!("{:?}", e))?;
         connection
-            .hset_multiple(format!("minion_preset:{}", id), values.as_slice())
+            .set(format!("minion_preset:{}", id), &minion_preset_json)
             .map_err(|e| format!("{:?}", e))?;
 
         Ok(id)
@@ -889,12 +933,11 @@ impl StorageImpl for StorageRedis {
         keys.sort();
 
         for key in keys {
-            let id: String = key.split(':').last().unwrap().to_string();
-            // Fields are stored as HashMap
-            let values = connection
-                .hgetall(key.as_str())
+            let minion_preset_json: String = connection
+                .get(key.as_str())
                 .map_err(|e| format!("{:?}", e))?;
-            let minion_preset: MinionPreset = MinionPreset::dehash(id, values);
+            let minion_preset: MinionPreset = serde_json::from_str(minion_preset_json.as_str())
+                .map_err(|e| format!("{:?}", e))?;
             minion_presets.push(minion_preset);
         }
 
@@ -904,25 +947,29 @@ impl StorageImpl for StorageRedis {
     fn get_minion_preset_by_id(&self, id: &str) -> Result<Option<MinionPreset>, String> {
         let mut connection = self.create_connection()?;
         // If minion_preset doesn't exist, return None
-        let values: Vec<(String, String)> = connection
-            .hgetall(format!("minion_preset:{}", id))
-            .map_err(|e| format!("{:?}", e))?;
-        if values.is_empty() {
+        if !connection
+            .exists(format!("minion_preset:{}", id).as_str())
+            .map_err(|e| format!("{:?}", e))?
+        {
             return Ok(None);
         }
 
-        let minion_preset: MinionPreset = MinionPreset::dehash(id.to_string(), values);
-
+        let minion_preset_json: String = connection
+            .get(format!("minion_preset:{}", id))
+            .map_err(|e| format!("{:?}", e))?;
+        let minion_preset: MinionPreset =
+            serde_json::from_str(minion_preset_json.as_str()).map_err(|e| format!("{:?}", e))?;
         Ok(Some(minion_preset))
     }
 
     fn update_minion_preset(&self, minion_preset: &MinionPreset) -> Result<(), String> {
         let mut connection = self.create_connection()?;
-        let values = minion_preset.hash();
+        let minion_preset_json =
+            serde_json::to_string(minion_preset).map_err(|e| format!("{:?}", e))?;
         connection
-            .hset_multiple(
+            .set(
                 format!("minion_preset:{}", minion_preset.id),
-                values.as_slice(),
+                &minion_preset_json,
             )
             .map_err(|e| format!("{:?}", e))?;
         Ok(())

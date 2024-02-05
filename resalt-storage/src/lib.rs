@@ -2,7 +2,6 @@ use log::{debug, error};
 use resalt_config::ResaltConfig;
 use resalt_models::*;
 use resalt_storage_files::StorageFiles;
-use resalt_storage_mysql::StorageMySQL;
 use resalt_storage_redis::StorageRedis;
 use serde_json::Value;
 
@@ -23,22 +22,6 @@ impl Storage {
                 Box::new(
                     StorageFiles::connect(&path)
                         .unwrap_or_else(|_| panic!("Error connecting to {}", &path)),
-                )
-            }
-            "mysql" => {
-                let database_url = format!(
-                    "mysql://{}:{}@{}:{}/{}",
-                    *ResaltConfig::DATABASE_USERNAME,
-                    *ResaltConfig::DATABASE_PASSWORD,
-                    *ResaltConfig::DATABASE_HOST,
-                    *ResaltConfig::DATABASE_PORT,
-                    *ResaltConfig::DATABASE_DATABASE
-                );
-                debug!("Database URL: \"{}\"", database_url);
-                Box::new(
-                    StorageMySQL::connect(&database_url)
-                        .await
-                        .unwrap_or_else(|_| panic!("Error connecting to {}", &database_url)),
                 )
             }
             "redis" => {
@@ -162,9 +145,17 @@ impl StorageImpl for Storage {
         perms: String,
         last_login: Option<ResaltTime>,
         email: Option<String>,
+        preferences: String,
     ) -> Result<User, String> {
-        self.storage
-            .create_user_hashed(id, username, password, perms, last_login, email)
+        self.storage.create_user_hashed(
+            id,
+            username,
+            password,
+            perms,
+            last_login,
+            email,
+            preferences,
+        )
     }
 
     fn list_users(&self, paginate: Paginate) -> Result<Vec<User>, String> {

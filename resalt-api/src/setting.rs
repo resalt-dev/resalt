@@ -44,6 +44,7 @@ pub fn import_backup(data: &Storage, config: &DataDump) -> Result<(), StatusCode
                 user.perms.clone(),
                 user.last_login,
                 user.email.clone(),
+                user.preferences.clone(),
             ) {
                 Ok(_) => {}
                 Err(e) => {
