@@ -24,7 +24,13 @@ export function MainRouter() {
 	const router = createBrowserRouter([
 		{
 			path: '/',
-			element: <RootLayout currentUser={currentUser} setCurrentUser={setCurrentUser} />,
+			element: (
+				<RootLayout
+					currentUser={currentUser}
+					setCurrentUser={setCurrentUser}
+					toastController={toastController}
+				/>
+			),
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			children: Object.entries(paths).map(([_name, path]) => ({
 				path: path.path,

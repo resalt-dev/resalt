@@ -128,6 +128,24 @@ impl Minion {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct UserPreferences {
+    pub theme: String,
+}
+impl UserPreferences {
+    pub fn validate(&self) -> bool {
+        self.theme.len() <= 32
+    }
+}
+
+impl Default for UserPreferences {
+    fn default() -> Self {
+        Self {
+            theme: "light".to_string(),
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct User {
     pub id: String,
     pub username: String,
@@ -136,12 +154,8 @@ pub struct User {
     #[serde(rename = "lastLogin")]
     pub last_login: Option<ResaltTime>,
     pub email: Option<String>,
-    #[serde(default = "user_preferences_default")]
-    pub preferences: String,
-}
-
-fn user_preferences_default() -> String {
-    "{}".to_string()
+    #[serde(default)]
+    pub preferences: UserPreferences,
 }
 
 impl Default for User {
@@ -153,7 +167,7 @@ impl Default for User {
             perms: "".to_string(),
             last_login: None,
             email: None,
-            preferences: "{}".to_string(), // Set default value for preferences
+            preferences: UserPreferences::default(),
         }
     }
 }

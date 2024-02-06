@@ -9,6 +9,7 @@ import type RunCommand from '../models/RunCommand';
 import SaltEvent from '../models/SaltEvent';
 import SystemStatus from '../models/SystemStatus';
 import User from '../models/User';
+import UserPreferences from '../models/UserPreferences';
 
 const API_URL = '/api';
 const u = undefined;
@@ -138,13 +139,15 @@ export async function updateUserPassword(
 	password: string,
 	abort: AbortSignal,
 ): Promise<void> {
-	await sendRequest(
-		'POST',
-		`/users/${userId}/password`,
+	await sendRequest('POST', `/users/${userId}/password`, { password }, abort);
+}
 
-		{ password },
-		abort,
-	);
+export async function updateUserPreferences(
+	userId: string,
+	preferences: UserPreferences,
+	abort: AbortSignal,
+): Promise<void> {
+	await sendRequest('POST', `/users/${userId}/preferences`, preferences, abort);
 }
 
 export async function addUserToPermissionGroup(

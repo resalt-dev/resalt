@@ -1,6 +1,6 @@
 use axum::http::StatusCode;
 use log::error;
-use resalt_models::{Paginate, StorageImpl, User};
+use resalt_models::{Paginate, StorageImpl, User, UserPreferences};
 use resalt_security::hash_password;
 use resalt_storage::Storage;
 
@@ -17,7 +17,7 @@ pub fn create_user(
         "[]".to_string(),
         None,
         email,
-        "{}".to_string(),
+        UserPreferences::default(),
     )
     .map_err(|e| {
         error!("api.create_user {:?}", e);
@@ -51,6 +51,18 @@ pub fn update_user(data: &Storage, user: &User) -> Result<(), StatusCode> {
         error!("api.update_user {:?}", e);
         StatusCode::INTERNAL_SERVER_ERROR
     })
+}
+
+pub fn update_user_preferences(
+    data: &Storage,
+    user_id: &str,
+    preferences: &UserPreferences,
+) -> Result<(), StatusCode> {
+    data.update_user_preferences(user_id, preferences)
+        .map_err(|e| {
+            error!("api.update_user_preferences {:?}", e);
+            StatusCode::INTERNAL_SERVER_ERROR
+        })
 }
 
 pub fn delete_user(data: &Storage, user_id: &str) -> Result<(), StatusCode> {

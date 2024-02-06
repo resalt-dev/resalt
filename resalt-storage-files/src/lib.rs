@@ -187,7 +187,7 @@ impl StorageImpl for StorageFiles {
         perms: String,
         last_login: Option<ResaltTime>,
         email: Option<String>,
-        preferences: String,
+        preferences: UserPreferences,
     ) -> Result<User, String> {
         let id = id.unwrap_or(format!("usr_{}", uuid::Uuid::new_v4()));
         let user = User {
@@ -266,6 +266,21 @@ impl StorageImpl for StorageFiles {
     fn update_user(&self, user: &User) -> Result<(), String> {
         let path = format!("users/{}", user.id);
         self.save_file(&path, user)?;
+        Ok(())
+    }
+
+    fn update_user_preferences(
+        &self,
+        user_id: &str,
+        preferences: &UserPreferences,
+    ) -> Result<(), String> {
+        let mut user = match self.get_user_by_id(user_id)? {
+            Some(user) => user,
+            None => return Err("User does not exist".to_string()),
+        };
+        user.preferences = preferences.to_owned();
+        let path = format!("users/{}", user_id);
+        self.save_file(&path, &user)?;
         Ok(())
     }
 

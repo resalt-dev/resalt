@@ -1,6 +1,6 @@
 use crate::{
     AuthToken, Event, Filter, Job, JobReturn, JobSort, Minion, MinionPreset, MinionSort, Paginate,
-    PermissionGroup, ResaltTime, SaltToken, User,
+    PermissionGroup, ResaltTime, SaltToken, User, UserPreferences,
 };
 
 pub trait StorageImpl: Send + Sync {
@@ -30,7 +30,7 @@ pub trait StorageImpl: Send + Sync {
         perms: String,
         last_login: Option<ResaltTime>,
         email: Option<String>,
-        preferences: String,
+        preferences: UserPreferences,
     ) -> Result<User, String>;
 
     fn list_users(&self, paginate: Paginate) -> Result<Vec<User>, String>;
@@ -40,6 +40,12 @@ pub trait StorageImpl: Send + Sync {
     fn get_user_by_username(&self, username: &str) -> Result<Option<User>, String>;
 
     fn update_user(&self, user: &User) -> Result<(), String>;
+
+    fn update_user_preferences(
+        &self,
+        user_id: &str,
+        preferences: &UserPreferences,
+    ) -> Result<(), String>;
 
     fn delete_user(&self, id: &str) -> Result<(), String>;
 
@@ -222,7 +228,9 @@ pub fn test_storage_impl_users(data: &dyn StorageImpl) {
             "testperms".to_string(),
             None,
             None,
-            "testprefs".to_string(),
+            UserPreferences {
+                theme: "testtheme".to_string(),
+            },
         )
         .unwrap();
     assert!(user.id.starts_with("usr_"));
@@ -283,7 +291,9 @@ pub fn test_storage_impl_authtoken(data: &dyn StorageImpl) {
             "testperms".to_string(),
             None,
             None,
-            "testprefs".to_string(),
+            UserPreferences {
+                theme: "testtheme".to_string(),
+            },
         )
         .unwrap();
     data.update_user(&user).unwrap();

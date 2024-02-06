@@ -145,7 +145,7 @@ impl StorageImpl for Storage {
         perms: String,
         last_login: Option<ResaltTime>,
         email: Option<String>,
-        preferences: String,
+        preferences: UserPreferences,
     ) -> Result<User, String> {
         self.storage.create_user_hashed(
             id,
@@ -172,6 +172,14 @@ impl StorageImpl for Storage {
 
     fn update_user(&self, user: &User) -> Result<(), String> {
         self.storage.update_user(user)
+    }
+
+    fn update_user_preferences(
+        &self,
+        user_id: &str,
+        preferences: &UserPreferences,
+    ) -> Result<(), String> {
+        self.storage.update_user_preferences(user_id, preferences)
     }
 
     fn delete_user(&self, id: &str) -> Result<(), String> {

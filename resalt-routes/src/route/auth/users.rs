@@ -13,9 +13,10 @@ use resalt_api::{
     },
     user::{
         create_user, delete_user, get_user_by_id, get_user_by_username, get_users, update_user,
+        update_user_preferences,
     },
 };
-use resalt_models::{AuthStatus, Paginate, PaginateQuery};
+use resalt_models::{AuthStatus, Paginate, PaginateQuery, UserPreferences};
 use resalt_security::hash_password;
 use resalt_storage::Storage;
 use serde::Deserialize;
@@ -159,6 +160,41 @@ pub async fn route_user_password_post(
     // Update password
     user.password = Some(hash_password(&input.password));
     update_user(&data, &user)?;
+
+    Ok(Json(()))
+}
+
+pub async fn route_user_preferences_post(
+    Path(user_id): Path<String>,
+    State(data): State<Storage>,
+    Extension(auth): Extension<AuthStatus>,
+    Json(preferences): Json<UserPreferences>,
+) -> Result<impl IntoResponse, StatusCode> {
+    // Validate permission
+    if auth.user_id == user_id {
+        // User can always update their own preferences
+    } else {
+        #[allow(clippy::collapsible_else_if)]
+        if !has_resalt_permission(&auth, P_ADMIN_USER)? {
+            return Err(StatusCode::FORBIDDEN);
+        }
+    }
+
+    // Check if user exists
+    let user = match get_user_by_id(&data, &user_id)? {
+        Some(user) => user,
+        None => {
+            return Err(StatusCode::NOT_FOUND);
+        }
+    };
+
+    // Validate preferences
+    if !preferences.validate() {
+        return Err(StatusCode::BAD_REQUEST);
+    }
+
+    // Update preferences
+    update_user_preferences(&data, &user.id, &preferences)?;
 
     Ok(Json(()))
 }

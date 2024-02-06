@@ -109,7 +109,7 @@ impl StorageImpl for StorageRedis {
         perms: String,
         last_login: Option<ResaltTime>,
         email: Option<String>,
-        preferences: String,
+        preferences: UserPreferences,
     ) -> Result<User, String> {
         let mut connection = self.create_connection()?;
         let id = id.unwrap_or(format!("usr_{}", uuid::Uuid::new_v4()));
@@ -209,6 +209,18 @@ impl StorageImpl for StorageRedis {
         let user_json = serde_json::to_string(user).map_err(|e| format!("{:?}", e))?;
         connection
             .set(format!("user:{}", user.id), &user_json)
+            .map_err(|e| format!("{:?}", e))?;
+        Ok(())
+    }
+
+    fn update_user_preferences(
+        &self,
+        user_id: &str,
+        preferences: &UserPreferences,
+    ) -> Result<(), String> {
+        let mut connection = self.create_connection()?;
+        connection
+            .json_set(format!("user:{}", user_id), ".preferences", &preferences)
             .map_err(|e| format!("{:?}", e))?;
         Ok(())
     }

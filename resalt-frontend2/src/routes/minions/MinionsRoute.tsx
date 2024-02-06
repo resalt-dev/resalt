@@ -248,11 +248,9 @@ export default function MinionsRoute(props: { toastController: ToastController }
 		}
 
 		if (selectedPreset === id) {
-			console.log('Unselecting preset');
 			// Unselect the item
 			setSelectedPreset(null);
 		} else {
-			console.log('Selecting preset', id);
 			setSelectedPreset(id);
 		}
 	}
@@ -358,7 +356,6 @@ export default function MinionsRoute(props: { toastController: ToastController }
 		const abort = new AbortController();
 		getMinions(filters, sort, limit, offset, abort.signal)
 			.then((v) => {
-				console.log('Got minions', v);
 				setMinions(v);
 			})
 			.catch((err: Error) => {
@@ -370,8 +367,6 @@ export default function MinionsRoute(props: { toastController: ToastController }
 	}, [minionsLastRequested, filters, toastController]);
 
 	function resyncMinion(minionId: string) {
-		console.log('Resyncing minion', minionId);
-
 		const startUISync = () =>
 			setSyncingMinions((syncingMinions) => {
 				const copy = new Set(syncingMinions);

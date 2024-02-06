@@ -74,6 +74,10 @@ async fn start_server(
         .route("/users/:user_id", delete(route_user_delete))
         .route("/users/:user_id/password", post(route_user_password_post))
         .route(
+            "/users/:user_id/preferences",
+            post(route_user_preferences_post),
+        )
+        .route(
             "/users/:user_id/permissions/:group_id",
             post(route_user_permissions_post),
         )

@@ -5,6 +5,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import ResaltSidebar from '../layout/ResaltSidebar';
 import '../lib/fluentui.css';
 import { paths } from '../lib/paths';
+import { ToastController } from '../lib/toast';
 import User from '../models/User';
 import ResaltHeader from './header/ResaltHeader';
 
@@ -44,7 +45,9 @@ const useStyles = makeStyles({
 export default function RootLayout(props: {
 	currentUser: User | null;
 	setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
+	toastController: ToastController;
 }) {
+	const { currentUser, setCurrentUser, toastController } = props;
 	const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 	const styles = useStyles();
 	const location = useLocation();
@@ -53,10 +56,11 @@ export default function RootLayout(props: {
 	return (
 		<div className={styles.rootLayout}>
 			<ResaltHeader
-				currentUser={props.currentUser}
-				setCurrentUser={props.setCurrentUser}
+				currentUser={currentUser}
+				setCurrentUser={setCurrentUser}
 				sidebarCollapsed={sidebarCollapsed}
 				setSidebarCollapsed={setSidebarCollapsed}
+				toastController={toastController}
 			/>
 			<div
 				className={mergeClasses(

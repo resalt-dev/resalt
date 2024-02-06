@@ -19,6 +19,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import ResaltLogo from '../../components/ResaltLogo.tsx';
 import { getCurrentUser } from '../../lib/api.ts';
 import { paths } from '../../lib/paths.ts';
+import { ToastController } from '../../lib/toast.tsx';
 import User from '../../models/User.ts';
 import ResaltHeaderSearch from './ResaltHeaderSearch.tsx';
 import { ResaltHeaderSettings } from './ResaltHeaderSettings.tsx';
@@ -142,8 +143,10 @@ export default function ResaltHeader(props: {
 	setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
 	sidebarCollapsed: boolean;
 	setSidebarCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
+	toastController: ToastController;
 }) {
-	const { currentUser, setCurrentUser, sidebarCollapsed, setSidebarCollapsed } = props;
+	const { currentUser, setCurrentUser, sidebarCollapsed, setSidebarCollapsed, toastController } =
+		props;
 
 	// Navigation
 	const location = useLocation();
@@ -235,7 +238,11 @@ export default function ResaltHeader(props: {
 					onClick={() => console.log('header:icon:notif')}
 					className={styles.headerButton}
 				/>
-				<ResaltHeaderSettings currentUser={currentUser}>
+				<ResaltHeaderSettings
+					currentUser={currentUser}
+					setCurrentUser={setCurrentUser}
+					toastController={toastController}
+				>
 					<Button
 						appearance="transparent"
 						shape="square"
