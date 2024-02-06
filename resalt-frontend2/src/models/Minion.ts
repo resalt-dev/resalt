@@ -52,11 +52,11 @@ export default class Minion {
 
 	conformity: string | null;
 
-	conformitySuccess: number;
+	conformitySuccess: number | null;
 
-	conformityIncorrect: number;
+	conformityIncorrect: number | null;
 
-	conformityError: number;
+	conformityError: number | null;
 
 	lastUpdatedConformity: string | null;
 
@@ -72,9 +72,9 @@ export default class Minion {
 		lastUpdatedPillars: string | null = null,
 		lastUpdatedPkgs: string | null = null,
 		conformity: string | null = null,
-		conformitySuccess = 0,
-		conformityIncorrect = 0,
-		conformityError = 0,
+		conformitySuccess: number | null = null,
+		conformityIncorrect: number | null = null,
+		conformityError: number | null = null,
 		lastUpdatedConformity: string | null = null,
 		osType: string | null = null,
 	) {

@@ -17,6 +17,8 @@ import {
 	PeopleTeamRegular,
 	PersonKeyFilled,
 	PersonKeyRegular,
+	ReceiptPlayFilled,
+	ReceiptPlayRegular,
 	ServerFilled,
 	ServerRegular,
 	SignOutFilled,
@@ -33,6 +35,7 @@ import {
 } from '@fluentui/react-icons';
 import { PathParam, generatePath } from 'react-router-dom';
 import DashboardRoute from '../routes/dashboard/DashboardRoute';
+import DeployRoute from '../routes/deploy/DeployRoute';
 import EventRoute from '../routes/events/:eventId/EventRoute';
 import EventsRoute from '../routes/events/EventsRoute';
 import GrainsRoute from '../routes/grains/GrainsRoute';
@@ -47,6 +50,7 @@ import MinionConformityRoute from '../routes/minions/:minionId/conformity/Minion
 import MinionGrainsRoute from '../routes/minions/:minionId/grains/MinionGrainsRoute';
 import MinionPackagesRoute from '../routes/minions/:minionId/packages/MinionPackagesRoute';
 import MinionPillarsRoute from '../routes/minions/:minionId/pillars/MinionPillarsRoute';
+import MinionTerminalRoute from '../routes/minions/:minionId/terminal/MinionTerminalRoute';
 import MinionsRoute from '../routes/minions/MinionsRoute';
 import PackagesRoute from '../routes/packages/PackagesRoute';
 import PermissionsRoute from '../routes/permissions/PermissionsRoute';
@@ -88,6 +92,7 @@ const GrainsIcon = bundleIcon(BookInformationFilled, BookInformationRegular);
 const ConformityIcon = bundleIcon(TaskListSquareRtlFilled, TaskListSquareRtlRegular);
 const PillarsIcon = bundleIcon(VaultFilled, VaultRegular);
 const PackagesIcon = bundleIcon(AppsFilled, AppsRegular);
+const DeployIcon = bundleIcon(ReceiptPlayFilled, ReceiptPlayRegular);
 const TerminalIcon = bundleIcon(WindowPlayFilled, WindowPlayRegular);
 const JobsIcon = bundleIcon(TasksAppFilled, TasksAppRegular);
 const EventsIcon = bundleIcon(ListFilled, ListRegular);
@@ -125,15 +130,16 @@ export const paths = {
 		MinionPackagesRoute,
 		PackagesIcon,
 	),
+	minion_terminal: new Path<{ minionId: string }>(
+		'/minions/:minionId/terminal',
+		'Terminal',
+		MinionTerminalRoute,
+		TerminalIcon,
+	),
 	grains: new Path<{}>('/grains', 'Grains', GrainsRoute, GrainsIcon),
 	pillars: new Path<{}>('/pillars', 'Pillars', PillarsRoute, PillarsIcon),
 	packages: new Path<{}>('/packages', 'Packages', PackagesRoute, PackagesIcon),
-	terminal: new Path<{ minionId?: string }>(
-		'/terminal/:minionId?',
-		'Terminal',
-		TerminalIcon,
-		TerminalIcon,
-	),
+	deploy: new Path<{}>('/deploy', 'Deploy', DeployRoute, DeployIcon),
 	jobs: new Path<{}>('/jobs', 'Jobs', JobsRoute, JobsIcon),
 	job: new Path<{ jobId: string }>('/jobs/:jobId', 'Job', JobRoute, JobsIcon),
 	events: new Path<{}>('/events', 'Events', EventsRoute, EventsIcon),
@@ -150,7 +156,7 @@ export const sidebar: { title: string; shortTitle: string; items: Path[] }[] = [
 	{
 		title: 'Minions',
 		shortTitle: 'Min',
-		items: [paths.minions, paths.grains, paths.pillars, paths.packages],
+		items: [paths.minions, paths.grains, paths.pillars, paths.packages, paths.deploy],
 	},
 	{
 		title: 'Monitoring',

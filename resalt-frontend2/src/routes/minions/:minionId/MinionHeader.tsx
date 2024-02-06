@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { paths } from '../../../lib/paths';
 import { useGlobalStyles } from '../../../lib/ui';
 
-export type MinionTab = '' | 'grains' | 'conformity' | 'pillars' | 'packages';
+export type MinionTab = '' | 'grains' | 'conformity' | 'pillars' | 'packages' | 'terminal';
 export default function MinionHeader(props: { tab: MinionTab; minionId: string; error?: Error }) {
 	const { tab, minionId, error } = props;
 	const globalStyles = useGlobalStyles();
@@ -40,6 +40,9 @@ export default function MinionHeader(props: { tab: MinionTab; minionId: string; 
 						</Link>
 						<Link to={paths.minion_packages.getPath({ minionId })}>
 							<Tab value="packages">Packages</Tab>
+						</Link>
+						<Link to={paths.minion_terminal.getPath({ minionId })}>
+							<Tab value="terminal">Terminal</Tab>
 						</Link>
 					</TabList>
 				</div>

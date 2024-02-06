@@ -23,6 +23,7 @@ import {
 	TableCellLayout,
 	TableColumnDefinition,
 	TableColumnId,
+	TableColumnSizingOptions,
 	TableHeader,
 	TableHeaderCell,
 	TableRow,
@@ -30,6 +31,7 @@ import {
 	ToolbarButton,
 	Tooltip,
 	createTableColumn,
+	useTableColumnSizing_unstable,
 	useTableFeatures,
 	useTableSort,
 } from '@fluentui/react-components';
@@ -51,7 +53,7 @@ import {
 	SwipeDownRegular,
 	bundleIcon,
 } from '@fluentui/react-icons';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
 	createMinionPreset,
@@ -107,18 +109,92 @@ const presetColumns: TableColumnDefinition<MinionPreset>[] = [
 		},
 	}),
 ];
+
 const minionColumns: TableColumnDefinition<Minion>[] = [
 	createTableColumn<Minion>({
+		columnId: 'view',
+		compare: () => 0,
+		renderHeaderCell: () => '',
+		renderCell: (item) => (
+			<Link
+				to={paths.minion.getPath({
+					minionId: item.id,
+				})}
+			>
+				<Tooltip content="Open Minion" relationship="label">
+					<Button icon={<OpenIcon />} />
+				</Tooltip>
+			</Link>
+		),
+	}),
+	createTableColumn<Minion>({
 		columnId: 'id',
-		compare: (a, b) => {
-			return a.id.localeCompare(b.id);
-		},
-		renderHeaderCell: () => {
-			return 'ID';
-		},
-		renderCell: (item) => {
-			return <TableCellLayout>{item.id}</TableCellLayout>;
-		},
+		compare: (a, b) => a.id.localeCompare(b.id),
+		renderHeaderCell: () => 'ID',
+		renderCell: (item) => <TableCellLayout appearance="primary">{item.id}</TableCellLayout>,
+	}),
+	createTableColumn<Minion>({
+		columnId: 'osType',
+		compare: (a, b) => (a.osType ?? '').localeCompare(b.osType ?? ''),
+		renderHeaderCell: () => 'OS',
+		renderCell: (item) => <TableCellLayout>{item.osType ?? 'Unknown'}</TableCellLayout>,
+	}),
+	createTableColumn<Minion>({
+		columnId: 'lastSeen',
+		compare: (a, b) => (a.lastSeen ?? '').localeCompare(b.lastSeen ?? ''),
+		renderHeaderCell: () => 'Last seen',
+		renderCell: (item) => <TableCellLayout>{formatDate(item.lastSeen)}</TableCellLayout>,
+	}),
+	createTableColumn<Minion>({
+		columnId: 'conformitySuccess',
+		compare: (a, b) => (a.conformitySuccess ?? -1) - (b.conformitySuccess ?? -1),
+		renderHeaderCell: () => 'Success',
+		renderCell: (item) => (
+			<Badge
+				color={item.lastUpdatedConformity === null ? 'important' : 'success'}
+				size="large"
+				shape="rounded"
+				style={{ width: '100%' }}
+			>
+				{item.conformitySuccess ?? 'Unknown'}
+			</Badge>
+		),
+	}),
+	createTableColumn<Minion>({
+		columnId: 'conformityIncorrect',
+		compare: (a, b) => (a.conformityIncorrect ?? -1) - (b.conformityIncorrect ?? -1),
+		renderHeaderCell: () => 'Incorrect',
+		renderCell: (item) => (
+			<Badge
+				color={item.lastUpdatedConformity === null ? 'important' : 'warning'}
+				size="large"
+				shape="rounded"
+				style={{ width: '100%' }}
+			>
+				{item.conformityIncorrect ?? 'Unknown'}
+			</Badge>
+		),
+	}),
+	createTableColumn<Minion>({
+		columnId: 'conformityError',
+		compare: (a, b) => (a.conformityError ?? -1) - (b.conformityError ?? -1),
+		renderHeaderCell: () => 'Error',
+		renderCell: (item) => (
+			<Badge
+				color={item.lastUpdatedConformity === null ? 'important' : 'danger'}
+				size="large"
+				shape="rounded"
+				style={{ width: '100%' }}
+			>
+				{item.conformityError ?? 'Unknown'}
+			</Badge>
+		),
+	}),
+	createTableColumn<Minion>({
+		columnId: 'actions',
+		compare: () => 0,
+		renderHeaderCell: () => 'Actions',
+		renderCell: () => null,
 	}),
 ];
 
@@ -135,6 +211,9 @@ export default function MinionsRoute(props: { toastController: ToastController }
 	const [filtersExpanded, setFiltersExpanded] = useState(true);
 	const [filters, setFilters] = useState<Filter[]>([]);
 	const [filtersModified, setFiltersModified] = useState(false);
+	const [sort, setSort] = useState<string | null>('id.desc');
+	const [limit, setLimit] = useState<number | null>(null);
+	const [offset, setOffset] = useState<number | null>(null);
 
 	const globalStyles = useGlobalStyles();
 
@@ -350,9 +429,6 @@ export default function MinionsRoute(props: { toastController: ToastController }
 	//
 
 	useEffect(() => {
-		const sort = null; // TODO
-		const limit = null; // TODO
-		const offset = null; // TODO
 		const abort = new AbortController();
 		getMinions(filters, sort, limit, offset, abort.signal)
 			.then((v) => {
@@ -364,14 +440,12 @@ export default function MinionsRoute(props: { toastController: ToastController }
 		return () => {
 			abort.abort();
 		};
-	}, [minionsLastRequested, filters, toastController]);
+	}, [minionsLastRequested, filters, sort, limit, offset, toastController]);
 
 	function resyncMinion(minionId: string) {
 		const startUISync = () =>
 			setSyncingMinions((syncingMinions) => {
-				const copy = new Set(syncingMinions);
-				copy.add(minionId);
-				return copy;
+				return new Set([...syncingMinions, minionId]);
 			});
 		const stopUISync = () =>
 			setSyncingMinions((syncingMinions) => {
@@ -398,16 +472,36 @@ export default function MinionsRoute(props: { toastController: ToastController }
 		};
 	}
 
+	//
 	// Minions table
+	//
+	const [minionColumnsWithState] = React.useState<TableColumnDefinition<Minion>[]>(minionColumns);
+	const [columnSizingOptions] = React.useState<TableColumnSizingOptions>({
+		view: {
+			idealWidth: 50,
+		},
+		conformitySuccess: {
+			idealWidth: 75,
+		},
+		conformityIncorrect: {
+			idealWidth: 75,
+		},
+		conformityError: {
+			idealWidth: 75,
+		},
+	});
 	const {
 		getRows,
-		sort: { getSortDirection, toggleColumnSort, sort },
+		sort: { getSortDirection, toggleColumnSort, sort: sortTable },
+		columnSizing_unstable,
+		tableRef: minionsTableRef,
 	} = useTableFeatures(
 		{
-			columns: minionColumns,
+			columns: minionColumnsWithState,
 			items: minions === undefined ? emptyMinions : minions ?? [],
 		},
 		[
+			useTableColumnSizing_unstable({ columnSizingOptions }),
 			useTableSort({
 				defaultSortState: { sortColumn: 'id', sortDirection: 'ascending' },
 			}),
@@ -415,11 +509,17 @@ export default function MinionsRoute(props: { toastController: ToastController }
 	);
 	const headerSortProps = (columnId: TableColumnId) => ({
 		onClick: (e: React.MouseEvent) => {
+			if (columnId === 'actions' || columnId === 'view') {
+				return;
+			}
 			toggleColumnSort(e, columnId);
+			const dir = getSortDirection(columnId) === 'ascending' ? 'desc' : 'asc';
+			console.log('Sort:', columnId + '.' + dir);
+			setSort(columnId + '.' + dir);
 		},
 		sortDirection: getSortDirection(columnId),
 	});
-	const rows = sort(getRows());
+	const rows = sortTable(getRows());
 
 	return (
 		<>
@@ -655,23 +755,24 @@ export default function MinionsRoute(props: { toastController: ToastController }
 					<Card>
 						<CardHeader header="Minions" />
 
-						<Table sortable>
+						<Table ref={minionsTableRef}>
 							<TableHeader>
 								<TableRow>
-									<TableHeaderCell style={{ width: '3rem' }}>
-										{/* ViewButton */}
-									</TableHeaderCell>
-									<TableHeaderCell {...headerSortProps('id')}>ID</TableHeaderCell>
-									<TableHeaderCell {...headerSortProps('osType')}>
-										OS
-									</TableHeaderCell>
-									<TableHeaderCell {...headerSortProps('lastUpdated')}>
-										Last seen
-									</TableHeaderCell>
-									<TableHeaderCell {...headerSortProps('conformity')}>
-										Conformity
-									</TableHeaderCell>
-									<TableHeaderCell>{/* Cog */}</TableHeaderCell>
+									{minionColumnsWithState.map((column) => (
+										<TableHeaderCell
+											key={column.columnId}
+											sortable={
+												column.columnId !== 'actions' &&
+												column.columnId !== 'view'
+											}
+											{...columnSizing_unstable.getTableHeaderCellProps(
+												column.columnId,
+											)}
+											{...headerSortProps(column.columnId)}
+										>
+											{column.renderHeaderCell()}
+										</TableHeaderCell>
+									))}
 								</TableRow>
 							</TableHeader>
 							<TableBody>
@@ -696,101 +797,64 @@ export default function MinionsRoute(props: { toastController: ToastController }
 										</tr>
 									) : (
 										<TableRow key={item.id}>
-											<TableCell>
-												<Link
-													to={paths.minion.getPath({
-														minionId: item.id,
-													})}
+											{minionColumnsWithState.map((column) => (
+												<TableCell
+													key={column.columnId}
+													{...columnSizing_unstable.getTableCellProps(
+														column.columnId,
+													)}
 												>
-													<Tooltip
-														content="Open Minion"
-														relationship="label"
-													>
-														<Button icon={<OpenIcon />} />
-													</Tooltip>
-												</Link>
-											</TableCell>
-											<TableCell>{item.id}</TableCell>
-											<TableCell>{item.osType ?? 'Unknown'}</TableCell>
-											<TableCell>{formatDate(item.lastSeen)}</TableCell>
-											<TableCell>
-												{item.lastUpdatedConformity === null ? (
-													<Badge
-														color="important"
-														size="large"
-														shape="rounded"
-													>
-														Unknown
-													</Badge>
-												) : (
-													<>
-														<Badge
-															color="success"
-															size="large"
-															shape="rounded"
-														>
-															{item.conformitySuccess}
-														</Badge>
-														{' / '}
-														<Badge
-															color="warning"
-															size="large"
-															shape="rounded"
-														>
-															{item.conformityIncorrect}
-														</Badge>
-														{' / '}
-														<Badge
-															color="danger"
-															size="large"
-															shape="rounded"
-														>
-															{item.conformityError}
-														</Badge>
-													</>
-												)}
-											</TableCell>
-											<TableCell>
-												{!syncingMinions.has(item.id) ? (
-													<Tooltip
-														content="Resync minion"
-														relationship="label"
-													>
-														<Button
-															appearance="transparent"
-															icon={<ResyncIcon />}
-															onClick={() => {
-																resyncMinion(item.id);
-															}}
-														/>
-													</Tooltip>
-												) : (
-													<Tooltip
-														content="Syncing..."
-														relationship="label"
-													>
-														<Button
-															appearance="transparent"
-															icon={<Spinner size="tiny" />}
-														/>
-													</Tooltip>
-												)}{' '}
-												<Tooltip
-													content="Open in Terminal"
-													relationship="label"
-												>
-													<Link
-														to={paths.terminal.getPath({
-															minionId: item.id,
-														})}
-													>
-														<Button
-															appearance="transparent"
-															icon={<PlayIcon />}
-														/>
-													</Link>
-												</Tooltip>
-											</TableCell>
+													{column.columnId === 'actions' ? (
+														<TableCellLayout>
+															{!syncingMinions.has(item.id) ? (
+																<Tooltip
+																	content="Resync minion"
+																	relationship="label"
+																>
+																	<Button
+																		appearance="transparent"
+																		icon={<ResyncIcon />}
+																		onClick={() => {
+																			resyncMinion(item.id);
+																		}}
+																	/>
+																</Tooltip>
+															) : (
+																<Tooltip
+																	content="Syncing..."
+																	relationship="label"
+																>
+																	<Button
+																		appearance="transparent"
+																		icon={
+																			<Spinner size="tiny" />
+																		}
+																	/>
+																</Tooltip>
+															)}{' '}
+															<Tooltip
+																content="Open in Terminal"
+																relationship="label"
+															>
+																<Link
+																	to={paths.minion_terminal.getPath(
+																		{
+																			minionId: item.id,
+																		},
+																	)}
+																>
+																	<Button
+																		appearance="transparent"
+																		icon={<PlayIcon />}
+																	/>
+																</Link>
+															</Tooltip>
+														</TableCellLayout>
+													) : (
+														column.renderCell(item)
+													)}
+												</TableCell>
+											))}
 										</TableRow>
 									),
 								)}

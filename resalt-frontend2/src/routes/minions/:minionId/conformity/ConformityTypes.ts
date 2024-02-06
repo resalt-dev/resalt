@@ -208,11 +208,11 @@ export function buildConformityTree(conformity: Conformity[]): ConformityTreeNod
 export function conformityMapFluentColor(status: ConformityStatus | ''): string {
 	switch (status) {
 		case 'success':
-			return tokens.colorStatusSuccessBackground3;
+			return 'limegreen';
 		case 'incorrect':
 			return tokens.colorPaletteYellowBackground3;
 		case 'error':
-			return tokens.colorStatusDangerBackground3;
+			return 'red';
 		default:
 			return tokens.colorPalettePurpleBorderActive;
 	}
