@@ -487,3 +487,8 @@ img {
 .mouse-pointer {
 	cursor: pointer;
 }
+.no-select {
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
+}

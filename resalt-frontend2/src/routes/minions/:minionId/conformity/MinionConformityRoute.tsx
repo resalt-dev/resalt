@@ -6,7 +6,6 @@ import {
 	Radio,
 	RadioGroup,
 	SkeletonItem,
-	tokens,
 } from '@fluentui/react-components';
 import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
@@ -15,7 +14,15 @@ import { getMinionById } from '../../../../lib/api';
 import { ToastController } from '../../../../lib/toast';
 import Minion from '../../../../models/Minion';
 import MinionHeader from '../MinionHeader';
-import { Conformity, ConformitySortOrder, parseConformity } from './ConformityTypes';
+import {
+	Conformity,
+	ConformitySortOrder,
+	ConformityTreeNode,
+	buildConformityTree,
+	conformityMapFluentColor,
+	parseConformity,
+} from './ConformityTypes';
+import { MinionConformityTree } from './MinionConformityTree';
 
 // Recursive function to render conformity changes
 // for example output:
@@ -48,6 +55,7 @@ export default function MinionConformityRoute(props: { toastController: ToastCon
 	const [loadingError, setLoadingError] = useState<Error | undefined>(undefined);
 	const [minion, setMinion] = useState<Minion | null>(null);
 	const [conformity, setConformity] = useState<Conformity[]>([]);
+	const [conformityTree, setConformityTree] = useState<ConformityTreeNode | undefined>(undefined);
 	const [sortOrder, setSortOrder] = useState<ConformitySortOrder>(
 		Object.values(ConformitySortOrder).includes(searchParams.get('sort') as ConformitySortOrder)
 			? (searchParams.get('sort') as ConformitySortOrder)
@@ -64,6 +72,8 @@ export default function MinionConformityRoute(props: { toastController: ToastCon
 	const [filterNamespace, setFilterNamespace] = useState<string>(
 		searchParams.get('namespace') || '',
 	);
+	const [collapsedTreeList, setCollapsedTreeList] = useState<string[]>([]);
+	const [collapsedItemList, setCollapsedItemList] = useState<string[]>([]);
 
 	const minionId = useParams().minionId!;
 
@@ -104,7 +114,6 @@ export default function MinionConformityRoute(props: { toastController: ToastCon
 		getMinionById(minionId, abort.signal)
 			.then((minion: Minion) => {
 				setMinion(minion);
-				setConformity(parseConformity(minion?.conformity, sortOrder));
 			})
 			.catch((err: Error) => {
 				setLoadingError(err);
@@ -115,11 +124,23 @@ export default function MinionConformityRoute(props: { toastController: ToastCon
 		};
 	}, [minionId, toastController]);
 
+	//
+	// Conformity
+	//
+
+	useEffect(() => {
+		if (!minion) return;
+		// Parse conformity
+		const parsedConformity = parseConformity(minion?.conformity, sortOrder);
+		setConformity(parsedConformity);
+		setConformityTree(buildConformityTree(parsedConformity));
+	}, [minion, sortOrder]);
+
 	return (
 		<>
 			<MinionHeader tab="conformity" minionId={minionId!} error={loadingError} />
 			<div className="fl-grid">
-				<div className="fl-span-3">
+				<div className="fl-span-3 no-select">
 					<Card>
 						<CardHeader header="Options" />
 						<div>
@@ -185,77 +206,111 @@ export default function MinionConformityRoute(props: { toastController: ToastCon
 					<br />
 					<Card>
 						<CardHeader header="States" />
-						Options box
+						{!conformityTree ? (
+							<SkeletonItem />
+						) : (
+							<MinionConformityTree
+								node={conformityTree}
+								depth={0}
+								filterNamespace={filterNamespace}
+								setFilterNamespace={setFilterNamespace}
+								collapsedList={collapsedTreeList}
+								setCollapsedList={setCollapsedTreeList}
+							/>
+						)}
 					</Card>
 				</div>
 				<div className="fl-span-9">
 					{!minion ? (
 						<SkeletonItem />
 					) : (
-						conformity.map((c) => {
-							console.log(c);
-							const color =
-								c.status === 'success'
-									? tokens.colorStatusSuccessBackground3
-									: c.status === 'incorrect'
-										? tokens.colorPaletteYellowBackground3
-										: c.status === 'error'
-											? tokens.colorStatusDangerBackground3
-											: tokens.colorPalettePurpleBorderActive;
-							const pad = 15;
-							const title = c.data.__sls__ + ' // ' + c.data.__id__;
-							return (
-								<TerminalCard
-									key={c.title}
-									title={title}
-									style={{ borderLeft: `5px solid ${color}`, rowGap: '0' }}
-								>
-									<div
-										style={{
-											color: color,
-											lineHeight: '1.5',
-											lineHeightStep: '0',
+						conformity
+							.filter((c) => c.data.__sls__.startsWith(filterNamespace))
+							.filter((c) => {
+								if (showSuccess && c.data.result === true) return true;
+								if (showIncorrect && c.data.result === null) return true;
+								if (showError && c.data.result === false) return true;
+								return false;
+							})
+							.filter((c) => {
+								if (showCollapsed) {
+									return true;
+								}
+								return !collapsedItemList.includes(c.title);
+							})
+							.map((c) => {
+								const color = conformityMapFluentColor(c.status);
+								const pad = 15;
+								const prettyTitle = c.data.__sls__ + ' : ' + c.data.__id__;
+								return (
+									<TerminalCard
+										key={c.title}
+										title={prettyTitle}
+										subtitle={'# ' + c.data.__run_num__}
+										style={{ borderLeft: `5px solid ${color}`, rowGap: '0' }}
+										collapsed={collapsedItemList.includes(c.title)}
+										toggleCollapsed={() => {
+											if (collapsedItemList.includes(c.title)) {
+												setCollapsedItemList(
+													collapsedItemList.filter((i) => i !== c.title),
+												);
+											} else {
+												setCollapsedItemList([
+													...collapsedItemList,
+													c.title,
+												]);
+											}
 										}}
 									>
-										<pre>
-											{'ID: '.padStart(pad)}
-											{c.data.__id__}
-											<br />
-											{'Function: '.padStart(pad)}
-											{c.fun}
-											<br />
-											{'Name: '.padStart(pad)}
-											{c.data.name}
-											<br />
-											{'Result: '.padStart(pad)}
-											{c.data.result == true
-												? 'True'
-												: c.data.result == false
-													? 'False'
-													: 'None'}
-											<br />
-											{'Comment: '.padStart(pad)}
-											{c.data.comment
-												.split('\n')
-												.map((line: string) => {
-													return line + '\n' + ' '.repeat(pad);
-												})
-												.join('')
-												.trim()}
-											<br />
-											{'Started: '.padStart(pad)}
-											{c.data.start_time}
-											<br />
-											{'Duration: '.padStart(pad)}
-											{c.data.duration}
-											<br />
-											{'Changes: '.padStart(pad)}
-											{MinionConformityChanges(c.data.changes, pad).trim()}
-										</pre>
-									</div>
-								</TerminalCard>
-							);
-						})
+										<div
+											style={{
+												color: color,
+												lineHeight: '1.5',
+												lineHeightStep: '0',
+											}}
+										>
+											<pre>
+												{'ID: '.padStart(pad)}
+												{c.data.__id__}
+												<br />
+												{'Function: '.padStart(pad)}
+												{c.fun}
+												<br />
+												{'Name: '.padStart(pad)}
+												{c.data.name}
+												<br />
+												{'Result: '.padStart(pad)}
+												{c.data.result == true
+													? 'True'
+													: c.data.result == false
+														? 'False'
+														: 'None'}
+												<br />
+												{'Comment: '.padStart(pad)}
+												{c.data.comment
+													.split('\n')
+													.map((line: string) => {
+														return line + '\n' + ' '.repeat(pad);
+													})
+													.join('')
+													.trim()}
+												<br />
+												{'Started: '.padStart(pad)}
+												{c.data.start_time}
+												<br />
+												{'Duration: '.padStart(pad)}
+												{c.data.duration}
+												<br />
+												{'Changes: '.padStart(pad)}
+												{MinionConformityChanges(
+													c.data.changes,
+													pad,
+												).trim()}
+											</pre>
+										</div>
+									</TerminalCard>
+								);
+							})
 					)}
 				</div>
 			</div>

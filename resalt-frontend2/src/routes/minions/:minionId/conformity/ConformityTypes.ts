@@ -1,3 +1,5 @@
+import { tokens } from '@fluentui/tokens';
+
 export enum ConformitySortOrder {
 	Incremental = 'inc',
 	Decremental = 'dec',
@@ -60,10 +62,11 @@ export function parseConformityData(data: unknown): ConformityData | null {
 	};
 }
 
+type ConformityStatus = 'success' | 'incorrect' | 'error';
 export type Conformity = {
 	title: string;
 	fun: string;
-	status: 'success' | 'incorrect' | 'error';
+	status: ConformityStatus;
 	data: ConformityData;
 };
 
@@ -133,8 +136,84 @@ export function parseConformity(
 
 export type ConformityTreeNode = {
 	name: string;
-	color: string;
+	status: ConformityStatus | '';
 	parent: ConformityTreeNode | null;
 	subtree: ConformityTreeNode[];
 	items: Conformity[];
 };
+
+// Reduce above Conformity states to a tree of SLS files
+// - a (1)
+//   - aa (1)
+//   - ab (1)
+// - common
+//   - init
+//     - test (2)
+// - editor (1)
+//   - vim (7)
+function sortSubtreeRecursively(subtree: ConformityTreeNode[]) {
+	subtree.sort((a, b) => a.name.localeCompare(b.name));
+	subtree.forEach((node) => {
+		sortSubtreeRecursively(node.subtree);
+	});
+}
+
+export function buildConformityTree(conformity: Conformity[]): ConformityTreeNode {
+	let conformityTree = conformity.reduce(
+		(acc, c) => {
+			let parts = c.data.__sls__.split('.');
+			let current = acc;
+			for (let i = 0; i < parts.length; i++) {
+				let part = parts[i];
+				let existing = current.subtree.find((e) => e.name === part);
+				if (!existing) {
+					existing = {
+						name: part,
+						status: '',
+						parent: current,
+						subtree: [],
+						items: [],
+					};
+					current.subtree.push(existing);
+				}
+				current = existing;
+			}
+			current.items.push(c);
+			// Set min status for chain going up
+			let parent: ConformityTreeNode | null = current;
+			while (parent !== null) {
+				if (c.status === 'error') {
+					parent.status = 'error';
+				} else if (c.status === 'incorrect' && parent.status !== 'error') {
+					parent.status = 'incorrect';
+				} else if (c.status === 'success' && parent.status === '') {
+					parent.status = 'success';
+				}
+				parent = parent.parent;
+			}
+			return acc;
+		},
+		{
+			name: '#',
+			status: '',
+			parent: null,
+			subtree: [],
+			items: [],
+		} as ConformityTreeNode,
+	);
+	sortSubtreeRecursively(conformityTree.subtree);
+	return conformityTree;
+}
+
+export function conformityMapFluentColor(status: ConformityStatus | ''): string {
+	switch (status) {
+		case 'success':
+			return tokens.colorStatusSuccessBackground3;
+		case 'incorrect':
+			return tokens.colorPaletteYellowBackground3;
+		case 'error':
+			return tokens.colorStatusDangerBackground3;
+		default:
+			return tokens.colorPalettePurpleBorderActive;
+	}
+}
