@@ -1,6 +1,6 @@
 use crate::{
     AuthToken, Event, Filter, Job, JobReturn, JobSort, Minion, MinionPreset, MinionSort, Paginate,
-    PermissionGroup, ResaltTime, SaltToken, User, UserPreferences,
+    PermissionGroup, Preferences, ResaltTime, SaltToken, User,
 };
 
 pub trait StorageImpl: Send + Sync {
@@ -9,6 +9,18 @@ pub trait StorageImpl: Send + Sync {
     fn clone_self(&self) -> Box<dyn StorageImpl> {
         self.clone()
     }
+
+    // Extremely generic KV operations
+
+    // fn get(&self, key: &str) -> Result<Option<String>, String>;
+
+    // fn set(&self, key: &str, value: &str) -> Result<(), String>;
+
+    // fn delete(&self, key: &str) -> Result<(), String>;
+
+    // fn list(&self, prefix: &str) -> Result<Vec<String>, String>;
+
+    // fn list_prefix(&self, prefix: &str) -> Result<Vec<String>, String>;
 
     fn get_status(&self) -> Result<StorageStatus, String>;
 
@@ -30,7 +42,6 @@ pub trait StorageImpl: Send + Sync {
         perms: String,
         last_login: Option<ResaltTime>,
         email: Option<String>,
-        preferences: UserPreferences,
     ) -> Result<User, String>;
 
     fn list_users(&self, paginate: Paginate) -> Result<Vec<User>, String>;
@@ -41,13 +52,11 @@ pub trait StorageImpl: Send + Sync {
 
     fn update_user(&self, user: &User) -> Result<(), String>;
 
-    fn update_user_preferences(
-        &self,
-        user_id: &str,
-        preferences: &UserPreferences,
-    ) -> Result<(), String>;
-
     fn delete_user(&self, id: &str) -> Result<(), String>;
+
+    fn upsert_preferences(&self, user_id: &str, preferences: &Preferences) -> Result<(), String>;
+
+    fn get_preferences(&self, user_id: &str) -> Result<Option<Preferences>, String>;
 
     /// Create a new auth token.
     ///
@@ -228,9 +237,6 @@ pub fn test_storage_impl_users(data: &dyn StorageImpl) {
             "testperms".to_string(),
             None,
             None,
-            UserPreferences {
-                theme: "testtheme".to_string(),
-            },
         )
         .unwrap();
     assert!(user.id.starts_with("usr_"));
@@ -291,9 +297,6 @@ pub fn test_storage_impl_authtoken(data: &dyn StorageImpl) {
             "testperms".to_string(),
             None,
             None,
-            UserPreferences {
-                theme: "testtheme".to_string(),
-            },
         )
         .unwrap();
     data.update_user(&user).unwrap();

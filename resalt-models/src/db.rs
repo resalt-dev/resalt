@@ -128,16 +128,16 @@ impl Minion {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct UserPreferences {
+pub struct Preferences {
     pub theme: String,
 }
-impl UserPreferences {
+impl Preferences {
     pub fn validate(&self) -> bool {
         self.theme.len() <= 32
     }
 }
 
-impl Default for UserPreferences {
+impl Default for Preferences {
     fn default() -> Self {
         Self {
             theme: "light".to_string(),
@@ -154,8 +154,6 @@ pub struct User {
     #[serde(rename = "lastLogin")]
     pub last_login: Option<ResaltTime>,
     pub email: Option<String>,
-    #[serde(default)]
-    pub preferences: UserPreferences,
 }
 
 impl Default for User {
@@ -167,13 +165,16 @@ impl Default for User {
             perms: "".to_string(),
             last_login: None,
             email: None,
-            preferences: UserPreferences::default(),
         }
     }
 }
 
 impl User {
-    pub fn public(&self, permission_groups: Vec<PermissionGroup>) -> Value {
+    pub fn public(
+        &self,
+        permission_groups: Vec<PermissionGroup>,
+        preferences: Preferences,
+    ) -> Value {
         let mut result: Value = serde_json::value::to_value(self).unwrap();
         // Remove password
         result.as_object_mut().unwrap().remove("password");
@@ -191,6 +192,12 @@ impl User {
         result.as_object_mut().unwrap().insert(
             "permissionGroups".to_owned(),
             serde_json::Value::Array(permission_groups_json),
+        );
+
+        // Add preferences
+        result.as_object_mut().unwrap().insert(
+            "preferences".to_owned(),
+            serde_json::to_value(&preferences).unwrap(),
         );
 
         // Convert "perms" to array

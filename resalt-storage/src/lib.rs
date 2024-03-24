@@ -145,17 +145,9 @@ impl StorageImpl for Storage {
         perms: String,
         last_login: Option<ResaltTime>,
         email: Option<String>,
-        preferences: UserPreferences,
     ) -> Result<User, String> {
-        self.storage.create_user_hashed(
-            id,
-            username,
-            password,
-            perms,
-            last_login,
-            email,
-            preferences,
-        )
+        self.storage
+            .create_user_hashed(id, username, password, perms, last_login, email)
     }
 
     fn list_users(&self, paginate: Paginate) -> Result<Vec<User>, String> {
@@ -174,12 +166,12 @@ impl StorageImpl for Storage {
         self.storage.update_user(user)
     }
 
-    fn update_user_preferences(
-        &self,
-        user_id: &str,
-        preferences: &UserPreferences,
-    ) -> Result<(), String> {
-        self.storage.update_user_preferences(user_id, preferences)
+    fn upsert_preferences(&self, user_id: &str, preferences: &Preferences) -> Result<(), String> {
+        self.storage.upsert_preferences(user_id, preferences)
+    }
+
+    fn get_preferences(&self, user_id: &str) -> Result<Option<Preferences>, String> {
+        self.storage.get_preferences(user_id)
     }
 
     fn delete_user(&self, id: &str) -> Result<(), String> {

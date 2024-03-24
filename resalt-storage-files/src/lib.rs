@@ -187,7 +187,6 @@ impl StorageImpl for StorageFiles {
         perms: String,
         last_login: Option<ResaltTime>,
         email: Option<String>,
-        preferences: UserPreferences,
     ) -> Result<User, String> {
         let id = id.unwrap_or(format!("usr_{}", uuid::Uuid::new_v4()));
         let user = User {
@@ -197,7 +196,6 @@ impl StorageImpl for StorageFiles {
             perms,
             last_login,
             email: email.clone(),
-            preferences: preferences.clone(),
         };
 
         let path = format!("users/{}", id);
@@ -269,25 +267,31 @@ impl StorageImpl for StorageFiles {
         Ok(())
     }
 
-    fn update_user_preferences(
-        &self,
-        user_id: &str,
-        preferences: &UserPreferences,
-    ) -> Result<(), String> {
-        let mut user = match self.get_user_by_id(user_id)? {
-            Some(user) => user,
-            None => return Err("User does not exist".to_string()),
-        };
-        user.preferences = preferences.to_owned();
-        let path = format!("users/{}", user_id);
-        self.save_file(&path, &user)?;
-        Ok(())
-    }
-
     fn delete_user(&self, id: &str) -> Result<(), String> {
         let path = format!("users/{}", id);
         self.delete_file(&path)?;
         Ok(())
+    }
+
+    ////////////////////////
+    /// User Preferences ///
+    ////////////////////////
+
+    fn upsert_preferences(&self, user_id: &str, preferences: &Preferences) -> Result<(), String> {
+        let path = format!("users_preferences/{}", user_id);
+        self.save_file(&path, preferences)?;
+        Ok(())
+    }
+
+    fn get_preferences(&self, user_id: &str) -> Result<Option<Preferences>, String> {
+        let path = format!("users_preferences/{}", user_id);
+        let exists = self.check_file_exists(&path)?;
+        if !exists {
+            return Ok(None);
+        }
+
+        let preferences: Preferences = self.load_file(&path)?;
+        Ok(Some(preferences))
     }
 
     ///////////////////

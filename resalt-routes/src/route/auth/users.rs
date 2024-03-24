@@ -12,11 +12,11 @@ use resalt_api::{
         is_user_member_of_group, remove_user_from_group,
     },
     user::{
-        create_user, delete_user, get_user_by_id, get_user_by_username, get_users, update_user,
-        update_user_preferences,
+        create_user, delete_user, get_preferences, get_user_by_id, get_user_by_username, get_users,
+        update_preferences, update_user,
     },
 };
-use resalt_models::{AuthStatus, Paginate, PaginateQuery, UserPreferences};
+use resalt_models::{AuthStatus, Paginate, PaginateQuery, Preferences};
 use resalt_security::hash_password;
 use resalt_storage::Storage;
 use serde::Deserialize;
@@ -41,7 +41,10 @@ pub async fn route_users_get(
     // Map to "public" - for among other things - remove password
     let mut results: Vec<Value> = Vec::new();
     for user in users {
-        results.push(user.public(get_permission_groups_by_user_id(&data, &user.id)?));
+        results.push(user.public(
+            get_permission_groups_by_user_id(&data, &user.id)?,
+            get_preferences(&data, &user.id)?.unwrap_or_default(),
+        ));
     }
 
     Ok(Json(results))
@@ -72,7 +75,10 @@ pub async fn route_users_post(
     let user = create_user(&data, input.username.clone(), None, input.email.clone())?;
 
     // Map to "public" - for among other things - remove password
-    let user = user.public(get_permission_groups_by_user_id(&data, &user.id)?);
+    let user = user.public(
+        get_permission_groups_by_user_id(&data, &user.id)?,
+        get_preferences(&data, &user.id)?.unwrap_or_default(),
+    );
 
     Ok(Json(user))
 }
@@ -94,7 +100,10 @@ pub async fn route_user_get(
     };
 
     // Map to "public" - for among other things - remove password
-    let user = user.public(get_permission_groups_by_user_id(&data, &user.id)?);
+    let user = user.public(
+        get_permission_groups_by_user_id(&data, &user.id)?,
+        get_preferences(&data, &user.id)?.unwrap_or_default(),
+    );
 
     Ok(Json(user))
 }
@@ -168,7 +177,7 @@ pub async fn route_user_preferences_post(
     Path(user_id): Path<String>,
     State(data): State<Storage>,
     Extension(auth): Extension<AuthStatus>,
-    Json(preferences): Json<UserPreferences>,
+    Json(preferences): Json<Preferences>,
 ) -> Result<impl IntoResponse, StatusCode> {
     // Validate permission
     if auth.user_id == user_id {
@@ -194,7 +203,7 @@ pub async fn route_user_preferences_post(
     }
 
     // Update preferences
-    update_user_preferences(&data, &user.id, &preferences)?;
+    update_preferences(&data, &user.id, &preferences)?;
 
     Ok(Json(()))
 }
