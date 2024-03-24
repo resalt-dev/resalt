@@ -30,7 +30,7 @@ services:
       replicas: 3
 
   # frontend:
-  #   image: oven/bun:1.0.17
+  #   image: oven/bun:1.0.35
   #   volumes:
   #     - ./resalt-frontend/.svelte-kit/tsconfig.json:/home/bun/app/.svelte-kit/tsconfig.json
   #     - ./resalt-frontend/src:/home/bun/app/src
@@ -44,7 +44,7 @@ services:
   #   ports:
   #     - "5555:5555"
   frontend:
-    image: docker.io/oven/bun:1.0.21
+    image: docker.io/oven/bun:1.0.35
     volumes:
       - ./resalt-frontend2/public:/home/bun/app/public
       - ./resalt-frontend2/src:/home/bun/app/src
