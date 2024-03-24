@@ -16,6 +16,7 @@ import {
 	typographyStyles,
 	useId,
 } from '@fluentui/react-components';
+import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import loginBackground from '../../assets/images/login-background.jpg';
 import { login } from '../../lib/api';
@@ -38,6 +39,9 @@ const useStyles = makeStyles({
 });
 
 export default function LoginRoute() {
+	const [username, setUsername] = useState('');
+	const [password, setPassword] = useState('');
+
 	// Navigate
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
@@ -50,8 +54,6 @@ export default function LoginRoute() {
 
 	function loginSubmit(e: React.FormEvent<HTMLFormElement>) {
 		console.log('Login submitted');
-		const username = (document.getElementById(loginUsername) as HTMLInputElement).value;
-		const password = (document.getElementById(loginPassword) as HTMLInputElement).value;
 		const abort = new AbortController();
 		login(username, password, abort.signal)
 			.then(() => {
@@ -84,10 +86,23 @@ export default function LoginRoute() {
 									</div>
 									<div className={styles.loginFieldsArea}>
 										<Label htmlFor={loginUsername}>Username</Label>
-										<Input id={loginUsername} />
+										<Input
+											id={loginUsername}
+											onChange={(e) => {
+												setUsername(e.target.value);
+											}}
+											value={username}
+										/>
 										<br />
 										<Label htmlFor={loginPassword}>Password</Label>
-										<Input id={loginPassword} type="password" />
+										<Input
+											id={loginPassword}
+											onChange={(e) => {
+												setPassword(e.target.value);
+											}}
+											value={password}
+											type="password"
+										/>
 									</div>
 								</DialogContent>
 								<DialogActions>
