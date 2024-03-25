@@ -1,6 +1,6 @@
 use axum::http::StatusCode;
 use log::error;
-use resalt_models::{MinionPreset, StorageImpl};
+use resalt_models::MinionPreset;
 use resalt_storage::Storage;
 
 pub fn create_minion_preset(

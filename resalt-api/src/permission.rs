@@ -1,6 +1,6 @@
 use axum::http::StatusCode;
 use log::error;
-use resalt_models::{Paginate, PermissionGroup, StorageImpl, User};
+use resalt_models::{Paginate, PermissionGroup, User};
 use resalt_storage::Storage;
 
 pub fn get_permission_groups(

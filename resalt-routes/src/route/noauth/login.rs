@@ -5,7 +5,7 @@ use axum::{extract::State, http::StatusCode};
 use log::*;
 use resalt_api::user::create_user;
 use resalt_config::ResaltConfig;
-use resalt_models::{StorageImpl, User};
+use resalt_models::User;
 use resalt_salt::SaltAPI;
 use resalt_storage::Storage;
 use serde::{Deserialize, Serialize};

@@ -8,5 +8,3 @@ publish.workspace = true
 r2d2 = "0.8.10"
 redis = { version = "0.24.0", features = ["r2d2", "keep-alive", "json"], default-features = false }
 resalt-models = { path = "../resalt-models" }
-serde_json = { workspace = true }
-uuid = { workspace = true }

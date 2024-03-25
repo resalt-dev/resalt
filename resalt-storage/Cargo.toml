@@ -12,3 +12,4 @@ resalt-storage-files = { path = "../resalt-storage-files" }
 resalt-storage-redis = { path = "../resalt-storage-redis" }
 serde = { workspace = true }
 serde_json = { workspace = true }
+uuid = { workspace = true }

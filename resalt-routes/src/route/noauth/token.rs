@@ -1,7 +1,6 @@
 use axum::{extract::State, http::StatusCode, response::IntoResponse, Form, Json};
 use log::*;
 use resalt_config::ResaltConfig;
-use resalt_models::StorageImpl;
 use resalt_salt::RESALT_SALT_SYSTEM_SERVICE_USERNAME;
 use resalt_storage::Storage;
 use serde::Deserialize;

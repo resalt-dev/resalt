@@ -1,25 +1,40 @@
 use axum::{extract::State, http::StatusCode, response::IntoResponse};
-use log::*;
 use resalt_config::ResaltConfig;
-use resalt_models::{StorageImpl, StorageStatus};
+use resalt_models::StorageStatus;
 use resalt_salt::SaltEventListenerStatus;
 use resalt_storage::Storage;
 
 pub async fn route_metrics_get(
     State(listener_status): State<SaltEventListenerStatus>,
-    State(data): State<Storage>,
+    State(_data): State<Storage>,
 ) -> Result<impl IntoResponse, StatusCode> {
     if !*ResaltConfig::METRICS_ENABLED {
         return Err(StatusCode::NOT_FOUND);
     }
 
-    let db_status: Option<StorageStatus> = match data.get_status() {
-        Ok(s) => Some(s),
-        Err(e) => {
-            error!("Error getting database status: {}", e);
-            None
-        }
-    };
+    // let db_status: Option<StorageStatus> = match data.get_status() {
+    //     Ok(s) => Some(s),
+    //     Err(e) => {
+    //         error!("Error getting database status: {}", e);
+    //         None
+    //     }
+    // };
+    // TODO: actually impl route_metrics_get integ into db
+    let db_status = Some(StorageStatus {
+        auth_tokens_total: -1,
+        auth_tokens_active: -1,
+        events_total: -1,
+        job_returns_total: -1,
+        jobs_total: -1,
+        minions_total: -1,
+        minions_success: -1,
+        minions_incorrect: -1,
+        minions_error: -1,
+        minions_unknown: -1,
+        permission_group_users_total: -1,
+        permission_groups_total: -1,
+        users_total: -1,
+    });
 
     let salt: bool;
     {

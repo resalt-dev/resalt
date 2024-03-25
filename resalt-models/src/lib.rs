@@ -13,7 +13,7 @@ pub use filter::*;
 pub use salt::*;
 pub use sort::*;
 pub use status::*;
-pub use storage::{StorageImpl, StorageStatus};
+pub use storage::*;
 pub use time::*;
 
 use serde::{Deserialize, Deserializer};

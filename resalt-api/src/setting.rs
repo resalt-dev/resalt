@@ -28,7 +28,7 @@ pub fn import_backup(data: &Storage, config: &DataDump) -> Result<(), StatusCode
             }
         };
         if user_exists {
-            match data.update_user(user) {
+            match data.set_user(user) {
                 Ok(_) => {}
                 Err(e) => {
                     error!("route_settings_import_post update_user {:?}", e);
@@ -110,7 +110,7 @@ pub fn import_backup(data: &Storage, config: &DataDump) -> Result<(), StatusCode
 
     // Import minions
     for minion in &config.minions {
-        match data.upsert_minion(minion.clone()) {
+        match data.set_minion(minion.clone()) {
             Ok(_) => {}
             Err(e) => {
                 error!("route_settings_import_post update_minion {:?}", e);

@@ -1,6 +1,6 @@
 use axum::http::StatusCode;
 use log::error;
-use resalt_models::{Paginate, Preferences, StorageImpl, User};
+use resalt_models::{Paginate, Preferences, User};
 use resalt_security::hash_password;
 use resalt_storage::Storage;
 
@@ -46,7 +46,7 @@ pub fn get_user_by_username(data: &Storage, username: &str) -> Result<Option<Use
 }
 
 pub fn update_user(data: &Storage, user: &User) -> Result<(), StatusCode> {
-    data.update_user(user).map_err(|e| {
+    data.set_user(user).map_err(|e| {
         error!("api.update_user {:?}", e);
         StatusCode::INTERNAL_SERVER_ERROR
     })
