@@ -1,6 +1,6 @@
 use crate::{
     AuthToken, Event, Filter, Job, JobReturn, JobSort, Minion, MinionPreset, MinionSort, Paginate,
-    PermissionGroup, Preferences, ResaltTime, SaltToken, User,
+    PermissionGroup, ResaltTime, SaltToken, User,
 };
 
 pub trait StorageImpl: Send + Sync {
@@ -12,15 +12,15 @@ pub trait StorageImpl: Send + Sync {
 
     // Extremely generic KV operations
 
-    // fn get(&self, key: &str) -> Result<Option<String>, String>;
+    fn get(&self, key: &str) -> Result<Option<String>, String>;
 
-    // fn set(&self, key: &str, value: &str) -> Result<(), String>;
+    fn set(&self, key: &str, value: &str) -> Result<(), String>;
 
-    // fn delete(&self, key: &str) -> Result<(), String>;
+    fn delete(&self, key: &str) -> Result<(), String>;
 
-    // fn list(&self, prefix: &str) -> Result<Vec<String>, String>;
+    fn list(&self, prefix: &str) -> Result<Vec<String>, String>;
 
-    // fn list_prefix(&self, prefix: &str) -> Result<Vec<String>, String>;
+    // High-level operations
 
     fn get_status(&self) -> Result<StorageStatus, String>;
 
@@ -53,10 +53,6 @@ pub trait StorageImpl: Send + Sync {
     fn update_user(&self, user: &User) -> Result<(), String>;
 
     fn delete_user(&self, id: &str) -> Result<(), String>;
-
-    fn upsert_preferences(&self, user_id: &str, preferences: &Preferences) -> Result<(), String>;
-
-    fn get_preferences(&self, user_id: &str) -> Result<Option<Preferences>, String>;
 
     /// Create a new auth token.
     ///

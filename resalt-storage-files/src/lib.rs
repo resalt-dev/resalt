@@ -31,7 +31,12 @@ impl StorageFiles {
         Ok(storage)
     }
 
-    fn save_file(&self, path: &str, data: &impl Serialize) -> Result<(), String> {
+    fn save_file_json(&self, path: &str, data: &impl Serialize) -> Result<(), String> {
+        let serialized_data = serde_json::to_string_pretty(data).map_err(|e| format!("{:?}", e))?;
+        self.save_file(path, &serialized_data)
+    }
+
+    fn save_file(&self, path: &str, data: &str) -> Result<(), String> {
         let path = format!("{}/{}.json", self.path, path);
 
         // Create parent folders if does not exist
@@ -50,9 +55,8 @@ impl StorageFiles {
 
         // Write file
         debug!("Writing file: {}", path);
-        let serialized_data = serde_json::to_string_pretty(data).map_err(|e| format!("{:?}", e))?;
         let mut file = std::fs::File::create(path.clone()).map_err(|e| format!("{:?}", e))?;
-        file.write_all(serialized_data.as_bytes())
+        file.write_all(data.as_bytes())
             .map_err(|e| format!("{:?}", e))?;
         Ok(())
     }
@@ -108,6 +112,35 @@ impl StorageFiles {
 impl StorageImpl for StorageFiles {
     fn clone(&self) -> Box<dyn StorageImpl> {
         Box::new(Clone::clone(self))
+    }
+
+    fn get(&self, key: &str) -> Result<Option<String>, String> {
+        let path = format!("kv/{}", key);
+        let exists = self.check_file_exists(&path)?;
+        if !exists {
+            return Ok(None);
+        }
+
+        let value: String = self.load_file(&path)?;
+        Ok(Some(value))
+    }
+
+    fn set(&self, key: &str, value: &str) -> Result<(), String> {
+        let path = format!("kv/{}", key);
+        self.save_file(&path, value)?;
+        Ok(())
+    }
+
+    fn delete(&self, key: &str) -> Result<(), String> {
+        let path = format!("kv/{}", key);
+        self.delete_file(&path)?;
+        Ok(())
+    }
+
+    fn list(&self, prefix: &str) -> Result<Vec<String>, String> {
+        let path = format!("kv/{}", prefix);
+        let keys = self.list_file_names(&path)?;
+        Ok(keys)
     }
 
     fn get_status(&self) -> Result<StorageStatus, String> {
@@ -199,7 +232,7 @@ impl StorageImpl for StorageFiles {
         };
 
         let path = format!("users/{}", id);
-        self.save_file(&path, &user)?;
+        self.save_file_json(&path, &user)?;
 
         Ok(user)
     }
@@ -263,7 +296,7 @@ impl StorageImpl for StorageFiles {
 
     fn update_user(&self, user: &User) -> Result<(), String> {
         let path = format!("users/{}", user.id);
-        self.save_file(&path, user)?;
+        self.save_file_json(&path, user)?;
         Ok(())
     }
 
@@ -271,27 +304,6 @@ impl StorageImpl for StorageFiles {
         let path = format!("users/{}", id);
         self.delete_file(&path)?;
         Ok(())
-    }
-
-    ////////////////////////
-    /// User Preferences ///
-    ////////////////////////
-
-    fn upsert_preferences(&self, user_id: &str, preferences: &Preferences) -> Result<(), String> {
-        let path = format!("users_preferences/{}", user_id);
-        self.save_file(&path, preferences)?;
-        Ok(())
-    }
-
-    fn get_preferences(&self, user_id: &str) -> Result<Option<Preferences>, String> {
-        let path = format!("users_preferences/{}", user_id);
-        let exists = self.check_file_exists(&path)?;
-        if !exists {
-            return Ok(None);
-        }
-
-        let preferences: Preferences = self.load_file(&path)?;
-        Ok(Some(preferences))
     }
 
     ///////////////////
@@ -315,7 +327,7 @@ impl StorageImpl for StorageFiles {
 
         // Save authtoken
         let path = format!("authtokens/{}", id);
-        self.save_file(&path, &authtoken)?;
+        self.save_file_json(&path, &authtoken)?;
 
         // Update user's last_login
         user.last_login = Some(authtoken.timestamp);
@@ -348,7 +360,7 @@ impl StorageImpl for StorageFiles {
         // Update authtoken with salt_token
         authtoken.salt_token = salt_token.cloned();
         let path = format!("authtokens/{}", auth_token);
-        self.save_file(&path, &authtoken)?;
+        self.save_file_json(&path, &authtoken)?;
 
         Ok(())
     }
@@ -426,7 +438,7 @@ impl StorageImpl for StorageFiles {
     fn upsert_minion(&self, minion: Minion) -> Result<(), String> {
         // Update if it exists, insert if it doesn't
         let path = format!("minions/{}", minion.id);
-        self.save_file(&path, &minion)?;
+        self.save_file_json(&path, &minion)?;
 
         Ok(())
     }
@@ -438,7 +450,7 @@ impl StorageImpl for StorageFiles {
         };
         minion.last_seen = time;
         let path = format!("minions/{}", minion_id);
-        self.save_file(&path, &minion)?;
+        self.save_file_json(&path, &minion)?;
         Ok(())
     }
 
@@ -457,7 +469,7 @@ impl StorageImpl for StorageFiles {
         minion.grains = Some(grains);
         minion.os_type = Some(os_type);
         let path = format!("minions/{}", minion_id);
-        self.save_file(&path, &minion)?;
+        self.save_file_json(&path, &minion)?;
         Ok(())
     }
 
@@ -474,7 +486,7 @@ impl StorageImpl for StorageFiles {
         minion.last_updated_pillars = Some(time);
         minion.pillars = Some(pillars);
         let path = format!("minions/{}", minion_id);
-        self.save_file(&path, &minion)?;
+        self.save_file_json(&path, &minion)?;
         Ok(())
     }
 
@@ -491,7 +503,7 @@ impl StorageImpl for StorageFiles {
         minion.last_updated_pkgs = Some(time);
         minion.pkgs = Some(pkgs);
         let path = format!("minions/{}", minion_id);
-        self.save_file(&path, &minion)?;
+        self.save_file_json(&path, &minion)?;
         Ok(())
     }
 
@@ -514,7 +526,7 @@ impl StorageImpl for StorageFiles {
         minion.conformity_incorrect = Some(incorrect);
         minion.conformity_error = Some(error);
         let path = format!("minions/{}", minion_id);
-        self.save_file(&path, &minion)?;
+        self.save_file_json(&path, &minion)?;
         Ok(())
     }
 
@@ -544,7 +556,7 @@ impl StorageImpl for StorageFiles {
         };
 
         let path = format!("events/{}", id);
-        self.save_file(&path, &event)?;
+        self.save_file_json(&path, &event)?;
 
         Ok(id)
     }
@@ -608,7 +620,7 @@ impl StorageImpl for StorageFiles {
         };
 
         let path = format!("jobs/{}", jid);
-        self.save_file(&path, &job)?;
+        self.save_file_json(&path, &job)?;
 
         Ok(())
     }
@@ -680,7 +692,7 @@ impl StorageImpl for StorageFiles {
         };
 
         let path = format!("job_returns/{}", id);
-        self.save_file(&path, &job_return)?;
+        self.save_file_json(&path, &job_return)?;
 
         Ok(())
     }
@@ -722,7 +734,7 @@ impl StorageImpl for StorageFiles {
         };
 
         let path = format!("permission_groups/{}", id);
-        self.save_file(&path, &permission_group)?;
+        self.save_file_json(&path, &permission_group)?;
 
         Ok(id)
     }
@@ -775,7 +787,7 @@ impl StorageImpl for StorageFiles {
 
     fn update_permission_group(&self, permission_group: &PermissionGroup) -> Result<(), String> {
         let path = format!("permission_groups/{}", permission_group.id);
-        self.save_file(&path, permission_group)?;
+        self.save_file_json(&path, permission_group)?;
         Ok(())
     }
 
@@ -787,7 +799,7 @@ impl StorageImpl for StorageFiles {
 
     fn insert_permission_group_user(&self, user_id: &str, group_id: &str) -> Result<(), String> {
         let path = format!("permission_group_user/{}/{}", user_id, group_id);
-        self.save_file(&path, &())?;
+        self.save_file_json(&path, &())?;
         Ok(())
     }
 
@@ -858,7 +870,7 @@ impl StorageImpl for StorageFiles {
         };
 
         let path = format!("minion_presets/{}", id);
-        self.save_file(&path, &minion_preset)?;
+        self.save_file_json(&path, &minion_preset)?;
 
         Ok(id)
     }
@@ -894,7 +906,7 @@ impl StorageImpl for StorageFiles {
 
     fn update_minion_preset(&self, minion_preset: &MinionPreset) -> Result<(), String> {
         let path = format!("minion_presets/{}", minion_preset.id);
-        self.save_file(&path, minion_preset)?;
+        self.save_file_json(&path, minion_preset)?;
         Ok(())
     }
 

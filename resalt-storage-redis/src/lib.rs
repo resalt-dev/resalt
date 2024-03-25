@@ -32,6 +32,30 @@ impl StorageImpl for StorageRedis {
         Box::new(Clone::clone(self))
     }
 
+    fn get(&self, key: &str) -> Result<Option<String>, String> {
+        let mut connection = self.create_connection()?;
+        let value: Option<String> = connection.get(key).map_err(|e| format!("{:?}", e))?;
+        Ok(value)
+    }
+
+    fn set(&self, key: &str, value: &str) -> Result<(), String> {
+        let mut connection = self.create_connection()?;
+        connection.set(key, value).map_err(|e| format!("{:?}", e))?;
+        Ok(())
+    }
+
+    fn delete(&self, key: &str) -> Result<(), String> {
+        let mut connection = self.create_connection()?;
+        connection.del(key).map_err(|e| format!("{:?}", e))?;
+        Ok(())
+    }
+
+    fn list(&self, prefix: &str) -> Result<Vec<String>, String> {
+        let mut connection = self.create_connection()?;
+        let keys: Vec<String> = connection.keys(prefix).map_err(|e| format!("{:?}", e))?;
+        Ok(keys)
+    }
+
     fn get_status(&self) -> Result<StorageStatus, String> {
         //        let mut connection = self.create_connection()?;
 
@@ -217,38 +241,6 @@ impl StorageImpl for StorageRedis {
             .del(format!("user:{}", id))
             .map_err(|e| format!("{:?}", e))?;
         Ok(())
-    }
-
-    ////////////////////////
-    /// User Preferences ///
-    ////////////////////////
-
-    fn upsert_preferences(&self, user_id: &str, preferences: &Preferences) -> Result<(), String> {
-        let mut connection = self.create_connection()?;
-        let preferences_json =
-            serde_json::to_string(preferences).map_err(|e| format!("{:?}", e))?;
-        connection
-            .set(format!("user_preferences:{}", user_id), &preferences_json)
-            .map_err(|e| format!("{:?}", e))?;
-        Ok(())
-    }
-
-    fn get_preferences(&self, user_id: &str) -> Result<Option<Preferences>, String> {
-        let mut connection = self.create_connection()?;
-        // If user preferences doesn't exist, return None
-        if !connection
-            .exists(format!("user_preferences:{}", user_id).as_str())
-            .map_err(|e| format!("{:?}", e))?
-        {
-            return Ok(None);
-        }
-
-        let preferences_json: String = connection
-            .get(format!("user_preferences:{}", user_id))
-            .map_err(|e| format!("{:?}", e))?;
-        let preferences: Preferences =
-            serde_json::from_str(preferences_json.as_str()).map_err(|e| format!("{:?}", e))?;
-        Ok(Some(preferences))
     }
 
     ///////////////////

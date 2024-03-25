@@ -64,7 +64,7 @@ pub fn update_preferences(
     user_id: &str,
     preferences: &Preferences,
 ) -> Result<(), StatusCode> {
-    data.upsert_preferences(user_id, preferences).map_err(|e| {
+    data.set_preferences(user_id, preferences).map_err(|e| {
         error!("api.update_preferences {:?}", e);
         StatusCode::INTERNAL_SERVER_ERROR
     })

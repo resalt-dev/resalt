@@ -1,8 +1,11 @@
+use std::collections::HashMap;
+
 use log::{debug, error};
 use resalt_config::ResaltConfig;
 use resalt_models::*;
 use resalt_storage_files::StorageFiles;
 use resalt_storage_redis::StorageRedis;
+use serde::Serialize;
 use serde_json::Value;
 
 #[derive(Clone)]
@@ -105,7 +108,13 @@ impl Storage {
             }
         }
         let perms = Value::Array(perms);
-        let perms = serde_json::to_string(&perms).unwrap();
+        let perms = match serde_json::to_string(&perms) {
+            Ok(perms) => perms,
+            Err(e) => {
+                error!("{:?}", e);
+                return Err(e.to_string());
+            }
+        };
         let mut user: User = match self.get_user_by_id(user_id) {
             Ok(Some(user)) => user,
             Ok(None) => {
@@ -126,11 +135,112 @@ impl Storage {
             }
         }
     }
+
+    fn obj_to_map(&self, obj: &impl Serialize) -> Result<HashMap<String, String>, String> {
+        let obj = match serde_json::to_value(obj) {
+            Ok(value) => value,
+            Err(e) => return Err(e.to_string()),
+        };
+        let obj = match obj.as_object() {
+            Some(obj) => obj,
+            None => return Err("Object is not a map".to_string()),
+        };
+        let mut map: HashMap<String, String> = HashMap::new();
+        for (key, value) in obj.iter() {
+            map.insert(key.clone(), value.to_string());
+        }
+        Ok(map)
+    }
+
+    fn save_object(&self, prefix: &str, obj: &impl Serialize) -> Result<(), String> {
+        let map = match self.obj_to_map(obj) {
+            Ok(map) => map,
+            Err(e) => return Err(e),
+        };
+        for (key, value) in map.iter() {
+            match self.set(&format!("{}:{}", prefix, key), value) {
+                Ok(_) => (),
+                Err(e) => return Err(e),
+            }
+        }
+        Ok(())
+    }
+
+    fn read_map(&self, prefix: &str) -> Result<Option<HashMap<String, String>>, String> {
+        let keys = match self.list(&format!("{}:*", prefix)) {
+            Ok(keys) => keys,
+            Err(e) => return Err(e),
+        };
+        if keys.is_empty() {
+            return Ok(None);
+        }
+        let mut map: HashMap<String, String> = HashMap::new();
+        for key in keys {
+            let value = match self.get(&key) {
+                Ok(value) => value,
+                Err(e) => return Err(e),
+            };
+            let value = match value {
+                Some(value) => value,
+                None => continue,
+            };
+            let key = key.replace(&format!("{}:", prefix), "");
+            map.insert(key, value);
+        }
+        Ok(Some(map))
+    }
+
+    fn read_object<T: serde::de::DeserializeOwned>(
+        &self,
+        prefix: &str,
+    ) -> Result<Option<T>, String> {
+        let map = match self.read_map(prefix) {
+            Ok(map) => map,
+            Err(e) => return Err(e),
+        };
+        let map = match map {
+            Some(map) => map,
+            None => return Ok(None),
+        };
+        let obj = match serde_json::to_value(map) {
+            Ok(obj) => obj,
+            Err(e) => return Err(e.to_string()),
+        };
+        let obj = match serde_json::from_value(obj) {
+            Ok(obj) => obj,
+            Err(e) => return Err(e.to_string()),
+        };
+        Ok(Some(obj))
+    }
+
+    pub fn get_preferences(&self, user_id: &str) -> Result<Option<Preferences>, String> {
+        self.read_object(&format!("user:{}:preferences", user_id))
+    }
+
+    pub fn set_preferences(&self, user_id: &str, preferences: &Preferences) -> Result<(), String> {
+        self.save_object(&format!("user:{}:preferences", user_id), preferences)
+    }
 }
 
 impl StorageImpl for Storage {
     fn clone(&self) -> Box<dyn StorageImpl> {
         Box::new(Clone::clone(self))
+    }
+
+    fn get(&self, key: &str) -> Result<Option<String>, String> {
+        self.storage.get(key)
+    }
+
+    fn set(&self, key: &str, value: &str) -> Result<(), String> {
+        self.storage.set(key, value)
+    }
+
+    fn delete(&self, key: &str) -> Result<(), String> {
+        self.storage.delete(key)
+    }
+
+    fn list(&self, key: &str) -> Result<Vec<String>, String> {
+        self.storage.list(key)
     }
 
     fn get_status(&self) -> Result<StorageStatus, String> {
@@ -164,14 +274,6 @@ impl StorageImpl for Storage {
 
     fn update_user(&self, user: &User) -> Result<(), String> {
         self.storage.update_user(user)
-    }
-
-    fn upsert_preferences(&self, user_id: &str, preferences: &Preferences) -> Result<(), String> {
-        self.storage.upsert_preferences(user_id, preferences)
-    }
-
-    fn get_preferences(&self, user_id: &str) -> Result<Option<Preferences>, String> {
-        self.storage.get_preferences(user_id)
     }
 
     fn delete_user(&self, id: &str) -> Result<(), String> {
