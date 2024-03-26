@@ -34,7 +34,7 @@ pub async fn renew_token_salt_token(
     };
 
     // Update token with salt session
-    match data.update_authtoken_salttoken(auth_token, Some(&salt_token)) {
+    match data.set_authtoken_salttoken(auth_token, Some(&salt_token)) {
         Ok(_) => {}
         Err(e) => {
             error!("update_token_salt_token update_salttoken {:?}", e);
@@ -86,10 +86,10 @@ pub fn validate_auth_token(data: &Storage, token: &str) -> Result<Option<AuthSta
     };
 
     Ok(Some(AuthStatus {
-        user_id: authtoken.user_id,
+        user_id: authtoken.user_id.clone(),
         perms: user.perms,
-        auth_token: authtoken.id,
-        salt_token: authtoken.salt_token,
+        auth_token: authtoken.id.clone(),
+        salt_token: authtoken.salt_token(),
     }))
 }
 

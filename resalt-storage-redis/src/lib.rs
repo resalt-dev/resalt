@@ -49,9 +49,9 @@ impl StorageImpl for StorageRedis {
         Ok(())
     }
 
-    fn keys(&self, prefix: &str) -> Result<Vec<String>, String> {
+    fn keys(&self, pattern: &str) -> Result<Vec<String>, String> {
         let mut connection = self.create_connection()?;
-        let keys: Vec<String> = connection.keys(prefix).map_err(|e| format!("{:?}", e))?;
+        let keys: Vec<String> = connection.keys(pattern).map_err(|e| format!("{:?}", e))?;
         Ok(keys)
     }
 }

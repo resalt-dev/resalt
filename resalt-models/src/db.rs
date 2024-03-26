@@ -11,9 +11,23 @@ use serde_json::{json, Value};
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct AuthToken {
     pub id: String,
+    #[serde(rename = "userId")]
     pub user_id: String,
     pub timestamp: ResaltTime,
-    pub salt_token: Option<SaltToken>,
+    #[serde(rename = "saltToken")]
+    pub salt_token_str: Option<String>,
+}
+
+impl AuthToken {
+    pub fn salt_token(&self) -> Option<SaltToken> {
+        match &self.salt_token_str {
+            Some(salt_token) => match serde_json::from_str(salt_token) {
+                Ok(salt_token) => Some(salt_token),
+                Err(_) => None,
+            },
+            None => None,
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -22,38 +36,6 @@ pub struct Event {
     pub timestamp: ResaltTime,
     pub tag: String,
     pub data: String,
-}
-
-impl Event {
-    pub fn hash(&self) -> Vec<(&str, String)> {
-        let values = Vec::from([
-            (
-                "timestamp",
-                self.timestamp.format("%Y-%m-%d %H:%M:%S").to_string(),
-            ),
-            ("tag", self.tag.clone()),
-            ("data", self.data.clone()),
-        ]);
-        values
-    }
-
-    pub fn dehash(id: String, values: Vec<(String, String)>) -> Self {
-        let mut event = Event {
-            id,
-            timestamp: ResaltTime::default(),
-            tag: "".to_string(),
-            data: "".to_string(),
-        };
-        for (key, value) in values {
-            match key.as_str() {
-                "timestamp" => event.timestamp = ResaltTime::parse_from_rfc3339(&value).unwrap(),
-                "tag" => event.tag = value,
-                "data" => event.data = value,
-                _ => (),
-            }
-        }
-        event
-    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]

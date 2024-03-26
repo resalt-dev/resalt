@@ -1,6 +1,6 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
-use log::{debug, error};
+use log::*;
 use resalt_config::ResaltConfig;
 use resalt_models::*;
 use resalt_storage_files::StorageFiles;
@@ -89,6 +89,7 @@ impl Storage {
                 return Err(e);
             }
         };
+        info!("Groups: {:?}", groups);
         let mut perms: Vec<Value> = Vec::new();
         for group in groups {
             // Parse group.perms as json array
@@ -147,7 +148,15 @@ impl Storage {
         };
         let mut map: HashMap<String, String> = HashMap::new();
         for (key, value) in obj.iter() {
-            map.insert(key.clone(), value.to_string());
+            // Value to string. If string, unquoted, if number, unquoted, etc.
+            let converted_value = match value {
+                Value::String(value) => value.to_string(),
+                Value::Number(value) => value.to_string(),
+                Value::Bool(value) => value.to_string(),
+                Value::Null => continue,
+                _ => value.to_string(),
+            };
+            map.insert(key.clone(), converted_value);
         }
         Ok(map)
     }
@@ -194,6 +203,7 @@ impl Storage {
         &self,
         prefix: &str,
     ) -> Result<Option<T>, String> {
+        info!("Reading object: {}", prefix);
         let map = match self.read_map(prefix) {
             Ok(map) => map,
             Err(e) => return Err(e),
@@ -213,23 +223,39 @@ impl Storage {
         Ok(Some(obj))
     }
 
-    fn id(prefix: &str) -> String {
-        format!("{}_{}", prefix, uuid::Uuid::new_v4())
-    }
-
-    fn keys_depth(&self, prefix: &str, depth: usize) -> Result<Vec<String>, String> {
+    fn delete_object(&self, prefix: &str) -> Result<(), String> {
         let keys = match self.s.keys(&format!("{}:*", prefix)) {
             Ok(keys) => keys,
             Err(e) => return Err(e),
         };
-        let mut result: Vec<String> = Vec::new();
         for key in keys {
-            let key = key.replace(&format!("{}:", prefix), "");
-            if key.split(':').count() == depth {
-                result.push(key);
+            match self.s.del(&key) {
+                Ok(_) => (),
+                Err(e) => return Err(e),
             }
         }
-        Ok(result)
+        Ok(())
+    }
+
+    fn id(prefix: &str) -> String {
+        format!("{}_{}", prefix, uuid::Uuid::new_v4())
+    }
+
+    fn keys_depth(&self, pattern: &str, depth: usize) -> Result<Vec<String>, String> {
+        let keys = match self.s.keys(pattern) {
+            Ok(keys) => keys,
+            Err(e) => return Err(e),
+        };
+        debug!("Keys({}): {:?}", pattern, keys);
+        let mut result: HashSet<String> = HashSet::new();
+        for key in keys {
+            let parts = key.split(':');
+            if depth <= parts.clone().count() {
+                result.insert(parts.take(depth).collect::<Vec<&str>>().join(":"));
+            }
+        }
+        debug!("Keys({:?}:{}): {:?}", pattern, depth, result);
+        Ok(result.into_iter().collect())
     }
 
     //
@@ -445,7 +471,7 @@ impl Storage {
     }
 
     pub fn delete_permission_group(&self, id: &str) -> Result<(), String> {
-        match self.s.del(&format!("permission_group:{}", id)) {
+        match self.delete_object(&format!("permission_group:{}", id)) {
             Ok(_) => Ok(()),
             Err(e) => Err(e),
         }
@@ -487,7 +513,7 @@ impl Storage {
         &self,
         user_id: &str,
     ) -> Result<Vec<PermissionGroup>, String> {
-        let keys = match self.keys_depth("permission_group_user:*", 2) {
+        let keys = match self.keys_depth("permission_group_user:*", 3) {
             Ok(keys) => keys,
             Err(e) => return Err(e),
         };
@@ -564,7 +590,7 @@ impl Storage {
         group_id: &str,
     ) -> Result<(), String> {
         let key = format!("permission_group_user:{}:{}", user_id, group_id);
-        match self.s.del(&key) {
+        match self.delete_object(&key) {
             Ok(_) => Ok(()),
             Err(e) => Err(e),
         }
@@ -625,7 +651,9 @@ impl Storage {
     }
 
     pub fn set_minion_last_seen(&self, minion_id: &str, time: ResaltTime) -> Result<(), String> {
-        let key = format!("minion:{}:last_seen", minion_id);
+        let key = format!("minion:{}:id", minion_id);
+        self.s.set(&key, &minion_id)?;
+        let key = format!("minion:{}:lastSeen", minion_id);
         self.s.set(&key, &time.to_string())
     }
 
@@ -636,11 +664,12 @@ impl Storage {
         grains: String,
         os_type: String,
     ) -> Result<(), String> {
+        self.set_minion_last_seen(minion_id, time)?;
         let key = format!("minion:{}:grains", minion_id);
         self.s.set(&key, &grains)?;
-        let key = format!("minion:{}:os_type", minion_id);
+        let key = format!("minion:{}:osType", minion_id);
         self.s.set(&key, &os_type)?;
-        let key = format!("minion:{}:grains_time", minion_id);
+        let key = format!("minion:{}:lastUpdatedGrains", minion_id);
         self.s.set(&key, &time.to_string())
     }
 
@@ -650,9 +679,10 @@ impl Storage {
         time: ResaltTime,
         pillars: String,
     ) -> Result<(), String> {
+        self.set_minion_last_seen(minion_id, time)?;
         let key = format!("minion:{}:pillars", minion_id);
         self.s.set(&key, &pillars)?;
-        let key = format!("minion:{}:pillars_time", minion_id);
+        let key = format!("minion:{}:lastUpdatedPillars", minion_id);
         self.s.set(&key, &time.to_string())
     }
 
@@ -662,9 +692,10 @@ impl Storage {
         time: ResaltTime,
         pkgs: String,
     ) -> Result<(), String> {
+        self.set_minion_last_seen(minion_id, time)?;
         let key = format!("minion:{}:pkgs", minion_id);
         self.s.set(&key, &pkgs)?;
-        let key = format!("minion:{}:pkgs_time", minion_id);
+        let key = format!("minion:{}:lastUpdatedPkgs", minion_id);
         self.s.set(&key, &time.to_string())
     }
 
@@ -677,20 +708,21 @@ impl Storage {
         incorrect: i32,
         error: i32,
     ) -> Result<(), String> {
+        self.set_minion_last_seen(minion_id, time)?;
         let key = format!("minion:{}:conformity", minion_id);
         self.s.set(&key, &conformity)?;
-        let key = format!("minion:{}:conformity_time", minion_id);
+        let key = format!("minion:{}:lastUpdatedConformity", minion_id);
         self.s.set(&key, &time.to_string())?;
-        let key = format!("minion:{}:conformity_success", minion_id);
+        let key = format!("minion:{}:conformitySuccess", minion_id);
         self.s.set(&key, &success.to_string())?;
-        let key = format!("minion:{}:conformity_incorrect", minion_id);
+        let key = format!("minion:{}:conformityIncorrect", minion_id);
         self.s.set(&key, &incorrect.to_string())?;
-        let key = format!("minion:{}:conformity_error", minion_id);
+        let key = format!("minion:{}:conformityError", minion_id);
         self.s.set(&key, &error.to_string())
     }
 
     pub fn delete_minion(&self, id: &str) -> Result<(), String> {
-        match self.s.del(&format!("minion:{}", id)) {
+        match self.delete_object(&format!("minion:{}", id)) {
             Ok(_) => Ok(()),
             Err(e) => Err(e),
         }
@@ -730,7 +762,7 @@ impl Storage {
     }
 
     pub fn delete_minion_preset(&self, id: &str) -> Result<(), String> {
-        match self.s.del(&format!("minion_preset:{}", id)) {
+        match self.delete_object(&format!("minion_preset:{}", id)) {
             Ok(_) => Ok(()),
             Err(e) => Err(e),
         }
@@ -818,12 +850,14 @@ impl Storage {
     }
 
     pub fn set_user_last_login(&self, user_id: &str, time: ResaltTime) -> Result<(), String> {
-        let key = format!("user:{}:last_login", user_id);
+        let key = format!("user:{}:id", user_id);
+        self.s.set(&key, &user_id)?;
+        let key = format!("user:{}:lastLogin", user_id);
         self.s.set(&key, &time.to_string())
     }
 
     pub fn delete_user(&self, id: &str) -> Result<(), String> {
-        match self.s.del(&format!("user:{}", id)) {
+        match self.delete_object(&format!("user:{}", id)) {
             Ok(_) => Ok(()),
             Err(e) => Err(e),
         }
@@ -867,10 +901,10 @@ impl Storage {
     /// If user does not exist, this function will return an error.
     pub fn create_authtoken(&self, user_id: String) -> Result<AuthToken, String> {
         let auth_token = AuthToken {
-            id: Storage::id("autht"),
+            id: Storage::id("auth"),
             user_id,
             timestamp: ResaltTime::now(),
-            salt_token: None,
+            salt_token_str: None,
         };
         self.save_object(&format!("auth_token:{}", auth_token.id), &auth_token)?;
 
@@ -884,18 +918,24 @@ impl Storage {
         self.read_object(&format!("auth_token:{}", id))
     }
 
-    pub fn update_authtoken_salttoken(
+    pub fn set_authtoken_salttoken(
         &self,
         auth_token: &str,
         salt_token: Option<&SaltToken>,
     ) -> Result<(), String> {
+        // Check if auth token exists
+        let key = format!("auth_token:{}:id", auth_token);
+        if self.s.get(&key).unwrap_or_else(|_| None).is_none() {
+            return Err("Auth token does not exist".to_string());
+        }
+
         let salt_token_str = salt_token
             .as_ref()
             .map(|st| serde_json::to_string(st).unwrap());
 
         // Update authtoken with salt_token
         self.s.set(
-            &format!("auth_token:{}:salt_token", auth_token),
+            &format!("auth_token:{}:saltToken", auth_token),
             &salt_token_str.unwrap_or_else(|| "".to_string()),
         )
     }

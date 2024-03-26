@@ -7,3 +7,4 @@ publish.workspace = true
 [dependencies]
 log = { workspace = true }
 resalt-models = { path = "../resalt-models" }
+regex = { workspace = true }

@@ -8,11 +8,6 @@ use std::io::{Read, Write};
 /// Structure:
 /// e.g. PATH=./files
 ///
-/// ./files/users/<user_id>.json
-/// ./files/authtokens/<authtoken_id>.json
-/// ./files/minions/<minion_id>.json
-/// ./files/events/<event_id>.json
-/// etc.
 
 #[derive(Clone)]
 pub struct StorageFiles {
@@ -30,7 +25,7 @@ impl StorageFiles {
     }
 
     fn save_file_string(&self, path: &str, data: &str) -> Result<(), String> {
-        let path = format!("{}/{}.json", self.path, path);
+        let path = format!("{}/{}.data", self.path, path);
 
         // Create parent folders if does not exist
         let parts = path.split('/').collect::<Vec<&str>>();
@@ -47,7 +42,7 @@ impl StorageFiles {
         }
 
         // Write file
-        debug!("Writing file: {}", path);
+        // debug!("Writing file: {}", path);
         let mut file = std::fs::File::create(path.clone()).map_err(|e| format!("{:?}", e))?;
         file.write_all(data.as_bytes())
             .map_err(|e| format!("{:?}", e))?;
@@ -55,7 +50,7 @@ impl StorageFiles {
     }
 
     fn load_file_string(&self, path: &str) -> Result<String, String> {
-        let path = format!("{}/{}.json", self.path, path);
+        let path = format!("{}/{}.data", self.path, path);
         let mut file = std::fs::File::open(path).map_err(|e| format!("{:?}", e))?;
         let mut data = String::new();
         file.read_to_string(&mut data)
@@ -64,8 +59,8 @@ impl StorageFiles {
     }
 
     fn check_file_exists(&self, path: &str) -> Result<bool, String> {
-        let path = format!("{}/{}.json", self.path, path);
-        debug!("Checking if file exists: {}", path);
+        let path = format!("{}/{}.data", self.path, path);
+        // debug!("Checking if file exists: {}", path);
         let exists = std::path::Path::new(&path).exists();
         Ok(exists)
     }
@@ -85,14 +80,14 @@ impl StorageFiles {
                 .file_name()
                 .into_string()
                 .map_err(|e| format!("{:?}", e))?;
-            let file_name = file_name.trim_end_matches(".json").to_string();
+            let file_name = file_name.trim_end_matches(".data").to_string();
             file_names.push(file_name);
         }
         Ok(file_names)
     }
 
     fn delete_file(&self, path: &str) -> Result<(), String> {
-        let path = format!("{}/{}.json", self.path, path);
+        let path = format!("{}/{}.data", self.path, path);
         std::fs::remove_file(path).map_err(|e| format!("{:?}", e))?;
         Ok(())
     }
@@ -126,9 +121,14 @@ impl StorageImpl for StorageFiles {
         Ok(())
     }
 
-    fn keys(&self, prefix: &str) -> Result<Vec<String>, String> {
-        let path = format!("kv/{}", prefix);
-        let keys = self.list_file_names(&path)?;
+    fn keys(&self, pattern: &str) -> Result<Vec<String>, String> {
+        let keys = self.list_file_names("kv")?;
+        let pattern = pattern.replace("*", ".*");
+        let regex = regex::Regex::new(&pattern).map_err(|e| format!("{:?}", e))?;
+        let keys = keys
+            .into_iter()
+            .filter(|key| regex.is_match(key))
+            .collect::<Vec<String>>();
         Ok(keys)
     }
 }
