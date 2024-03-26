@@ -10,7 +10,7 @@ import {
 } from '@fluentui/react-components';
 import { CSSProperties } from 'react';
 
-const useStyles = makeStyles({
+export const useTerminalStyles = makeStyles({
 	card: {
 		backgroundColor: 'black',
 		...shorthands.padding('0'),
@@ -46,7 +46,7 @@ export function TerminalCard(props: {
 	collapsed: boolean;
 	toggleCollapsed: () => void;
 }) {
-	const styles = useStyles();
+	const styles = useTerminalStyles();
 	return (
 		<Card className={mergeClasses(styles.card, props.className)} style={props.style}>
 			<CardHeader
