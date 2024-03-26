@@ -82,6 +82,17 @@ where
     }
 }
 
+pub fn de_string_as_option_i32<'de, D>(de: D) -> Result<Option<i32>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let opt = Option::<String>::deserialize(de)?;
+    match opt.as_deref() {
+        None | Some("") => Ok(None),
+        Some(s) => s.parse::<i32>().map_err(serde::de::Error::custom).map(Some),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

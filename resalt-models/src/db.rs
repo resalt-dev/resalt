@@ -1,4 +1,4 @@
-use crate::{ResaltTime, SaltToken};
+use crate::{de_string_as_option_i32, ResaltTime, SaltToken};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
@@ -76,11 +76,23 @@ pub struct Minion {
     #[serde(rename = "lastUpdatedPkgs")]
     pub last_updated_pkgs: Option<ResaltTime>,
     pub conformity: Option<String>,
-    #[serde(rename = "conformitySuccess")]
+    #[serde(
+        rename = "conformitySuccess",
+        deserialize_with = "de_string_as_option_i32",
+        default
+    )]
     pub conformity_success: Option<i32>,
-    #[serde(rename = "conformityIncorrect")]
+    #[serde(
+        rename = "conformityIncorrect",
+        deserialize_with = "de_string_as_option_i32",
+        default
+    )]
     pub conformity_incorrect: Option<i32>,
-    #[serde(rename = "conformityError")]
+    #[serde(
+        rename = "conformityError",
+        deserialize_with = "de_string_as_option_i32",
+        default
+    )]
     pub conformity_error: Option<i32>,
     #[serde(rename = "lastUpdatedConformity")]
     pub last_updated_conformity: Option<ResaltTime>,
