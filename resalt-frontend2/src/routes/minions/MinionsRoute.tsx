@@ -382,7 +382,7 @@ export default function MinionsRoute(props: { toastController: ToastController }
 
 	function updateFilter(f: Filter, fieldType: string, newValue: string): void {
 		setFilters((filters) => {
-			const copy: Filter[] = structuredClone(filters);
+			const copy: Filter[] = filters.map(Filter.fromObject);
 			const foundFilters = copy.filter((f2) => f2.id === f.id);
 			console.log('Updating filter', f, copy);
 			if (foundFilters.length !== 1) {
